@@ -6,9 +6,12 @@ import { drawPiece } from '../../engine/js/pieces.js';
 import { drawChar, exprAt, hand, EXPR } from '../../engine/js/characters.js';
 import { placeStamp, nameTitle, counter, badge, stamp, healthBar, scoreboard, vsSplit, vsLabel, paper, mono, serif, sans } from '../../engine/js/hud.js';
 import { DotMap, ISO } from '../../engine/js/map.js';
+import { loadImage, photoCard } from '../../engine/js/photo.js';
 
 const GOC = await fetch('../engine/data/game_of_century.json').then(r => r.json());
 const map = await new DotMap().init();
+// real archival photos (free licenses, see photos/credits.json)
+const P = Object.fromEntries(await Promise.all(['fischer13', 'fischer1972', 'spassky1973', 'grave'].map(async k => [k, await loadImage(`../episodes/fischer/photos/${k}.jpg`)])));
 
 // ---------- shared pieces of staging ----------
 const B = new Board();
@@ -186,6 +189,7 @@ export async function build(T) {
   // S4 — New York 1956
   shot(s('ny'), (g, lt, t) => {
     woodRoom(g);
+    photoCard(g, P.fischer13, lt, -1, { x: 205, y: 470, w: 240, aspect: 0.95, rot: -0.035, style: 'frame', tone: 'sepia', fx: 0.42, fy: 0.42, credit: 'United Press · PD', zoom: [1.05, 1.12], dur: 3 });
     B.setCam({ yaw: -0.2 + lt * 0.03, pitch: 0.58, dist: 12.5 - lt * 0.15, fov: 1450, cy: H * 0.56, target: [4, 0, 4.6] });
     const hands = seated(g, B, 'bobby13', exprAt([[0, 'focus']], lt), t, { z: 9.4 });
     B.drawSlab(g, { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' }); hands();
@@ -198,11 +202,13 @@ export async function build(T) {
   shot(s('age'), (g, lt, t) => {
     woodRoom(g);
     camera(g, { zoom: lerp(1, 1.06, seg(lt, 0, 2.3)), fy: 760, t });
-    drawChar(g, 'bobby13', { x: W / 2, y: 760, s: 1.6, e: exprAt([[0, 'neutral'], [0.9, 'focus']], lt), t });
+    const ph = w('age', 'thirteen') - s('age') - 0.15;
+    drawChar(g, 'bobby13', { x: lerp(W / 2, 300, seg(lt, ph, ph + 0.45, ease.inOut)), y: 760, s: 1.6, e: exprAt([[0, 'neutral'], [0.9, 'focus']], lt), t });
+    photoCard(g, P.fischer13, lt, ph, { x: 790, y: 790, w: 400, aspect: 1.0, rot: 0.06, from: 'right', caption: 'BOBBY · APRIL 1956', credit: 'United Press · Public domain', fx: 0.4, fy: 0.42, zoom: [1.0, 1.1], dur: 2.5 });
     for (const [x, ty] of [[180, 'p'], [880, 'n'], [540, 'k']]) drawPiece(g, ty, 'w', x, 1500, 520, { blur: 14 });
     nameTitle(g, lt, 'Bobby Fischer', '13 YEARS OLD', { y: 210, t0: 0.05, subColor: C.gold });
   });
-  cue(w('age', 'thirteen'), 'tick', 0.8);
+  cue(w('age', 'thirteen'), 'tick', 0.8); cue(w('age', 'thirteen') - 0.15, 'whoosh', 0.6); cue(w('age', 'thirteen') + 0.2, 'shutter', 0.7);
 
   // S6a — against a master
   shot(s('queen'), (g, lt, t) => {
@@ -321,8 +327,9 @@ export async function build(T) {
     map.pin(g, 'Reykjavik', { color: C.blue, a: seg(lt, 1.2, 1.6), pulse: (lt * 0.8) % 1 });
     placeStamp(g, lt, 'Reykjavik', '1972', { y: 160, t0: 0.1 });
     badge(g, 'MATCH OF THE CENTURY', W / 2, 260, { color: C.red, size: 30, a: seg(t, w('rey', '1972'), w('rey', '1972') + 0.3) });
+    photoCard(g, P.fischer1972, lt, w('rey', '1972') - s('rey'), { x: 850, y: 1050, w: 260, aspect: 1.25, rot: 0.07, caption: 'FISCHER · 1972', credit: 'Anefo / Nationaal Archief · CC0', fx: 0.5, fy: 0.32, zoom: [1.0, 1.08], dur: 2 });
   }, { trans: 'leak' });
-  cue(s('rey'), 'whoosh', 0.9); cue(w('rey', '1972'), 'boom', 0.9);
+  cue(s('rey'), 'whoosh', 0.9); cue(w('rey', '1972'), 'boom', 0.9); cue(w('rey', '1972') + 0.1, 'shutter', 0.6);
 
   // S12 — Boris Spassky, World champion (VS)
   const vsT = s('spassky');
@@ -333,12 +340,14 @@ export async function build(T) {
     drawChar(g, 'spassky', { x: 290 - (1 - seg(lt, 0, 0.4, ease.out)) * 400, y: 860, s: 1.25, e: exprAt([[0, 'neutral'], [1.2, 'smug']], lt), t });
     drawChar(g, 'bobby72', { x: 800 + (1 - seg(lt, 0, 0.4, ease.out)) * 400, y: 860, s: 1.25, e: 'focus', t });
     vsLabel(g, lt, 0.15, W / 2, 520);
+    photoCard(g, P.spassky1973, lt, 0.35, { x: 175, y: 430, w: 220, aspect: 1.2, rot: -0.1, caption: 'SPASSKY', credit: 'Anefo · CC0', fx: 0.45, fy: 0.3, zoom: [1.15, 1.2] });
+    photoCard(g, P.fischer1972, lt, 0.55, { x: 905, y: 430, w: 220, aspect: 1.2, rot: 0.1, caption: 'FISCHER', credit: 'Anefo · CC0', fx: 0.5, fy: 0.3, zoom: [1.05, 1.1] });
     g.save(); g.font = serif(40, 700); g.textAlign = 'center'; g.fillStyle = C.cream;
     g.fillText('BORIS SPASSKY', 290, 1220); g.fillText('BOBBY FISCHER', 800, 1220);
     g.font = mono(22, 800); g.letterSpacing = '4px'; g.fillStyle = C.red; g.fillText('USSR', 290, 1258); g.fillStyle = C.blue; g.fillText('USA', 800, 1258); g.restore();
     healthBar(g, 'Boris Spassky', 'WORLD CHAMPION', 1, { y: 170, a: seg(t, w('spassky', 'World') - 0.1, w('spassky', 'World') + 0.2) });
   }, { trans: 'whip' });
-  cue(vsT + 0.15, 'boom', 1); cue(w('spassky', 'World'), 'hit', 0.6);
+  cue(vsT + 0.15, 'boom', 1); cue(w('spassky', 'World'), 'hit', 0.6); cue(vsT + 0.4, 'shutter', 0.5); cue(vsT + 0.6, 'shutter', 0.5);
 
   // S13 — Soviets held the title for 24 years
   const champs = [['1948', 'byrne'], ['1957', 'spassky'], ['1960', 'bobby72'], ['1963', 'byrne'], ['1969', 'spassky']];
@@ -550,6 +559,7 @@ export async function build(T) {
     B.drawPieces(g, [{ t: 'k', c: 'w', x: 4.5, z: 5.5, glow: kg > 0.05 ? C.gold : null, halo: C.gold, haloA: kg, sharp: true }, { t: 'p', c: 'b', x: 2.5, z: 3.5 }, { t: 'p', c: 'w', x: 6.5, z: 2.5 }], { focus: 11 });
     const cp = B.project(7.4, 0, 6.8); candle(g, cp.x, cp.y, cp.s / 110, t);
     placeStamp(g, lt, 'Reykjavik', '2008', { y: 160, t0: 0.05 });
+    photoCard(g, P.grave, lt, w('died', 'died') - s('died'), { x: 225, y: 1000, w: 280, aspect: 1.2, rot: -0.05, from: 'left', tone: 'warm', caption: 'LAUGARDÆLIR', credit: 'Ted Cross · CC BY 2.0', fx: 0.6, fy: 0.3, zoom: [1.0, 1.08], dur: 4 });
   }, { trans: 'fade', transDur: 0.5, vig: 0.7 });
   cue(w('died', 'died'), 'boom', 0.6); cue(kingT, 'shimmer', 0.8);
 
