@@ -92,8 +92,10 @@ export async function build(T) {
     const ho = opp ? seated(g, B, opp, oppE, t, { z: -1.6, face: 1, reach: oppReach }) : () => {};
     cabinet(g, B, { t, open, xray, inside });
     B.drawSlab(g, { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' });
-    ht(); ho();
-    if (pieces) B.drawPieces(g, pieces, { focus: focus ?? B.dist, dof });
+    ht();
+    if (typeof pieces === 'function') pieces();
+    else if (pieces) B.drawPieces(g, pieces, { focus: focus ?? B.dist, dof });
+    ho();  // the opponent last: seen from behind, he is a foreground silhouette
     return env;
   };
 
@@ -102,14 +104,13 @@ export async function build(T) {
   mateHook.cues(cue);
   const hookMateT = w('hook1', 'beat');
   shot(0, (g, lt, t, sh) => {
-    rig(B, lt, [[0, { yaw: -0.75, pitch: 0.5, dist: 13.5, cy: H * 0.55, target: [4, 0.6, 3] }], [len(sh), { yaw: -0.2, pitch: 0.42, dist: 10.5 }]], { t, bump: mateHook.bump(t), e: lin });
+    rig(B, lt, [[0, { yaw: 0.55, pitch: 0.3, dist: 10.5, cy: H * 0.5, target: [4, 1.6, 6.5] }], [len(sh), { yaw: 0.12, pitch: 0.36, dist: 8.6 }]], { t, bump: mateHook.bump(t), e: lin });
     const env = room(g, B, 'palace', { t });
     picture(g, B, P.napoleon, [12.4, 9.8, 12.85], [15.2, 9.8, 12.85], [12.4, 5.2, 12.85], { tone: 'warm', fx: 0.5, fy: 0.3, border: '#C9A05A' });
     const m = mateHook.current(t);
     const ht = seated(g, B, 'turk', exprAt([[0, 'focus'], [hookMateT - (t - lt), { ...EXPR.smug, nod: 0.4 }]], lt), t, { z: 9.4, side: -1, reach: m ? { sq: m.to, u: (t - m.t0 + 0.15) / 0.75 } : null });
-    const hn = seated(g, B, 'napoleon', t >= hookMateT ? { ...EXPR.shock, shake: 0.6 } : 'focus', t, { z: -1.6, face: 1 });
     cabinet(g, B, { t });
-    B.drawSlab(g, { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' }); ht(); hn();
+    B.drawSlab(g, { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' }); ht();
     mateHook.draw(g, t, { dof: 1.3 });
     if (t >= hookMateT) {
       const q = seg(t, hookMateT, hookMateT + 0.3);
@@ -216,10 +217,9 @@ export async function build(T) {
   shot(s('wins') - 0.05, (g, lt, t, sh) => {
     const m = quick.current(t);
     turkSet(g, lt, t, [[0, { yaw: -0.7, pitch: 0.72, dist: 10, cy: H * 0.5, target: [5.5, 0, 3] }], [len(sh), { yaw: -0.4, pitch: 0.8, dist: 8 }]], {
-      turkE: t >= winT ? { ...EXPR.smug, nod: 0.6 } : 'focus', opp: 'kempelen', oppE: t >= winT ? { ...EXPR.shock } : 'focus', bump: quick.bump(t) * 1.5,
-      reach: m && m.k % 2 === 0 ? { sq: m.to, u: (t - m.t0 + 0.15) / 0.75 } : null,
+      turkE: t >= winT ? { ...EXPR.smug, nod: 0.6 } : 'focus', opp: 'courtier', oppE: t >= winT ? { ...EXPR.shock } : 'focus', bump: quick.bump(t) * 1.5,
+      reach: m && m.k % 2 === 0 ? { sq: m.to, u: (t - m.t0 + 0.15) / 0.75 } : null, pieces: () => quick.draw(g, t, { dof: 1.2 }),
     });
-    quick.draw(g, t, { dof: 1.2 });
     if (t >= winT) {
       const [kx, kz] = sqXZ('e1'), kp = B.project(kx, 0.8, kz);
       target(g, kp.x, kp.y, 90, t, C.red, seg(t, winT, winT + 0.2));
@@ -248,7 +248,7 @@ export async function build(T) {
     [[-1.2, -4.4, kT, true], [4.2, -4.8, kT + 0.12, true], [9.4, -4.4, kT + 0.24, true], [1.4, -7.2, scT, false], [7.2, -7.2, scT + 0.12, false]].forEach(([x, z, t0, king]) => {
       const a = seg(t, t0, t0 + 0.25, ease.back);
       if (a <= 0) return;
-      const p = actor(g, B, king ? 'napoleon' : 'babbage', { x, y: lerp(0.5, 3.6, a), z, k: 1.25, t, face: 1, silhouette: true, alpha: clamp(a * 2) });
+      const p = actor(g, B, king ? (x > 4 ? 'empress' : 'courtier') : 'franklin', { x, y: lerp(0.5, 3.6, a), z, k: 1.25, t, face: 1, silhouette: true, alpha: clamp(a * 2) });
       if (p && king) crown(g, p.x, p.y - 160 * p.s / 100, 0.75 * p.s / 100, { a: clamp(a) });
     });
     badge(g, 'KINGS', W / 2 - 200, 300, { color: C.gold, size: 44, a: seg(t, kT, kT + 0.15) });
@@ -266,14 +266,15 @@ export async function build(T) {
   // S11 — 1809: Napoleon sits down (his portrait already hangs in the palace)
   shot(s('napoleon') - 0.05, (g, lt, t, sh) => {
     const sitT = w('napoleon', 'sits') - s('napoleon');
-    rig(B, lt, [[0, { yaw: 0.7, pitch: 0.36, dist: 14, cy: H * 0.5, target: [4, 1.2, 3] }], [len(sh), { yaw: 0.25, pitch: 0.3, dist: 11.5 }]], { t });
+    rig(B, lt, [[0, { yaw: 0.75, pitch: 0.36, dist: 14, cy: H * 0.5, target: [4, 1.2, 3] }], [len(sh), { yaw: 0.45, pitch: 0.32, dist: 11.5 }]], { t });
     const env = room(g, B, 'palace', { t });
     picture(g, B, P.napoleon, [-4.6, 10.2, 12.85], [-1.8, 10.2, 12.85], [-4.6, 5.6, 12.85], { tone: 'warm', fx: 0.5, fy: 0.3, border: '#C9A05A' });
     const ht = seated(g, B, 'turk', 'neutral', t, { z: 9.4 });
     const u = seg(lt, sitT - 0.4, sitT + 0.3, ease.out);
     const hn = seated(g, B, 'napoleon', { ...EXPR.smug, look: [0, 1] }, t, { z: -1.6, face: 1, lift: lerp(5.2, 3.1, u), alpha: clamp(u * 3) });
-    cabinet(g, B, { t }); B.drawSlab(g, { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' }); ht(); if (u > 0.9) hn();
+    cabinet(g, B, { t }); B.drawSlab(g, { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' }); ht();
     B.drawPieces(g, piecesAt(NT, 0), { focus: B.dist, dof: 1.2 });
+    hn();
     placeStamp(g, lt, 'Schönbrunn', '1809', { y: 160, t0: 0.05 });
     credit(g, 'PORTRAIT: J.-L. DAVID, 1812 · PUBLIC DOMAIN', seg(lt, 0.6, 1));
   }, { trans: 'leak' });
@@ -320,7 +321,7 @@ export async function build(T) {
   cue(backT, 'whirr', 0.8); cue(backT + 0.5, 'clack', 0.9);
   // S14 — he tries again; the Turk takes the piece away
   shot(s('again') - 0.05, (g, lt, t, sh) => {
-    turkSet(g, lt, t, [[0, { yaw: 0.35, pitch: 0.65, dist: 9.5, cy: H * 0.5, target: [1.4, 0, 3] }], [len(sh), { yaw: -0.1, pitch: 0.6, dist: 8.6 }]], { turkE: { ...EXPR.angry, look: [-1, 0.6] }, reach: turkHand(t), opp: 'napoleon', oppE: t > awayT ? { ...EXPR.shock } : 'smug', oppReach: napHand(t), pieces: cheatPieces(t), dof: 1.4 });
+    turkSet(g, lt, t, [[0, { yaw: -0.55, pitch: 0.95, dist: 9.5, cy: H * 0.5, target: [1.4, 0, 3] }], [len(sh), { yaw: -0.8, pitch: 0.9, dist: 8.6 }]], { turkE: { ...EXPR.angry, look: [-1, 0.6] }, reach: turkHand(t), opp: 'napoleon', oppE: t > awayT ? { ...EXPR.shock } : 'smug', oppReach: napHand(t), pieces: cheatPieces(t), dof: 1.4 });
     if (t > awayT + 0.6) { const p = B.project(-0.75, 0.4, 2.5); xMark(g, p.x, p.y, 70, C.red, seg(t, awayT + 0.6, awayT + 0.8)); }
   }, { trans: 'zoom' });
   cue(ill2 + 0.45, 'clack', 0.8); cue(awayT, 'whirr', 0.7); cue(awayT + 0.6, 'thud', 0.8);
@@ -347,7 +348,7 @@ export async function build(T) {
   });
   shot(s('sweep') - 0.05, (g, lt, t, sh) => {
     const u = seg(t, sweepT - 0.15, sweepT + 0.45);
-    turkSet(g, lt, t, [[0, { yaw: -0.95, pitch: 0.42, dist: 13, cy: H * 0.5, target: [5, 0.5, 4] }], [len(sh), { yaw: -0.6, pitch: 0.36, dist: 11.5 }]], {
+    turkSet(g, lt, t, [[0, { yaw: -1.25, pitch: 0.55, dist: 13, cy: H * 0.5, target: [5, 0.5, 4] }], [len(sh), { yaw: -1.0, pitch: 0.5, dist: 11.5 }]], {
       turkE: t > sweepT ? { ...EXPR.angry, open: 0.5, mouth: 'grit' } : 'angry', opp: 'napoleon', oppE: t > sweepT + 0.2 ? { ...EXPR.shock, shake: 0.8 } : 'smug',
       reach: u > 0 && u < 1 ? { x: lerp(-0.5, 9, u), z: 6, y: 0.8, u: Math.sin(PI * u), hold: true } : null, pieces: sweptAt(t, 0.6), dof: 1.2, shake: 2,
     });
@@ -363,11 +364,11 @@ export async function build(T) {
   fin.cues(cue);
   shot(s('mate') - 0.1, (g, lt, t, sh) => {
     const m = fin.current(t), mated = t >= mateT;
-    turkSet(g, lt, t, [[0, { yaw: 0.35, pitch: 0.85, dist: 9.5, cy: H * 0.5, target: [4, 0, 2] }], [len(sh), { yaw: 0.05, pitch: 0.9, dist: 7.8 }]], {
+    turkSet(g, lt, t, [[0, { yaw: 1.25, pitch: 0.95, dist: 9.5, cy: H * 0.5, target: [4, 0, 2] }], [len(sh), { yaw: 1.0, pitch: 1.05, dist: 7.8 }]], {
       turkE: mated ? { ...EXPR.smug, nod: 0.5 } : 'focus', opp: 'napoleon', oppE: mated ? { ...EXPR.shock } : 'worried', bump: fin.bump(t) * 1.5,
       reach: m && m.k % 2 === 0 ? { sq: m.to, u: (t - m.t0 + 0.15) / 0.75 } : null, over: mated ? { light: C.lime, lightA: 0.45 } : null,
+      pieces: () => fin.draw(g, t, { dof: 1.2 }),
     });
-    fin.draw(g, t, { dof: 1.2 });
     if (mated) {
       const q = seg(t, mateT, mateT + 0.3);
       B.dots(g, C.red, 0.8 * q, ['d1', 'd2', 'f1', 'f2']);

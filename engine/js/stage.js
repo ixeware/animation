@@ -40,10 +40,13 @@ export function actor(g, b, who, { x = 4, y = 3.1, z = 9.4, k = 1, e = 'neutral'
 }
 
 // character seated at the board: far side (z≈9.4, face=-1) or near side (z≈-1.4, face=1).
-// Returns a function that draws the hands after the board. reach = {sq, u}: the hand travels to a square and back (u 0..1)
+// Returns a function that draws the hands after the board. reach = {sq, u}: the hand travels to a square and back (u 0..1).
+// When the camera is behind the character (over-the-shoulder), nothing is drawn now: the returned function draws the
+// hands and then the character as a dark, defocused back-view silhouette in the foreground — call it after the pieces.
 export function seated(g, b, who, e, t, { x = 4, z = 9.3, k = 1.0, lift = 3.1, alpha = 1, hx = 1.6, reach = null, side = 1, face = -1, ...o } = {}) {
-  actor(g, b, who, { x, y: lift, z, k, e, t, face, alpha, ...o });
-  return () => {
+  const back = (b.E[2] - z) * face < 0;
+  if (!back) actor(g, b, who, { x, y: lift, z, k, e, t, face, alpha, ...o });
+  const hands = () => {
     for (const sd of [-1, 1]) {
       if (b.toCam(x + sd * hx, 0.25, z + face * 0.75)[2] < 0.6) continue;
       let p = b.project(x + sd * hx * -face, 0.25, z + face * 0.75), r = 0.33 * p.s;
@@ -54,6 +57,12 @@ export function seated(g, b, who, e, t, { x = 4, z = 9.3, k = 1.0, lift = 3.1, a
       }
       g.save(); g.globalAlpha *= alpha; hand(g, p.x, p.y, r); g.restore();
     }
+  };
+  if (!back) return hands;
+  return () => {
+    hands();
+    const d = b.toCam(x, lift, z)[2];
+    actor(g, b, who, { x, y: lift, z, k, e: 'neutral', t, face, alpha, silhouette: true, shade: 'brightness(0.18) saturate(0.5)', blur: clamp((b.dist - d) * 1.3, 0, 12) });
   };
 }
 

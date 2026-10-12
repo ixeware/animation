@@ -56,7 +56,7 @@ def main(ep):
     # music with ducking under the voice
     m = music.render(meta['music'], dur)[:n]
     m = np.pad(m, ((0, n - len(m)), (0, 0)))
-    duck = 1 - 0.45 * np.clip(envelope(v, 0.25) * 2.2, 0, 1)
+    duck = 1 - 0.55 * np.clip(envelope(v, 0.25) * 2.2, 0, 1)
     m = m * duck[:, None]
 
     # SFX
@@ -81,10 +81,22 @@ def main(ep):
     meter = pyln.Meter(SR)
     bed = m * 0.62 + fx * 0.38
     bed = ffilter(bed, 'highshelf=f=5000:g=4,equalizer=f=250:t=q:w=1:g=-2')[:n]
-    gap = meta.get('bed_gap', 4.0)
+    script = json.loads((Path(ep) / 'script.json').read_text())
+    gap = script.get('mix', {}).get('bed_gap', meta.get('bed_gap', 4.0))
     lv, lb = meter.integrated_loudness(vv), meter.integrated_loudness(bed)
     bed *= 10 ** ((lv - gap - lb) / 20)
-    print(f'  voice {lv:.1f} LUFS, bed {lb:.1f} -> {lv - gap:.1f} LUFS')
+    # rider: no 3-second stretch of the bed may rise more than 1 LU above its target (dense openings, big hits)
+    win, hop = int(3 * SR), int(0.5 * SR)
+    centers, gains = [], []
+    for s0 in range(0, max(1, n - win), hop):
+        seg_ = bed[s0:s0 + win]
+        l = meter.integrated_loudness(seg_) if np.abs(seg_).max() > 1e-5 else -99
+        gains.append(min(1.0, 10 ** ((lv - gap + 1 - l) / 20))); centers.append(s0 + win // 2)
+    if gains:
+        g = np.interp(np.arange(n), centers, gains)
+        g = np.convolve(g, np.ones(int(0.4 * SR)) / int(0.4 * SR), mode='same')
+        bed *= g[:, None]
+    print(f'  voice {lv:.1f} LUFS, bed {lb:.1f} -> {lv - gap:.1f} LUFS (gap {gap} LU, rider min gain {min(gains or [1]):.2f})')
     m, fx = bed, np.zeros_like(bed)
     mixd = vv * 1.0 + bed
     sf.write(b / 'stems_voice.wav', vv, SR); sf.write(b / 'stems_music.wav', m, SR); sf.write(b / 'stems_sfx.wav', fx, SR)

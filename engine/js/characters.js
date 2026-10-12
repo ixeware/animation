@@ -19,6 +19,7 @@ export const CAST = {
   franklin: { face: [1.02, 1.04, 0.95], hair: 'franklin', hairC: '#CFC9BE', brow: '#9B9488', suit: '#8C7F6E', suitD: '#6E6354', shirt: 'jabot', vest: '#B8AE9C', glasses: 'round', ears: 1 },
   babbage: { face: [1.0, 1.04, 0.92], hair: 'receding', hairC: '#8E8A84', brow: '#6E6A64', suit: '#262A30', suitD: '#1A1D22', shirt: 'bow', tie: '#15171A', sideburns: true, ears: 1 },
   empress: { face: [0.95, 1.02, 0.86], hair: 'updo', hairC: '#DCCBA6', brow: '#9C7E58', suit: '#4A78A8', suitD: '#33587E', shirt: 'gown', ears: 0.9, female: true, crown: true },
+  courtier: { face: [0.96, 1.04, 0.86], hair: 'wig', hairC: '#E4E0D8', brow: '#8A7A66', suit: '#2F5D4A', suitD: '#21443A', shirt: 'jabot', vest: '#D9C7A0', ears: 1 },
   operator: { face: [0.94, 1.04, 0.84], hair: 'tied', hairC: '#3A2A20', brow: '#2E2119', suit: '#E8E0CF', suitD: '#C2B8A3', shirt: 'sleeves', vest: '#3B2E26', ears: 1 },
 };
 
@@ -269,7 +270,7 @@ function eye(g, cx, cy, e, side, t, pupilScale) {
   g.restore();
 }
 
-export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0, tilt = 0, silhouette = false, eyeGlow = null, noBody = false, alpha = 1 } = {}) {
+export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0, tilt = 0, silhouette = false, shade = 'brightness(0)', eyeGlow = null, noBody = false, alpha = 1 } = {}) {
   const c = CAST[who];
   const [fw, fh, jaw] = c.face;
   // idle life: breathing bob + slow head sway
@@ -279,7 +280,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   const sh = e.shake || 0, nod = e.nod || 0, turn = clamp(e.turn || 0, -1, 1);
   x += Math.sin(t * 47) * sh * 6 * s; tilt += Math.sin(t * 39) * sh * 0.03; y += Math.abs(Math.sin(t * 9)) * nod * -10 * s;
   g.save(); g.globalAlpha *= alpha; g.translate(x, y); g.scale(s, s); g.rotate(tilt);
-  if (silhouette) g.filter = 'brightness(0)';
+  if (silhouette) g.filter = shade;
   if (!noBody) body(g, c);
   hairBack(g, c, fw);
   // ears
