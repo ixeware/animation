@@ -271,6 +271,53 @@ def m_finale(S, a, b):
         S.add(t, bell([note('D5'), note('A5'), note('F5'), note('E5')][i % 4]), 0.15, pan=0.3 * ((-1) ** i), rev=0.7, until=b)
 
 
+# --- The Mechanical Turk ---
+def m_clockwork(S, a, b):  # music box over a ticking escapement and pizzicato bass
+    box = ['D5', 'F5', 'A5', 'D6', 'C#6', 'A5', 'E5', 'G5']
+    for i, t in enumerate(beats(a, b, 2)):
+        S.add(t, bell(note(box[i % len(box)]), 1.2), 0.16, pan=0.35 * ((-1) ** i), rev=0.55, until=b)
+    for i, t in enumerate(beats(a, b, 1)):
+        S.add(t, bp(noise(0.02), 2400 if i % 2 else 1700, 7000) * env_exp(0.02, 0.004), 0.5, pan=-0.3 if i % 2 else 0.3, rev=0.1, until=b)
+    for t in beats(a, b, 0.5):
+        S.add(t, pizz(chord_at(t)[0] - 12, 1.2), 0.45, rev=0.25, until=b)
+    S.add(a, pad([note('D3'), note('A3')], b - a + 0.4, cut=1500, att=1.2), 0.22, rev=0.5, until=b + 0.2)
+
+
+def harpsi(m, d=0.6):  # bright plucked string, a cheap harpsichord
+    return hp(ks(hz(m), d, damp=0.994, bright=0.95), 180)
+
+
+def m_court(S, a, b):  # 18th-century court: harpsichord broken chords, light bass
+    prog = ['Dm', 'A', 'Dm', 'C', 'F', 'Gm', 'A', 'Dm']
+    for i, t in enumerate(beats(a, b, 2)):
+        ch = chord_at(t, prog)
+        S.add(t, harpsi([ch[0], ch[1], ch[2], ch[1]][i % 4] + 12), 0.4, pan=-0.25 + 0.5 * (i % 2), rev=0.3, until=b)
+    for t in beats(a, b, 1):
+        S.add(t, harpsi(chord_at(t, prog)[0] - 12 + 12, 0.9), 0.35, rev=0.3, until=b)
+    shaker(S, a, b, 0.05)
+
+
+def m_inferno(S, a, b):  # fire: low rumble, dissonant swell, slow drums
+    t = t_(b - a + 0.5)
+    rumble = lp(noise(b - a + 0.5), 180) * (0.6 + 0.4 * np.sin(2 * np.pi * 0.7 * t))
+    S.add(a, rumble, 0.5, rev=0.2, until=b + 0.3)
+    S.add(a, strings([note('D3'), note('D#3'), note('A3'), note('C4')], b - a + 0.4, cut=2600, att=1.2), 0.35, rev=0.6, until=b + 0.3)
+    for tt in beats(a, b, 0.5):
+        S.add(tt, timpani(note('D2'), 1.2), 0.45, rev=0.4, until=b + 0.3)
+
+
+def m_digital(S, a, b):  # modern pulse for the present day
+    for i, t in enumerate(beats(a, b, 4)):
+        m = chord_at(t, ['Dm', 'Bb', 'F', 'C'])[i % 3] + 24
+        S.add(t, lp(saw(hz(m), 0.12, voices=2), 3200) * env_exp(0.12, 0.05), 0.16, pan=0.4 * ((-1) ** i), rev=0.3, until=b)
+    for t in beats(a, b, 1):
+        S.add(t, kick(), 0.7, until=b)
+    for t in beats(a + BEAT / 2, b, 1):
+        S.add(t, hat(), 0.16, pan=0.3, until=b)
+    for t in beats(a, b, 0.25):
+        S.add(t, pad(chord_at(t, ['Dm', 'Bb', 'F', 'C']), BEAT * 4, cut=2200, att=0.3), 0.25, rev=0.4, until=b)
+
+
 MOODS = {k[2:]: v for k, v in globals().items() if k.startswith('m_')}
 
 

@@ -4,8 +4,9 @@ import { W, H, C, rgba, clamp, lerp, ease } from './core.js';
 export const CITY = {
   'New York': [-74.0, 40.7], 'Reykjavik': [-21.9, 64.1], 'Belgrade': [20.5, 44.8], 'Budapest': [19.0, 47.5],
   'Manila': [121.0, 14.6], 'Tokyo': [139.7, 35.7], 'Pasadena': [-118.1, 34.1], 'Moscow': [37.6, 55.75],
+  'Vienna': [16.37, 48.21], 'Paris': [2.35, 48.86], 'London': [-0.13, 51.51], 'Philadelphia': [-75.17, 39.95],
 };
-export const ISO = { USA: 840, ISL: 352, SRB: 688, MNE: 499, HUN: 348, PHL: 608, JPN: 392, RUS: 643 };
+export const ISO = { AUT: 40, FRA: 250, GBR: 826, USA: 840, ISL: 352, SRB: 688, MNE: 499, HUN: 348, PHL: 608, JPN: 392, RUS: 643 };
 
 export class DotMap {
   async init() {

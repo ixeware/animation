@@ -13,6 +13,8 @@ export const ENV = {
   crimson: { base: '#0A0203', wall: ['#5A1418', '#3E0C10'], banners: '#8E1E22', floor: ['#160506', '#100405'], light: '#FF8A7A', lightA: 0.35, star: true },
   backroom: { base: '#030405', wall: ['#1A1D20', '#141618'], floor: ['#0E1012', '#0B0C0E'], light: '#FFF1D6', lightA: 0.2, lamp: true },
   cold: { base: '#05080B', wall: ['#24323C', '#1C2830'], seam: '#121A20', floor: ['#10171C', '#0D1318'], light: '#CFE6FF', lightA: 0.2, windows: true },
+  palace: { base: '#100B06', wall: ['#A8956C', '#9C8962'], panels: '#D9B565', rail: '#C9A05A', floor: ['#3A2817', '#2C1E11'], light: '#FFE6B0', lightA: 0.42,
+    frames: true, chandeliers: true, table: ['#5A3A1E', '#3A2412', '#2A1A0C'] },
   dark: { base: '#020304', wall: ['#0E1215', '#0B0E10'], floor: ['#08090B', '#060708'], light: '#9FB7C9', lightA: 0.07 },
 };
 
@@ -66,6 +68,15 @@ function shell(g, b, env, t, lights) {
   }
   if (env.rail) for (const [z, x0, x1, fx] of [[fz1 - 0.05, LEFT_X, RIGHT_X, 0], [fz0 + 0.05, LEFT_X, RIGHT_X, 0]])
     strip(g, b, [[x0, 1.6, z], [x1, 1.6, z], [x1, 1.9, z], [x0, 1.9, z]], fogged(b, env, env.rail, 4, 2, z));
+  if (env.panels) {  // palace wainscoting: gilded moulding rectangles on every wall panel
+    const mould = q => { if (b.poly(g, q)) { g.strokeStyle = fogged(b, env, env.panels, ...q[0]); g.lineWidth = Math.max(1.5, b.project(...q[0]).s * 0.05); g.stroke(); } };
+    for (let x = LEFT_X; x < RIGHT_X; x += 2) for (const [ya, yb] of [[-2.6, 0.9], [2.3, 10.5]]) {
+      mould([[x + 0.3, ya, fz1 - 0.03], [x + 1.7, ya, fz1 - 0.03], [x + 1.7, yb, fz1 - 0.03], [x + 0.3, yb, fz1 - 0.03]]);
+      mould([[x + 0.3, ya, fz0 + 0.03], [x + 1.7, ya, fz0 + 0.03], [x + 1.7, yb, fz0 + 0.03], [x + 0.3, yb, fz0 + 0.03]]);
+    }
+    for (const xw of [LEFT_X + 0.03, RIGHT_X - 0.03]) for (let z = fz0; z < fz1; z += 2.5) for (const [ya, yb] of [[-2.6, 0.9], [2.3, 10.5]])
+      mould([[xw, ya, z + 0.3], [xw, ya, z + 2.2], [xw, yb, z + 2.2], [xw, yb, z + 0.3]]);
+  }
   if (env.strips) {  // tall glowing light columns (TV hall), on the back and side walls
     const cols = [];
     for (let x = LEFT_X + 2; x < RIGHT_X; x += 3.4) cols.push([[x, FLOOR_Y, fz1 - 0.05], [x + 0.35, FLOOR_Y, fz1 - 0.05], [x + 0.35, 13, fz1 - 0.05], [x, 13, fz1 - 0.05]]);
@@ -91,6 +102,28 @@ function shell(g, b, env, t, lights) {
       { p: [0.5, 6.8, fz0 + 0.2], r: 1.1 }, { p: [7.5, 6.8, fz0 + 0.2], r: 1.1 }] : []),
   ];
   for (const l of L) lamp(g, b, l, env, t);
+  if (env.chandeliers && !lights) for (const [x, z] of [[-3, 3], [11, 3], [4, -5]]) chandelier(g, b, x, 9.6, z, env, t);
+}
+
+// crystal chandelier: cord, gold ring and a crown of candle glows
+export function chandelier(g, b, x, y, z, env, t = 0) {
+  if (b.toCam(x, y, z)[2] < 0.6) return;
+  const top = b.project(x, CEIL_Y, z), q = b.project(x, y, z);
+  g.save(); g.strokeStyle = '#3A3226'; g.lineWidth = Math.max(2, q.s * 0.04); g.beginPath(); g.moveTo(top.x, top.y); g.lineTo(q.x, q.y); g.stroke(); g.restore();
+  const ring = [];
+  for (let i = 0; i <= 24; i++) { const a = i / 24 * 6.283; ring.push(b.project(x + Math.cos(a) * 1.2, y - 0.3, z + Math.sin(a) * 1.2)); }
+  g.save(); g.strokeStyle = '#C9A05A'; g.lineWidth = Math.max(2, q.s * 0.08); g.beginPath(); ring.forEach((p, i) => i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y)); g.stroke();
+  g.fillStyle = 'rgba(230,240,255,0.5)'; for (let i = 0; i < 24; i += 2) { const p = ring[i]; g.beginPath(); g.ellipse(p.x, p.y + q.s * 0.22, q.s * 0.05, q.s * 0.14, 0, 0, 7); g.fill(); }
+  g.restore();
+  for (let i = 0; i < 6; i++) {
+    const a = i / 6 * 6.283 + 0.3, px = x + Math.cos(a) * 1.2, pz = z + Math.sin(a) * 1.2;
+    if (b.toCam(px, y, pz)[2] < 0.6) continue;
+    const c = b.project(px, y - 0.05, pz), r = c.s * 0.5 * (1 + 0.06 * Math.sin(t * 11 + i));
+    const gr = g.createRadialGradient(c.x, c.y, 0, c.x, c.y, r);
+    gr.addColorStop(0, 'rgba(255,255,255,0.95)'); gr.addColorStop(0.2, rgba(env.light, 0.7)); gr.addColorStop(1, rgba(env.light, 0));
+    g.save(); g.globalCompositeOperation = 'screen'; g.fillStyle = gr; g.beginPath(); g.arc(c.x, c.y, r, 0, 7); g.fill(); g.restore();
+  }
+  pool(g, b, x, y - 0.4, z, 4.5, env.light, 0.16, true);
 }
 
 function star(g, b, x, y, z, r, color) {
@@ -249,4 +282,74 @@ export function blindLight(g, b, { a = 1, color = '#D2E1EB' } = {}) {
     strip(g, b, [[-4, FLOOR_Y + 0.01, z], [12, FLOOR_Y + 0.01, z], [12, FLOOR_Y + 0.01, z + 0.6], [-4, FLOOR_Y + 0.01, z + 0.6]], rgba(color, 0.1 * a));
   }
   g.restore();
+}
+
+// gear in a vertical plane z = const (facing the camera on the -z side); angle in radians
+export function gear(g, b, x, y, z, r, { teeth = 12, angle = 0, color = '#B8893A', hub = '#3A2A16', a = 1 } = {}) {
+  if (a <= 0) return;
+  const pts = [];
+  for (let i = 0; i < teeth * 4; i++) {
+    const k = Math.floor(i / 2) % 2 ? 0.8 : 1, th = angle + (i / (teeth * 4)) * 6.283;
+    pts.push([x + Math.cos(th) * r * k, y + Math.sin(th) * r * k, z]);
+  }
+  g.save(); g.globalAlpha *= a;
+  if (b.poly(g, pts)) { g.fillStyle = color; g.fill(); g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 2; g.stroke(); }
+  const ring = [], hole = [];
+  for (let i = 0; i < 20; i++) { const th = i / 20 * 6.283; ring.push([x + Math.cos(th) * r * 0.55, y + Math.sin(th) * r * 0.55, z - 0.01]); hole.push([x + Math.cos(th) * r * 0.16, y + Math.sin(th) * r * 0.16, z - 0.02]); }
+  if (b.poly(g, ring)) { g.fillStyle = mix(color, '#000000', 0.25); g.fill(); }
+  for (let k = 0; k < 4; k++) {  // spokes
+    const th = angle + k * Math.PI / 2, w = r * 0.07;
+    const c = Math.cos(th), sn = Math.sin(th);
+    strip(g, b, [[x - sn * w, y + c * w, z - 0.015], [x + sn * w, y - c * w, z - 0.015], [x + c * r * 0.55 + sn * w, y + sn * r * 0.55 - c * w, z - 0.015], [x + c * r * 0.55 - sn * w, y + sn * r * 0.55 + c * w, z - 0.015]], color);
+  }
+  if (b.poly(g, hole)) { g.fillStyle = hub; g.fill(); }
+  g.restore();
+}
+
+// The Turk's cabinet: a wooden chest under the board with doors on the front (z = -0.6 side).
+// open: 0..1 swings the doors; xray: 0..1 turns the front into glass and calls inside() to draw the hidden operator.
+export function cabinet(g, b, { open = 0, xray = 0, t = 0, inside = null, wood = ['#6A4526', '#4A2E18', '#3A2412'], spin = 1 } = {}) {
+  const [top, side, front] = wood;
+  const zf = -0.6, y0 = FLOOR_Y + 0.35, y1 = -0.85;
+  box(g, b, [-0.6, FLOOR_Y, -0.6], [8.6, -0.75, 8.6], { top: side, side: mix(side, '#000000', 0.25), front });
+  // little legs / plinth
+  box(g, b, [-0.8, FLOOR_Y, -0.8], [8.8, FLOOR_Y + 0.3, 8.8], { top: side, side: mix(side, '#000000', 0.4), front: mix(front, '#000000', 0.3) });
+  const seen = b.E[2] < zf;
+  if (seen) {
+    const doors = [[-0.3, 3.4, 1], [3.7, 6.15, 1], [8.3, 6.15, -1]];  // [hinge x, free-edge x, direction]
+    // interior: dark recess, gears in the left bay, brass rods in the right bay
+    const inner = (x0, x1) => strip(g, b, [[x0, y0, zf - 0.01], [x1, y0, zf - 0.01], [x1, y1, zf - 0.01], [x0, y1, zf - 0.01]], '#120B06');
+    if (open > 0.01 || xray > 0.01) {
+      inner(-0.3, 3.4); inner(3.7, 8.3);
+      const k = Math.max(open, xray);
+      gear(g, b, 0.9, -1.6, zf + 0.7, 0.75, { teeth: 10, angle: t * 1.4 * spin, a: k });
+      gear(g, b, 2.2, -2.2, zf + 0.9, 0.55, { teeth: 8, angle: -t * 1.9 * spin + 0.2, a: k, color: '#C89A48' });
+      gear(g, b, 2.4, -1.15, zf + 1.1, 0.38, { teeth: 7, angle: t * 2.6 * spin, a: k, color: '#A87A30' });
+      gear(g, b, 0.7, -2.65, zf + 1.2, 0.32, { teeth: 6, angle: -t * 3 * spin, a: k, color: '#A87A30' });
+      if (open > 0.01) for (const x of [4.6, 5.6, 6.8, 7.6]) strip(g, b, [[x, y0 + 0.2, zf + 1.6], [x + 0.08, y0 + 0.2, zf + 1.6], [x + 0.08, y1 - 0.2, zf + 1.6], [x, y1 - 0.2, zf + 1.6]], 'rgba(185,140,70,0.6)');
+      if (xray > 0.01 && inside) {
+        g.save(); b.poly(g, [[-0.3, y0, zf], [8.3, y0, zf], [8.3, y1, zf], [-0.3, y1, zf]]); g.clip(); inside(g); g.restore();
+      }
+    }
+    // doors: closed quads, or swung open around their hinge
+    for (const [hx, fx, dir] of doors) {
+      const w = Math.abs(fx - hx), th = open * 1.55, ex = hx + dir * w * Math.cos(th), ez = zf - w * Math.sin(th);
+      const pts = [[hx, y0, zf - 0.02], [ex, y0, ez - 0.02], [ex, y1, ez - 0.02], [hx, y1, zf - 0.02]];
+      const col = open > 0.5 ? mix(front, '#000000', 0.25) : mix(front, '#FFFFFF', 0.06);
+      g.save(); g.globalAlpha *= 1 - xray * 0.85;
+      strip(g, b, pts, col);
+      if (b.poly(g, pts)) { g.strokeStyle = '#C9A05A'; g.lineWidth = Math.max(1.5, b.project(hx, y1, zf).s * 0.03); g.stroke(); }
+      const kn = b.project(lerp(hx, ex, 0.85), (y0 + y1) / 2, lerp(zf, ez, 0.85) - 0.05);  // brass knob
+      g.fillStyle = '#E2B14A'; g.beginPath(); g.arc(kn.x, kn.y, Math.max(2, kn.s * 0.09), 0, 7); g.fill();
+      g.restore();
+    }
+    if (xray > 0.01) {  // glowing wireframe of the cabinet edges
+      g.save(); g.globalAlpha *= xray; g.strokeStyle = '#7FE3FF'; g.shadowColor = '#7FE3FF'; g.shadowBlur = 18; g.lineWidth = 3;
+      for (const q of [[[-0.6, FLOOR_Y, zf], [8.6, FLOOR_Y, zf], [8.6, -0.75, zf], [-0.6, -0.75, zf]], [[-0.6, FLOOR_Y, 8.6], [8.6, FLOOR_Y, 8.6], [8.6, -0.75, 8.6], [-0.6, -0.75, 8.6]]])
+        if (b.poly(g, q)) g.stroke();
+      g.restore();
+    }
+  }
+  // top lip under the board
+  box(g, b, [-1.1, -0.75, -1.1], [9.1, -0.35, 9.1], { top, side: front, front });
 }

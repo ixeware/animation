@@ -48,7 +48,7 @@ export function seated(g, b, who, e, t, { x = 4, z = 9.3, k = 1.0, lift = 3.1, a
       if (b.toCam(x + sd * hx, 0.25, z + face * 0.75)[2] < 0.6) continue;
       let p = b.project(x + sd * hx * -face, 0.25, z + face * 0.75), r = 0.33 * p.s;
       if (reach && sd === side && reach.u > 0) {
-        const [sx, sz] = sqXZ(reach.sq), q = b.project(sx, 0.9, sz), u = Math.sin(Math.PI * clamp(reach.u));
+        const [sx, sz] = reach.sq ? sqXZ(reach.sq) : [reach.x, reach.z], q = b.project(sx, reach.y ?? 0.9, sz), u = reach.hold ? clamp(reach.u) : Math.sin(Math.PI * clamp(reach.u));
         p = { x: lerp(p.x, q.x, u), y: lerp(p.y, q.y, u) - Math.sin(Math.PI * u) * 40, s: lerp(p.s, q.s, u) };
         r = 0.33 * p.s;
       }

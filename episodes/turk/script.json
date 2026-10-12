@@ -1,0 +1,287 @@
+{
+ "title": "The Mechanical Turk",
+ "post": "The Mechanical Turk #chess #story #education #history",
+ "lead_in": 0.05,
+ "tail": 1.4,
+ "voice": {
+  "provider": "chatterbox",
+  "reference_fish_id": "f6a86fbea5f64970abd883813072ec6d",
+  "exaggeration": 0.6,
+  "cfg_weight": 0.35,
+  "temperature": 0.8,
+  "seed": 7,
+  "_name": "Trailet narrador (Fish sample) cloned locally with Chatterbox",
+  "_fish": {
+   "provider": "fish",
+   "reference_id": "f6a86fbea5f64970abd883813072ec6d",
+   "model": "s1"
+  },
+  "_alternatives": {
+   "3081f4a3f88943d791deda5cec39997b": "Paramount Feature Presentation Announcer",
+   "c8ccdaacb27049e29f2f69b5fac6b9f4": "DEEP STORY",
+   "69f5f158321f4f7f8f945148a6b7d17f": "Pierrot",
+   "d67524ad1936410896ad120583cb1117": "Andrew: English Man (US) - Storytelling, Deep"
+  },
+  "fallback": {
+   "provider": "kokoro",
+   "name": "am_michael",
+   "speed": 0.9,
+   "pitch_semitones": -1.5
+  }
+ },
+ "phrases": [
+  {
+   "id": "hook1",
+   "text": "This robot beat Napoleon at chess.",
+   "pause": 0.45,
+   "colors": {
+    "robot": "blue",
+    "Napoleon": "gold",
+    "chess.": "gold"
+   }
+  },
+  {
+   "id": "hook2",
+   "text": "In 1809. A century before the word robot even existed.",
+   "pause": 0.5,
+   "colors": {
+    "1809.": "gold",
+    "century": "gold",
+    "robot": "blue",
+    "existed.": "blue"
+   }
+  },
+  {
+   "id": "hook3",
+   "text": "So who was moving the pieces?",
+   "pause": 0.9,
+   "colors": {
+    "who": "red",
+    "moving": "red",
+    "pieces?": "red"
+   }
+  },
+  {
+   "id": "vienna",
+   "text": "Vienna. 1770.",
+   "pause": 0.45,
+   "colors": {
+    "Vienna.": "blue",
+    "1770.": "gold"
+   }
+  },
+  {
+   "id": "unveil",
+   "text": "An inventor builds the Empress a chess machine.",
+   "pause": 0.4,
+   "colors": {
+    "Empress": "gold",
+    "chess": "blue",
+    "machine.": "blue"
+   }
+  },
+  {
+   "id": "turk",
+   "text": "A life-size Turk, sitting on a cabinet full of gears.",
+   "pause": 0.4,
+   "colors": {
+    "Turk,": "gold",
+    "gears.": "blue"
+   }
+  },
+  {
+   "id": "doors",
+   "text": "He opens every door. Nothing inside but clockwork.",
+   "pause": 0.5,
+   "colors": {
+    "every": "gold",
+    "door.": "gold",
+    "clockwork.": "blue"
+   }
+  },
+  {
+   "id": "arm",
+   "text": "Then the Turk lifts its arm...",
+   "pause": 0.35,
+   "colors": {
+    "arm...": "gold"
+   }
+  },
+  {
+   "id": "wins",
+   "text": "and wins.",
+   "pause": 0.7,
+   "colors": {
+    "wins.": "lime"
+   }
+  },
+  {
+   "id": "tour",
+   "text": "For decades, it tours Europe. Kings. Scholars. Even Benjamin Franklin.",
+   "pause": 0.6,
+   "colors": {
+    "Europe.": "blue",
+    "Kings.": "gold",
+    "Scholars.": "gold",
+    "Benjamin": "gold",
+    "Franklin.": "gold"
+   }
+  },
+  {
+   "id": "napoleon",
+   "text": "1809. Napoleon sits down.",
+   "pause": 0.45,
+   "colors": {
+    "1809.": "gold",
+    "Napoleon": "gold"
+   }
+  },
+  {
+   "id": "illegal",
+   "text": "He makes an illegal move.",
+   "pause": 0.35,
+   "colors": {
+    "illegal": "red"
+   }
+  },
+  {
+   "id": "back",
+   "text": "The Turk puts the piece back.",
+   "pause": 0.35,
+   "colors": {
+    "back.": "blue"
+   }
+  },
+  {
+   "id": "again",
+   "text": "He tries again. The Turk takes the piece away.",
+   "pause": 0.4,
+   "colors": {
+    "again.": "red",
+    "away.": "blue"
+   }
+  },
+  {
+   "id": "third",
+   "text": "A third time...",
+   "pause": 0.3,
+   "colors": {
+    "third": "red"
+   }
+  },
+  {
+   "id": "sweep",
+   "text": "the Turk sweeps every piece off the board.",
+   "pause": 0.7,
+   "colors": {
+    "sweeps": "red",
+    "every": "red",
+    "piece": "red"
+   }
+  },
+  {
+   "id": "mate",
+   "text": "Then it checkmates him.",
+   "pause": 0.4,
+   "colors": {
+    "checkmates": "lime"
+   }
+  },
+  {
+   "id": "fair",
+   "text": "Fair and square.",
+   "pause": 0.9,
+   "colors": {
+    "Fair": "gold",
+    "square.": "gold"
+   }
+  },
+  {
+   "id": "secret",
+   "text": "Except... the Turk had a secret.",
+   "pause": 0.5,
+   "colors": {
+    "Except...": "red",
+    "secret.": "red"
+   }
+  },
+  {
+   "id": "inside",
+   "text": "Inside the cabinet, behind the fake gears, hid a chess master.",
+   "pause": 0.6,
+   "colors": {
+    "fake": "red",
+    "gears,": "red",
+    "chess": "gold",
+    "master.": "gold"
+   }
+  },
+  {
+   "id": "how",
+   "text": "Magnets. A candle. A lever.",
+   "pause": 0.7,
+   "colors": {
+    "Magnets.": "blue",
+    "candle.": "gold",
+    "lever.": "lime"
+   }
+  },
+  {
+   "id": "babbage",
+   "text": "Charles Babbage lost to it twice.",
+   "pause": 0.35,
+   "colors": {
+    "Charles": "gold",
+    "Babbage": "gold",
+    "twice.": "red"
+   }
+  },
+  {
+   "id": "computer",
+   "text": "Later, he designed the first computer.",
+   "pause": 0.6,
+   "colors": {
+    "first": "blue",
+    "computer.": "blue"
+   }
+  },
+  {
+   "id": "fire",
+   "text": "1854. Philadelphia. A fire.",
+   "pause": 0.4,
+   "colors": {
+    "1854.": "gold",
+    "Philadelphia.": "blue",
+    "fire.": "red"
+   }
+  },
+  {
+   "id": "burns",
+   "text": "The Turk burns.",
+   "pause": 0.8,
+   "colors": {
+    "burns.": "red"
+   }
+  },
+  {
+   "id": "amazon",
+   "text": "Today, Amazon runs a service where humans do the jobs computers can't.",
+   "pause": 0.4,
+   "colors": {
+    "Amazon": "gold",
+    "humans": "red",
+    "computers": "blue",
+    "can't.": "blue"
+   }
+  },
+  {
+   "id": "name",
+   "text": "They named it... Mechanical Turk.",
+   "pause": 0.2,
+   "colors": {
+    "Mechanical": "lime",
+    "Turk.": "lime"
+   }
+  }
+ ]
+}

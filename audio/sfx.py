@@ -289,9 +289,59 @@ def tvoff():
     return norm(x + hp(noise(d), 3000) * np.exp(-t / 0.15) * 0.4)
 
 
+def creak():  # old wooden door hinge
+    d = 0.9
+    t = t_(d)
+    f = 180 + 120 * np.sin(2 * np.pi * 0.9 * t) + 40 * np.sin(2 * np.pi * 7 * t)
+    x = np.sign(np.sin(2 * np.pi * np.cumsum(f) / SR)) * (rng.random(len(t)) > 0.4)
+    return norm(bp(x, 300, 3000) * np.sin(np.pi * t / d) ** 0.7, 0.7)
+
+
+def fire():  # crackling flames
+    d = 3.0
+    x = lp(noise(d), 900) * 0.4
+    for _ in range(160):
+        s0 = int(rng.uniform(0, d - 0.03) * SR); c = bp(noise(0.012), 1500, 7000) * env_exp(0.012, 0.002)
+        x[s0:s0 + len(c)] += c * rng.uniform(0.3, 1.2)
+    e = np.minimum(1, t_(d) / 0.3) * np.minimum(1, (d - t_(d)) / 0.5)
+    return norm(x * e)
+
+
+def scatter():  # a whole chess set swept off the board
+    d = 1.3
+    out = np.zeros(int(d * SR))
+    for i in range(26):
+        s0 = int(abs(rng.normal(0.25, 0.22)) * SR); c = clack() * rng.uniform(0.25, 0.8)
+        e = min(len(out), s0 + len(c)); out[s0:e] += c[:e - s0]
+    sw = whoosh(0.5) * 0.8
+    out[:len(sw)] += sw
+    return norm(out)
+
+
+def ratchet():  # clockwork winding
+    d = 1.0
+    out = np.zeros(int(d * SR))
+    for i in range(14):
+        s0 = int((i / 14) ** 0.9 * (d - 0.05) * SR); c = bp(noise(0.015), 2500, 8000) * env_exp(0.015, 0.003)
+        out[s0:s0 + len(c)] += c
+    return norm(out)
+
+
+def typewriter():  # five keys and a bell
+    d = 1.4
+    out = np.zeros(int(d * SR))
+    for i in range(5):
+        s0 = int(i * 0.13 * SR); c = bp(noise(0.03), 1200, 6000) * env_exp(0.03, 0.006) + np.sin(2 * np.pi * 180 * t_(0.03)) * env_exp(0.03, 0.01) * 0.4
+        out[s0:s0 + len(c)] += c
+    s0 = int(0.75 * SR); b = ting()[:len(out) - s0] * 0.5
+    out[s0:s0 + len(b)] += b
+    return norm(out)
+
+
 BANK = {name: fn for name, fn in globals().items()
         if callable(fn) and name in ('boom hit clack whoosh ting static shield tick alarm pluck riser shimmer thud buzz '
-                                     'whirr shutter stamp clock lamp cheer confetti poof heartbeat sting spit splat tvoff glass sparkle').split()}
+                                     'whirr shutter stamp clock lamp cheer confetti poof heartbeat sting spit splat tvoff glass sparkle '
+                                     'creak fire scatter ratchet typewriter').split()}
 
 
 def render_all():

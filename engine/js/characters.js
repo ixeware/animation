@@ -12,6 +12,14 @@ export const CAST = {
   bobbyOld: { face: [0.98, 1.04, 0.9], hair: 'cap', hairC: '#E9E6E0', brow: '#D9D4CC', suit: '#2F3A3F', suitD: '#202A2E', shirt: 'puffer', beard: '#ECE9E3', beardBig: true, cap: '#27354F', ears: 1 },
   spassky: { face: [1.0, 1.02, 0.92], hair: 'wavy', hairC: '#A47B4E', brow: '#7A5735', suit: '#5C636B', suitD: '#41474E', shirt: 'tie', tie: '#7B2B33', ears: 1 },
   byrne: { face: [0.92, 1.06, 0.86], hair: 'receding', hairC: '#3E3228', brow: '#3E3228', suit: '#6E5640', suitD: '#523F2F', shirt: 'bow', tie: '#6E1F2B', glasses: true, ears: 1 },
+  // The Mechanical Turk episode
+  turk: { face: [0.98, 1.06, 0.86], hair: 'turban', hairC: '#2A1E16', brow: '#1E1712', suit: '#8A2F2C', suitD: '#5E1E1F', shirt: 'robe', ears: 1, mustache: '#1E1712', turban: '#EFE8D8', fez: '#B3262E' },
+  napoleon: { face: [0.96, 1.02, 0.86], hair: 'bicorne', hairC: '#2F2219', brow: '#2A1F17', suit: '#24365E', suitD: '#18264A', shirt: 'uniform', ears: 1 },
+  kempelen: { face: [0.95, 1.06, 0.84], hair: 'wig', hairC: '#ECE8E0', brow: '#7A6A58', suit: '#7A3B2A', suitD: '#5A2A1E', shirt: 'jabot', vest: '#C9A05A', ears: 1 },
+  franklin: { face: [1.02, 1.04, 0.95], hair: 'franklin', hairC: '#CFC9BE', brow: '#9B9488', suit: '#8C7F6E', suitD: '#6E6354', shirt: 'jabot', vest: '#B8AE9C', glasses: 'round', ears: 1 },
+  babbage: { face: [1.0, 1.04, 0.92], hair: 'receding', hairC: '#8E8A84', brow: '#6E6A64', suit: '#262A30', suitD: '#1A1D22', shirt: 'bow', tie: '#15171A', sideburns: true, ears: 1 },
+  empress: { face: [0.95, 1.02, 0.86], hair: 'updo', hairC: '#DCCBA6', brow: '#9C7E58', suit: '#4A78A8', suitD: '#33587E', shirt: 'gown', ears: 0.9, female: true, crown: true },
+  operator: { face: [0.94, 1.04, 0.84], hair: 'tied', hairC: '#3A2A20', brow: '#2E2119', suit: '#E8E0CF', suitD: '#C2B8A3', shirt: 'sleeves', vest: '#3B2E26', ears: 1 },
 };
 
 export const EXPR = {
@@ -89,12 +97,53 @@ function body(g, c, open) {
     g.fillStyle = c.suitD; g.beginPath(); g.ellipse(0, 150, 70, 26, 0, 0, 7); g.fill();
   }
   if (c.shirt === 'open') { g.fillStyle = '#D8D2C8'; g.beginPath(); g.moveTo(-30, 150); g.lineTo(30, 150); g.lineTo(0, 200); g.closePath(); g.fill(); }
+  if (c.shirt === 'robe') {  // Ottoman robe with a fur collar and a gold sash
+    g.save(); g.clip(p);
+    g.fillStyle = '#3C5A3A'; g.beginPath(); g.moveTo(-70, 150); g.lineTo(70, 150); g.lineTo(30, 520); g.lineTo(-30, 520); g.closePath(); g.fill();
+    g.fillStyle = '#C9A05A'; g.fillRect(-220, 430, 440, 40);
+    g.restore();
+    g.strokeStyle = '#F1EBDD'; g.lineWidth = 34; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-150, 200); g.quadraticCurveTo(-60, 170, -50, 520); g.moveTo(150, 200); g.quadraticCurveTo(60, 170, 50, 520); g.stroke();
+    g.strokeStyle = 'rgba(160,140,110,0.5)'; g.lineWidth = 3;
+    for (let y = 210; y < 520; y += 26) for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(sd * (60 + (y < 260 ? 60 : 0)) - 12, y); g.lineTo(sd * (60 + (y < 260 ? 60 : 0)) + 12, y + 8); g.stroke(); }
+  }
+  if (c.shirt === 'uniform') {  // Napoleon: blue coat, white waistcoat, red collar, gold epaulettes
+    g.fillStyle = '#F2EFE8'; g.beginPath(); g.moveTo(-70, 160); g.lineTo(70, 160); g.lineTo(46, 520); g.lineTo(-46, 520); g.closePath(); g.fill();
+    g.fillStyle = '#C9A05A'; for (let y = 230; y < 520; y += 56) { g.beginPath(); g.arc(0, y, 8, 0, 7); g.fill(); }
+    g.fillStyle = '#B3262E'; g.beginPath(); g.roundRect(-64, 138, 128, 34, 10); g.fill();
+    g.fillStyle = '#F5F1E8'; g.beginPath(); g.moveTo(-22, 150); g.lineTo(22, 150); g.lineTo(0, 196); g.closePath(); g.fill();
+    for (const sd of [-1, 1]) {
+      g.fillStyle = '#E2B14A'; g.beginPath(); g.ellipse(sd * 158, 196, 52, 20, sd * 0.25, 0, 7); g.fill();
+      g.strokeStyle = '#C9922E'; g.lineWidth = 5; for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(sd * 158 + i * 13, 208); g.lineTo(sd * 158 + i * 14, 244); g.stroke(); }
+    }
+  }
+  if (c.shirt === 'jabot') {  // 18th-century coat, waistcoat and a lace jabot
+    g.fillStyle = c.vest; g.beginPath(); g.moveTo(-70, 160); g.lineTo(70, 160); g.lineTo(40, 520); g.lineTo(-40, 520); g.closePath(); g.fill();
+    g.fillStyle = '#FBF8F0'; g.strokeStyle = 'rgba(150,140,120,0.5)'; g.lineWidth = 3;
+    for (let i = 0; i < 5; i++) { const y = 160 + i * 26, r = 30 - i * 3; g.beginPath(); g.ellipse(0, y, r, 18, 0, 0, Math.PI); g.fill(); g.stroke(); }
+  }
+  if (c.shirt === 'gown') {  // the Empress: low neckline, lace trim and pearls
+    g.fillStyle = SKIN.base; g.beginPath(); g.moveTo(-120, 175); g.quadraticCurveTo(0, 270, 120, 175); g.lineTo(60, 150); g.lineTo(-60, 150); g.closePath(); g.fill();
+    g.strokeStyle = '#FBF8F0'; g.lineWidth = 14; g.beginPath(); g.moveTo(-130, 178); g.quadraticCurveTo(0, 290, 130, 178); g.stroke();
+    g.fillStyle = '#FFF8EA'; for (let i = -5; i <= 5; i++) { const a = i / 5; g.beginPath(); g.arc(a * 62, 182 + (1 - a * a) * 34, 7, 0, 7); g.fill(); }
+  }
+  if (c.shirt === 'sleeves') {  // shirt sleeves and a dark waistcoat (the hidden operator)
+    g.save(); g.clip(p); g.fillStyle = c.vest;
+    g.beginPath(); g.moveTo(-60, 150); g.lineTo(-10, 300); g.lineTo(-20, 520); g.lineTo(-150, 520); g.lineTo(-130, 190); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(60, 150); g.lineTo(10, 300); g.lineTo(20, 520); g.lineTo(150, 520); g.lineTo(130, 190); g.closePath(); g.fill(); g.restore();
+  }
 }
 
 function hairBack(g, c, fw) {
   g.fillStyle = c.hairC;
   if (c.hair === 'messy') { g.beginPath(); g.ellipse(0, -20, 118 * fw, 125, 0, 0, 7); g.fill(); }
   if (c.hair === 'wavy') { g.beginPath(); g.ellipse(0, -40, 112 * fw, 105, 0, 0, 7); g.fill(); }
+  if (c.hair === 'wig' || c.hair === 'tied') { g.beginPath(); g.ellipse(0, -30, 112 * fw, 112, 0, 0, 7); g.fill(); }
+  if (c.hair === 'franklin') {  // long grey hair falling to the shoulders
+    const w = 100 * fw; g.beginPath(); g.moveTo(-w * 0.9, -80); g.bezierCurveTo(-w - 50, 0, -w - 40, 120, -w - 14, 175);
+    g.lineTo(w + 14, 175); g.bezierCurveTo(w + 40, 120, w + 50, 0, w * 0.9, -80); g.closePath(); g.fill();
+  }
+  if (c.hair === 'updo') { g.beginPath(); g.ellipse(0, -150, 80, 62, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(0, -40, 118 * fw, 110, 0, 0, 7); g.fill(); }
 }
 
 function hairFront(g, c, fw, fh) {
@@ -129,6 +178,23 @@ function hairFront(g, c, fw, fh) {
       p.moveTo(-w - 4, 10); p.bezierCurveTo(-w - 6, -60, -w + 6, -90, -70, -100); p.lineTo(-60, -60); p.bezierCurveTo(-80, -40, -w + 8, -10, -w - 4, 10);
       p.moveTo(w + 4, 10); p.bezierCurveTo(w + 6, -60, w - 6, -90, 70, -100); p.lineTo(60, -60); p.bezierCurveTo(80, -40, w - 8, -10, w + 4, 10);
       p.moveTo(-30, -h + 6); p.quadraticCurveTo(0, -h - 10, 30, -h + 6); p.quadraticCurveTo(0, -h + 2, -30, -h + 6); break;
+    case 'wig':  // powdered wig with rolled curls over the ears
+    case 'tied':
+      p.moveTo(-w - 6, -10); p.bezierCurveTo(-w - 12, -h * 0.95, -40, -h - 20, 0, -h - 18);
+      p.bezierCurveTo(40, -h - 20, w + 12, -h * 0.95, w + 6, -10);
+      p.bezierCurveTo(w - 4, -60, 50, -84, 0, -86); p.bezierCurveTo(-50, -84, -w + 4, -60, -w - 6, -10); break;
+    case 'franklin':  // bald crown, side hair only
+      p.moveTo(-w - 6, 40); p.bezierCurveTo(-w - 12, -20, -w - 4, -70, -w + 18, -88); p.lineTo(-w + 22, 30); p.closePath();
+      p.moveTo(w + 6, 40); p.bezierCurveTo(w + 12, -20, w + 4, -70, w - 18, -88); p.lineTo(w - 22, 30); p.closePath(); break;
+    case 'updo':
+      p.moveTo(-w - 8, 0); p.bezierCurveTo(-w - 16, -h - 10, -30, -h - 30, 0, -h - 26);
+      p.bezierCurveTo(30, -h - 30, w + 16, -h - 10, w + 8, 0);
+      p.bezierCurveTo(w - 6, -70, 30, -86, 4, -92); p.bezierCurveTo(-30, -86, -w + 6, -70, -w - 8, 0); break;
+    case 'bicorne':
+      p.moveTo(-w - 2, -24); p.bezierCurveTo(-w - 6, -h * 0.9, -30, -h - 14, 10, -h - 12);
+      p.bezierCurveTo(70, -h - 8, w + 6, -h * 0.7, w + 2, -24);
+      p.bezierCurveTo(w - 8, -60, 40, -78, 0, -74); p.bezierCurveTo(-40, -70, -w + 6, -56, -w - 2, -24); break;
+    case 'turban': break;
     case 'cap':
       // white hair tufts at the sides
       p.moveTo(-w - 10, 30); p.bezierCurveTo(-w - 22, -10, -w - 10, -60, -w + 14, -70); p.lineTo(-w + 20, 20); p.closePath();
@@ -136,10 +202,43 @@ function hairFront(g, c, fw, fh) {
   }
   g.fill(p);
   // a few highlight strands
-  if (c.hair !== 'cap' && c.hair !== 'receding') {
+  if (!['cap', 'receding', 'turban', 'franklin'].includes(c.hair)) {
     g.save(); g.clip(p); g.strokeStyle = rgba('#ffffff', 0.07); g.lineWidth = 5; g.lineCap = 'round';
     for (let i = 1; i < 3; i++) { g.beginPath(); g.moveTo(-60 + i * 30, -h + 4); g.quadraticCurveTo(-30 + i * 34, -h + 40, -10 + i * 36, -h + 30); g.stroke(); }
     g.restore();
+  }
+  if (c.hair === 'wig') {  // two rolled curls on each side, over the ears
+    g.fillStyle = c.hairC; g.strokeStyle = 'rgba(150,140,125,0.55)'; g.lineWidth = 4;
+    for (const sd of [-1, 1]) for (const y of [-2, 34]) {
+      g.beginPath(); g.roundRect(sd * (w + 12) - 34, y - 15, 68, 30, 15); g.fill(); g.stroke();
+      g.beginPath(); g.moveTo(sd * (w + 12) - 20, y); g.quadraticCurveTo(sd * (w + 12), y - 10, sd * (w + 12) + 20, y); g.stroke();
+    }
+  }
+  if (c.hair === 'turban') {  // big wrapped turban with a red crown and a jewel
+    g.fillStyle = c.fez; g.beginPath(); g.roundRect(-46, -h - 92, 92, 70, 20); g.fill();
+    const tp = new Path2D();
+    tp.moveTo(-w - 22, -30); tp.bezierCurveTo(-w - 40, -h - 50, -40, -h - 70, 0, -h - 62);
+    tp.bezierCurveTo(40, -h - 70, w + 40, -h - 50, w + 22, -30);
+    tp.bezierCurveTo(w - 10, -70, 40, -80, 0, -78); tp.bezierCurveTo(-40, -80, -w + 10, -70, -w - 22, -30);
+    const tg = g.createLinearGradient(0, -h - 60, 0, -40); tg.addColorStop(0, c.turban); tg.addColorStop(1, '#CFC6B2');
+    g.fillStyle = tg; g.fill(tp);
+    g.save(); g.clip(tp); g.strokeStyle = 'rgba(120,105,85,0.45)'; g.lineWidth = 6;
+    for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(-w - 30, -40 - i * 30); g.quadraticCurveTo(0, -110 - i * 34, w + 30, -50 - i * 24); g.stroke(); }
+    g.restore();
+    g.fillStyle = '#2FD3B5'; g.strokeStyle = '#C9A05A'; g.lineWidth = 5; g.beginPath(); g.ellipse(0, -h - 20, 14, 18, 0, 0, 7); g.fill(); g.stroke();
+    g.fillStyle = '#F5F1E8'; g.beginPath(); g.moveTo(0, -h - 38); g.quadraticCurveTo(30, -h - 110, 10, -h - 140); g.quadraticCurveTo(-4, -h - 90, 0, -h - 38); g.fill();
+  }
+  if (c.hair === 'bicorne') {  // Napoleon's hat, worn sideways, with the tricolour cockade
+    const hp = new Path2D();
+    hp.moveTo(-w - 95, -40); hp.bezierCurveTo(-w - 60, -h - 110, w + 60, -h - 110, w + 95, -40);
+    hp.bezierCurveTo(w + 40, -76, 50, -h + 34, 0, -h + 36); hp.bezierCurveTo(-50, -h + 34, -w - 40, -76, -w - 95, -40);
+    g.fillStyle = '#16181C'; g.fill(hp); g.strokeStyle = '#3A3F47'; g.lineWidth = 6; g.stroke(hp);
+    g.strokeStyle = '#C9A05A'; g.lineWidth = 4; g.beginPath(); g.moveTo(-w - 80, -46); g.bezierCurveTo(-w - 30, -h + 4, w + 30, -h + 4, w + 80, -46); g.stroke();
+    for (const [r, col] of [[24, '#2B4C9B'], [16, '#F5F1E8'], [8, '#C8283A']]) { g.fillStyle = col; g.beginPath(); g.arc(w - 10, -h - 36, r, 0, 7); g.fill(); }
+  }
+  if (c.crown) {  // small imperial crown on the updo
+    g.fillStyle = '#E2B14A'; g.beginPath(); g.moveTo(-40, -h - 18); g.lineTo(-46, -h - 58); g.lineTo(-20, -h - 38); g.lineTo(0, -h - 68); g.lineTo(20, -h - 38); g.lineTo(46, -h - 58); g.lineTo(40, -h - 18); g.closePath(); g.fill();
+    g.fillStyle = '#C8283A'; g.beginPath(); g.arc(0, -h - 34, 7, 0, 7); g.fill();
   }
   if (c.hair === 'cap') {
     g.fillStyle = c.cap; g.beginPath(); g.moveTo(-w - 6, -48); g.bezierCurveTo(-w - 4, -h - 40, w + 4, -h - 40, w + 6, -48); g.closePath(); g.fill();
@@ -226,8 +325,21 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
       for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(i * 22, 90); g.quadraticCurveTo(i * 26, 140, i * 18, 180); g.stroke(); }
       g.fillStyle = '#DAD6CF'; g.beginPath(); g.ellipse(-26, 52, 34, 13, 0.25, 0, 7); g.ellipse(26, 52, 34, 13, -0.25, 0, 7); g.fill(); // mustache
     }
+    if (c.sideburns) { g.fillStyle = c.hairC; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(sd * 88 * fw, 30, 16, 52, sd * -0.1, 0, 7); g.fill(); } }
     mouth(g, e, c);
-    if (c.glasses) {
+    if (c.mustache) {  // curled moustache over the mouth
+      g.fillStyle = c.mustache;
+      for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(0, 52); g.bezierCurveTo(sd * 30, 38, sd * 60, 44, sd * 74, 30); g.bezierCurveTo(sd * 70, 50, sd * 40, 66, 0, 60); g.fill(); }
+    }
+    if (c.female) {  // lashes
+      g.strokeStyle = '#2A1F1A'; g.lineWidth = 4; g.lineCap = 'round';
+      for (const sd of [-1, 1]) for (let i = 0; i < 2; i++) { const a = -0.25 - i * 0.3; g.beginPath(); g.moveTo(sd * (38 + 18 * Math.cos(a)), -2 - 24 * Math.sin(-a)); g.lineTo(sd * (38 + 26 * Math.cos(a)), -2 - 34 * Math.sin(-a)); g.stroke(); }
+    }
+    if (c.glasses === 'round') {  // Franklin's small spectacles, low on the nose
+      g.strokeStyle = '#4A3F33'; g.lineWidth = 4;
+      for (const sd of [-1, 1]) { g.beginPath(); g.arc(sd * 36, 8, 22, 0, 7); g.stroke(); }
+      g.beginPath(); g.moveTo(-14, 6); g.quadraticCurveTo(0, 0, 14, 6); g.stroke();
+    } else if (c.glasses) {
       g.strokeStyle = '#2B2622'; g.lineWidth = 6;
       for (const sd of [-1, 1]) { g.beginPath(); g.roundRect(sd * 38 - 30, -32, 60, 54, 14); g.stroke(); }
       g.beginPath(); g.moveTo(-8, -10); g.quadraticCurveTo(0, -16, 8, -10); g.stroke();

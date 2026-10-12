@@ -132,3 +132,38 @@ export function dust(g, x, y, t, t0, { n = 10, color = '#C9D2D8', life = 0.7, si
   }
   g.restore();
 }
+
+// a cluster of flame tongues at a screen point (billboard); s = pixels per unit / 100
+export function flames(g, x, y, s, t, { seed = 1, n = 7, w = 1.6, h = 2.6, a = 1 } = {}) {
+  if (a <= 0) return;
+  const r = rng(seed * 31 + 7);
+  g.save(); g.globalCompositeOperation = 'screen'; g.globalAlpha *= a;
+  for (let i = 0; i < n; i++) {
+    const ox = (r() - 0.5) * w * 100 * s, ph = r() * 6.28, sp = 5 + r() * 5;
+    const hh = h * 100 * s * (0.45 + 0.55 * r()) * (0.75 + 0.25 * Math.sin(t * sp + ph)), ww = hh * (0.28 + 0.1 * r());
+    const sway = Math.sin(t * 3.1 + ph) * ww * 0.35, bx = x + ox, by = y;
+    const gr = g.createLinearGradient(bx, by, bx, by - hh);
+    gr.addColorStop(0, 'rgba(255,240,190,0.95)'); gr.addColorStop(0.35, 'rgba(255,160,60,0.85)'); gr.addColorStop(0.75, 'rgba(230,70,30,0.55)'); gr.addColorStop(1, 'rgba(120,20,10,0)');
+    g.fillStyle = gr; g.beginPath(); g.moveTo(bx - ww, by);
+    g.bezierCurveTo(bx - ww * 1.1, by - hh * 0.45, bx + sway - ww * 0.3, by - hh * 0.7, bx + sway, by - hh);
+    g.bezierCurveTo(bx + sway + ww * 0.3, by - hh * 0.7, bx + ww * 1.1, by - hh * 0.45, bx + ww, by); g.fill();
+  }
+  const gl = g.createRadialGradient(x, y - h * 40 * s, 0, x, y - h * 40 * s, h * 130 * s);
+  gl.addColorStop(0, 'rgba(255,140,50,0.35)'); gl.addColorStop(1, 'rgba(255,90,30,0)');
+  g.fillStyle = gl; g.beginPath(); g.arc(x, y - h * 40 * s, h * 130 * s, 0, 7); g.fill();
+  g.restore();
+}
+
+// embers drifting up across the frame (screen space)
+export function embers(g, t, { n = 60, seed = 3, a = 1, color = '#FFB060' } = {}) {
+  if (a <= 0) return;
+  const r = rng(seed);
+  g.save(); g.globalCompositeOperation = 'screen'; g.fillStyle = color; g.shadowColor = color; g.shadowBlur = 10;
+  for (let i = 0; i < n; i++) {
+    const x0 = r() * W, sp = 120 + r() * 260, ph = r() * 10, life = (t * sp / H + ph) % 1;
+    const x = x0 + Math.sin(t * 2 + i) * 30, y = H * (1.05 - life * 1.15), sz = 2 + r() * 4;
+    g.globalAlpha = a * Math.sin(life * Math.PI) * (0.5 + 0.5 * r());
+    g.beginPath(); g.arc(x, y, sz, 0, 7); g.fill();
+  }
+  g.restore();
+}
