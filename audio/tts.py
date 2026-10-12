@@ -214,12 +214,18 @@ class Chatterbox(Cached):
         seed0, best = self.v.get('seed', 7), None
         for k in range(self.v.get('retries', 6)):
             a, heard = self.take(text, seed0 + k)
-            score = similar(text, ' '.join(w for w, _, _ in heard))
+            score = similar(text, blind(a))
             if best is None or score > best[0]: best = (score, a, heard)
             if score >= 0.97:
                 break
-            print(f'  retake ({score:.2f}): {text!r} heard {" ".join(w for w, _, _ in heard)!r}')
+            print(f'  retake ({score:.2f}): {text!r}')
         return best[1], best[2]
+
+
+def blind(a):
+    """Unprompted transcription for verification (a prompt would make whisper 'hear' the script)."""
+    recognize(a[:SR // 10], '')  # make sure the model is loaded
+    return _asr.transcribe(resample_poly(a, 160, 441).astype(np.float32), language='en', fp16=False)['text']
 
 
 def similar(a, b):
