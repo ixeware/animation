@@ -1,0 +1,283 @@
+{
+ "title": "Bobby Fischer",
+ "post": "Bobby Fischer's paranoia #chess #story #education",
+ "voice": {
+  "name": "am_michael",
+  "speed": 0.9,
+  "pitch_semitones": -1.5
+ },
+ "lead_in": 0.05,
+ "tail": 1.4,
+ "phrases": [
+  {
+   "id": "hook1",
+   "text": "This man beat the entire Soviet Union at chess.",
+   "pause": 0.5,
+   "colors": {
+    "Soviet": "red",
+    "Union": "red",
+    "chess": "gold"
+   }
+  },
+  {
+   "id": "hook2",
+   "text": "Then he pulled the fillings out of his teeth.",
+   "pause": 0.5,
+   "colors": {
+    "fillings": "red",
+    "teeth": "red"
+   }
+  },
+  {
+   "id": "hook3",
+   "text": "So nobody could get inside his head.",
+   "pause": 0.8,
+   "colors": {
+    "nobody": "red",
+    "head": "blue"
+   }
+  },
+  {
+   "id": "ny",
+   "text": "New York. 1956.",
+   "pause": 0.5,
+   "colors": {
+    "New": "blue",
+    "York.": "blue",
+    "1956.": "gold"
+   }
+  },
+  {
+   "id": "age",
+   "text": "Bobby Fischer is thirteen.",
+   "pause": 0.5,
+   "colors": {
+    "Bobby": "gold",
+    "Fischer": "gold",
+    "thirteen.": "gold"
+   }
+  },
+  {
+   "id": "queen",
+   "text": "Against a master, he leaves his queen hanging.",
+   "pause": 0.5,
+   "colors": {
+    "master,": "gold",
+    "queen": "red",
+    "hanging.": "red"
+   }
+  },
+  {
+   "id": "purpose",
+   "text": "On purpose.",
+   "pause": 0.8,
+   "colors": {}
+  },
+  {
+   "id": "later",
+   "text": "Twenty-four moves later...",
+   "pause": 1.5,
+   "colors": {
+    "Twenty-four": "gold"
+   }
+  },
+  {
+   "id": "mate1",
+   "text": "Checkmate.",
+   "pause": 0.9,
+   "colors": {}
+  },
+  {
+   "id": "century",
+   "text": "They call it the Game of the Century.",
+   "pause": 0.8,
+   "colors": {
+    "Game": "gold",
+    "Century.": "gold"
+   }
+  },
+  {
+   "id": "rey",
+   "text": "Reykjavik. 1972.",
+   "pause": 0.5,
+   "colors": {
+    "Reykjavik.": "blue",
+    "1972.": "gold"
+   }
+  },
+  {
+   "id": "spassky",
+   "text": "Boris Spassky. World champion.",
+   "pause": 0.5,
+   "colors": {
+    "Boris": "red",
+    "Spassky.": "red",
+    "champion.": "gold"
+   }
+  },
+  {
+   "id": "soviets",
+   "text": "The Soviets had held the title for twenty-four years.",
+   "pause": 0.6,
+   "colors": {
+    "Soviets": "red",
+    "twenty-four": "gold"
+   }
+  },
+  {
+   "id": "loses",
+   "text": "Bobby loses game one.",
+   "pause": 0.5,
+   "colors": {
+    "loses": "red"
+   }
+  },
+  {
+   "id": "cameras",
+   "text": "Then he hears the cameras.",
+   "pause": 0.5,
+   "colors": {
+    "cameras.": "red"
+   }
+  },
+  {
+   "id": "refuses",
+   "text": "He refuses to play.",
+   "pause": 0.5,
+   "colors": {
+    "refuses": "red"
+   }
+  },
+  {
+   "id": "down",
+   "text": "Down two to zero.",
+   "pause": 0.8,
+   "colors": {
+    "Down": "red",
+    "zero.": "red"
+   }
+  },
+  {
+   "id": "room",
+   "text": "Game three. A back room. No cameras.",
+   "pause": 0.7,
+   "colors": {
+    "three.": "gold",
+    "back": "blue",
+    "room.": "blue",
+    "No": "red"
+   }
+  },
+  {
+   "id": "wins",
+   "text": "Bobby wins.",
+   "pause": 0.4,
+   "colors": {}
+  },
+  {
+   "id": "again",
+   "text": "Then again. And again.",
+   "pause": 0.5,
+   "colors": {}
+  },
+  {
+   "id": "champ",
+   "text": "World champion.",
+   "pause": 1.3,
+   "colors": {
+    "World": "gold",
+    "champion.": "gold"
+   }
+  },
+  {
+   "id": "vanish",
+   "text": "And then... he vanished.",
+   "pause": 1.1,
+   "colors": {
+    "vanished.": "blue"
+   }
+  },
+  {
+   "id": "never",
+   "text": "He never played for the title again.",
+   "pause": 0.6,
+   "colors": {
+    "never": "red"
+   }
+  },
+  {
+   "id": "watching",
+   "text": "He was sure the Soviets were watching.",
+   "pause": 0.5,
+   "colors": {
+    "Soviets": "red",
+    "watching.": "red"
+   }
+  },
+  {
+   "id": "fillings",
+   "text": "So the fillings came out.",
+   "pause": 0.8,
+   "colors": {
+    "fillings": "red"
+   }
+  },
+  {
+   "id": "spat",
+   "text": "In 1992, he spat on an order from the US government.",
+   "pause": 0.5,
+   "colors": {
+    "1992,": "gold",
+    "spat": "red",
+    "US": "blue",
+    "government.": "blue"
+   },
+   "say": "In 1992, he spat on an order from the U.S. government."
+  },
+  {
+   "id": "home",
+   "text": "He never went home again.",
+   "pause": 0.7,
+   "colors": {
+    "never": "red",
+    "home": "blue"
+   }
+  },
+  {
+   "id": "iceland",
+   "text": "Iceland took him in.",
+   "pause": 0.8,
+   "colors": {
+    "Iceland": "blue"
+   }
+  },
+  {
+   "id": "died",
+   "text": "He died in Reykjavik. The city where he became king.",
+   "pause": 0.9,
+   "colors": {
+    "died": "red",
+    "Reykjavik.": "blue",
+    "king.": "gold"
+   }
+  },
+  {
+   "id": "age64",
+   "text": "Age sixty-four.",
+   "pause": 0.7,
+   "colors": {
+    "sixty-four.": "gold"
+   }
+  },
+  {
+   "id": "square",
+   "text": "One year for every square on the board.",
+   "pause": 0.0,
+   "colors": {
+    "every": "gold",
+    "square": "gold",
+    "board.": "gold"
+   }
+  }
+ ]
+}

@@ -1,0 +1,274 @@
+"""Procedural score in D minor, ~120 BPM, arranged by the episode's music sections.
+
+Sections come from cues.json ("music": [{t, m}, ...]); each mood is a small arrangement of
+synth instruments laid on a global beat grid so the cuts land on time.
+"""
+import functools
+
+import numpy as np
+from scipy.signal import fftconvolve
+
+from sfx import SR, lp, hp, bp, noise, env_exp, ks, t_, rng
+
+BPM = 120
+BEAT = 60 / BPM
+
+
+def hz(n):  # MIDI note -> Hz
+    return 440.0 * 2 ** ((n - 69) / 12)
+
+
+N = {k: v for k, v in zip('C C# D D# E F F# G G# A A# B'.split(), range(12))}
+
+
+def note(name):  # 'D4' -> midi
+    return 12 * (int(name[-1]) + 1) + N[name[:-1]]
+
+
+# ---------- instruments ----------
+@functools.lru_cache(maxsize=None)
+def pizz(m, d=0.9):
+    x = ks(hz(m), d, damp=0.994, bright=0.35)
+    return lp(x, 3500) * env_exp(d, 0.35)
+
+
+def saw(f, d, voices=3, det=0.006):
+    t = t_(d)
+    return sum(2 * ((t * f * (1 + det * (i - 1)) + rng.random()) % 1) - 1 for i in range(voices)) / voices
+
+
+def pad(ms, d, cut=1400, att=0.6, rel=0.8):
+    t = t_(d)
+    x = sum(saw(hz(m), d) for m in ms) / len(ms)
+    e = np.minimum(1, t / att) * np.minimum(1, (d - t) / rel)
+    return lp(x, cut) * e
+
+
+def strings(ms, d, cut=2200, att=0.25):
+    t = t_(d)
+    x = sum(saw(hz(m), d, 4, 0.004) * (1 + 0.004 * np.sin(2 * np.pi * 5.5 * t)) for m in ms) / len(ms)
+    return lp(x, cut) * np.minimum(1, t / att) * np.minimum(1, (d - t) / 0.3)
+
+
+@functools.lru_cache(maxsize=None)
+def piano(m, d=2.5, vel=1.0):
+    t = t_(d)
+    f = hz(m)
+    x = sum(np.sin(2 * np.pi * f * k * t) * a * np.exp(-t * (1.2 + k * 0.9)) for k, a in [(1, 1), (2, 0.45), (3, 0.22), (4, 0.12), (5, 0.06)])
+    x[:200] += lp(noise(200 / SR), 2500) * 0.15
+    return x * np.minimum(1, t / 0.004) * vel
+
+
+@functools.lru_cache(maxsize=None)
+def bell(m, d=1.8):
+    t = t_(d)
+    f = hz(m)
+    return (np.sin(2 * np.pi * f * t) + 0.4 * np.sin(2 * np.pi * f * 2.76 * t) + 0.2 * np.sin(2 * np.pi * f * 5.4 * t)) * np.exp(-t / 0.45)
+
+
+@functools.lru_cache(maxsize=None)
+def bass(m, d=0.45):
+    t = t_(d)
+    f = hz(m)
+    x = np.sin(2 * np.pi * f * t) + 0.3 * np.sin(2 * np.pi * 2 * f * t)
+    return x * np.minimum(1, t / 0.01) * np.exp(-t / (d * 0.6))
+
+
+def kick(d=0.35):
+    t = t_(d)
+    return np.sin(2 * np.pi * (48 + 70 * np.exp(-t * 28)) * t) * np.exp(-t / 0.12)
+
+
+def snare(d=0.2, a=1.0):
+    t = t_(d)
+    return (bp(noise(d), 1200, 7000) * np.exp(-t / 0.05) + np.sin(2 * np.pi * 185 * t) * np.exp(-t / 0.04) * 0.6) * a
+
+
+def hat(d=0.05):
+    return hp(noise(d), 7000) * env_exp(d, 0.012)
+
+
+def timpani(m=note('D2'), d=1.4):
+    t = t_(d)
+    return np.sin(2 * np.pi * hz(m) * t * (1 + 0.02 * np.exp(-t * 8))) * np.exp(-t / 0.5) + lp(noise(d), 300) * np.exp(-t / 0.05) * 0.3
+
+
+# D minor progressions
+CH = {
+    'Dm': [note('D3'), note('F3'), note('A3')], 'Bb': [note('A#2'), note('D3'), note('F3')],
+    'Gm': [note('G2'), note('A#2'), note('D3')], 'A': [note('A2'), note('C#3'), note('E3')],
+    'F': [note('F2'), note('A2'), note('C3')], 'C': [note('C3'), note('E3'), note('G3')],
+    'D': [note('D3'), note('F#3'), note('A3')], 'Eb': [note('D#3'), note('G3'), note('A#3')],
+}
+PROG = ['Dm', 'Bb', 'Gm', 'A']
+
+
+class Score:
+    def __init__(self, dur):
+        self.dur = dur
+        self.L = np.zeros(int((dur + 4) * SR))
+        self.R = np.zeros_like(self.L)
+        self.wet = np.zeros_like(self.L)
+
+    def add(self, t, x, gain=1.0, pan=0.0, rev=0.25, until=None):
+        if until is not None:  # hard section boundary with a short fade
+            n = max(0, int((until - t) * SR))
+            if n <= 0:
+                return
+            if len(x) > n:
+                x = x[:n].copy(); f = min(len(x), int(0.04 * SR)); x[-f:] *= np.linspace(1, 0, f)
+        s = int(t * SR)
+        if s < 0 or s >= len(self.L):
+            return
+        x = x[:len(self.L) - s] * gain
+        self.L[s:s + len(x)] += x * np.sqrt(0.5 * (1 - pan))
+        self.R[s:s + len(x)] += x * np.sqrt(0.5 * (1 + pan))
+        self.wet[s:s + len(x)] += x * rev
+
+    def mix(self):
+        d = 2.6
+        tt = t_(d)
+        ir = noise(d) * np.exp(-tt / 0.7)
+        ir = lp(ir, 5000)
+        w = fftconvolve(self.wet, ir)[:len(self.L)] * 0.035
+        st = np.stack([self.L + w, self.R + np.roll(w, 331)], 1)
+        return st[:int(self.dur * SR)]
+
+
+def beats(a, b, div=1):
+    """global beat-grid times in [a, b) at subdivision div (1 = quarter, 2 = eighth...)."""
+    step = BEAT / div
+    k = np.ceil(a / step - 1e-6)
+    out = []
+    while k * step < b - 1e-6:
+        out.append(k * step); k += 1
+    return out
+
+
+def chord_at(t, prog=PROG, bars=1):
+    return CH[prog[int(t / (BEAT * 4 * bars)) % len(prog)]]
+
+
+# ---------- moods ----------
+def m_hook(S, a, b):
+    S.add(a, pad([note('D2'), note('A2'), note('D3')], b - a + 0.6, cut=700, att=1.0), 0.55, rev=0.4, until=b + 0.3)
+    for t in beats(a, b, 1):
+        S.add(t, hat(), 0.18, pan=0.3, until=b)
+    for i, t in enumerate(beats(a + 0.01, b, 0.5)):
+        S.add(t, piano([note('D3'), note('F3'), note('E3'), note('A2')][i % 4], 2.0), 0.35, pan=-0.2, rev=0.5, until=b)
+
+
+def m_intrigue(S, a, b):
+    for i, t in enumerate(beats(a, b, 2)):
+        ch = chord_at(t)
+        m = [ch[0], ch[1], ch[2], ch[1]][i % 4] + 12
+        S.add(t, pizz(m), 0.5, pan=-0.35 + 0.7 * (i % 2), rev=0.2, until=b)
+    for t in beats(a, b, 0.5):
+        S.add(t, bass(chord_at(t)[0] - 12, 0.9), 0.5, until=b)
+    for t in beats(a, b, 1):
+        S.add(t, hat(), 0.12, pan=0.4, until=b)
+    for i, t in enumerate(beats(a + BEAT * 2, b, 0.25)):
+        S.add(t, bell([note('A5'), note('F5'), note('E5'), note('D5')][i % 4]), 0.12, pan=0.3, rev=0.5, until=b)
+
+
+def m_tension(S, a, b):
+    for i, t in enumerate(beats(a, b, 4)):
+        S.add(t, pizz(note('D4') + [0, 1, 0, 3][i % 4] + (i // 16) * 2), 0.45 + 0.3 * (t - a) / (b - a), pan=-0.3 + 0.6 * (i % 2), until=b)
+    S.add(a, strings([note('D3'), note('D#3')], b - a, cut=1800, att=1.2), 0.3, until=b)
+    for t in beats(a, b, 2):
+        S.add(t, kick(), 0.35, until=b)
+
+
+def m_drop(S, a, b):
+    S.add(a, pad([note('D2')], b - a + 0.3, cut=300, att=0.05), 0.35, until=b)
+
+
+def m_hit(S, a, b):
+    S.add(a, timpani(), 0.9, rev=0.5)
+    S.add(a, strings(CH['D'] + [note('D4')], b - a + 0.8, cut=2600, att=0.05), 0.4, rev=0.5, until=b + 0.4)
+
+
+def m_glory(S, a, b):
+    S.add(a, pad(CH['F'] + [note('A3')], b - a + 0.5, cut=1800, att=0.3), 0.45, rev=0.5, until=b + 0.3)
+    for i, t in enumerate(beats(a, b, 2)):
+        S.add(t, bell([note('F5'), note('A5'), note('C6'), note('A5')][i % 4]), 0.15, pan=0.4 * ((-1) ** i), rev=0.6, until=b)
+
+
+def m_coldwar(S, a, b, intensity=0.0):
+    for i, t in enumerate(beats(a, b, 2)):  # low staccato string ostinato
+        root = chord_at(t, PROG, 1)[0]
+        S.add(t, strings([root - 12, root], 0.22, cut=1400, att=0.01), 0.42 + 0.2 * intensity, pan=-0.2, rev=0.15, until=b)
+    for t in beats(a, b, 1):
+        S.add(t, snare(a=0.35 if (t / BEAT) % 2 > 0.5 else 0.15), 0.45 + 0.2 * intensity, pan=0.2, until=b)
+        if (t / BEAT) % 4 < 0.5:
+            S.add(t, timpani(chord_at(t)[0] - 12), 0.45, rev=0.4, until=b)
+    for t in beats(a, b, 0.25):  # brass-ish chord stabs every bar
+        S.add(t, pad(chord_at(t), BEAT * 4, cut=1300 + 900 * intensity, att=0.08, rel=0.6), 0.32 + 0.15 * intensity, rev=0.4, until=b)
+    if intensity:
+        for t in beats(a, b, 4):
+            S.add(t, hat(), 0.12, pan=0.5, until=b)
+
+
+def m_build(S, a, b):
+    m_coldwar(S, a, b, intensity=1.0)
+    S.add(a, strings([note('D4'), note('A4')], b - a, cut=3000, att=(b - a) * 0.8), 0.25, until=b)
+
+
+def m_victory(S, a, b):
+    S.add(a, timpani(), 1.0, rev=0.6)
+    S.add(a, strings(CH['D'] + [note('D4'), note('F#4'), note('A4')], b - a + 1.0, cut=4000, att=0.08), 0.55, rev=0.6, until=b + 0.6)
+    for i, m in enumerate([note('D5'), note('F#5'), note('A5'), note('D6')]):
+        S.add(a + i * 0.12, bell(m), 0.25, pan=0.3, rev=0.6)
+
+
+def m_void(S, a, b):
+    S.add(a, pad([note('D5'), note('A5')], b - a + 0.5, cut=2500, att=1.5), 0.12, rev=0.8, until=b + 0.4)
+    for t, m in zip(np.arange(a + 0.4, b, 1.5), [note('A4'), note('F4'), note('D4'), note('E4')]):
+        S.add(t, piano(m, 3.0, 0.8), 0.4, pan=0.15, rev=0.9, until=b + 0.6)
+
+
+def m_paranoia(S, a, b):
+    S.add(a, strings([note('D3'), note('D#3'), note('A3')], b - a + 0.3, cut=1600, att=0.8), 0.32, rev=0.5, until=b + 0.2)
+    t = t_(b - a)
+    trem = strings([note('D#4')], b - a, cut=3000, att=0.4) * (0.5 + 0.5 * np.sign(np.sin(2 * np.pi * 8 * t)))
+    S.add(a, trem, 0.12, pan=0.5, until=b)
+    for tt in beats(a, b, 1):
+        S.add(tt, hat(0.03), 0.2, pan=-0.6, until=b)
+
+
+def m_exile(S, a, b):
+    for t in beats(a, b, 2):
+        S.add(t, bass(chord_at(t, ['Dm', 'Gm', 'Bb', 'A'], 1)[0] - 12, 0.35), 0.5, until=b)
+    for t in beats(a, b, 0.25):
+        S.add(t, pad(chord_at(t, ['Dm', 'Gm', 'Bb', 'A']), BEAT * 4, cut=900, att=0.4), 0.3, rev=0.4, until=b)
+    for i, t in enumerate(beats(a, b, 1)):
+        S.add(t, piano([note('D4'), note('F4'), note('A4'), note('G4')][i % 4], 1.5, 0.6), 0.22, pan=0.2, rev=0.5, until=b)
+
+
+def m_elegy(S, a, b):
+    mel = ['A4', 'F4', 'E4', 'D4', 'A#3', 'D4', 'C#4', 'D4']
+    for i, t in enumerate(np.arange(a + 0.1, b, BEAT * 1.5)):
+        S.add(t, piano(note(mel[i % len(mel)]), 3.0, 0.9), 0.5, pan=0.1, rev=0.8, until=b + 0.5)
+    for t in beats(a, b, 0.25):
+        ch = chord_at(t, ['Dm', 'Bb', 'F', 'A'])
+        S.add(t, pad(ch, BEAT * 4 + 0.4, cut=1200, att=0.8), 0.32, rev=0.6, until=b + 0.3)
+        S.add(t, piano(ch[0] - 12, 3.0, 0.7), 0.35, rev=0.6, until=b + 0.3)
+
+
+def m_finale(S, a, b):
+    S.add(a, strings(CH['Dm'] + [note('D4'), note('A4'), note('D5')], b - a + 0.5, cut=3500, att=1.6), 0.5, rev=0.7, until=b)
+    S.add(a, timpani(), 0.6, rev=0.6)
+    for i, t in enumerate(np.arange(a + 0.2, b, BEAT)):
+        S.add(t, bell([note('D5'), note('A5'), note('F5'), note('E5')][i % 4]), 0.15, pan=0.3 * ((-1) ** i), rev=0.7, until=b)
+
+
+MOODS = {k[2:]: v for k, v in globals().items() if k.startswith('m_')}
+
+
+def render(sections, dur):
+    S = Score(dur)
+    for sec, nxt in zip(sections, sections[1:]):
+        if sec['m'] in MOODS:
+            MOODS[sec['m']](S, sec['t'], nxt['t'])
+    out = S.mix()
+    return out / max(1e-6, np.abs(out).max()) * 0.9
