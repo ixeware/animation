@@ -43,7 +43,10 @@ def main(ep):
 
     # voice: 24k -> 44.1k, clean + warm + compressed, slight room
     v, vsr = sf.read(b / 'narration.wav', dtype='float32')
-    v = resample_poly(v, 147, 80)[:n]
+    if vsr != SR:
+        from math import gcd
+        g = gcd(SR, vsr); v = resample_poly(v, SR // g, vsr // g)
+    v = v[:n]
     v = np.pad(v, (0, n - len(v)))
     v = ffilter(v, 'highpass=f=70,equalizer=f=140:t=q:w=1.0:g=2.5,equalizer=f=3200:t=q:w=1.2:g=2,'
                    'acompressor=threshold=-22dB:ratio=3:attack=5:release=90:makeup=4,'
