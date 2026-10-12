@@ -2,7 +2,7 @@
 // turns each chess move into a small event (lift, arc, landing squash, shockwave, sparks, shards).
 import { W, H, C, clamp, lerp, ease, track, noise1, inv } from './core.js';
 import { sqXZ, piecesAt } from './board.js';
-import { drawChar, hand } from './characters.js';
+import { drawChar, hand, EXPR } from './characters.js';
 import { sprite, spriteBox } from './pieces.js';
 import { burst, shockwave, glint, shatterImage, dust } from './fx.js';
 
@@ -21,14 +21,32 @@ export function rig(b, lt, keys, { t = lt, shake = 1, e = ease.inOut, bump = 0 }
   return b;
 }
 
-// character behind the far edge of the board; returns a function that draws the hands after the board.
-// reach = {sq, u}: the right hand travels to a square and back (u 0..1)
-export function seated(g, b, who, e, t, { x = 4, z = 9.3, k = 1.0, lift = 3.1, alpha = 1, hx = 1.6, reach = null, side = 1 } = {}) {
-  const a = b.project(x, 0, z);
-  drawChar(g, who, { x: a.x, y: a.y - lift * a.s, s: a.s * k / 100 * 1.05, e, t, alpha });
+// The cartoon heads are billboards; to sell the 3D orbit, the face turns by the angle between the
+// character's facing direction (+z or -z) and the line of sight from the camera.
+const resolve = e => (typeof e === 'string' ? EXPR[e] : e) || EXPR.neutral;
+function viewTurn(b, x, z, face) {
+  const dx = x - b.E[0], dz = z - b.E[2], l = Math.hypot(dx, dz) || 1;
+  return face * (dx / l);  // = dot(facing, right axis of the ray toward the character)
+}
+
+// a character at a world point (head center), drawn as a camera-facing billboard; returns its projection
+export function actor(g, b, who, { x = 4, y = 3.1, z = 9.4, k = 1, e = 'neutral', t = 0, face = -1, follow = 0.85, alpha = 1, blur = 0, ...o } = {}) {
+  if (b.toCam(x, y, z)[2] < 0.8 || alpha <= 0) return null;
+  const p = b.project(x, y, z), ex = resolve(e);
+  if (blur > 0.5) { g.save(); g.filter = `blur(${blur.toFixed(1)}px)`; }
+  drawChar(g, who, { ...o, x: p.x, y: p.y, s: p.s * k / 100 * 1.05, e: { ...ex, turn: clamp((ex.turn || 0) - viewTurn(b, x, z, face) * follow, -1, 1) }, t, alpha });
+  if (blur > 0.5) g.restore();
+  return p;
+}
+
+// character seated at the board: far side (z≈9.4, face=-1) or near side (z≈-1.4, face=1).
+// Returns a function that draws the hands after the board. reach = {sq, u}: the hand travels to a square and back (u 0..1)
+export function seated(g, b, who, e, t, { x = 4, z = 9.3, k = 1.0, lift = 3.1, alpha = 1, hx = 1.6, reach = null, side = 1, face = -1, ...o } = {}) {
+  actor(g, b, who, { x, y: lift, z, k, e, t, face, alpha, ...o });
   return () => {
     for (const sd of [-1, 1]) {
-      let p = b.project(x + sd * hx, 0.25, z - 0.75), r = 0.33 * p.s;
+      if (b.toCam(x + sd * hx, 0.25, z + face * 0.75)[2] < 0.6) continue;
+      let p = b.project(x + sd * hx * -face, 0.25, z + face * 0.75), r = 0.33 * p.s;
       if (reach && sd === side && reach.u > 0) {
         const [sx, sz] = sqXZ(reach.sq), q = b.project(sx, 0.9, sz), u = Math.sin(Math.PI * clamp(reach.u));
         p = { x: lerp(p.x, q.x, u), y: lerp(p.y, q.y, u) - Math.sin(Math.PI * u) * 40, s: lerp(p.s, q.s, u) };

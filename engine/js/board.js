@@ -27,10 +27,21 @@ export class Board {
     return { x: this.cx + this.f * dot(d, this.R) / depth, y: this.cy - this.f * dot(d, this.U) / depth, s: this.f / depth, z: depth };
   }
 
-  poly(ctx, pts) {
+  // camera-space coordinates: [right, up, depth]
+  toCam(x, y, z) { const d = sub([x, y, z], this.E); return [dot(d, this.R), dot(d, this.U), dot(d, this.F)]; }
+
+  // polygon path with near-plane clipping, so geometry can surround the camera (walls, floor, close-ups)
+  poly(ctx, pts, near = 0.2) {
+    const cam = pts.map(p => this.toCam(...p)), out = [];
+    for (let i = 0; i < cam.length; i++) {
+      const a = cam[i], b = cam[(i + 1) % cam.length], ia = a[2] >= near, ib = b[2] >= near;
+      if (ia) out.push(a);
+      if (ia !== ib) { const k = (near - a[2]) / (b[2] - a[2]); out.push([a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, near]); }
+    }
     ctx.beginPath();
-    pts.forEach(([x, y, z], i) => { const p = this.project(x, y, z); i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); });
+    out.forEach(([rx, uy, d], i) => { const x = this.cx + this.f * rx / d, y = this.cy - this.f * uy / d; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
     ctx.closePath();
+    return out.length >= 3;
   }
 
   quad(ctx, x0, z0, x1, z1, y = 0) { this.poly(ctx, [[x0, y, z0], [x1, y, z0], [x1, y, z1], [x0, y, z1]]); }
@@ -116,7 +127,7 @@ export class Board {
     const fz = focus ?? this.dist;
     const list = pieces.map(p => ({ ...p, pr: this.project(p.x, p.y || 0, p.z) })).sort((a, b) => b.pr.z - a.pr.z);
     for (const p of list) {
-      if (p.alpha === 0) continue;
+      if (p.alpha === 0 || p.pr.z < 0.6) continue;
       const h = p.pr.s * scale * (p.scale || 1);
       const blur = clamp(Math.abs(p.pr.z - fz) * dof, 0, maxBlur) * (p.sharp ? 0 : 1);
       if (p.trail) this.trail(ctx, p.trail, p, h);
