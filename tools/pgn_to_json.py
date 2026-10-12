@@ -23,8 +23,8 @@ def main(movetext, out, start_fen=None):
                  "sq": chess.square_name(sq)} for sq, pc in board.piece_map().items()]
 
     plies = [{"san": None, "pieces": snapshot()}]
-    tokens = [t for t in movetext.replace("\n", " ").split()
-              if not t[0].isdigit() or t in ("0-0", "0-0-0")]
+    import re
+    tokens = re.sub(r"\d+\.(\.\.)?", " ", movetext.replace("\n", " ")).split()
     for tok in tokens:
         if tok in ("1-0", "0-1", "1/2-1/2", "*"):
             break

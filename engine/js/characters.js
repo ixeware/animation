@@ -32,14 +32,17 @@ export const EXPR = {
 // blend expression keyframes: keys = [[t, 'name' | {...}], ...]
 export function exprAt(keys, t) {
   const get = k => (typeof k === 'string' ? EXPR[k] : { ...EXPR.neutral, ...k });
-  let a = keys[0], b = keys[0];
-  for (let i = 0; i < keys.length; i++) { if (keys[i][0] <= t) { a = keys[i]; b = keys[i + 1] || keys[i]; } }
-  const ea = get(a[1]), eb = get(b[1]);
-  const u = b === a ? 0 : smooth(clamp((t - a[0]) / Math.min(0.22, b[0] - a[0])));
-  if (u <= 0) return ea;
+  // the active key is the last one whose time has passed; we blend into it from the previous key over 0.2 s
+  let i = 0;
+  while (i + 1 < keys.length && keys[i + 1][0] <= t) i++;
+  const cur = get(keys[i][1]);
+  if (i === 0) return cur;
+  const prev = get(keys[i - 1][1]);
+  const u = smooth(clamp((t - keys[i][0]) / 0.2));
+  if (u >= 1) return cur;
   const out = {};
-  for (const k of new Set([...Object.keys(ea), ...Object.keys(eb)])) {
-    const va = ea[k] ?? EXPR.neutral[k] ?? 0, vb = eb[k] ?? EXPR.neutral[k] ?? 0;
+  for (const k of new Set([...Object.keys(prev), ...Object.keys(cur)])) {
+    const va = prev[k] ?? EXPR.neutral[k] ?? 0, vb = cur[k] ?? EXPR.neutral[k] ?? 0;
     out[k] = typeof va === 'number' ? lerp(va, vb, u) : Array.isArray(va) ? va.map((x, j) => lerp(x, vb[j], u)) : (u < 0.5 ? va : vb);
   }
   return out;
@@ -173,13 +176,16 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   // idle life: breathing bob + slow head sway
   const ph = who.length * 1.7 + x * 0.01;
   y += Math.sin(t * 1.7 + ph) * 4 * s; tilt += Math.sin(t * 0.8 + ph) * 0.018;
+  // reactions: shake (fear/shock jitter), nod (laugh / agreement bounce)
+  const sh = e.shake || 0, nod = e.nod || 0, turn = clamp(e.turn || 0, -1, 1);
+  x += Math.sin(t * 47) * sh * 6 * s; tilt += Math.sin(t * 39) * sh * 0.03; y += Math.abs(Math.sin(t * 9)) * nod * -10 * s;
   g.save(); g.globalAlpha *= alpha; g.translate(x, y); g.scale(s, s); g.rotate(tilt);
   if (silhouette) g.filter = 'brightness(0)';
   if (!noBody) body(g, c);
   hairBack(g, c, fw);
   // ears
   g.fillStyle = SKIN.shade;
-  for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(sd * 98 * fw, 8, 18 * c.ears, 28 * c.ears, 0, 0, 7); g.fill(); }
+  for (const sd of [-1, 1]) { const k = 1 - clamp(sd * turn, 0, 1) * 0.75; g.beginPath(); g.ellipse(sd * 98 * fw - turn * 10, 8, 18 * c.ears * k, 28 * c.ears, 0, 0, 7); g.fill(); }
   // head with soft side shading
   const hp = headPath(fw, fh, jaw);
   const hg = g.createLinearGradient(-110, 0, 110, 0); hg.addColorStop(0, SKIN.base); hg.addColorStop(0.7, SKIN.base); hg.addColorStop(1, SKIN.shade);
@@ -191,6 +197,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   // blink every ~3.7s unless lids already heavy
   const bt = (t + (who.length * 0.37)) % 3.7, blink = bt < 0.12 ? Math.sin(bt / 0.12 * Math.PI) : 0;
   const ee = { ...e, lid: Math.max(e.lid ?? 0, blink) };
+  g.save(); g.translate(turn * 26 * fw, 0);  // head turn: the face slides toward the look direction
   if (silhouette) {
     g.filter = 'none';
     if (eyeGlow) for (const sd of [-1, 1]) { g.save(); g.shadowColor = eyeGlow; g.shadowBlur = 30; g.fillStyle = eyeGlow; g.beginPath(); g.ellipse(sd * 38, -2, 14, 8, sd * 0.25, 0, 7); g.fill(); g.restore(); }
@@ -204,9 +211,10 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
       g.beginPath(); g.roundRect(-30, -8, 60, 16, 8); g.fill(); g.restore();
     }
     // nose
+    g.save(); g.translate(turn * 12, 0);
     g.fillStyle = SKIN.deep; g.globalAlpha *= 0.55;
     g.beginPath(); g.moveTo(-4, 4); g.quadraticCurveTo(-16, 32, -12, 38); g.quadraticCurveTo(0, 44, 12, 38); g.quadraticCurveTo(4, 30, -4, 4); g.fill();
-    g.globalAlpha /= 0.55;
+    g.restore();
     if (e.blush) { g.fillStyle = rgba(SKIN.blush, 0.35 * e.blush); for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(sd * 58, 40, 20, 11, 0, 0, 7); g.fill(); } }
     if (c.beardBig) { // white bushy beard drawn over the jaw, mouth sits on it
       g.fillStyle = c.beard;
@@ -226,7 +234,8 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
       g.fillStyle = rgba('#ffffff', 0.12); for (const sd of [-1, 1]) { g.beginPath(); g.roundRect(sd * 38 - 27, -29, 54, 48, 12); g.fill(); }
     }
   }
-  hairFront(g, c, fw, fh);
+  g.restore();
+  g.save(); g.translate(turn * 9, 0); hairFront(g, c, fw, fh); g.restore();
   if (!silhouette) {
     if (e.sweat) sweatDrop(g, 92, -70 + Math.sin(t * 2) * 4 + ((t * 30) % 30), 0.9, e.sweat);
     if (e.tear) { g.fillStyle = rgba('#7cc4f2', 0.9 * e.tear); g.beginPath(); g.ellipse(34, 24 + ((t * 40) % 60), 7, 11, 0, 0, 7); g.fill(); }

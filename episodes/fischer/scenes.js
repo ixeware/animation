@@ -7,24 +7,18 @@ import { drawChar, exprAt, hand, EXPR } from '../../engine/js/characters.js';
 import { placeStamp, nameTitle, counter, badge, stamp, healthBar, scoreboard, vsSplit, vsLabel, paper, mono, serif, sans } from '../../engine/js/hud.js';
 import { DotMap, ISO } from '../../engine/js/map.js';
 import { loadImage, photoCard } from '../../engine/js/photo.js';
+import { rig, seated, Moves } from '../../engine/js/stage.js';
+import { burst, shockwave, glint, dust } from '../../engine/js/fx.js';
 
 const GOC = await fetch('../engine/data/game_of_century.json').then(r => r.json());
+const G1 = await fetch('../engine/data/spassky_fischer_1972_g1.json').then(r => r.json());
+const G3 = await fetch('../engine/data/spassky_fischer_1972_g3.json').then(r => r.json());
 const map = await new DotMap().init();
 // real archival photos (free licenses, see photos/credits.json)
 const P = Object.fromEntries(await Promise.all(['fischer13', 'fischer1972', 'spassky1973', 'grave'].map(async k => [k, await loadImage(`../episodes/fischer/photos/${k}.jpg`)])));
 
 // ---------- shared pieces of staging ----------
 const B = new Board();
-
-// character sitting behind the far edge of the board
-function seated(g, b, who, e, t, { x = 4, z = 9.3, k = 1.0, hands = true, handY = 0.25, lift = 3.1, alpha = 1, hx = 1.6 } = {}) {
-  const a = b.project(x, 0, z);
-  drawChar(g, who, { x: a.x, y: a.y - lift * a.s, s: a.s * k / 100 * 1.05, e, t, alpha });
-  return () => { // hands are drawn after the board
-    if (!hands) return;
-    for (const sd of [-1, 1]) { const p = b.project(x + sd * hx, handY, z - 0.75); hand(g, p.x, p.y, 0.33 * p.s); }
-  };
-}
 
 function woodRoom(g) {
   const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#3B2A1F'); gr.addColorStop(0.5, '#24190F'); gr.addColorStop(1, '#0C0806');
@@ -138,6 +132,18 @@ function spit(g, x0, y0, x1, y1, u) {
   g.restore();
 }
 
+// extra props for the new inserts
+function bigCam(g, x, y, s, t) {  // a hero-sized film camera with spinning reels and a blinking REC light
+  filmCam(g, x, y, s, t, 1);
+  const on = ((t * 2) % 1) < 0.6;
+  g.save(); g.font = mono(Math.round(26 * s), 800); g.fillStyle = on ? C.red : 'rgba(255,107,79,0.3)'; g.textAlign = 'left';
+  g.shadowColor = C.red; g.shadowBlur = on ? 18 : 0; g.fillText('● REC', x - 70 * s, y - 120 * s); g.restore();
+  // lens glare
+  const gr = g.createRadialGradient(x + 125 * s, y, 0, x + 125 * s, y, 160 * s);
+  gr.addColorStop(0, 'rgba(200,230,255,0.55)'); gr.addColorStop(1, 'rgba(200,230,255,0)');
+  g.save(); g.globalCompositeOperation = 'screen'; g.fillStyle = gr; g.fillRect(x - 60 * s, y - 180 * s, 400 * s, 360 * s); g.restore();
+}
+
 // ---------- the film ----------
 export async function build(T) {
   const s = id => T.s(id), w = (id, k) => T.w(id, k).s;
@@ -145,174 +151,214 @@ export async function build(T) {
   const cue = (t, id, gain = 1) => cues.push({ t: +t.toFixed(3), id, gain });
   const shots = [];
   const shot = (a, draw, o = {}) => shots.push({ a, draw, ...o });
+  const wood = { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' };
 
-  // S1 — hook: the Soviet kings fall
+  // S1a — hook, wide: Fischer and the Soviet machine; the kings start to fall
   const kings = [[1.5, 5.5], [3.2, 4.6], [5.0, 5.2], [6.6, 4.4], [2.4, 3.2], [4.4, 2.8], [6.0, 2.4], [1.2, 2.0]];
-  const fallAt = i => w('hook1', 'beat') + i * 0.26;
+  const fallAt = i => w('hook1', 'beat') + i * 0.3;
+  const hookPieces = t => {
+    const ps = [{ t: 'k', c: 'w', x: 4.5, z: 7.5 }, { t: 'q', c: 'w', x: 3.5, z: 7.4 }, { t: 'r', c: 'w', x: 1.5, z: 7.6 }, { t: 'r', c: 'w', x: 6.5, z: 7.6 }, { t: 'n', c: 'w', x: 2.5, z: 7.3 }, { t: 'b', c: 'w', x: 5.5, z: 7.3 }];
+    kings.forEach(([x, z], i) => { const u = seg(t, fallAt(i), fallAt(i) + 0.32, ease.in); ps.push({ t: 'k', c: 'b', x: x + u * 0.45, z, rot: u * 1.5, y: Math.sin(u * Math.PI) * 0.15 }); });
+    return ps;
+  };
+  const kingFX = (g, t) => kings.forEach(([x, z], i) => {
+    const p = B.project(x + 0.5, 0, z), sc = p.s / 130, tl = fallAt(i) + 0.32;
+    dust(g, p.x, p.y, t, tl, { size: 20 * sc, spread: 120 * sc, seed: i });
+    burst(g, p.x, p.y - 20 * sc, t, tl, { n: 10, color: '#FF8A6C', speed: 500 * sc, size: 4 * sc, seed: i + 5 });
+  });
   shot(0, (g, lt, t) => {
     crimson(g, H * 0.25);
-    for (let i = 0; i < 5; i++) drawChar(g, i % 2 ? 'spassky' : 'byrne', { x: 140 + i * 200, y: 330 + (i % 2) * 40, s: 0.62, silhouette: true, eyeGlow: C.red, t, alpha: 0.85 * (1 - seg(t, 2.6, 3.4)) });
-    B.setCam({ yaw: 0.06 * Math.sin(t * 0.3), pitch: 0.6, dist: lerp(12.5, 11.2, seg(t, 0, 3.8)), fov: 1500, cy: H * 0.55, target: [4, 0, 4.4] });
-    const hands = seated(g, B, 'bobby72', exprAt([[0, 'focus'], [w('hook1', 'Soviet'), 'smug']], t), t, { z: 9.6 });
+    for (let i = 0; i < 5; i++) drawChar(g, i % 2 ? 'spassky' : 'byrne', { x: 140 + i * 200, y: 330 + (i % 2) * 40, s: 0.62, silhouette: true, eyeGlow: C.red, t });
+    rig(B, lt, [[0, { yaw: -0.5, pitch: 0.68, dist: 14.5, cy: H * 0.55, target: [4, 0, 4.4] }], [1.8, { yaw: -0.1, pitch: 0.58, dist: 11.5 }]], { t });
+    const hands = seated(g, B, 'bobby72', exprAt([[0, 'focus'], [w('hook1', 'beat'), { ...EXPR.smug, turn: 0.3 }]], t), t, { z: 9.6 });
     B.drawSlab(g); hands();
-    const ps = [{ t: 'k', c: 'w', x: 4.5, z: 7.5 }, { t: 'q', c: 'w', x: 3.5, z: 7.4 }, { t: 'r', c: 'w', x: 1.5, z: 7.6 }, { t: 'r', c: 'w', x: 6.5, z: 7.6 }, { t: 'n', c: 'w', x: 2.5, z: 7.3 }, { t: 'b', c: 'w', x: 5.5, z: 7.3 }];
-    kings.forEach(([x, z], i) => {
-      const u = seg(t, fallAt(i), fallAt(i) + 0.35, ease.in);
-      ps.push({ t: 'k', c: 'b', x: x + u * 0.4, z, rot: u * 1.45, alpha: 1 - seg(t, fallAt(i) + 0.6, fallAt(i) + 1.2) * 0.55 });
-      if (u > 0 && u < 1) B.highlight(g, String.fromCharCode(97 + Math.floor(x)) + (Math.floor(z) + 1), C.red, 0.5 * (1 - u));
-    });
-    B.drawPieces(g, ps, { focus: 11, dof: 1.4 });
+    B.drawPieces(g, hookPieces(t), { focus: 11, dof: 1.4 });
+    kingFX(g, t);
   }, { vig: 0.6 });
-  kings.forEach((_, i) => cue(fallAt(i) + 0.3, 'clack', 0.7));
-  cue(0.05, 'boom', 1); cue(w('hook1', 'chess'), 'hit', 0.6);
+  // S1b — low angle among the falling kings
+  shot(w('hook1', 'Soviet') - 0.05, (g, lt, t) => {
+    crimson(g, H * 0.2);
+    rig(B, lt, [[0, { yaw: 0.75, pitch: 0.2, dist: 7.5, cy: H * 0.5, target: [4, 0.6, 3.8] }], [2.2, { yaw: 0.2, pitch: 0.32, dist: 6.2 }]], { t, shake: 2 });
+    const hands = seated(g, B, 'bobby72', { ...EXPR.smug, turn: 0.4, look: [0.6, 0.4] }, t, { z: 9.6 });
+    B.drawSlab(g); hands();
+    B.drawPieces(g, hookPieces(t), { focus: 6, dof: 2.0 });
+    kingFX(g, t);
+  }, { trans: 'whip', vig: 0.65 });
+  kings.forEach((_, i) => { cue(fallAt(i) + 0.3, 'clack', 0.8); cue(fallAt(i) + 0.3, 'thud', 0.35); });
+  cue(0.05, 'boom', 1); cue(w('hook1', 'chess'), 'hit', 0.7);
 
-  // S2 — fillings out
+  // S2a — the fillings pop
   shot(s('hook2'), (g, lt, t) => {
     bgBase(g, { top: '#3A2326', mid: '#160E10', edge: '#050304', cy: H * 0.35 });
-    camera(g, { zoom: lerp(1, 1.08, seg(lt, 0, 2.5)), t });
+    camera(g, { zoom: 1 + 0.12 * pulse(t, w('hook2', 'fillings'), 0.3), fy: 640, t });
     spotlight(g, W / 2, 640, 520, '#ffe0d0', 0.18);
-    tooth(g, W / 2 + 40, 640, 2.2, t, [w('hook2', 'fillings'), w('hook2', 'teeth'), w('hook2', 'teeth') + 0.22]);
-    drawChar(g, 'bobbyBeard', { x: 250, y: 1420, s: 1.25, e: exprAt([[0, 'worried'], [0.9, 'paranoid']], lt), t, tilt: 0.12 });
+    tooth(g, W / 2 + 40, 640, 2.2, t, [w('hook2', 'fillings'), w('hook2', 'out'), null]);
+    glint(g, W / 2 - 50, 490, t, w('hook2', 'fillings'), { r: 220 });
+    drawChar(g, 'bobbyBeard', { x: 250, y: 1420, s: 1.25, e: exprAt([[0, 'worried'], [w('hook2', 'fillings') - s('hook2'), { ...EXPR.shock, shake: 0.6, turn: 0.5, look: [1, -1] }]], lt), t, tilt: 0.12 });
   }, { trans: 'zoom' });
-  cue(w('hook2', 'fillings'), 'ting', 0.9); cue(w('hook2', 'teeth'), 'ting', 0.8); cue(w('hook2', 'teeth') + 0.22, 'ting', 0.7); cue(s('hook2'), 'whoosh', 0.8);
+  // S2b — punch-in on his face as the last filling flies past
+  shot(w('hook2', 'teeth') - 0.12, (g, lt, t) => {
+    bgBase(g, { top: '#4A2226', mid: '#1A0B0C', edge: '#050203', cy: H * 0.4 });
+    speedlines(g, W / 2, 760, t, { a: 0.3, color: '#ffc8b8' });
+    camera(g, { zoom: lerp(1.25, 1.12, seg(lt, 0, 0.5, ease.out)), fy: 760, t });
+    drawChar(g, 'bobbyBeard', { x: W / 2, y: 820, s: 2.1, e: { ...EXPR.paranoid, shake: 0.5, look: [-1, -0.5] }, t });
+    tooth(g, 830, 330, 0.9, t, [-9, -9, w('hook2', 'teeth')]);
+    burst(g, 830, 300, t, w('hook2', 'teeth') + 0.05, { n: 14, color: '#E8EEF2', speed: 700, size: 6 });
+  }, { trans: 'zoom' });
+  cue(w('hook2', 'fillings'), 'ting', 0.9); cue(w('hook2', 'out'), 'ting', 0.8); cue(w('hook2', 'teeth'), 'ting', 0.8); cue(w('hook2', 'teeth'), 'hit', 0.5);
 
-  // S3 — nobody gets inside his head
+  // S3a — nobody gets inside his head: the shield
   shot(s('hook3'), (g, lt, t) => {
     bgBase(g, { top: '#1F2A31', mid: '#0D1317', edge: '#030506', cy: H * 0.36 });
-    const look = Math.sin(lt * 5) > 0 ? [1, 0] : [-1, 0];
     waves(g, W / 2, 700, lt, { block: seg(t, w('hook3', 'nobody'), w('hook3', 'nobody') + 0.3) });
-    camera(g, { zoom: lerp(1, 1.12, seg(t, w('hook3', 'head') - 0.2, w('hook3', 'head') + 0.4)), fy: 700, t });
-    drawChar(g, 'bobbyBeard', { x: W / 2, y: 720, s: 1.45, e: { ...EXPR.paranoid, look }, t });
+    shockwave(g, W / 2, 700, t, w('hook3', 'nobody'), { r0: 200, r1: 520, life: 0.5, color: C.teal, lw: 12, squash: 1 });
+    camera(g, { zoom: lerp(1, 1.1, seg(lt, 0, 1.4)), fy: 700, t });
+    drawChar(g, 'bobbyBeard', { x: W / 2, y: 720, s: 1.45, e: { ...EXPR.paranoid, look: [Math.sin(lt * 5) > 0 ? 1 : -1, 0], turn: Math.sin(lt * 5) * 0.4 }, t });
   });
-  cue(s('hook3'), 'static', 0.5); cue(w('hook3', 'nobody'), 'shield', 0.8); cue(w('hook3', 'head'), 'boom', 0.7);
+  // S3b — extreme close-up: the eyes dart
+  shot(w('hook3', 'inside') - 0.08, (g, lt, t) => {
+    bgBase(g, { top: '#2A1416', mid: '#0D0708', edge: '#030202', cy: H * 0.4 });
+    waves(g, W / 2, 760, lt + 1, { a: 0.6, r0: 900, r1: 420 });
+    camera(g, { zoom: lerp(1, 1.12, seg(lt, 0, 1.2)), fy: 760, t });
+    drawChar(g, 'bobbyBeard', { x: W / 2, y: 980, s: 3.6, e: { ...EXPR.paranoid, pupil: 0.5, look: [Math.sin(lt * 9) > 0 ? 1 : -1, 0] }, t });
+    flash(g, 0.3 * pulse(t, w('hook3', 'head'), 0.25), C.red);
+  }, { trans: 'zoom' });
+  cue(s('hook3'), 'static', 0.5); cue(w('hook3', 'nobody'), 'shield', 0.9); cue(w('hook3', 'head'), 'boom', 0.8); cue(w('hook3', 'inside') - 0.05, 'heartbeat', 0.6);
 
-  // S4 — New York 1956
+  // S4 — New York 1956: a wide sweep around the board
   shot(s('ny'), (g, lt, t) => {
     woodRoom(g);
     photoCard(g, P.fischer13, lt, -1, { x: 205, y: 470, w: 240, aspect: 0.95, rot: -0.035, style: 'frame', tone: 'sepia', fx: 0.42, fy: 0.42, credit: 'United Press · PD', zoom: [1.05, 1.12], dur: 3 });
-    B.setCam({ yaw: -0.2 + lt * 0.03, pitch: 0.58, dist: 12.5 - lt * 0.15, fov: 1450, cy: H * 0.56, target: [4, 0, 4.6] });
+    rig(B, lt, [[0, { yaw: -0.8, pitch: 0.75, dist: 15, cy: H * 0.56, target: [4, 0, 4.6] }], [2.6, { yaw: -0.05, pitch: 0.58, dist: 11 }]], { t });
     const hands = seated(g, B, 'bobby13', exprAt([[0, 'focus']], lt), t, { z: 9.4 });
-    B.drawSlab(g, { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' }); hands();
-    B.drawPieces(g, piecesAt(GOC, 33), { focus: 12, dof: 1.5 });
+    B.drawSlab(g, wood); hands();
+    B.drawPieces(g, piecesAt(GOC, 33), { focus: B.dist, dof: 1.5 });
     placeStamp(g, lt, 'New York', '1956', { y: 160, t0: 0.05 });
   }, { trans: 'leak' });
-  cue(s('ny'), 'whoosh', 0.9); cue(w('ny', '1956'), 'boom', 0.8);
+  cue(w('ny', '1956'), 'boom', 0.8);
 
-  // S5 — Bobby is 13
+  // S5 — Bobby is 13 (cartoon slides away, the real photo slides in)
   shot(s('age'), (g, lt, t) => {
     woodRoom(g);
     camera(g, { zoom: lerp(1, 1.06, seg(lt, 0, 2.3)), fy: 760, t });
     const ph = w('age', 'thirteen') - s('age') - 0.15;
-    drawChar(g, 'bobby13', { x: lerp(W / 2, 300, seg(lt, ph, ph + 0.45, ease.inOut)), y: 760, s: 1.6, e: exprAt([[0, 'neutral'], [0.9, 'focus']], lt), t });
+    drawChar(g, 'bobby13', { x: lerp(W / 2, 300, seg(lt, ph, ph + 0.45, ease.inOut)), y: 760, s: 1.6, e: exprAt([[0, 'neutral'], [0.6, { ...EXPR.focus, turn: 0.4, look: [1, 0] }]], lt), t });
     photoCard(g, P.fischer13, lt, ph, { x: 790, y: 790, w: 400, aspect: 1.0, rot: 0.06, from: 'right', caption: 'BOBBY · APRIL 1956', credit: 'United Press · Public domain', fx: 0.4, fy: 0.42, zoom: [1.0, 1.1], dur: 2.5 });
     for (const [x, ty] of [[180, 'p'], [880, 'n'], [540, 'k']]) drawPiece(g, ty, 'w', x, 1500, 520, { blur: 14 });
     nameTitle(g, lt, 'Bobby Fischer', '13 YEARS OLD', { y: 210, t0: 0.05, subColor: C.gold });
-  });
+  }, { trans: 'whip' });
   cue(w('age', 'thirteen'), 'tick', 0.8); cue(w('age', 'thirteen') - 0.15, 'whoosh', 0.6); cue(w('age', 'thirteen') + 0.2, 'shutter', 0.7);
 
   // S6a — against a master
   shot(s('queen'), (g, lt, t) => {
     woodRoom(g);
-    camera(g, { zoom: lerp(1.04, 1, seg(lt, 0, 1.3)), fy: 760, t });
-    drawChar(g, 'byrne', { x: W / 2, y: 760, s: 1.55, e: 'smug', t });
+    camera(g, { zoom: lerp(1.08, 1, seg(lt, 0, 1.3, ease.out)), fy: 760, t });
+    drawChar(g, 'byrne', { x: W / 2, y: 760, s: 1.55, e: exprAt([[0, 'smug'], [0.7, { ...EXPR.smug, nod: 0.6 }]], lt), t });
     for (const [x, ty] of [[220, 'q'], [860, 'b']]) drawPiece(g, ty, 'b', x, 1500, 540, { blur: 14 });
     nameTitle(g, lt, 'Donald Byrne', 'U.S. MASTER', { y: 210, t0: 0.05, subColor: C.red });
   }, { trans: 'whip' });
-  cue(s('queen'), 'whoosh', 0.7);
 
-  // S6b — he leaves his queen hanging: 17...Be6!!
-  const beT = w('queen', 'leaves');
+  // S6b — 17...Be6!!: the bishop leaves the queen hanging
+  const beMove = new Moves(B, GOC, [{ k: 34, t0: w('queen', 'leaves'), dur: 0.42, label: '17...Be6!!', labelColor: C.lime }]);
+  beMove.cues(cue);
   shot(w('queen', 'he') - 0.05, (g, lt, t) => {
     woodRoom(g);
-    B.setCam({ yaw: 0.35 - lt * 0.04, pitch: 0.82, dist: 8.6 - lt * 0.3, fov: 1500, cy: H * 0.52, target: [3.4, 0, 5.2] });
-    const hands = seated(g, B, 'bobby13', exprAt([[0, 'focus'], [1.0, 'smug']], lt), t, { z: 9.4 });
-    B.drawSlab(g, { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' }); hands();
-    const u = seg(t, beT, beT + 0.55, x => x);
-    const qa = seg(t, w('queen', 'queen') - 0.1, w('queen', 'queen') + 0.2);
-    B.highlight(g, 'g4', C.red, 0.55 * u); B.highlight(g, 'e6', C.teal, 0.6 * u);
-    B.dots(g, C.red, 0.5 * qa, ['b6']);
-    B.drawPieces(g, piecesAt(GOC, 34, u, { opts: { q2: { halo: C.red, haloA: qa * (0.7 + 0.3 * Math.sin(t * 9)), sharp: true } } }), { focus: 8.6, dof: 1.2 });
-    B.reticle(g, 'e6', t, C.teal, u);
-    B.laser(g, 'c5', 'b6', C.red, qa, 0.7, seg(t, w('queen', 'queen') - 0.1, w('queen', 'queen') + 0.25));
-    const [bx, bz] = sqXZ('b6'), qp = B.project(bx, 0.75, bz);
-    target(g, qp.x, qp.y, 70, t, C.red, qa);
-    B.label(g, 'e6', '17...Be6!!', C.lime, u);
+    rig(B, lt, [[0, { yaw: 0.5, pitch: 0.78, dist: 11, cy: H * 0.52, target: [3.8, 0, 5.4] }], [0.7, { yaw: 0.3, pitch: 0.85, dist: 8.2, target: [3.6, 0, 5.4] }]], { t, bump: beMove.bump(t) });
+    const m = beMove.current(t);
+    const hands = seated(g, B, 'bobby13', exprAt([[0, 'focus'], [0.6, { ...EXPR.smug, look: [0, 1] }]], lt), t, { z: 9.4, reach: m ? { sq: m.to, u: (t - m.t0 + 0.15) / 0.75 } : null });
+    B.drawSlab(g, wood); hands();
+    beMove.draw(g, t, { dof: 1.2 });
   });
-  cue(beT + 0.5, 'clack', 1); cue(w('queen', 'queen'), 'alarm', 0.6); cue(w('queen', 'hanging'), 'boom', 0.6);
+  // S6c — the hanging queen, close and low
+  const qT = w('queen', 'queen');
+  shot(qT - 0.1, (g, lt, t) => {
+    woodRoom(g);
+    rig(B, lt, [[0, { yaw: 1.0, pitch: 0.28, dist: 6, cy: H * 0.5, target: [1.6, 0.5, 5.5] }], [1.7, { yaw: 0.75, pitch: 0.34, dist: 5.2 }]], { t, shake: 1.5 });
+    const hands = seated(g, B, 'bobby13', { ...EXPR.smug, turn: -0.5, look: [-1, 0.6] }, t, { z: 9.4 });
+    B.drawSlab(g, wood); hands();
+    const qa = seg(t, qT - 0.05, qT + 0.2);
+    B.dots(g, C.red, 0.55 * qa, ['b6']);
+    B.drawPieces(g, piecesAt(GOC, 34, 1, { opts: { q2: { halo: C.red, haloA: qa * (0.7 + 0.3 * Math.sin(t * 9)), sharp: true } } }), { focus: 5.5, dof: 1.6 });
+    B.laser(g, 'c5', 'b6', C.red, qa, 0.7, seg(t, qT, qT + 0.25));
+    const [bx, bz] = sqXZ('b6'), qp = B.project(bx, 0.75, bz);
+    target(g, qp.x, qp.y, 110, t, C.red, qa);
+    shockwave(g, qp.x, qp.y + 60, t, w('queen', 'hanging'), { r0: 40, r1: 300, color: C.red, lw: 10 });
+    badge(g, 'QUEEN HANGING', W / 2, 260, { color: C.red, size: 40, a: seg(t, w('queen', 'hanging'), w('queen', 'hanging') + 0.15), scale: lerp(1.5, 1, seg(t, w('queen', 'hanging'), w('queen', 'hanging') + 0.2, ease.out)) });
+  }, { trans: 'whip', whipDir: -1 });
+  cue(qT, 'alarm', 0.6); cue(w('queen', 'hanging'), 'boom', 0.7);
 
   // S7 — on purpose
   shot(s('purpose'), (g, lt, t) => {
     woodRoom(g);
-    camera(g, { zoom: lerp(1.0, 1.22, seg(lt, 0, 1.6, ease.out)), fy: 700, t });
-    drawChar(g, 'bobby13', { x: W / 2, y: 760, s: 1.6, e: exprAt([[0, 'smug']], lt), t });
+    camera(g, { zoom: lerp(1.0, 1.25, seg(lt, 0, 1.6, ease.out)), fy: 700, t });
+    drawChar(g, 'bobby13', { x: W / 2, y: 760, s: 1.6, e: exprAt([[0, 'smug'], [w('purpose', 'purpose') - s('purpose'), { ...EXPR.smug, browTilt: 0.7, nod: 0.5 }]], lt), t });
     drawPiece(g, 'q', 'b', 860, 1520, 560, { blur: 12 });
+    glint(g, 640, 640, t, w('purpose', 'purpose'), { r: 140, color: C.gold });
   }, { trans: 'zoom' });
-  cue(s('purpose'), 'whoosh', 0.6); cue(w('purpose', 'purpose'), 'pluck', 0.8);
+  cue(w('purpose', 'purpose'), 'pluck', 0.8); cue(w('purpose', 'purpose'), 'ting', 0.5);
 
-  // S8 — fast forward to mate (plies 35..82)
-  const ffA = s('later') - 0.2, ffB = w('later', 'later') + 0.55, slowB = s('mate1') - 0.05, mateT = w('mate1', 0);
-  const plyAt = t => {
-    if (t < ffA) return [34, 1];
-    if (t < ffB) { const x = 34 + (t - ffA) / (ffB - ffA) * (78 - 34); return [Math.floor(x) + 1, x % 1]; }
-    if (t < slowB) { const x = 78 + (t - ffB) / (slowB - ffB) * 3; return [Math.floor(x) + 1, (x % 1) * 1.6]; }
-    return [82, clamp((t - slowB) / 0.25)];
-  };
+  // S8a — fast forward: 24 moves while the camera swings round the board
+  const ffA = s('later') - 0.2, ffB = w('later', 'later') + 0.55, mateT = w('mate1', 0);
   shot(ffA, (g, lt, t) => {
-    const mated = t >= mateT;
-    const tint = mated ? seg(t, mateT, mateT + 0.15) * (1 - 0.6 * seg(t, mateT + 0.3, mateT + 1)) : 0;
-    bgBase(g, { top: mated ? '#30402A' : '#2A3238', cy: H * 0.3 });
-    const tz = lerp(4.2, 1.6, seg(t, ffA, slowB)), tx = lerp(4, 2.6, seg(t, ffA, slowB));
-    B.setCam({ yaw: lerp(-0.3, 0.25, seg(t, ffA, slowB)), pitch: lerp(0.75, 0.9, seg(t, ffB, mateT)), dist: lerp(11, 7.5, seg(t, ffB, mateT + 0.5)), fov: 1500, cy: H * 0.5, target: [tx, 0, tz] });
-    const hands = seated(g, B, 'bobby13', exprAt([[0, 'focus'], [mateT - ffA, 'triumph']], lt), t, { z: 9.4 });
-    B.drawSlab(g, { tint: C.lime, tintA: tint * 0.25 }); hands();
-    const [k, u] = plyAt(t), P = GOC[Math.min(k, 82)];
+    bgBase(g, { top: '#2A3238', cy: H * 0.3 });
+    rig(B, lt, [[0, { yaw: -0.4, pitch: 0.8, dist: 12, cy: H * 0.52, target: [4, 0, 4] }], [ffB - ffA, { yaw: 1.3, pitch: 0.95, dist: 10, target: [3.4, 0, 3] }]], { t, e: x => x });
+    const x = 34 + clamp((t - ffA) / (ffB - ffA)) * (78 - 34), k = Math.min(78, Math.floor(x) + 1), u = x % 1;
+    const hands = seated(g, B, 'bobby13', { ...EXPR.focus, look: [Math.sin(t * 7), 0.6] }, t, { z: 9.4 });
+    B.drawSlab(g); hands();
+    const P = GOC[k];
     if (P.from) { B.highlight(g, P.from, C.red, 0.45); B.highlight(g, P.to, C.teal, 0.55); }
-    if (mated) {
-      const m = seg(t, mateT, mateT + 0.3);
-      B.dots(g, C.red, 0.85 * m, ['b1', 'b2', 'd1', 'd2', 'c1']);
-      B.dots(g, C.lime, 0.35 * m);
-    }
-    B.drawPieces(g, piecesAt(GOC, Math.min(k, 82), clamp(u), { arc: 0.5 }), { focus: B.dist, dof: 1.0 });
-    if (mated) {
-      const m = seg(t, mateT + 0.1, mateT + 0.4);
-      for (const sq of ['b1', 'b2', 'd1', 'd2']) { const [x, z] = sqXZ(sq), p = B.project(x, 0.05, z); xMark(g, p.x, p.y, p.s * 0.45, C.red, m); }
-      const kp = B.project(2.5, 0.8, 0.5); target(g, kp.x, kp.y, 80, t, C.red, m);
-      B.laser(g, 'c2', 'c1', C.red, m, 0.6);
-      B.label(g, 'c2', '41...Rc2#', C.lime, m, 2.0);
-      speedlines(g, W / 2, H * 0.45, t, { a: 0.55 * (1 - seg(t, mateT + 0.2, mateT + 0.9)), color: '#E9FFD0' });
-    } else if (P.san) {
-      B.label(g, P.to, P.san, C.teal, 0.9);
-    }
-    const mv = Math.min(41, Math.ceil(k / 2));
-    if (t < mateT) badge(g, `▶▶  MOVE ${String(mv).padStart(2, '0')}`, W / 2, 170, { color: C.teal, size: 40, a: env(t, ffA, mateT, 0.2, 0.15) });
-    flash(g, 0.55 * pulse(t, mateT, 0.25), '#E6FFC8');
+    B.drawPieces(g, piecesAt(GOC, k, clamp(u * 1.4), { arc: 0.5, keepCaptured: false }), { focus: B.dist, dof: 1.0 });
+    badge(g, `▶▶  MOVE ${String(Math.min(41, Math.ceil(k / 2))).padStart(2, '0')}`, W / 2, 170, { color: C.teal, size: 40 });
   }, { trans: 'leak' });
   for (let k = 35; k <= 78; k += 2) cue(ffA + (k - 34) / 44 * (ffB - ffA), 'tick', 0.35);
-  for (let i = 0; i < 3; i++) cue(ffB + (i + 0.6) / 3 * (slowB - ffB), 'clack', 0.8);
+  // S8b/S8c — the last moves in slow motion, then the mate (41...Rc2#)
+  const slow = new Moves(B, GOC, [
+    { k: 79, t0: ffB + 0.05, dur: 0.4 }, { k: 80, t0: ffB + 0.55, dur: 0.4 }, { k: 81, t0: ffB + 1.05, dur: 0.4, color: C.red },
+    { k: 82, t0: mateT - 0.42, dur: 0.42, label: '41...Rc2#', labelColor: C.lime, color: C.red }]);
+  slow.cues(cue);
+  const mateBoard = (g, lt, t, keys) => {
+    const mated = t >= mateT;
+    bgBase(g, { top: mated ? '#30402A' : '#232A2F', cy: H * 0.3 });
+    rig(B, lt, keys, { t, bump: slow.bump(t) * 1.5 });
+    const hands = seated(g, B, 'bobby13', exprAt([[0, 'focus'], [mateT - (t - lt), 'triumph']], lt), t, { z: 9.4 });
+    B.drawSlab(g, { tint: C.lime, tintA: mated ? 0.22 * (1 - 0.6 * seg(t, mateT + 0.3, mateT + 1)) : 0 }); hands();
+    if (mated) { const m = seg(t, mateT, mateT + 0.3); B.dots(g, C.red, 0.85 * m, ['b1', 'b2', 'd1', 'd2', 'c1']); B.dots(g, C.lime, 0.3 * m); }
+    slow.draw(g, t, { dof: 1.3 });
+    if (mated) {
+      const m = seg(t, mateT + 0.05, mateT + 0.3);
+      for (const sq of ['b1', 'b2', 'd1', 'd2']) { const [x, z] = sqXZ(sq), p = B.project(x, 0.05, z); xMark(g, p.x, p.y, p.s * 0.45 * (1 + 0.4 * (1 - ease.back(m))), C.red, m); }
+      const kp = B.project(2.5, 0.8, 0.5); target(g, kp.x, kp.y, 90, t, C.red, m);
+      speedlines(g, W / 2, H * 0.45, t, { a: 0.6 * (1 - seg(t, mateT + 0.2, mateT + 0.9)), color: '#E9FFD0' });
+      flash(g, 0.55 * pulse(t, mateT, 0.25), '#E6FFC8');
+    }
+  };
+  shot(ffB, (g, lt, t) => mateBoard(g, lt, t, [[0, { yaw: 1.0, pitch: 0.45, dist: 8, cy: H * 0.5, target: [2.4, 0.3, 1.6] }], [mateT - 0.3 - ffB, { yaw: 0.55, pitch: 0.55, dist: 6.5 }]]), { trans: 'whip' });
+  shot(mateT - 0.28, (g, lt, t) => mateBoard(g, lt, t, [[0, { yaw: 0.2, pitch: 0.75, dist: 7.5, cy: H * 0.5, target: [2.6, 0.2, 1.4] }], [0.3, { yaw: 0.15, pitch: 0.8, dist: 5.8 }], [1.2, { yaw: 0.05, pitch: 0.82, dist: 5.4 }]]), { trans: 'zoom' });
   cue(ffB, 'riser', 0.9); cue(mateT, 'boom', 1.1); cue(mateT, 'hit', 0.9);
 
   // S9 — Byrne shocked
   shot(s('mate1') + 0.85, (g, lt, t) => {
     crimson(g, H * 0.4);
     speedlines(g, W / 2, 800, t, { a: 0.35, color: '#ffb0a0' });
-    camera(g, { zoom: lerp(1.15, 1.25, lt), fy: 800, t, shake: 6 * (1 - clamp(lt / 0.5)) });
-    drawChar(g, 'byrne', { x: W / 2, y: 820, s: 1.9, e: 'shock', t });
+    camera(g, { zoom: lerp(1.15, 1.3, lt), fy: 800, t });
+    drawChar(g, 'byrne', { x: W / 2, y: 820, s: 1.9, e: { ...EXPR.shock, shake: 1 }, t });
   }, { trans: 'whip' });
 
-  // S10 — The Game of the Century
+  // S10 — The Game of the Century: crane up over the final position
   shot(s('century'), (g, lt, t) => {
     woodRoom(g);
-    rays(g, W / 2, 260, t, { a: 0.1 * seg(t, w('century', 'Game') - 0.2, w('century', 'Game') + 0.3) });
-    B.setCam({ yaw: 0.2 + lt * 0.05, pitch: lerp(0.6, 1.0, seg(lt, 0, 3, ease.inOut)), dist: lerp(10, 12.5, seg(lt, 0, 3)), fov: 1500, cy: H * 0.68, target: [4, 0, 4] });
-    const hands = seated(g, B, 'bobby13', 'happy', t, { z: 9.4 });
-    B.drawSlab(g, { light: '#3A3029', dark: '#241C17', frame: '#1A120C', side: '#0E0905' }); hands();
+    rays(g, W / 2, 260, t, { a: 0.12 * seg(t, w('century', 'Game') - 0.2, w('century', 'Game') + 0.3) });
+    rig(B, lt, [[0, { yaw: -0.3, pitch: 0.55, dist: 9, cy: H * 0.68, target: [3.5, 0, 3.5] }], [2.8, { yaw: 0.45, pitch: 1.05, dist: 13, target: [4, 0, 4] }]], { t });
+    const hands = seated(g, B, 'bobby13', { ...EXPR.happy, nod: 0.5 }, t, { z: 9.4 });
+    B.drawSlab(g, wood); hands();
     B.drawPieces(g, piecesAt(GOC, 82), { focus: B.dist, dof: 1.2 });
-    const a = seg(t, w('century', 'Game') - 0.15, w('century', 'Game') + 0.25, ease.out);
-    g.save(); g.globalAlpha = a;
-    glowText(g, 'THE GAME', W / 2, 250 - (1 - a) * 30, { font: serif(92, 800), fill: C.gold, glow: 'rgba(245,196,81,0.6)', blur: 30 });
-    glowText(g, 'OF THE CENTURY', W / 2, 345 - (1 - a) * 30, { font: serif(70, 800), fill: C.gold, glow: 'rgba(245,196,81,0.6)', blur: 30 });
-    glowText(g, 'BYRNE 0 – 1 FISCHER  ·  OCT 17, 1956', W / 2, 410, { font: mono(24, 800), fill: C.cream, glow: 'rgba(0,0,0,0.8)', blur: 8, spacing: 4, a: seg(t, w('century', 'Century') , w('century', 'Century') + 0.4) });
+    const a = seg(t, w('century', 'Game') - 0.15, w('century', 'Game') + 0.25, ease.out), sc = lerp(1.4, 1, ease.back(a));
+    g.save(); g.globalAlpha = a; g.translate(W / 2, 300); g.scale(sc, sc); g.translate(-W / 2, -300);
+    glowText(g, 'THE GAME', W / 2, 250, { font: serif(92, 800), fill: C.gold, glow: 'rgba(245,196,81,0.6)', blur: 30 });
+    glowText(g, 'OF THE CENTURY', W / 2, 345, { font: serif(70, 800), fill: C.gold, glow: 'rgba(245,196,81,0.6)', blur: 30 });
     g.restore();
+    glowText(g, 'BYRNE 0 – 1 FISCHER  ·  OCT 17, 1956', W / 2, 410, { font: mono(24, 800), fill: C.cream, glow: 'rgba(0,0,0,0.8)', blur: 8, spacing: 4, a: seg(t, w('century', 'Century'), w('century', 'Century') + 0.4) });
+    glint(g, W / 2 + 230, 230, t, w('century', 'Game') + 0.2, { r: 200, color: C.gold });
   }, { trans: 'flash' });
   cue(w('century', 'Game'), 'boom', 1); cue(w('century', 'Game'), 'shimmer', 0.7);
 
@@ -320,16 +366,17 @@ export async function build(T) {
   shot(s('rey'), (g, lt, t) => {
     bgBase(g, { top: '#1E2B33', mid: '#0E1418', edge: '#04070A', cy: H * 0.4 });
     const u = seg(lt, 0, 2.6, ease.inOut);
-    map.view({ lon: lerp(-55, -24, u), lat: lerp(50, 62, u), zoom: lerp(9, 16, u), cy: H * 0.47 });
-    map.draw(g, { spacing: 15, base: '#4F7787', color: id => id === ISO.ISL ? rgba(C.blue, 0.95) : id === ISO.USA ? '#456C7C' : id === ISO.RUS ? '#7A3A36' : null });
-    map.route(g, 'New York', 'Reykjavik', seg(lt, 0.1, 1.6), { color: C.gold, bend: 0.3 });
+    map.view({ lon: lerp(-60, -24, u), lat: lerp(48, 62, u), zoom: lerp(7, 16, u), cy: H * 0.47 });
+    map.draw(g, { spacing: 15, color: id => id === ISO.ISL ? rgba(C.blue, 0.95) : id === ISO.USA ? '#6C93A3' : id === ISO.RUS ? '#7A3A36' : null });
+    const head = map.route(g, 'New York', 'Reykjavik', seg(lt, 0.1, 1.5), { color: C.gold, bend: 0.3 });
+    burst(g, head[0], head[1], t, s('rey') + 1.5, { n: 18, color: C.gold, speed: 500, size: 5 });
     map.pin(g, 'New York', { color: C.gold, a: 1 - seg(lt, 1.6, 2.2) });
     map.pin(g, 'Reykjavik', { color: C.blue, a: seg(lt, 1.2, 1.6), pulse: (lt * 0.8) % 1 });
     placeStamp(g, lt, 'Reykjavik', '1972', { y: 160, t0: 0.1 });
-    badge(g, 'MATCH OF THE CENTURY', W / 2, 260, { color: C.red, size: 30, a: seg(t, w('rey', '1972'), w('rey', '1972') + 0.3) });
+    badge(g, 'MATCH OF THE CENTURY', W / 2, 260, { color: C.red, size: 30, a: seg(t, w('rey', '1972'), w('rey', '1972') + 0.3), scale: lerp(1.4, 1, seg(t, w('rey', '1972'), w('rey', '1972') + 0.25, ease.out)) });
     photoCard(g, P.fischer1972, lt, w('rey', '1972') - s('rey'), { x: 850, y: 1050, w: 260, aspect: 1.25, rot: 0.07, caption: 'FISCHER · 1972', credit: 'Anefo / Nationaal Archief · CC0', fx: 0.5, fy: 0.32, zoom: [1.0, 1.08], dur: 2 });
   }, { trans: 'leak' });
-  cue(s('rey'), 'whoosh', 0.9); cue(w('rey', '1972'), 'boom', 0.9); cue(w('rey', '1972') + 0.1, 'shutter', 0.6);
+  cue(w('rey', '1972'), 'boom', 0.9); cue(w('rey', '1972') + 0.1, 'shutter', 0.6); cue(s('rey') + 1.5, 'ting', 0.6);
 
   // S12 — Boris Spassky, World champion (VS)
   const vsT = s('spassky');
@@ -337,9 +384,11 @@ export async function build(T) {
     g.fillStyle = '#05080B'; g.fillRect(0, 0, W, H);
     vsSplit(g, lt, { left: '#6E1A1F', right: '#123A57' });
     spotlight(g, 280, 820, 500, '#ff9a8a', 0.18); spotlight(g, 800, 820, 500, '#9ad0ff', 0.18);
-    drawChar(g, 'spassky', { x: 290 - (1 - seg(lt, 0, 0.4, ease.out)) * 400, y: 860, s: 1.25, e: exprAt([[0, 'neutral'], [1.2, 'smug']], lt), t });
-    drawChar(g, 'bobby72', { x: 800 + (1 - seg(lt, 0, 0.4, ease.out)) * 400, y: 860, s: 1.25, e: 'focus', t });
+    camera(g, { zoom: lerp(1.0, 1.06, seg(lt, 0, 2.3)), t });
+    drawChar(g, 'spassky', { x: 290 - (1 - seg(lt, 0, 0.4, ease.out)) * 400, y: 860, s: 1.25, e: exprAt([[0, { ...EXPR.neutral, turn: 0.5, look: [1, 0] }], [1.2, { ...EXPR.smug, turn: 0.3 }]], lt), t });
+    drawChar(g, 'bobby72', { x: 800 + (1 - seg(lt, 0, 0.4, ease.out)) * 400, y: 860, s: 1.25, e: { ...EXPR.focus, turn: -0.5, look: [-1, 0] }, t });
     vsLabel(g, lt, 0.15, W / 2, 520);
+    shockwave(g, W / 2, 520, t, vsT + 0.2, { r0: 60, r1: 420, color: C.gold, lw: 14, squash: 1 });
     photoCard(g, P.spassky1973, lt, 0.35, { x: 175, y: 430, w: 220, aspect: 1.2, rot: -0.1, caption: 'SPASSKY', credit: 'Anefo · CC0', fx: 0.45, fy: 0.3, zoom: [1.15, 1.2] });
     photoCard(g, P.fischer1972, lt, 0.55, { x: 905, y: 430, w: 220, aspect: 1.2, rot: 0.1, caption: 'FISCHER', credit: 'Anefo · CC0', fx: 0.5, fy: 0.3, zoom: [1.05, 1.1] });
     g.save(); g.font = serif(40, 700); g.textAlign = 'center'; g.fillStyle = C.cream;
@@ -353,183 +402,240 @@ export async function build(T) {
   const champs = [['1948', 'byrne'], ['1957', 'spassky'], ['1960', 'bobby72'], ['1963', 'byrne'], ['1969', 'spassky']];
   shot(s('soviets'), (g, lt, t) => {
     crimson(g, H * 0.35);
+    camera(g, { zoom: lerp(1.12, 1.0, seg(lt, 0, 3.5, ease.out)), dx: lerp(-60, 60, seg(lt, 0, 3.5)), t });
     champs.forEach(([yr, who], i) => {
-      const t0 = 0.15 + i * 0.32, a = seg(lt, t0, t0 + 0.25);
+      const t0 = 0.15 + i * 0.32, a = seg(lt, t0, t0 + 0.25, ease.back);
       const x = 120 + i * 210, y = 760 + (i % 2) * 50;
-      drawChar(g, who, { x, y: y + (1 - a) * 40, s: 0.72, silhouette: true, eyeGlow: C.red, t, alpha: a });
-      g.save(); g.globalAlpha = a; g.font = mono(30, 800); g.textAlign = 'center'; g.fillStyle = C.gold; g.fillText(yr, x, y + 230); g.restore();
+      drawChar(g, who, { x, y: y + (1 - a) * 80, s: 0.72, silhouette: true, eyeGlow: C.red, t, alpha: clamp(a) });
+      dust(g, x, y + 200, lt, t0 + 0.2, { color: '#7a2a2a', size: 30, spread: 120, seed: i });
+      g.save(); g.globalAlpha = clamp(a); g.font = mono(30, 800); g.textAlign = 'center'; g.fillStyle = C.gold; g.fillText(yr, x, y + 230); g.restore();
     });
     crown(g, 960, 520 + Math.sin(t * 2) * 6, 0.55, { a: seg(lt, 1.6, 1.9) });
     const yr = Math.round(lerp(1948, 1972, seg(t, s('soviets') + 0.1, w('soviets', 'twenty-four'))));
     counter(g, String(yr), 'SOVIET CHAMPIONS', { y: 330, size: 140, color: '#FFE9E4', glow: C.red, labelColor: C.red });
-    badge(g, '24 YEARS', W / 2, 1110, { color: C.gold, size: 54, a: seg(t, w('soviets', 'twenty-four'), w('soviets', 'twenty-four') + 0.2), scale: lerp(1.6, 1, seg(t, w('soviets', 'twenty-four'), w('soviets', 'twenty-four') + 0.2, ease.out)) });
+    const tw = w('soviets', 'twenty-four');
+    badge(g, '24 YEARS', W / 2, 1110, { color: C.gold, size: 54, a: seg(t, tw, tw + 0.2), scale: lerp(1.8, 1, seg(t, tw, tw + 0.25, ease.back)) });
+    shockwave(g, W / 2, 1110, t, tw + 0.1, { r0: 80, r1: 380, color: C.gold, lw: 10, squash: 0.5 });
   }, { trans: 'leak' });
-  champs.forEach((_, i) => cue(s('soviets') + 0.15 + i * 0.32, 'thud', 0.6));
+  champs.forEach((_, i) => cue(s('soviets') + 0.35 + i * 0.32, 'thud', 0.7));
   cue(w('soviets', 'twenty-four'), 'boom', 0.9);
 
-  // S14 — loses game one
+  // S14a — game 1: 29...Bxh2? 30.g3 — the bishop is trapped
+  const g1 = new Moves(B, G1, [{ k: 58, t0: w('loses', 'Bobby') - 0.1, dur: 0.42, label: '29...Bxh2?', labelColor: C.red, color: C.red }, { k: 59, t0: w('loses', 'game') - 0.2, dur: 0.4, label: '30.g3', labelColor: C.teal }]);
+  g1.cues(cue);
   shot(s('loses'), (g, lt, t) => {
     coldRoom(g);
-    drawChar(g, 'bobby72', { x: W / 2, y: 1000, s: 1.5, e: exprAt([[0, 'focus'], [w('loses', 'loses') - s('loses'), 'angry']], lt), t });
-    const f = pulse(t, w('loses', 'loses'), 0.4);
-    scoreboard(g, 'SPASSKY', 'FISCHER', t >= w('loses', 'loses') ? '1' : '0', '0', { y: 330, flashL: f, title: 'GAME 1' });
+    rig(B, lt, [[0, { yaw: -0.9, pitch: 0.55, dist: 9, cy: H * 0.5, target: [6.5, 0, 2.5] }], [1.3, { yaw: -0.55, pitch: 0.62, dist: 7 }]], { t, bump: g1.bump(t) });
+    const trapped = seg(t, w('loses', 'game') + 0.25, w('loses', 'game') + 0.45);
+    const hands = seated(g, B, 'bobby72', exprAt([[0, 'focus'], [w('loses', 'game') + 0.2 - s('loses'), { ...EXPR.worried, shake: 0.4, look: [1, 0.8], turn: 0.5 }]], lt), t, { z: 9.4 });
+    B.drawSlab(g); hands();
+    B.dots(g, C.red, 0.6 * trapped, ['h2', 'g1', 'g3']);
+    g1.draw(g, t, { dof: 1.1 });
+    const [hx, hz] = sqXZ('h2'), hp = B.project(hx, 0.8, hz);
+    target(g, hp.x, hp.y, 90, t, C.red, trapped);
+    badge(g, 'TRAPPED', hp.x - 40, hp.y - 170, { color: C.red, size: 34, a: trapped, scale: lerp(1.6, 1, ease.back(trapped)) });
   }, { trans: 'whip' });
-  cue(w('loses', 'loses'), 'buzz', 0.8);
+  // S14b — the scoreboard
+  shot(w('loses', 'one') - 0.05, (g, lt, t) => {
+    coldRoom(g);
+    camera(g, { zoom: lerp(1.1, 1.0, seg(lt, 0, 0.5, ease.out)), t });
+    drawChar(g, 'bobby72', { x: W / 2, y: 1000, s: 1.5, e: { ...EXPR.angry, shake: 0.3 }, t });
+    const f = pulse(t, w('loses', 'one'), 0.4);
+    scoreboard(g, 'SPASSKY', 'FISCHER', '1', '0', { y: 330, flashL: f, title: 'GAME 1' });
+  }, { trans: 'zoom' });
+  cue(w('loses', 'one'), 'buzz', 0.8);
 
-  // S15 — he hears the cameras
+  // S15a — he hears the cameras
   shot(s('cameras'), (g, lt, t) => {
     coldRoom(g);
-    const camOn = seg(t, w('cameras', 'cameras') - 0.2, w('cameras', 'cameras') + 0.1);
-    const look = lt < 0.9 ? [0, 0] : (Math.floor(lt * 3) % 2 ? [1, -0.4] : [-1, -0.4]);
-    camera(g, { zoom: lerp(1, 1.1, seg(lt, 0, 2.2)), fy: 820, t });
-    drawChar(g, 'bobby72', { x: W / 2, y: 860, s: 1.7, e: { ...exprAt([[0, 'focus'], [0.5, 'paranoid']], lt), look }, t });
-    g.save(); g.globalAlpha = camOn;
-    filmCam(g, 170, 260, 1.1, t, 1); filmCam(g, 910, 300, 1.1, t, -1); filmCam(g, 120, 1100, 0.9, t, 1); filmCam(g, 960, 1050, 0.9, t, -1);
-    g.restore();
-    if (camOn > 0) for (const [x, y] of [[300, 300], [780, 330]]) { g.save(); g.strokeStyle = rgba('#ffffff', 0.5 * camOn); g.lineWidth = 4; for (let i = 0; i < 3; i++) { const r = 30 + ((lt * 80 + i * 30) % 90); g.beginPath(); g.arc(x, y, r, -0.6, 0.6); g.stroke(); } g.restore(); }
+    const look = lt < 0.6 ? [0, 0] : (Math.floor(lt * 3) % 2 ? [1, -0.4] : [-1, -0.4]);
+    camera(g, { zoom: lerp(1, 1.12, seg(lt, 0, 1.3)), fy: 820, t });
+    drawChar(g, 'bobby72', { x: W / 2, y: 860, s: 1.7, e: { ...exprAt([[0, 'focus'], [0.4, 'paranoid']], lt), look, turn: look[0] * 0.5 }, t });
+    for (const [x, y, d] of [[260, 320, 0.4], [820, 360, 0.8]]) if (lt > d) { g.save(); g.strokeStyle = rgba('#ffffff', 0.5); g.lineWidth = 4; for (let i = 0; i < 3; i++) { const r = 30 + ((lt * 80 + i * 30) % 90); g.beginPath(); g.arc(x, y, r, -0.6, 0.6); g.stroke(); } g.restore(); }
   });
-  cue(w('cameras', 'cameras'), 'whirr', 0.9); cue(w('cameras', 'cameras') + 0.2, 'shutter', 0.7);
+  // S15b — the camera, huge, REC blinking
+  shot(w('cameras', 'cameras') - 0.05, (g, lt, t) => {
+    coldRoom(g);
+    camera(g, { zoom: lerp(1.25, 1.05, seg(lt, 0, 1.3, ease.out)), rot: lerp(-0.08, 0.02, seg(lt, 0, 1.3)), t });
+    filmCam(g, 170, 330, 1.0, t, 1); filmCam(g, 920, 1120, 0.9, t, -1);
+    bigCam(g, W / 2 - 60, 760, 3.2, t);
+  }, { trans: 'whip' });
+  cue(w('cameras', 'cameras'), 'whirr', 0.9); cue(w('cameras', 'cameras') + 0.25, 'shutter', 0.7); cue(w('cameras', 'cameras') + 0.6, 'shutter', 0.5);
 
   // S16 — refuses to play: empty chair, FORFEIT
   shot(s('refuses'), (g, lt, t) => {
     coldRoom(g);
-    B.setCam({ yaw: 0.1, pitch: 0.55, dist: 11.5 - lt * 0.3, fov: 1450, cy: H * 0.55, target: [4, 0, 4.5] });
-    const hands = seated(g, B, 'spassky', exprAt([[0, 'neutral'], [0.8, 'worried']], lt), t, { z: 9.4 });
+    rig(B, lt, [[0, { yaw: 0.6, pitch: 0.5, dist: 13, cy: H * 0.55, target: [4, 0, 4.5] }], [2, { yaw: 0.1, pitch: 0.58, dist: 10.5 }]], { t });
+    const hands = seated(g, B, 'spassky', exprAt([[0, 'neutral'], [0.8, { ...EXPR.worried, look: [0, 1] }]], lt), t, { z: 9.4 });
     B.drawSlab(g); hands();
-    B.drawPieces(g, piecesAt([{ pieces: start() }], 0), { focus: 11, dof: 1.3 });
-    // empty chair (near side)
+    B.drawPieces(g, piecesAt([{ pieces: start() }], 0), { focus: B.dist, dof: 1.3 });
     g.save(); g.fillStyle = '#1B2126'; g.beginPath(); g.roundRect(300, 1460, 480, 420, 30); g.fill(); g.restore();
     stamp(g, 'FORFEIT', W / 2, 1640, lt, w('refuses', 'play') - s('refuses'), { sub: 'GAME 2 · FISCHER ABSENT' });
-  });
+  }, { trans: 'leak' });
   cue(w('refuses', 'play'), 'stamp', 1); cue(s('refuses') + 0.2, 'clock', 0.5);
 
   // S17 — down two to zero
   shot(s('down'), (g, lt, t) => {
     coldRoom(g);
-    drawChar(g, 'bobby72', { x: W / 2, y: 1000, s: 1.5, e: 'angry', t });
+    camera(g, { zoom: lerp(1.1, 1.0, seg(lt, 0, 0.5, ease.out)), t });
+    drawChar(g, 'bobby72', { x: W / 2, y: 1000, s: 1.5, e: { ...EXPR.angry, shake: 0.6 * pulse(t, w('down', 'two'), 0.5) }, t });
     const f = pulse(t, w('down', 'two'), 0.4);
     scoreboard(g, 'SPASSKY', 'FISCHER', t >= w('down', 'two') ? '2' : '1', '0', { y: 330, flashL: f, title: 'AFTER GAME 2' });
     flash(g, 0.25 * f, C.red);
   }, { trans: 'whip' });
   cue(w('down', 'two'), 'buzz', 0.9);
 
-  // S18 — game three in a back room
+  // S18 — game three in a back room: crane down from the lamp
   shot(s('room'), (g, lt, t) => {
     g.fillStyle = '#07090B'; g.fillRect(0, 0, W, H);
+    camera(g, { dy: lerp(-200, 0, seg(lt, 0, 1.6, ease.out)), t });
     beam(g, W / 2, 0, 160, 1100, 1500, '#FFF1D6', 0.16);
-    g.fillStyle = '#2B2F33'; g.fillRect(W / 2 - 4, 0, 8, 150); g.fillStyle = '#C9B48A'; g.beginPath(); g.moveTo(W / 2 - 80, 190); g.lineTo(W / 2 + 80, 190); g.lineTo(W / 2 + 40, 140); g.lineTo(W / 2 - 40, 140); g.fill();
-    B.setCam({ yaw: -0.15 + lt * 0.04, pitch: 0.62, dist: 11 - lt * 0.25, fov: 1450, cy: H * 0.58, target: [4, 0, 4.4] });
+    g.fillStyle = '#2B2F33'; g.fillRect(W / 2 - 4, -200, 8, 350); g.fillStyle = '#C9B48A'; g.beginPath(); g.moveTo(W / 2 - 80, 190); g.lineTo(W / 2 + 80, 190); g.lineTo(W / 2 + 40, 140); g.lineTo(W / 2 - 40, 140); g.fill();
+    rig(B, lt, [[0, { yaw: -0.4, pitch: 1.0, dist: 13, cy: H * 0.6, target: [4, 0, 4.4] }], [2.4, { yaw: 0.05, pitch: 0.6, dist: 10.5 }]], { t });
     const hands = seated(g, B, 'spassky', 'focus', t, { z: 9.4 });
     B.drawSlab(g); hands();
-    B.drawPieces(g, piecesAt([{ pieces: start() }], 0), { focus: 11, dof: 1.3 });
+    B.drawPieces(g, piecesAt(G3, 0), { focus: B.dist, dof: 1.3 });
     placeStamp(g, lt, 'Game 3', 'Back room', { y: 280, t0: 0.05 });
-    if (lt > w('room', 'No') - s('room')) {
+    if (t > w('room', 'No')) {
       const a = seg(t, w('room', 'No'), w('room', 'No') + 0.2);
       g.save(); g.globalAlpha = a; filmCam(g, 860, 450, 0.9, t, -1); g.restore();
-      xMark(g, 860, 430, 170, C.red, a);
+      xMark(g, 860, 430, 170 * (1 + 0.5 * (1 - ease.back(a))), C.red, a);
     }
   }, { trans: 'leak', vig: 0.75 });
-  cue(s('room'), 'whoosh', 0.8); cue(s('room') + 0.1, 'lamp', 0.6); cue(w('room', 'No'), 'thud', 0.9);
+  cue(s('room') + 0.1, 'lamp', 0.6); cue(w('room', 'No'), 'thud', 0.9);
 
-  // S19 — Bobby wins, then again, and again (boss fight)
+  // S19 — Bobby wins, then again, and again: three hits from game 3, three camera angles, the boss bar drains
   const hits = [w('wins', 'wins'), w('again', 1), w('again', 3)];
-  const hp = t => 1 - hits.filter(h => t >= h).length * 0.22 - 0.0;
-  shot(s('wins'), (g, lt, t) => {
+  const g3 = new Moves(B, G3, [
+    { k: 62, t0: hits[0] - 0.42 }, { k: 63, t0: hits[0] + 0.45, dur: 0.35, color: C.red },
+    { k: 64, t0: hits[1] - 0.42 }, { k: 65, t0: hits[1] + 0.3, dur: 0.3, color: C.red },
+    { k: 66, t0: hits[2] - 0.42 }], { dur: 0.42 });
+  g3.cues(cue);
+  const hp = t => 1 - hits.filter(h => t >= h).length * 0.3;
+  const boss = (g, lt, t, keys) => {
     coldRoom(g);
     const last = hits.filter(h => t >= h).pop() ?? -9;
-    B.setCam({ yaw: 0.25 * Math.sin(t * 0.6), pitch: 0.7, dist: 9.5, fov: 1450, cy: H * 0.56, target: [4, 0, 5] });
-    const hands = seated(g, B, 'spassky', t < hits[0] ? 'focus' : t < hits[2] ? 'worried' : 'shock', t, { z: 9.4 });
+    rig(B, lt, keys, { t, bump: g3.bump(t) * 1.5 });
+    const n = hits.filter(h => t >= h).length;
+    const hands = seated(g, B, 'spassky', n === 0 ? 'focus' : n === 1 ? { ...EXPR.worried, look: [0, 1] } : { ...EXPR.shock, shake: 0.7 }, t, { z: 9.4 });
     B.drawSlab(g, { tint: C.lime, tintA: 0.3 * pulse(t, last, 0.3) }); hands();
-    const ps = start().map(p => ({ ...p, ...{ x: sqXZ(p.sq)[0], z: sqXZ(p.sq)[1] } }));
-    hits.forEach((h, i) => { const sqs = ['f5', 'd4', 'e3']; const u = seg(t, h - 0.35, h); ps.push({ t: 'n', c: 'w', x: lerp(4.5, sqXZ(sqs[i])[0], u), z: lerp(1.5, sqXZ(sqs[i])[1], u), y: Math.sin(u * Math.PI) * 0.8, alpha: t > h - 0.35 ? 1 : 0, sharp: true }); });
-    B.drawPieces(g, ps.filter(p => p.alpha !== 0 && !(p.c === 'b' && p.t === 'p' && t > hits[0] && p.sq === 'e7')), { focus: 9.5, dof: 1.2 });
+    g3.draw(g, t, { dof: 1.2, labels: false });
     healthBar(g, 'Boris Spassky', 'WORLD CHAMPION', lerp(hp(t - 0.25), hp(t), seg(t - last, 0, 0.25)), { y: 170 });
     if (t - last < 0.5) speedlines(g, W / 2, H * 0.45, t, { a: 0.5 * (1 - (t - last) / 0.5), color: '#E9FFD0' });
     flash(g, 0.35 * pulse(t, last, 0.2), '#E6FFC8');
-  }, { trans: 'whip' });
-  hits.forEach(h => { cue(h - 0.05, 'clack', 1); cue(h, 'boom', 0.8); cue(h, 'hit', 0.7); });
+  };
+  shot(s('wins'), (g, lt, t) => boss(g, lt, t, [[0, { yaw: 0.5, pitch: 0.7, dist: 10, cy: H * 0.55, target: [3, 0, 3.5] }], [1.6, { yaw: 0.2, pitch: 0.65, dist: 7.5 }]]), { trans: 'whip' });
+  shot(hits[1] - 0.3, (g, lt, t) => boss(g, lt, t, [[0, { yaw: -0.8, pitch: 0.38, dist: 7, cy: H * 0.5, target: [4.5, 0.3, 3.5] }], [1.0, { yaw: -0.55, pitch: 0.42, dist: 6 }]]), { trans: 'whip', whipDir: -1 });
+  shot(hits[2] - 0.3, (g, lt, t) => boss(g, lt, t, [[0, { yaw: 0.0, pitch: 1.1, dist: 10, cy: H * 0.55, target: [4.5, 0, 3.5] }], [1.4, { yaw: 0.6, pitch: 1.05, dist: 8 }]]), { trans: 'zoom' });
+  hits.forEach(h => { cue(h, 'boom', 0.8); cue(h, 'hit', 0.7); });
 
   // S20 — World champion
   const champT = s('champ');
   shot(champT, (g, lt, t) => {
     bgBase(g, { top: '#5A4A1C', mid: '#1C170B', edge: '#060503', cy: H * 0.42 });
     rays(g, W / 2, 820, t, { a: 0.16 });
-    camera(g, { zoom: lerp(1.08, 1, seg(lt, 0, 0.6, ease.out)), t });
-    drawChar(g, 'bobby72', { x: W / 2, y: 840, s: 1.6, e: 'triumph', t });
-    hand(g, 250, 640 - Math.sin(lt * 6) * 10, 52); hand(g, 830, 640 + Math.sin(lt * 6) * 10, 52);
+    camera(g, { zoom: lerp(1.15, 1, seg(lt, 0, 0.6, ease.out)), rot: lerp(0.05, 0, seg(lt, 0, 0.8, ease.out)), t });
+    drawChar(g, 'bobby72', { x: W / 2, y: 840, s: 1.6, e: { ...EXPR.triumph, nod: 0.8 }, t });
+    hand(g, 250, 640 - Math.sin(lt * 8) * 18, 52); hand(g, 830, 640 + Math.sin(lt * 8) * 18, 52);
     counter(g, '12½ – 8½', null, { y: 330, size: 120, color: '#FFF4D6', glow: C.gold });
-    badge(g, 'WORLD CHAMPION', W / 2, 440, { color: C.gold, size: 46, sub: 'REYKJAVIK · 1 SEPTEMBER 1972', a: seg(lt, 0.1, 0.4) });
+    badge(g, 'WORLD CHAMPION', W / 2, 440, { color: C.gold, size: 46, sub: 'REYKJAVIK · 1 SEPTEMBER 1972', a: seg(lt, 0.1, 0.4), scale: lerp(1.6, 1, seg(lt, 0.1, 0.4, ease.back)) });
+    shockwave(g, W / 2, 440, t, champT + 0.15, { r0: 100, r1: 560, color: C.gold, lw: 14, squash: 0.5 });
     confetti(g, t, champT + 0.05);
   }, { trans: 'flash' });
-  cue(champT, 'boom', 1.1); cue(champT, 'cheer', 0.7); cue(champT + 0.05, 'confetti', 0.8);
+  cue(champT, 'boom', 1.1); cue(champT, 'cheer', 0.8); cue(champT + 0.05, 'confetti', 0.8);
 
   // S21 — and then... he vanished
   const vanT = w('vanish', 'vanished');
   shot(s('vanish') - 0.3, (g, lt, t) => {
     coldRoom(g);
+    camera(g, { zoom: lerp(1.0, 1.12, seg(lt, 0, 2.2)), fy: 760, t });
     spotlight(g, W / 2, 700, 520, '#ffffff', 0.12);
     const gone = seg(t, vanT - 0.1, vanT + 0.5);
     g.save(); g.fillStyle = '#15191C'; g.beginPath(); g.roundRect(330, 860, 420, 600, 40); g.fill(); g.fillStyle = '#1B2024'; g.fillRect(310, 1180, 460, 70); g.restore();
-    drawChar(g, 'bobby72', { x: W / 2, y: 760, s: 1.35, e: 'neutral', t, alpha: 1 - gone });
-    if (gone > 0 && gone < 1) { const r = rng(11); for (let i = 0; i < 70; i++) { const x = 360 + r() * 360, y = 520 + r() * 700; g.fillStyle = rgba('#d8dde0', (1 - gone) * 0.8); g.beginPath(); g.arc(x + (r() - 0.5) * 300 * gone, y - gone * 300 * r(), 4 + r() * 6, 0, 7); g.fill(); } }
+    drawChar(g, 'bobby72', { x: W / 2, y: 760, s: 1.35, e: { ...EXPR.neutral, look: [0, 0.3] }, t, alpha: 1 - gone });
+    if (gone > 0 && gone < 1) { const r = rng(11); for (let i = 0; i < 90; i++) { const x = 360 + r() * 360, y = 520 + r() * 700; g.fillStyle = rgba('#d8dde0', (1 - gone) * 0.8); g.beginPath(); g.arc(x + (r() - 0.5) * 360 * gone, y - gone * 360 * r(), 4 + r() * 6, 0, 7); g.fill(); } }
+    glint(g, W / 2, 760, t, vanT, { r: 300, life: 0.5 });
   }, { trans: 'fade', transDur: 0.45 });
   cue(vanT, 'poof', 0.9);
 
-  // S22 — never played for the title again
+  // S22 — never played for the title again: the crown falls
+  const crownT = w('never', 'never');
   shot(s('never'), (g, lt, t) => {
     coldRoom(g);
-    B.setCam({ yaw: 0.4 + lt * 0.05, pitch: 0.72, dist: 9.5, fov: 1450, cy: H * 0.62, target: [4, 0, 4] });
+    rig(B, lt, [[0, { yaw: 0.9, pitch: 0.6, dist: 10, cy: H * 0.62, target: [4, 0.5, 4] }], [2.6, { yaw: 0.3, pitch: 0.75, dist: 8.5 }]], { t });
     B.drawSlab(g);
-    const tilt = seg(t, w('never', 'never'), w('never', 'never') + 0.6, ease.in);
+    const tilt = seg(t, crownT, crownT + 0.5, ease.in);
     const cp = B.project(4, 1.2, 4);
-    crown(g, cp.x + tilt * 90, cp.y + tilt * 100, 1.8, { tilt: tilt * 1.2, gray: tilt });
+    crown(g, cp.x + tilt * 90, cp.y + tilt * 100, 1.8, { tilt: tilt * 1.25, gray: tilt });
+    dust(g, cp.x + 90, cp.y + 160, t, crownT + 0.5, { size: 40, spread: 260, n: 14 });
+    burst(g, cp.x + 90, cp.y + 120, t, crownT + 0.5, { n: 16, color: C.gold, speed: 700, size: 6 });
     stamp(g, 'TITLE FORFEITED', W / 2, 420, lt, w('never', 'title') - s('never'), { size: 72, sub: '1975 · NEVER DEFENDED' });
   }, { trans: 'fade', transDur: 0.4 });
-  cue(w('never', 'never') + 0.55, 'thud', 0.9); cue(w('never', 'title'), 'stamp', 1);
+  cue(crownT + 0.5, 'thud', 1); cue(crownT + 0.5, 'clack', 0.6); cue(w('never', 'title'), 'stamp', 1);
 
-  // S23 — sure the Soviets were watching
+  // S23 — sure the Soviets were watching (the world breaks like glass)
   shot(s('watching'), (g, lt, t) => {
     g.fillStyle = '#040608'; g.fillRect(0, 0, W, H);
+    camera(g, { zoom: lerp(1.0, 1.1, seg(lt, 0, 2.8)), t });
     eyesInDark(g, lt, w('watching', 'Soviets') - s('watching'), 26);
     blinds(g, lt);
-    drawChar(g, 'bobbyBeard', { x: W / 2, y: 1080, s: 1.5, e: { ...EXPR.paranoid, look: [Math.sin(lt * 4) > 0 ? 1 : -1, -0.3] }, t });
+    drawChar(g, 'bobbyBeard', { x: W / 2, y: 1080, s: 1.5, e: { ...EXPR.paranoid, look: [Math.sin(lt * 4) > 0 ? 1 : -1, -0.3], turn: Math.sin(lt * 4) * 0.5, shake: 0.25 }, t });
     g.fillStyle = 'rgba(210,225,235,0.12)'; for (let i = 0; i < 6; i++) g.fillRect(0, 900 + i * 58, W, 20);
-  }, { trans: 'fade', transDur: 0.35, vig: 0.7 });
-  cue(s('watching'), 'heartbeat', 0.9); cue(w('watching', 'Soviets'), 'sting', 0.8);
+  }, { trans: 'shatter', vig: 0.7 });
+  cue(s('watching') + 0.3, 'heartbeat', 0.9); cue(w('watching', 'Soviets'), 'sting', 0.8);
 
   // S24 — so the fillings came out
   shot(s('fillings'), (g, lt, t) => {
     bgBase(g, { top: '#4A1A1C', mid: '#1A0B0C', edge: '#050203', cy: H * 0.35 });
-    camera(g, { zoom: lerp(1.15, 1.25, lt / 2), fy: 640, t, shake: 4 * pulse(t, w('fillings', 'out'), 0.3) });
-    tooth(g, W / 2, 680, 2.5, t, [w('fillings', 'fillings'), w('fillings', 'came'), w('fillings', 'out')], { tint: 'rgba(255,60,40,0.08)' });
+    const pops = [w('fillings', 'fillings'), w('fillings', 'came'), w('fillings', 'out')];
+    camera(g, { zoom: 1.15 + pops.reduce((a, p) => a + 0.08 * pulse(t, p, 0.25), 0), fy: 640, t });
+    tooth(g, W / 2, 680, 2.5, t, pops, { tint: 'rgba(255,60,40,0.08)' });
+    pops.forEach((p, i) => { glint(g, W / 2 + [-100, 85, 0][i], 520 + [0, 15, 75][i], t, p, { r: 180 }); burst(g, W / 2 + [-100, 85, 0][i], 520, t, p, { n: 10, color: '#E8EEF2', speed: 600, size: 5, seed: i }); });
   }, { trans: 'zoom' });
   cue(w('fillings', 'fillings'), 'ting', 0.9); cue(w('fillings', 'came'), 'ting', 0.9); cue(w('fillings', 'out'), 'ting', 0.9); cue(w('fillings', 'out'), 'boom', 0.6);
 
-  // S25 — spat on the US order (1992)
+  // S25a — 1992: the order from the US Treasury
   const spitT = w('spat', 'spat');
   shot(s('spat'), (g, lt, t) => {
     coldRoom(g);
+    camera(g, { zoom: lerp(1.0, 1.1, seg(lt, 0, 2.0)), fy: 600, t });
     placeStamp(g, lt, 'Yugoslavia', '1992', { y: 150, t0: 0.05 });
-    paper(g, W / 2, 560, 560, 680, { rot: -0.04, title: 'U.S. DEPARTMENT\nOF THE TREASURY', lines: 9 });
-    spit(g, 540, 1540, 560, 620, (t - spitT) / 0.35);
-    drawChar(g, 'bobbyBeard', { x: W / 2, y: 1500, s: 1.25, e: exprAt([[0, 'angry'], [spitT - s('spat') - 0.15, { ...EXPR.angry, mouth: 'o', open: 0.3 }], [spitT - s('spat') + 0.3, 'smug']], lt), t });
-    stamp(g, 'WARRANT', W / 2, 610, lt, w('spat', 'government') - s('spat'), { size: 110, sub: 'ARREST ORDERED' });
+    paper(g, W / 2, 620 + (1 - seg(lt, 0, 0.5, ease.out)) * 600, 600, 720, { rot: lerp(0.2, -0.04, seg(lt, 0, 0.5, ease.out)), title: 'U.S. DEPARTMENT\nOF THE TREASURY', lines: 9 });
+    badge(g, 'EXECUTIVE ORDER 12810', W / 2, 1060, { color: C.blue, size: 30, a: seg(lt, 0.7, 1.0) });
   }, { trans: 'leak' });
-  cue(s('spat'), 'whoosh', 0.8); cue(w('spat', '1992'), 'boom', 0.7); cue(spitT, 'spit', 1); cue(spitT + 0.35, 'splat', 0.9); cue(w('spat', 'government'), 'stamp', 1);
+  cue(s('spat') + 0.1, 'whoosh', 0.7); cue(w('spat', '1992'), 'boom', 0.7);
+  // S25b — he spits
+  shot(w('spat', 'he') - 0.05, (g, lt, t) => {
+    coldRoom(g);
+    camera(g, { zoom: lerp(1.05, 1.2, seg(lt, 0, 1.0)), fy: 820, t });
+    drawChar(g, 'bobbyBeard', { x: W / 2, y: 860, s: 2.0, e: exprAt([[0, 'angry'], [spitT - (w('spat', 'he') - 0.05) - 0.12, { ...EXPR.angry, mouth: 'o', open: 0.4, shake: 0.4 }], [spitT - (w('spat', 'he') - 0.05) + 0.3, { ...EXPR.smug, browTilt: 0.6 }]], lt), t });
+    const u = (t - spitT) / 0.35;
+    if (u > 0 && u < 1) { const k = ease.in(u); g.save(); g.fillStyle = 'rgba(200,230,240,0.9)'; g.beginPath(); g.ellipse(W / 2, 1010 - k * 200, 14 + k * 160, 10 + k * 120, 0, 0, 7); g.fill(); g.restore(); }
+  }, { trans: 'whip' });
+  cue(spitT, 'spit', 1);
+  // S25c — on the order: splat, then WARRANT
+  shot(w('spat', 'order') - 0.05, (g, lt, t) => {
+    coldRoom(g);
+    camera(g, { zoom: lerp(1.3, 1.15, seg(lt, 0, 0.4, ease.out)), fy: 620, t });
+    paper(g, W / 2, 620, 600, 720, { rot: -0.04, title: 'U.S. DEPARTMENT\nOF THE TREASURY', lines: 9 });
+    spit(g, W / 2, 620, W / 2 + 20, 600, 1 + clamp(lt / 0.6));
+    stamp(g, 'WARRANT', W / 2, 640, lt, w('spat', 'government') - (w('spat', 'order') - 0.05), { size: 110, sub: 'ARREST ORDERED' });
+  }, { trans: 'zoom' });
+  cue(w('spat', 'order') - 0.05, 'splat', 0.9); cue(w('spat', 'government'), 'stamp', 1);
 
   // S26 — never went home: exile route (starts on the USA, pans east)
   shot(s('home'), (g, lt, t) => {
     bgBase(g, { top: '#1E2B33', mid: '#0E1418', edge: '#04070A', cy: H * 0.4 });
     const u = seg(lt, 0.5, 2.3, ease.inOut);
-    map.view({ lon: lerp(-80, 75, u), lat: lerp(40, 38, u), zoom: 6, cy: H * 0.46 });
+    map.view({ lon: lerp(-80, 75, u), lat: lerp(40, 38, u), zoom: lerp(7, 6, u), cy: H * 0.46 });
     const usa = seg(t, w('home', 'never'), w('home', 'never') + 0.3);
     map.draw(g, { spacing: 14, color: id => id === ISO.USA ? (usa > 0.5 ? rgba(C.red, 0.85) : '#6C93A3') : null });
     const [ux, uy] = map.proj(-98, 39);
-    xMark(g, ux, uy, 180, C.red, usa);
+    xMark(g, ux, uy, 180 * (1 + 0.6 * (1 - ease.back(usa))), C.red, usa);
     map.route(g, 'Belgrade', 'Budapest', seg(lt, 0.9, 1.2), { bend: 0.4 });
     map.route(g, 'Budapest', 'Manila', seg(lt, 1.1, 1.9), { bend: 0.25 });
     map.route(g, 'Manila', 'Tokyo', seg(lt, 1.8, 2.2), { bend: 0.3 });
-    for (const [c, a0, below] of [['Belgrade', 0.8, true], ['Budapest', 1.0, false], ['Manila', 1.8, true], ['Tokyo', 2.1, false]]) map.pin(g, c, { a: seg(lt, a0, a0 + 0.2), below });
+    for (const [c, a0, below] of [['Belgrade', 0.8, true], ['Budapest', 1.0, false], ['Manila', 1.8, true], ['Tokyo', 2.1, false]]) map.pin(g, c, { a: seg(lt, a0, a0 + 0.2), below, pulse: lt > a0 ? ((lt - a0) * 1.5) % 1 : 0 });
     placeStamp(g, lt, 'Exile', '1992 – 2004', { y: 160 });
   }, { trans: 'whip' });
   cue(w('home', 'never'), 'buzz', 0.8); cue(s('home') + 0.9, 'whoosh', 0.5); cue(s('home') + 1.6, 'whoosh', 0.5);
@@ -540,39 +646,50 @@ export async function build(T) {
     const u = seg(lt, 0, 2.0, ease.inOut);
     map.view({ lon: lerp(60, -20, u), lat: lerp(42, 62, u), zoom: lerp(3.6, 14, u), cy: H * 0.47 });
     const ic = seg(t, w('iceland', 'Iceland'), w('iceland', 'Iceland') + 0.4);
-    map.draw(g, { spacing: 13, base: '#4F7787', color: id => id === ISO.ISL ? rgba(C.blue, 0.4 + 0.6 * ic) : id === ISO.USA ? rgba(C.red, 0.85) : null });
+    map.draw(g, { spacing: 13, color: id => id === ISO.ISL ? rgba(C.blue, 0.4 + 0.6 * ic) : id === ISO.USA ? rgba(C.red, 0.85) : null });
     map.route(g, 'Tokyo', 'Reykjavik', seg(lt, 0, 1.5), { bend: 0.35, color: C.blue });
     map.pin(g, 'Reykjavik', { color: C.blue, a: seg(lt, 1.2, 1.5), pulse: (lt * 0.8) % 1 });
-    badge(g, 'ICELANDIC CITIZEN', W / 2, 300, { color: C.blue, size: 40, sub: 'MARCH 2005', a: seg(lt, 0.9, 1.2) });
+    badge(g, 'ICELANDIC CITIZEN', W / 2, 300, { color: C.blue, size: 40, sub: 'MARCH 2005', a: seg(lt, 0.9, 1.2), scale: lerp(1.5, 1, seg(lt, 0.9, 1.2, ease.back)) });
   });
   cue(w('iceland', 'Iceland'), 'shimmer', 0.8);
 
-  // S28 — died in Reykjavik, the city where he became king
+  // S28a — he died in Reykjavik
   const kingT = w('died', 'king');
-  shot(s('died'), (g, lt, t) => {
+  const lastBoard = (g, lt, t, keys) => {
     bgBase(g, { top: '#26323A', mid: '#0F151A', edge: '#030507', cy: H * 0.32 });
     bokeh(g, t, { n: 10, color: '#cfe6ff', a: 0.05, seed: 8 });
-    B.setCam({ yaw: 0.12 - lt * 0.02, pitch: 0.6, dist: 11.5 - lt * 0.2, fov: 1450, cy: H * 0.56, target: [4, 0, 4.6] });
-    const hands = seated(g, B, 'bobbyOld', exprAt([[0, 'tired'], [1.0, 'sad']], lt), t, { z: 9.4 });
+    rig(B, lt, keys, { t, shake: 0.6 });
+    const hands = seated(g, B, 'bobbyOld', exprAt([[0, 'tired'], [0.8, { ...EXPR.sad, look: [0, 1] }]], lt), t, { z: 9.4 });
     B.drawSlab(g); hands();
     const kg = seg(t, kingT - 0.1, kingT + 0.4);
-    B.drawPieces(g, [{ t: 'k', c: 'w', x: 4.5, z: 5.5, glow: kg > 0.05 ? C.gold : null, halo: C.gold, haloA: kg, sharp: true }, { t: 'p', c: 'b', x: 2.5, z: 3.5 }, { t: 'p', c: 'w', x: 6.5, z: 2.5 }], { focus: 11 });
+    B.drawPieces(g, [{ t: 'k', c: 'w', x: 4.5, z: 5.5, glow: kg > 0.05 ? C.gold : null, halo: C.gold, haloA: kg, sharp: true }, { t: 'p', c: 'b', x: 2.5, z: 3.5 }, { t: 'p', c: 'w', x: 6.5, z: 2.5 }], { focus: B.dist });
     const cp = B.project(7.4, 0, 6.8); candle(g, cp.x, cp.y, cp.s / 110, t);
+  };
+  shot(s('died'), (g, lt, t) => {
+    lastBoard(g, lt, t, [[0, { yaw: 0.4, pitch: 0.6, dist: 13, cy: H * 0.56, target: [4, 0, 4.6] }], [2, { yaw: 0.1, pitch: 0.58, dist: 11 }]]);
     placeStamp(g, lt, 'Reykjavik', '2008', { y: 160, t0: 0.05 });
     photoCard(g, P.grave, lt, w('died', 'died') - s('died'), { x: 225, y: 1000, w: 280, aspect: 1.2, rot: -0.05, from: 'left', tone: 'warm', caption: 'LAUGARDÆLIR', credit: 'Ted Cross · CC BY 2.0', fx: 0.6, fy: 0.3, zoom: [1.0, 1.08], dur: 4 });
   }, { trans: 'fade', transDur: 0.5, vig: 0.7 });
+  // S28b — the city where he became king: low on the glowing king
+  shot(w('died', 'The') - 0.08, (g, lt, t) => {
+    lastBoard(g, lt, t, [[0, { yaw: -0.6, pitch: 0.25, dist: 6, cy: H * 0.5, target: [4.5, 0.7, 5.5] }], [2.2, { yaw: -0.25, pitch: 0.3, dist: 5 }]]);
+    const kp = B.project(4.5, 1.1, 5.5);
+    rays(g, kp.x, kp.y, t, { a: 0.14 * seg(t, kingT - 0.1, kingT + 0.4), color: '#ffe9a8', len: 900 });
+    glint(g, kp.x, kp.y - 40, t, kingT, { r: 260, color: C.gold });
+  }, { trans: 'fade', transDur: 0.4, vig: 0.7 });
   cue(w('died', 'died'), 'boom', 0.6); cue(kingT, 'shimmer', 0.8);
 
-  // S29 — age 64: squares light up
+  // S29 — age 64: squares light up while the camera spins overhead
   const sqA = w('age64', 'Age'), sqB = w('age64', 'sixty-four') + 0.6;
   const lit = t => Math.floor(clamp((t - sqA) / (sqB - sqA)) * 64);
   shot(s('age64') - 0.2, (g, lt, t) => {
     bgBase(g, { top: '#26323A', mid: '#0F151A', edge: '#030507', cy: H * 0.32 });
-    B.setCam({ yaw: 0.0 + lt * 0.08, pitch: 1.05, dist: 12, fov: 1450, cy: H * 0.55, target: [4, 0, 4] });
+    rig(B, lt, [[0, { yaw: -0.6, pitch: 1.15, dist: 13, cy: H * 0.55, target: [4, 0, 4] }], [2.3, { yaw: 0.9, pitch: 1.05, dist: 11.5 }]], { t, e: x => x });
     B.drawSlab(g);
     const n = lit(t);
     for (let i = 0; i < n; i++) { const f = i % 8, r = Math.floor(i / 8); B.highlight(g, String.fromCharCode(97 + (r % 2 ? 7 - f : f)) + (r + 1), C.gold, 0.55, false); }
-    counter(g, String(n).padStart(2, '0'), n >= 64 ? 'YEARS · SQUARES' : 'YEARS', { y: 320, size: 170, color: '#FFF4D6', glow: C.gold, labelColor: C.gold });
+    counter(g, String(n).padStart(2, '0'), n >= 64 ? 'YEARS · SQUARES' : 'YEARS', { y: 320, size: 170 * (1 + 0.15 * pulse(t, sqB, 0.3)), color: '#FFF4D6', glow: C.gold, labelColor: C.gold });
+    const c = B.project(4, 0, 4); shockwave(g, c.x, c.y, t, sqB, { r0: 100, r1: 700, color: C.gold, lw: 14, squash: 0.6 });
   }, { trans: 'leak' });
   for (let i = 0; i < 64; i += 4) cue(sqA + i / 64 * (sqB - sqA), 'tick', 0.4);
   cue(sqB, 'boom', 0.9);
@@ -581,14 +698,13 @@ export async function build(T) {
   const endT = s('square');
   shot(endT, (g, lt, t) => {
     crimson(g, H * 0.25);
-    const u = seg(lt, 0, 2.4, ease.inOut);
-    B.setCam({ yaw: lerp(0.2, 0.06 * Math.sin(t * 0.3), u), pitch: lerp(1.0, 0.6, u), dist: lerp(11, 12.5, u), fov: 1500, cy: H * 0.55, target: [4, 0, 4.4] });
+    rig(B, lt, [[0, { yaw: 0.6, pitch: 1.0, dist: 11, cy: H * 0.55, target: [4, 0, 4.4] }], [2.4, { yaw: -0.5, pitch: 0.68, dist: 14.5 }]], { t });
     const hands = seated(g, B, 'bobby72', 'smug', t, { z: 9.6, alpha: seg(lt, 0.8, 1.6) });
     B.drawSlab(g); hands();
     for (let i = 0; i < 64; i++) B.highlight(g, String.fromCharCode(97 + (i % 8)) + (Math.floor(i / 8) + 1), C.gold, 0.5 * (1 - seg(lt, 1.2, 2.4)), false);
     B.drawPieces(g, [{ t: 'k', c: 'w', x: 4.5, z: 7.5 }, { t: 'q', c: 'w', x: 3.5, z: 7.4 }, { t: 'r', c: 'w', x: 1.5, z: 7.6 }, { t: 'r', c: 'w', x: 6.5, z: 7.6 }, { t: 'n', c: 'w', x: 2.5, z: 7.3 }, { t: 'b', c: 'w', x: 5.5, z: 7.3 }, ...kings.map(([x, z]) => ({ t: 'k', c: 'b', x, z }))].map(p => ({ ...p, alpha: p.c === 'b' ? seg(lt, 1.6, 2.4) : 1 })), { focus: 11, dof: 1.4 });
-    const a = seg(t, w('square', 'every') - 0.2, w('square', 'every') + 0.3);
-    g.save(); g.globalAlpha = a;
+    const a = seg(t, w('square', 'every') - 0.2, w('square', 'every') + 0.3), sc = lerp(1.3, 1, ease.back(a));
+    g.save(); g.globalAlpha = a; g.translate(W / 2, 300); g.scale(sc, sc); g.translate(-W / 2, -300);
     glowText(g, 'BOBBY FISCHER', W / 2, 250, { font: serif(86, 800), fill: C.cream, glow: 'rgba(0,0,0,0.9)', blur: 20 });
     glowText(g, '1943 – 2008', W / 2, 315, { font: serif(36, 700), fill: C.gold, glow: 'rgba(0,0,0,0.9)', blur: 10, spacing: 6 });
     glowText(g, '64 SQUARES  ·  64 YEARS', W / 2, 372, { font: mono(28, 800), fill: C.lime, glow: 'rgba(0,0,0,0.9)', blur: 8, spacing: 6 });
@@ -599,12 +715,14 @@ export async function build(T) {
   const tvOff = T.duration - 0.55;
   cue(tvOff, 'tvoff', 0.9);
 
+  // music: sections plus deliberate drops to (near) silence right before the big reveals
   const music = [
-    { t: 0, m: 'hook' }, { t: s('ny') - 0.1, m: 'intrigue' }, { t: s('later') - 0.2, m: 'tension' },
-    { t: w('later', 'later') + 0.4, m: 'drop' }, { t: mateT, m: 'hit' }, { t: s('century'), m: 'glory' },
-    { t: s('rey') - 0.1, m: 'coldwar' }, { t: s('room') - 0.1, m: 'build' }, { t: champT, m: 'victory' },
-    { t: s('vanish') - 0.3, m: 'void' }, { t: s('watching'), m: 'paranoia' }, { t: s('spat'), m: 'exile' },
-    { t: s('died'), m: 'elegy' }, { t: endT, m: 'finale' }, { t: T.duration, m: 'end' },
+    { t: 0, m: 'hook' }, { t: s('ny') - 0.1, m: 'intrigue' }, { t: w('queen', 'hanging') + 0.3, m: 'drop' }, { t: s('purpose'), m: 'intrigue' },
+    { t: s('later') - 0.2, m: 'tension' }, { t: w('later', 'later') + 0.4, m: 'drop' }, { t: mateT, m: 'hit' }, { t: s('century'), m: 'glory' },
+    { t: s('rey') - 0.1, m: 'coldwar' }, { t: s('refuses'), m: 'drop' }, { t: w('refuses', 'play') + 0.1, m: 'coldwar' }, { t: s('room') - 0.1, m: 'build' },
+    { t: s('champ') - 0.35, m: 'drop' }, { t: champT, m: 'victory' },
+    { t: s('vanish') - 0.3, m: 'void' }, { t: s('watching'), m: 'paranoia' }, { t: s('spat'), m: 'exile' }, { t: s('home') - 0.3, m: 'drop' }, { t: s('home'), m: 'exile' },
+    { t: s('died') - 0.4, m: 'drop' }, { t: s('died'), m: 'elegy' }, { t: endT, m: 'finale' }, { t: T.duration, m: 'end' },
   ];
   return { shots, cues, music, tvOff, duration: T.duration };
 }

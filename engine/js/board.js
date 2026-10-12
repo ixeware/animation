@@ -129,7 +129,7 @@ export class Board {
         gr.addColorStop(0, rgba(p.halo, 0.55 * p.haloA)); gr.addColorStop(1, rgba(p.halo, 0));
         ctx.fillStyle = gr; ctx.beginPath(); ctx.ellipse(g.x, g.y, r, r * 0.4, 0, 0, 7); ctx.fill(); ctx.restore();
       }
-      drawPiece(ctx, p.t, p.c, p.pr.x, p.pr.y, h, { blur, alpha: p.alpha ?? 1, glow: p.glow, rot: p.rot || 0 });
+      drawPiece(ctx, p.t, p.c, p.pr.x, p.pr.y, h, { blur, alpha: p.alpha ?? 1, glow: p.glow, rot: p.rot || 0, sx: p.sx || 1, sy: p.sy || 1 });
       if (p.bow) drawBow(ctx, p.pr.x, p.pr.y - h * 0.62, h * 0.32, p.bow);
     }
     return list;
@@ -158,7 +158,7 @@ export function drawBow(ctx, x, y, s, a = 1) {
 
 // Interpolate piece placement between plies k-1 -> k with progress u (0..1).
 // plies: from tools/pgn_to_json.py. Returns world-space piece list.
-export function piecesAt(plies, k, u = 1, { arc = 0.7, opts = {} } = {}) {
+export function piecesAt(plies, k, u = 1, { arc = 0.7, opts = {}, keepCaptured = true } = {}) {
   const cur = plies[Math.max(0, k)].pieces;
   if (k <= 0 || u >= 1) return cur.map(p => ({ ...p, ...xz(p.sq), ...(opts[p.id] || {}) }));
   const prev = new Map(plies[k - 1].pieces.map(p => [p.id, p]));
@@ -172,9 +172,10 @@ export function piecesAt(plies, k, u = 1, { arc = 0.7, opts = {} } = {}) {
     } else out.push({ ...p, x: x1, z: z1, ...(opts[p.id] || {}) });
     prev.delete(p.id);
   }
-  for (const q of prev.values()) { // captured: shrink & fade in the second half
+  for (const q of prev.values()) { // captured: stays until the attacker lands (it then shatters), or fades
     const [x, z] = sqXZ(q.sq), f = clamp((u - 0.45) / 0.4);
-    if (f < 1) out.push({ ...q, x, z, alpha: 1 - f, scale: 1 - f * 0.4, y: f * 0.3, rot: f * 0.6 });
+    if (keepCaptured) out.push({ ...q, x, z });
+    else if (f < 1) out.push({ ...q, x, z, alpha: 1 - f, scale: 1 - f * 0.4, y: f * 0.3, rot: f * 0.6 });
   }
   return out;
 }

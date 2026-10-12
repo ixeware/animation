@@ -25,7 +25,7 @@ def ffilter(x, chain, sr=SR):
     p = subprocess.run(['ffmpeg', '-v', 'error', '-f', 'f32le', '-ar', str(sr), '-ac', str(x.shape[1] if x.ndim > 1 else 1),
                         '-i', '-', '-af', chain, '-f', 'f32le', '-ar', str(sr), '-'],
                        input=x.astype(np.float32).tobytes(), capture_output=True, check=True)
-    y = np.frombuffer(p.stdout, np.float32)
+    y = np.frombuffer(p.stdout, np.float32).copy()
     return y.reshape(-1, x.shape[1]) if x.ndim > 1 else y
 
 
@@ -76,7 +76,17 @@ def main(ep):
         fx[s:s + len(x), 1] += x * np.sqrt(0.5 * (1 + pan))
 
     vv = np.stack([v, v], 1)
-    mixd = vv * 1.0 + m * 0.46 + fx * 0.23
+    # bed = music + SFX, brightened, then leveled to sit `bed_gap` LU under the voice (reference: 0.4-6 LU)
+    import pyloudnorm as pyln
+    meter = pyln.Meter(SR)
+    bed = m * 0.62 + fx * 0.38
+    bed = ffilter(bed, 'highshelf=f=5000:g=4,equalizer=f=250:t=q:w=1:g=-2')[:n]
+    gap = meta.get('bed_gap', 4.0)
+    lv, lb = meter.integrated_loudness(vv), meter.integrated_loudness(bed)
+    bed *= 10 ** ((lv - gap - lb) / 20)
+    print(f'  voice {lv:.1f} LUFS, bed {lb:.1f} -> {lv - gap:.1f} LUFS')
+    m, fx = bed, np.zeros_like(bed)
+    mixd = vv * 1.0 + bed
     sf.write(b / 'stems_voice.wav', vv, SR); sf.write(b / 'stems_music.wav', m, SR); sf.write(b / 'stems_sfx.wav', fx, SR)
     sf.write(b / 'mix_raw.wav', (mixd / max(1e-6, np.abs(mixd).max()) * 0.9).astype(np.float32), SR)
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', b / 'mix_raw.wav', '-af',

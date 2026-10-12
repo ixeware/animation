@@ -64,7 +64,7 @@ def hit():
 def clack():
     d = 0.18
     t = t_(d)
-    x = bp(noise(d), 1500, 5000) * env_exp(d, 0.006)
+    x = bp(noise(d), 2000, 9000) * env_exp(d, 0.005) * 1.3
     x += (np.sin(2 * np.pi * 950 * t) * 0.6 + np.sin(2 * np.pi * 1580 * t) * 0.35) * env_exp(d, 0.025)
     x += np.sin(2 * np.pi * 160 * t) * env_exp(d, 0.03) * 0.5
     return norm(x)
@@ -76,8 +76,8 @@ def whoosh(d=0.55):
     n = 12
     for i in range(n):  # sweeping band, piecewise
         a, b = i * len(x) // n, (i + 1) * len(x) // n
-        c = 300 * (12 ** np.sin(np.pi * (i + 0.5) / n))
-        out[a:b] = bp(x, c * 0.7, min(c * 1.4, 18000))[a:b]
+        c = 500 * (16 ** np.sin(np.pi * (i + 0.5) / n))
+        out[a:b] = bp(x, c * 0.6, min(c * 1.6, 19000))[a:b]
     e = np.sin(np.pi * t_(d) / d) ** 2
     return norm(out * e)
 
@@ -253,6 +253,34 @@ def splat():
     return norm(lp(noise(d), 1400) * env_exp(d, 0.05) + np.sin(2 * np.pi * (500 - 1200 * t) * t) * env_exp(d, 0.04) * 0.5)
 
 
+def glass():
+    """breaking glass: dense bright shards over a short low crack"""
+    d = 1.4
+    out = np.zeros(int(d * SR))
+    crack = lp(noise(0.08), 2500) * env_exp(0.08, 0.02)
+    out[:len(crack)] += crack * 1.2
+    for _ in range(70):
+        s0 = int(abs(rng.normal(0.05, 0.18)) * SR)
+        dd = rng.uniform(0.05, 0.35)
+        tt = t_(dd)
+        f = rng.uniform(2500, 9500)
+        sh = (np.sin(2 * np.pi * f * tt) + 0.5 * np.sin(2 * np.pi * f * 1.73 * tt)) * np.exp(-tt / (dd * 0.3))
+        sh = sh + bp(noise(dd), 4000, 12000) * np.exp(-tt / 0.01) * 0.6
+        e = min(len(out), s0 + len(sh))
+        out[s0:e] += sh[:e - s0] * rng.uniform(0.15, 0.6)
+    return norm(out)
+
+
+def sparkle():
+    d = 1.0
+    out = np.zeros(int(d * SR))
+    for i in range(9):
+        s0 = int(i * 0.05 * SR); tt = t_(0.5); f = 2000 * 2 ** (i / 5)
+        x = np.sin(2 * np.pi * f * tt) * np.exp(-tt / 0.12)
+        out[s0:s0 + len(x)] += x * (1 - i / 12)
+    return norm(out)
+
+
 def tvoff():
     d = 0.6
     t = t_(d)
@@ -263,7 +291,7 @@ def tvoff():
 
 BANK = {name: fn for name, fn in globals().items()
         if callable(fn) and name in ('boom hit clack whoosh ting static shield tick alarm pluck riser shimmer thud buzz '
-                                     'whirr shutter stamp clock lamp cheer confetti poof heartbeat sting spit splat tvoff').split()}
+                                     'whirr shutter stamp clock lamp cheer confetti poof heartbeat sting spit splat tvoff glass sparkle').split()}
 
 
 def render_all():

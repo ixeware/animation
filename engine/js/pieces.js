@@ -94,12 +94,18 @@ export function sprite(type, color, glow = null) {
 }
 
 // draw a piece standing at (x, y=base) with pixel height h (king-relative scale)
-export function drawPiece(ctx, type, color, x, y, h, { blur = 0, alpha = 1, glow = null, rot = 0, sx = 1 } = {}) {
+export function drawPiece(ctx, type, color, x, y, h, { blur = 0, alpha = 1, glow = null, rot = 0, sx = 1, sy = 1 } = {}) {
   const img = sprite(type, color, glow);
   const s = h / 150, w = SW * s, hh = SH * s;
   ctx.save(); ctx.globalAlpha *= alpha;
   if (blur > 0.6) ctx.filter = `blur(${blur.toFixed(1)}px)`;
-  ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.scale(sx, 1);
+  ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.scale(sx, sy);
   ctx.drawImage(img, -w / 2, -(SH - 10) * s, w, hh);
   ctx.restore();
+}
+
+// sprite geometry for effects that need to cut a piece into fragments
+export function spriteBox(h) {
+  const s = h / 150;
+  return { w: SW * s, h: SH * s, top: -(SH - 10) * s };
 }

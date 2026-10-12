@@ -2,6 +2,7 @@
 // The page exposes renderFrame(t), DURATION and cues for render.mjs.
 import { W, H, FPS, makeCanvas, clamp, inv } from './core.js';
 import { grain, vignette, lightLeak, flash, tvOff } from './draw.js';
+import { screenShatter } from './fx.js';
 import { buildChunks, drawCaptions } from './captions.js';
 
 const q = new URLSearchParams(location.search);
@@ -53,6 +54,15 @@ function drawShot(s, t, g) {
   g.restore();
 }
 
+// screen shake driven by impact sounds (boom, hit, stamp, glass); decays in ~0.15 s
+const SHAKE = { boom: 14, hit: 11, stamp: 12, glass: 16, thud: 6, clack: 2.5, buzz: 5 };
+const shakeCues = (film.cues || []).filter(c => SHAKE[c.id]).map(c => ({ t: c.t, a: SHAKE[c.id] * (c.gain ?? 1) }));
+function shakeAmp(t) {
+  let a = 0;
+  for (const c of shakeCues) { const d = t - c.t; if (d >= 0 && d < 0.6) a += c.a * Math.exp(-d / 0.15); }
+  return Math.min(a, 26) * (film.shake ?? 1);
+}
+
 function compose(t, frame) {
   const s = shots.find(s => t >= s.a && t < s.b) || shots[shots.length - 1];
   drawShot(s, t, lctx);
@@ -71,8 +81,18 @@ function compose(t, frame) {
     const u = 1 - lt / 0.25, z = 1 + u * u * 0.6;
     ctx.filter = `blur(${(u * 18).toFixed(1)}px)`;
     ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); ctx.drawImage(layer, 0, 0);
-  } else ctx.drawImage(layer, 0, 0);
+  } else {
+    // every shot keeps moving: slow push-in across the shot + impact shake from the sound cues
+    const kb = s.kb ?? 0.04, z = 1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + shakeAmp(t) * 0.0015;
+    const a = shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
+    ctx.translate(W / 2 + sx, H / 2 + sy); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
+    ctx.drawImage(layer, 0, 0);
+  }
   ctx.restore();
+  if (tr === 'shatter' && lt < 0.8) {  // the previous shot, frozen, breaks like glass over this one
+    const prev = shots[s.i - 1];
+    if (prev) { drawShot(prev, s.a - 0.001, hctx); screenShatter(ctx, hold, lt / 0.8, { seed: s.i * 7 + 3 }); }
+  }
   if (s.post) s.post(ctx, lt, t);
   // light leak straddles the cut into this shot (and into the next one, if it asks)
   const nx = shots[s.i + 1];
@@ -96,7 +116,10 @@ function renderFrame(t, frame = Math.round(t * FPS)) {
 
 window.DURATION = DURATION;
 window.renderFrame = renderFrame;
-window.CUES = film.cues || [];
+// every stylized cut gets a soft whoosh; glass breaks get their crash
+const autoCues = shots.slice(1).flatMap(s => s.trans === 'shatter' ? [{ t: s.a, id: 'glass', gain: 1 }, { t: s.a, id: 'hit', gain: 0.7 }]
+  : ['leak', 'whip', 'zoom', 'flash'].includes(s.trans) ? [{ t: Math.max(0, s.a - 0.12), id: 'whoosh', gain: 0.45 }] : []);
+window.CUES = [...(film.cues || []), ...(film.autoWhoosh === false ? [] : autoCues)];
 window.MUSIC = film.music || [];
 window.READY = true;
 if (q.has('t')) renderFrame(+q.get('t'));
