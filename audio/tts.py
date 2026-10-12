@@ -6,6 +6,8 @@ Writes build/narration.wav (44.1 kHz mono) and build/timings.json (phrase + word
 Providers (script.json -> "voice": {"provider": ...}):
   kokoro      local, free. {"name": "am_michael", "speed": 0.9, "pitch_semitones": -1.5}
   fish        Fish Audio, env FISH_API_KEY.  {"reference_id": "...", "model": "s1", "speed": 1.0}
+  chatterbox  local, free (MIT), voice cloning from a clip. {"reference_fish_id": "..."} or {"reference": "ref.wav"},
+              {"exaggeration": 0.6, "cfg_weight": 0.35}
   elevenlabs  ElevenLabs, env ELEVENLABS_API_KEY.
               {"voice_id": "...", "model": "eleven_multilingual_v2", "stability": 0.4, ...}
 API responses are cached in build/tts_cache/, so re-runs cost no credits.
@@ -110,8 +112,8 @@ class Kokoro:
 
 
 class Cached:
-    def __init__(self, v, cache):
-        self.v, self.cache = v, cache
+    def __init__(self, v, cache, ep=None):
+        self.v, self.cache, self.ep = v, cache, ep
         cache.mkdir(parents=True, exist_ok=True)
 
     def key(self, *parts):
@@ -139,7 +141,6 @@ class ElevenLabs(Cached):
 
 
 class Fish(Cached):
-    _asr = None
 
     def __call__(self, text, prev, nxt):
         f = self.cache / f"fish_{self.key(text)}.wav"
@@ -154,16 +155,79 @@ class Fish(Cached):
                                     'prosody': {'speed': v.get('speed', 1.0), 'volume': 0}})
             if r.status_code != 200: sys.exit(f'Fish {r.status_code}: {r.text[:300]}')
             f.write_bytes(r.content)
-        a, _ = trim(decode(f.read_bytes()))  # trim first: whisper snaps the first word to 0 after silence
-        onset = np.argmax(np.abs(a) > 0.01) / SR
-        # Fish returns no timestamps: recognize the clip and align words to the script
-        if Fish._asr is None:
-            import whisper
-            Fish._asr = whisper.load_model('small')
-        res = Fish._asr.transcribe(resample_poly(a, 160, 441).astype(np.float32), language='en',
-                                   word_timestamps=True, initial_prompt=text, fp16=False)
-        return a, [(w['word'].strip(), max(w['start'], onset if i == 0 else 0), w['end'])
-                   for i, w in enumerate(w for s in res['segments'] for w in s['words'])]
+        return recognize(decode(f.read_bytes()), text)
+
+
+_asr = None
+
+
+def recognize(a, text):
+    """No timestamps from the engine: trim, recognize the clip and return heard words with times."""
+    global _asr
+    a, _ = trim(a)  # trim first: whisper snaps the first word to 0 after silence
+    onset = np.argmax(np.abs(a) > 0.01) / SR
+    if _asr is None:
+        import whisper
+        _asr = whisper.load_model('small')
+    res = _asr.transcribe(resample_poly(a, 160, 441).astype(np.float32), language='en',
+                          word_timestamps=True, initial_prompt=text, fp16=False)
+    return a, [(w['word'].strip(), max(w['start'], onset if i == 0 else 0), w['end'])
+               for i, w in enumerate(w for s in res['segments'] for w in s['words'])]
+
+
+class Chatterbox(Cached):
+    """Local, free (MIT). Zero-shot cloning from a reference clip: either a local file
+    ("reference": path relative to the episode) or a public Fish voice sample ("reference_fish_id")."""
+    _m = None
+
+    def ref(self):
+        v = self.v
+        if v.get('reference'):
+            return str(self.ep / v['reference'])
+        if v.get('reference_fish_id'):
+            f = self.cache / f"ref_{v['reference_fish_id']}.wav"
+            if not f.exists():
+                d = requests.get(f"https://api.fish.audio/model/{v['reference_fish_id']}", timeout=30).json()
+                sf.write(f, decode(requests.get(d['samples'][0]['audio'], timeout=60).content), SR)
+            return str(f)
+        return None
+
+    def take(self, text, seed):
+        f = self.cache / f"cb_{self.key(text, seed)}.wav"
+        if not f.exists():
+            import torch
+            from chatterbox.tts import ChatterboxTTS
+            if Chatterbox._m is None:
+                Chatterbox._m = ChatterboxTTS.from_pretrained(device='cuda' if torch.cuda.is_available() else 'cpu')
+            m, v = Chatterbox._m, self.v
+            torch.manual_seed(seed)
+            wav = m.generate(text, audio_prompt_path=self.ref(), exaggeration=v.get('exaggeration', 0.6),
+                             cfg_weight=v.get('cfg_weight', 0.35), temperature=v.get('temperature', 0.8))
+            sf.write(f, wav.squeeze().numpy(), m.sr)
+        a, sr = sf.read(f, dtype='float32')
+        from math import gcd
+        g = gcd(SR, sr)
+        return recognize(resample_poly(a, SR // g, sr // g), text)
+
+    def __call__(self, text, prev, nxt):
+        # generative TTS sometimes slurs or drops words: verify each take with ASR, retry with new seeds
+        seed0, best = self.v.get('seed', 7), None
+        for k in range(self.v.get('retries', 6)):
+            a, heard = self.take(text, seed0 + k)
+            score = similar(text, ' '.join(w for w, _, _ in heard))
+            if best is None or score > best[0]: best = (score, a, heard)
+            if score >= 0.97:
+                break
+            print(f'  retake ({score:.2f}): {text!r} heard {" ".join(w for w, _, _ in heard)!r}')
+        return best[1], best[2]
+
+
+def similar(a, b):
+    """Letter-level similarity of script vs recognized text; digits are spelled out on both sides."""
+    import difflib
+    from num2words import num2words
+    n = lambda s: re.sub(r'[^a-z]', '', re.sub(r'\d+', lambda m: num2words(int(m.group())), s.lower()))
+    return difflib.SequenceMatcher(None, n(a), n(b)).ratio()
 
 
 def main(ep):
@@ -178,7 +242,7 @@ def main(ep):
         print(f'{need} is not set -> falling back to {v["fallback"]["provider"]}')
         v = v['fallback']; prov = v['provider']
     tts = {'kokoro': lambda: Kokoro(v), 'fish': lambda: Fish(v, build / 'tts_cache'),
-           'elevenlabs': lambda: ElevenLabs(v, build / 'tts_cache')}[prov]()
+           'elevenlabs': lambda: ElevenLabs(v, build / 'tts_cache'), 'chatterbox': lambda: Chatterbox(v, build / 'tts_cache', ep)}[prov]()
     ph = script['phrases']
     out, phrases = [], []
     t = script.get('lead_in', 0.0)

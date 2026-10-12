@@ -2,11 +2,18 @@
  "title": "Bobby Fischer",
  "post": "Bobby Fischer's paranoia #chess #story #education",
  "voice": {
-  "provider": "fish",
-  "reference_id": "f6a86fbea5f64970abd883813072ec6d",
-  "model": "s1",
-  "speed": 1.0,
-  "_name": "Trailet narrador",
+  "provider": "chatterbox",
+  "reference_fish_id": "f6a86fbea5f64970abd883813072ec6d",
+  "exaggeration": 0.6,
+  "cfg_weight": 0.35,
+  "temperature": 0.8,
+  "seed": 7,
+  "_name": "Trailet narrador (Fish sample) cloned locally with Chatterbox",
+  "_fish": {
+   "provider": "fish",
+   "reference_id": "f6a86fbea5f64970abd883813072ec6d",
+   "model": "s1"
+  },
   "_alternatives": {
    "3081f4a3f88943d791deda5cec39997b": "Paramount Feature Presentation Announcer",
    "c8ccdaacb27049e29f2f69b5fac6b9f4": "DEEP STORY",
