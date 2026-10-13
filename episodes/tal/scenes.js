@@ -140,7 +140,7 @@ export async function build(T) {
   const mateQ = w('gifts', 'queen') + 1.2;
   const sacQN = new Moves(B, QN, [{ k: 1, t0: giftT[2] - 0.45, color: C.gold, label: 'GIFT', labelColor: C.gold }, { k: 2, t0: giftT[2] + 0.35, color: C.red }, { k: 3, t0: mateQ - 0.42, color: C.lime, label: 'CHECKMATE', labelColor: C.lime }]);
   [sacKN, sacRK, sacQN].forEach(m => m.cues(cue));
-  const bowOn = (mv, plies, t) => { const m = mv.current(t); return m && m.k % 2 === 1 && t < m.land + 0.7 ? { [m.mover?.id]: { bow: 1, halo: C.gold, haloA: 0.8 } } : {}; };
+  const bowOn = (mv, plies, t) => { const m = mv.current(t); return m && m.label === 'GIFT' && t < m.land + 0.7 ? { [m.mover?.id]: { bow: 1, halo: C.gold, haloA: 0.8 } } : {}; };
   const sacShot = (a0, mv, plies, keys, { e = 'smug', opp = null } = {}) => shot(a0, (g, lt, t, sh) => {
     const m = mv.current(t);
     match(g, lt, t, keys(sh), { style: 'wood', who: 'tal', e, opp, oppE: 'worried', bump: mv.bump(t) * 1.4, reach: m && m.k % 2 === 1 ? { sq: m.to, u: (t - m.t0 + 0.15) / 0.75 } : null,
