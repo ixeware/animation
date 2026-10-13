@@ -4,49 +4,46 @@
  "lead_in": 0.05,
  "tail": 1.4,
  "voice": {
-  "provider": "chatterbox",
-  "reference_fish_id": "f6a86fbea5f64970abd883813072ec6d",
-  "exaggeration": 0.6,
-  "cfg_weight": 0.35,
-  "temperature": 0.8,
-  "seed": 7,
-  "_name": "Trailet narrador (Fish sample) cloned locally with Chatterbox",
-  "_fish": {
-   "provider": "fish",
-   "reference_id": "f6a86fbea5f64970abd883813072ec6d",
-   "model": "s1"
-  },
-  "_alternatives": {
-   "3081f4a3f88943d791deda5cec39997b": "Paramount Feature Presentation Announcer",
-   "c8ccdaacb27049e29f2f69b5fac6b9f4": "DEEP STORY",
-   "69f5f158321f4f7f8f945148a6b7d17f": "Pierrot",
-   "d67524ad1936410896ad120583cb1117": "Andrew: English Man (US) - Storytelling, Deep"
-  },
-  "fallback": {
-   "provider": "kokoro",
-   "name": "am_michael",
-   "speed": 0.9,
-   "pitch_semitones": -1.5
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+  "_chatterbox": {
+   "provider": "chatterbox",
+   "reference_fish_id": "f6a86fbea5f64970abd883813072ec6d",
+   "exaggeration": 0.6,
+   "cfg_weight": 0.35,
+   "temperature": 0.8,
+   "seed": 7,
+   "_name": "Trailet narrador (Fish sample) cloned locally with Chatterbox",
+   "_fish": {
+    "provider": "fish",
+    "reference_id": "f6a86fbea5f64970abd883813072ec6d",
+    "model": "s1"
+   },
+   "fallback": {
+    "provider": "kokoro",
+    "name": "am_michael",
+    "speed": 0.9,
+    "pitch_semitones": -1.5
+   }
   }
  },
  "mix": {
   "bed_gap": 7.0
  },
  "voice_fx": {
-  "tempo": 1.1,
-  "sts": {
-   "voice_id": "N2lVS1w4EtoT3dr4eOWO",
-   "_name": "Callum (ElevenLabs premade)",
-   "model": "eleven_english_sts_v2",
-   "stability": 0.5,
-   "similarity_boost": 0.85
-  }
+  "tempo": 1.24,
+  "max_gap": 0.18
  },
  "phrases": [
   {
    "id": "hook1",
    "text": "This chess piece sat in a drawer for fifty-five years.",
-   "pause": 0.3,
+   "say": "[curious] This chess piece sat in a drawer... for fifty-five years.",
+   "pause": 0.2,
    "colors": {
     "drawer": "gold",
     "fifty-five": "red",
@@ -56,7 +53,8 @@
   {
    "id": "hook2",
    "text": "Then it sold for almost a million dollars.",
-   "pause": 0.45,
+   "say": "[excited] Then it sold for almost a MILLION dollars!",
+   "pause": 0.28,
    "colors": {
     "sold": "gold",
     "million": "lime",
@@ -65,17 +63,19 @@
   },
   {
    "id": "hook3",
-   "text": "It cost five pounds.",
-   "pause": 0.45,
+   "text": "The price? Five pounds.",
+   "say": "[deadpan] The price? Five. Pounds.",
+   "pause": 0.32,
    "colors": {
-    "five": "red",
+    "Five": "red",
     "pounds.": "red"
    }
   },
   {
    "id": "bridge",
    "text": "So what is it?",
-   "pause": 0.6,
+   "say": "[whispers] So... what is it?",
+   "pause": 0.32,
    "colors": {
     "what": "gold",
     "is": "gold",
@@ -84,37 +84,44 @@
   },
   {
    "id": "answer",
-   "text": "It's one of the Lewis chessmen.",
-   "pause": 0.45,
+   "text": "It's a Lewis chessman. And these little guys? Total legends.",
+   "say": "[mischievously] It's a Lewis chessman. And these little guys? Total legends.",
+   "pause": 0.28,
    "colors": {
     "Lewis": "gold",
-    "chessmen.": "gold"
+    "chessman.": "gold",
+    "legends.": "lime"
    }
   },
   {
    "id": "lewis",
-   "text": "Isle of Lewis. 1831.",
-   "pause": 0.4,
+   "text": "Isle of Lewis, Scotland. 1831.",
+   "say": "[dramatic] Isle of Lewis, Scotland. 1831.",
+   "pause": 0.24,
    "colors": {
-    "Lewis.": "blue",
+    "Lewis,": "blue",
+    "Scotland.": "blue",
     "1831.": "gold"
    }
   },
   {
    "id": "hoard",
-   "text": "A sand dune gives up a hidden hoard. Ninety-three pieces, carved from walrus tusk.",
-   "pause": 0.4,
+   "text": "A sand dune gives up a hidden hoard. Ninety-three pieces, carved from walrus tusk. Yes, walrus.",
+   "say": "[mysterious] A sand dune gives up a hidden hoard. [amazed] Ninety-three pieces, carved from walrus tusk. [laughs] Yes... walrus.",
+   "pause": 0.28,
    "colors": {
     "hoard.": "gold",
     "Ninety-three": "gold",
     "walrus": "blue",
-    "tusk.": "blue"
+    "tusk.": "blue",
+    "walrus.": "blue"
    }
   },
   {
    "id": "old",
    "text": "Over eight hundred years old.",
-   "pause": 0.45,
+   "say": "Over eight hundred years old.",
+   "pause": 0.24,
    "colors": {
     "eight": "red",
     "hundred": "red"
@@ -122,29 +129,34 @@
   },
   {
    "id": "potter",
-   "text": "Copies even show up in the first Harry Potter film.",
-   "pause": 0.45,
+   "text": "They're so famous, copies even show up in Harry Potter.",
+   "say": "[excited] They're so famous, copies even show up in Harry Potter!",
+   "pause": 0.32,
    "colors": {
+    "famous,": "gold",
     "Harry": "gold",
-    "Potter": "gold"
+    "Potter.": "gold"
    }
   },
   {
    "id": "missing",
-   "text": "But five pieces were never found.",
-   "pause": 0.6,
+   "text": "But here's the twist. Five pieces were never found.",
+   "say": "[serious] But here's the twist. Five pieces... were never found.",
+   "pause": 0.32,
    "colors": {
-    "five": "red",
+    "twist.": "gold",
+    "Five": "red",
     "never": "red",
     "found.": "red"
    }
   },
   {
    "id": "buy",
-   "text": "In 1964, an Edinburgh dealer bought this piece for five pounds.",
-   "pause": 0.35,
+   "text": "1964. An Edinburgh antiques dealer buys this piece for five pounds.",
+   "say": "[storytelling] 1964. An Edinburgh antiques dealer buys this piece... for five pounds.",
+   "pause": 0.24,
    "colors": {
-    "1964,": "gold",
+    "1964.": "gold",
     "Edinburgh": "blue",
     "five": "lime",
     "pounds.": "lime"
@@ -152,8 +164,9 @@
   },
   {
    "id": "dealer",
-   "text": "His ledger just says: walrus tusk warrior. He had no idea.",
-   "pause": 0.45,
+   "text": "He writes in his ledger: walrus tusk warrior. He had absolutely no idea.",
+   "say": "[sarcastic] He writes in his ledger: walrus tusk warrior. [laughs] He had absolutely no idea.",
+   "pause": 0.32,
    "colors": {
     "walrus": "blue",
     "tusk": "blue",
@@ -164,26 +177,31 @@
   },
   {
    "id": "drawer",
-   "text": "After he died, his daughter kept it in a drawer.",
-   "pause": 0.5,
+   "text": "After he dies, it ends up in his daughter's drawer.",
+   "say": "[softly] After he dies, it ends up in his daughter's drawer.",
+   "pause": 0.32,
    "colors": {
-    "daughter": "gold",
+    "daughter's": "gold",
     "drawer.": "gold"
    }
   },
   {
    "id": "sothebys",
-   "text": "2019. The family takes it to Sotheby's.",
-   "pause": 0.4,
+   "text": "2019. The family takes it to Sotheby's. And the experts get very excited.",
+   "say": "2019. The family takes it to Sotheby's. [excited] And the experts get VERY excited.",
+   "pause": 0.24,
    "colors": {
     "2019.": "gold",
-    "Sotheby's.": "gold"
+    "Sotheby's.": "gold",
+    "very": "lime",
+    "excited.": "lime"
    }
   },
   {
    "id": "experts",
-   "text": "Experts believe it's one of the five missing pieces.",
-   "pause": 0.5,
+   "text": "They believe it's one of the five missing pieces.",
+   "say": "They believe it's one of the five missing pieces.",
+   "pause": 0.32,
    "colors": {
     "five": "red",
     "missing": "red",
@@ -193,7 +211,8 @@
   {
    "id": "hammer",
    "text": "The hammer falls at...",
-   "pause": 0.35,
+   "say": "[tense] The hammer falls at...",
+   "pause": 0.24,
    "colors": {
     "hammer": "gold"
    }
@@ -201,7 +220,8 @@
   {
    "id": "price",
    "text": "seven hundred and thirty-five thousand pounds.",
-   "pause": 0.7,
+   "say": "[shouting] SEVEN hundred and thirty-five THOUSAND pounds!",
+   "pause": 0.32,
    "colors": {
     "seven": "lime",
     "hundred": "lime",
@@ -213,7 +233,8 @@
   {
    "id": "still",
    "text": "Which means four may still be out there.",
-   "pause": 0.5,
+   "say": "[whispers] Which means... four may still be out there.",
+   "pause": 0.32,
    "colors": {
     "four": "red",
     "out": "gold",
@@ -222,7 +243,8 @@
   },
   {
    "id": "final",
-   "text": "So... check your drawer.",
+   "text": "So go check your drawer.",
+   "say": "[playfully] So... go check your drawer.",
    "pause": 0.0,
    "colors": {
     "check": "gold",

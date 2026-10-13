@@ -239,11 +239,12 @@ export async function build(T) {
   const lewisT = w('answer', 'Lewis');
   shot(s('answer') - 0.05, (g, lt, t, sh) => {
     museum(g, lt, t, [[0, { yaw: -0.45, pitch: 0.36, dist: 13, cy: H * 0.52, target: [4, 0.6, 4] }], [len(sh), { yaw: -0.2, pitch: 0.42, dist: 11.5 }]], { ez: lin });
-    nameTitle(g, lt, 'The Lewis Chessmen', 'c. 1150 – 1200 · BRITISH MUSEUM', { y: 220, t0: lewisT - (s('answer') - 0.05), subColor: C.gold, size: 66 });
+    nameTitle(g, lt, 'The Lewis Chessmen', 'c. 1150 – 1200 · BRITISH MUSEUM', { y: 300, t0: lewisT - (s('answer') - 0.05), subColor: C.gold, size: 66 });
+    const legT = w('answer', 'legends'); badge(g, 'TOTAL LEGENDS', W / 2, 480, { color: C.lime, size: 48, a: seg(t, legT, legT + 0.1), scale: pop(t, legT) });
     photoCard(g, P.bm_lewis, lt, 0.3, { x: 270, y: 900, w: 340, aspect: 0.8, rot: -0.05, from: 'left', caption: 'ROOM 40', credit: 'APK · CC BY 4.0', fx: 0.4, fy: 0.5, tone: 'color' });
     credit(g, 'WALL PHOTOS: APK · CC BY 4.0 / PAUL HUDSON · CC BY 2.0', seg(lt, 0.2, 0.5));
   }, { trans: 'flash' });
-  cue(lewisT, 'boom', 0.9); cue(lewisT, 'shimmer', 0.7); for (let k = 0; k < 3; k++) cue(s('answer') + 0.2 + k * 0.4, 'shutter', 0.35);
+  cue(lewisT, 'boom', 0.9); cue(lewisT, 'shimmer', 0.7); cue(w('answer', 'legends'), 'hit', 0.7); for (let k = 0; k < 3; k++) cue(s('answer') + 0.2 + k * 0.4, 'shutter', 0.35);
 
   // ======================= 1831 =======================
   // S7 — Isle of Lewis, 1831: the map dives to the Outer Hebrides
@@ -294,12 +295,14 @@ export async function build(T) {
     rig(B, lt, [[0, { yaw: -0.25, pitch: 0.06, dist: 7, cy: H * 0.6, target: [1, 1.2, 8] }], [len(sh), { yaw: -0.1, pitch: 0.05, dist: 6 }]], { t, e: ease.out });
     beach(g, B, t, { mound: 0, wind: 0.6 });
     const wp = at(0.4, sandAt(0.4, 8.4), 8.4);
-    walrus(g, wp.x, wp.y, wp.s * 1.15, t, { look: Math.sin(t * 1.3) });
+    walrus(g, wp.x, wp.y - 60 * pulse(t, yesT, 0.25), wp.s * 1.15, t, { look: Math.sin(t * 1.3) });
     drawLewisSet(g, B, [{ t: 'r', x: 3.2, z: 6.6, y: sandAt(3.2, 6.6), ground: sandAt(3.2, 6.6), k: 1.1 }], { t, dof: 0.5 });
     glint(g, wp.x - wp.s * 0.6, wp.y - wp.s * 0.9, t, w('hoard', 'tusk') + 0.05, { r: 200 });
     badge(g, 'WALRUS IVORY', W / 2, 300, { color: C.blue, size: 48, a: seg(t, walT, walT + 0.15), scale: pop(t, walT) });
+    badge(g, 'YES. WALRUS.', W / 2, 400, { color: C.cream, size: 40, a: seg(t, yesT, yesT + 0.1), scale: pop(t, yesT) });
   }, { trans: 'whip', whipDir: -1 });
-  cue(walT, 'honk', 0.8); cue(w('hoard', 'tusk'), 'ting', 0.6);
+  const yesT = T.w('hoard', -1).s;
+  cue(walT, 'honk', 0.5); cue(w('hoard', 'tusk'), 'ting', 0.6); cue(yesT, 'honk', 1.0);
 
   // S11 — over eight hundred years old: the king on a stone in candlelight, dust motes
   const oldT = w('old', 'eight');
@@ -317,7 +320,7 @@ export async function build(T) {
   cue(oldT, 'boom', 0.8); cue(oldT, 'sting', 0.5);
 
   // S16 — copies even show up in the first Harry Potter film: giant pieces in a stone hall, one smashed
-  const hpT = w('potter', 'Harry'), smashT = w('potter', 'film');
+  const hpT = w('potter', 'Harry'), smashT = w('potter', 'Potter') + 0.15;
   shot(s('potter') - 0.05, (g, lt, t, sh) => {
     rig(B, lt, [[0, { yaw: 0.6, pitch: 0.08, dist: 9, cy: H * 0.58, target: [4, 2, 4] }], [len(sh), { yaw: 0.25, pitch: 0.12, dist: 7.5 }]], { t, e: lin, bump: pulse(t, smashT, 0.3) * 2 });
     room(g, B, HALL, { t, blur: 4 });
@@ -359,7 +362,7 @@ export async function build(T) {
   }, { trans: 'whip' });
   cue(s('buy'), 'creak', 0.5); cue(w('buy', '1964'), 'boom', 0.7);
   // D2 — …bought it for five pounds: he lifts it, pleased with himself
-  const boughtT = w('buy', 'bought'), buyFiveT = w('buy', 'five');
+  const boughtT = w('buy', 'buys'), buyFiveT = w('buy', 'five');
   shot(boughtT - 0.08, (g, lt, t, sh) => {
     const u = seg(lt, 0, 0.5, ease.out);
     shop(g, lt, t, [[0, { yaw: 0.35, pitch: 0.1, dist: 7.4, cy: H * 0.44, target: [4.4, 2.6, 6] }], [len(sh), { yaw: 0.2, pitch: 0.08, dist: 6.4 }]], { piece: false, held: [lerp(4.6, 5.4, u), lerp(0, 1.4, u), lerp(3, 4.4, u)], dealerE: { ...EXPR.happy, look: [0.4, 0.6] }, blur: 4 });
@@ -375,14 +378,14 @@ export async function build(T) {
   cue(ledA, 'scribble', 0.9);
   // S19 — he had no idea
   const ideaT = w('dealer', 'idea');
-  shot(w('dealer', 'He') - 0.08, (g, lt, t, sh) => {
+  shot(w('dealer', 'had') - 0.3, (g, lt, t, sh) => {
     shop(g, lt, t, [[0, { yaw: 0.1, pitch: 0.14, dist: 8.4, cy: H * 0.46, target: [4.2, 2.4, 5] }], [len(sh), { yaw: -0.05, pitch: 0.12, dist: 7.6 }]], { dealerE: { ...EXPR.happy, look: [0.6, -0.3], nod: 0.4 }, ledger: 1, blur: 4, dof: 0.3 });
     badge(g, 'NO IDEA', W / 2, 300, { color: C.red, size: 56, a: seg(t, ideaT - 0.1, ideaT + 0.05), scale: pop(t, ideaT - 0.1) });
   }, { trans: 'zoom' });
   cue(ideaT - 0.1, 'pluck', 0.8);
 
   // S20 — after he died, his daughter kept it in a drawer
-  const diedT = w('drawer', 'died'), dDrawT = w('drawer', 'drawer');
+  const diedT = w('drawer', 'dies'), dDrawT = w('drawer', 'drawer');
   shot(s('drawer') - 0.05, (g, lt, t, sh) => {
     const shut = seg(t, dDrawT - 0.4, dDrawT + 0.1, ease.in);
     home(g, lt, t, [[0, { yaw: 0.45, pitch: 0.26, dist: 14, cy: H * 0.5, target: [2.4, 2.2, 6] }], [len(sh), { yaw: 0.3, pitch: 0.3, dist: 12 }]],
@@ -401,8 +404,8 @@ export async function build(T) {
   }, { trans: 'leak' });
   cue(w('sothebys', '2019'), 'boom', 0.7); cue(sothT, 'hit', 0.5);
   // E1 — experts believe…: a magnifier sweeps the warder on its plinth
-  const expT = w('experts', 'Experts'), fiveExT = w('experts', 'five'), missT = w('experts', 'missing');
-  shot(s('experts') - 0.05, (g, lt, t, sh) => {
+  const expT = w('sothebys', 'experts'), fiveExT = w('experts', 'five'), missT = w('experts', 'missing');
+  shot(expT - 0.1, (g, lt, t, sh) => {
     sale(g, lt, t, [[0, { yaw: -0.3, pitch: 0.1, dist: 4.4, cy: H * 0.58, target: [8.8, 1.3, 8.8] }], [len(sh), { yaw: -0.1, pitch: 0.08, dist: 3.8 }]], { blur: 6, bidders: false, ez: lin });
     const p = at(8.8, 0.4, 8.8), h = p.s * 1.35 * 1.1;
     const mx = p.x + Math.sin(lt * 2.4) * 140, my = p.y - h * 0.62 + Math.cos(lt * 1.7) * 60, r = 150;

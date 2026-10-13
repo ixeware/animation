@@ -95,6 +95,28 @@ def align(caps, heard, dur):
     return times
 
 
+def squeeze(a, max_gap=0.25, thr_db=-32, fade=0.02):
+    """Shorten silences inside a take to at most max_gap seconds (dramatic engines pause a lot)."""
+    hop = int(0.01 * SR)
+    n = len(a) // hop
+    if n < 3:
+        return a
+    rms = np.sqrt(np.mean(a[:n * hop].reshape(n, hop) ** 2, axis=1) + 1e-12)
+    quiet = 20 * np.log10(rms / (rms.max() + 1e-12)) < thr_db
+    out, i, keep, f = [], 0, int(max_gap * SR), int(fade * SR)
+    while i < n:
+        j = i
+        while j < n and quiet[j] == quiet[i]:
+            j += 1
+        seg = a[i * hop:(j * hop if j < n else len(a))]
+        if quiet[i] and 0 < i and j < n and len(seg) > keep:  # an inner pause: keep its two ends, cross-faded
+            h = keep // 2
+            seg = np.concatenate([seg[:h] * np.r_[np.ones(h - f), np.linspace(1, 0, f)], seg[-h:] * np.r_[np.linspace(0, 1, f), np.ones(h - f)]])
+        out.append(seg)
+        i = j
+    return np.concatenate(out)
+
+
 def tempo(a, k):
     """Change speed without changing pitch."""
     if abs(k - 1) < 1e-3:
@@ -151,6 +173,10 @@ class Kokoro:
         return a, [(w, s * self.ratio, e * self.ratio) for w, s, e in words if re.search(r'\w', w)]
 
 
+TAG = re.compile(r'\[[^\]]*\]\s*')
+untag = lambda s: TAG.sub('', s).strip()  # [excited] So... -> So...
+
+
 class Cached:
     def __init__(self, v, cache, ep=None):
         self.v, self.cache, self.ep = v, cache, ep
@@ -166,16 +192,23 @@ class ElevenLabs(Cached):
         if not f.exists():
             key = os.environ.get('ELEVENLABS_API_KEY') or sys.exit('ELEVENLABS_API_KEY is not set')
             v = self.v
+            model = v.get('model', 'eleven_multilingual_v2')
+            body = {'text': text, 'model_id': model,
+                    'voice_settings': {'stability': v.get('stability', 0.4), 'similarity_boost': v.get('similarity', 0.8),
+                                       'style': v.get('style', 0.3), 'use_speaker_boost': True, 'speed': v.get('speed', 1.0)}}
+            if model.startswith('eleven_v3'):  # v3 reads [audio tags] in the text; no request stitching, stability is 0 / 0.5 / 1
+                body['voice_settings'] = {'stability': v.get('stability', 0.5), 'similarity_boost': v.get('similarity', 0.8)}
+                if v.get('seed') is not None: body['seed'] = v['seed']
+            else:
+                body.update(previous_text=prev, next_text=nxt)
             r = requests.post(f"https://api.elevenlabs.io/v1/text-to-speech/{v['voice_id']}/with-timestamps",
-                              params={'output_format': 'mp3_44100_128'}, headers={'xi-api-key': key}, timeout=120,
-                              json={'text': text, 'model_id': v.get('model', 'eleven_multilingual_v2'),
-                                    'previous_text': prev, 'next_text': nxt,
-                                    'voice_settings': {'stability': v.get('stability', 0.4), 'similarity_boost': v.get('similarity', 0.8),
-                                                       'style': v.get('style', 0.3), 'use_speaker_boost': True, 'speed': v.get('speed', 1.0)}})
+                              params={'output_format': 'mp3_44100_128'}, headers={'xi-api-key': key}, timeout=120, json=body)
             if r.status_code != 200: sys.exit(f'ElevenLabs {r.status_code}: {r.text[:300]}')
             f.write_text(r.text)
         d = json.loads(f.read_text())
         al = d.get('alignment') or d.get('normalized_alignment')
+        if TAG.search(text):  # character timings would include the [tags]: measure the words with whisper instead
+            return recognize(decode(base64.b64decode(d['audio_base64'])), untag(text))
         return decode(base64.b64decode(d['audio_base64'])), words_from_chars(
             al['characters'], al['character_start_times_seconds'], al['character_end_times_seconds'])
 
@@ -298,10 +331,11 @@ def main(ep):
     for i, p in enumerate(ph):
         say = p.get('say', p['text'])
         audio, heard = tts(say, ph[i - 1].get('say', ph[i - 1]['text']) if i else '', ph[i + 1].get('say', ph[i + 1]['text']) if i + 1 < len(ph) else '')
-        if fx.get('tempo', 1) != 1 or sts:
+        if fx.get('tempo', 1) != 1 or sts or fx.get('max_gap'):
             audio = tempo(trim(audio)[0], fx.get('tempo', 1))
+            if fx.get('max_gap'): audio = squeeze(audio, fx['max_gap'])
             if sts: audio = sts(audio)
-            audio, heard = recognize(audio, say)  # timings change with tempo and voice: measure again
+            audio, heard = recognize(audio, untag(say))  # timings change with tempo and voice: measure again
         audio, cut = trim(audio)
         dur = len(audio) / SR
         caps = p['text'].split()

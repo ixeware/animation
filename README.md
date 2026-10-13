@@ -47,8 +47,14 @@ npm i                      # playwright (браузер берётся сист�
 
 `script.json` → `voice_fx` обрабатывает готовую озвучку: `tempo` ускоряет её без смены высоты (ffmpeg atempo),
 `sts` прогоняет каждую фразу через ElevenLabs speech-to-speech (`voice_id`, `model`), после чего тайминги слов
-снова снимаются whisper. Нужен `ELEVENLABS_API_KEY`; ответы кэшируются в `build/tts_cache/sts_*.mp3`. Таль и
-Льюис озвучены голосом Callum (`N2lVS1w4EtoT3dr4eOWO`, встроенный голос ElevenLabs), темп 1,1.
+снова снимаются whisper. Нужен `ELEVENLABS_API_KEY`; ответы кэшируются в `build/tts_cache/sts_*.mp3`. Таль
+озвучен голосом Callum (`N2lVS1w4EtoT3dr4eOWO`, встроенный голос ElevenLabs), темп 1,1. `max_gap` ужимает паузы
+внутри фразы до заданной длины (с).
+
+Льюис озвучен напрямую моделью `eleven_v3` (тот же Callum): в поле фразы `say` стоят аудиотеги вроде `[excited]`,
+`[whispers]`, `[sarcastic]`, `[laughs]`, а `text` остаётся чистым для субтитров. У v3 живая интонация: разброс
+высоты 7–8 полутонов против 3,4 у Chatterbox→Callum и 4,4–5,5 у @chess.history. Но говорит она медленно, поэтому
+`voice_fx: {tempo: 1.24, max_gap: 0.18}`. Цена около 1 кредита за символ, весь ролик примерно 1 100 кредитов.
 
 В Фишере стоит `chatterbox`: локальный клон голоса Fish «Trailet narrador» по его публичному образцу
 (`reference_fish_id`). Он выбран на слух из пяти голосов, ближайших к @chess.history. Отбор шёл среди
