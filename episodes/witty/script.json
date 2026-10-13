@@ -1,0 +1,240 @@
+{
+ "title": "Witty Alien",
+ "post": "No school. Goats. Then he beat Magnus Carlsen. #chess #wittyalien #magnuscarlsen #aliengambit #story",
+ "lead_in": 0.05,
+ "tail": 1.4,
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\""
+ },
+ "voice_fx": {
+  "tempo": 1.27,
+  "max_gap": 0.15
+ },
+ "mix": {
+  "bed_gap": 7.0
+ },
+ "phrases": [
+  {
+   "id": "hook1",
+   "text": "This guy never went to school.",
+   "say": "[intrigued] This guy never went to school.",
+   "pause": 0.16,
+   "colors": {
+    "never": "red",
+    "school.": "red"
+   }
+  },
+  {
+   "id": "hook2",
+   "text": "His dad wanted him to herd goats.",
+   "say": "[deadpan] His dad wanted him to herd goats.",
+   "pause": 0.2,
+   "colors": {
+    "herd": "gold",
+    "goats.": "gold"
+   }
+  },
+  {
+   "id": "hook3",
+   "text": "And he just beat Magnus Carlsen.",
+   "say": "[excited] And he just beat... Magnus Carlsen!",
+   "pause": 0.24,
+   "colors": {
+    "beat": "lime",
+    "Magnus": "gold",
+    "Carlsen.": "gold"
+   }
+  },
+  {
+   "id": "name",
+   "text": "Meet Witty Alien.",
+   "say": "[playfully] Meet... Witty Alien.",
+   "pause": 0.24,
+   "colors": {
+    "Witty": "lime",
+    "Alien.": "lime"
+   }
+  },
+  {
+   "id": "village",
+   "text": "Drenov. A tiny village in Bulgaria.",
+   "say": "[storytelling] Drenov. A tiny village in Bulgaria.",
+   "pause": 0.2,
+   "colors": {
+    "Drenov.": "gold",
+    "Bulgaria.": "blue"
+   }
+  },
+  {
+   "id": "goats",
+   "text": "The family kept goats. The kids took turns herding them. School? Not on the menu.",
+   "say": "The family kept goats. The kids took turns herding them. [dry] School? Not on the menu.",
+   "pause": 0.24,
+   "colors": {
+    "goats.": "gold",
+    "School?": "red",
+    "Not": "red"
+   }
+  },
+  {
+   "id": "self",
+   "text": "So Volen taught himself. From first grade up.",
+   "say": "[softly] So Volen taught himself. From first grade up.",
+   "pause": 0.24,
+   "colors": {
+    "himself.": "lime"
+   }
+  },
+  {
+   "id": "chess",
+   "text": "His brother showed him chess. And the kid was good. Bulgarian youth champion good.",
+   "say": "[impressed] His brother showed him chess. And the kid was good. Bulgarian youth champion good.",
+   "pause": 0.24,
+   "colors": {
+    "chess.": "gold",
+    "champion": "gold"
+   }
+  },
+  {
+   "id": "leave",
+   "text": "At seventeen, he left home. Alone and broke.",
+   "say": "[serious] At seventeen, he left home. Alone... and broke.",
+   "pause": 0.24,
+   "colors": {
+    "seventeen,": "red",
+    "broke.": "red"
+   }
+  },
+  {
+   "id": "code",
+   "text": "He taught himself to code, became a programmer, and was bored out of his mind.",
+   "say": "He taught himself to code, became a programmer, [sighs] and was bored out of his mind.",
+   "pause": 0.24,
+   "colors": {
+    "programmer,": "blue",
+    "bored": "red"
+   }
+  },
+  {
+   "id": "quit",
+   "text": "So in 2022 he quit to stream chess. With two hundred leva in his pocket. About a hundred bucks.",
+   "say": "[mischievously] So in 2022 he quit to stream chess. With two hundred leva in his pocket. [laughs] About a hundred bucks.",
+   "pause": 0.24,
+   "colors": {
+    "quit": "red",
+    "stream": "lime",
+    "hundred": "gold",
+    "bucks.": "gold"
+   }
+  },
+  {
+   "id": "gambit",
+   "text": "Then he did something insane. Move six: he throws his knight onto f7. For a pawn.",
+   "say": "[excited] Then he did something insane. Move six: he throws his knight onto f7. [whispers] For a pawn.",
+   "pause": 0.2,
+   "colors": {
+    "insane.": "red",
+    "knight": "gold",
+    "f7.": "gold"
+   }
+  },
+  {
+   "id": "engines",
+   "text": "Engines hate it. Humans panic.",
+   "say": "[dry] Engines hate it. [laughs] Humans panic.",
+   "pause": 0.2,
+   "colors": {
+    "hate": "red",
+    "panic.": "lime"
+   }
+  },
+  {
+   "id": "alien",
+   "text": "He called it the Alien Gambit. And it blew up.",
+   "say": "He called it the Alien Gambit. [excited] And it blew up.",
+   "pause": 0.24,
+   "colors": {
+    "Alien": "lime",
+    "Gambit.": "lime",
+    "blew": "gold"
+   }
+  },
+  {
+   "id": "magnus",
+   "text": "September 2026. Five-minute blitz. Witty Alien versus Magnus Carlsen.",
+   "say": "[dramatic] September 2026. Five-minute blitz. Witty Alien... versus Magnus Carlsen.",
+   "pause": 0.2,
+   "colors": {
+    "blitz.": "gold",
+    "Witty": "lime",
+    "Alien": "lime",
+    "Magnus": "gold",
+    "Carlsen.": "gold"
+   }
+  },
+  {
+   "id": "losing",
+   "text": "Magnus is crushing him.",
+   "say": "[tense] Magnus is crushing him.",
+   "pause": 0.16,
+   "colors": {
+    "crushing": "red"
+   }
+  },
+  {
+   "id": "blunder",
+   "text": "Then one natural move, and it's a blunder.",
+   "say": "[whispers] Then one natural move... [gasps] and it's a blunder.",
+   "pause": 0.16,
+   "colors": {
+    "natural": "blue",
+    "blunder.": "red"
+   }
+  },
+  {
+   "id": "checks",
+   "text": "Rook check. Queen check. Magnus resigns.",
+   "say": "[excited] Rook check! Queen check! Magnus resigns!",
+   "pause": 0.24,
+   "colors": {
+    "check.": "gold",
+    "resigns.": "lime"
+   }
+  },
+  {
+   "id": "shirt",
+   "text": "Witty Alien rips his shirt on stream.",
+   "say": "[laughs] Witty Alien rips his shirt on stream.",
+   "pause": 0.2,
+   "colors": {
+    "rips": "red",
+    "shirt": "red"
+   }
+  },
+  {
+   "id": "luck",
+   "text": "His verdict? Pure luck.",
+   "say": "[deadpan] His verdict? Pure luck.",
+   "pause": 0.28,
+   "colors": {
+    "Pure": "gold",
+    "luck.": "gold"
+   }
+  },
+  {
+   "id": "final",
+   "text": "Not bad for a kid who was supposed to herd goats.",
+   "say": "[warmly] Not bad for a kid who was supposed to herd goats.",
+   "pause": 0.0,
+   "colors": {
+    "kid": "gold",
+    "goats.": "gold"
+   }
+  }
+ ]
+}

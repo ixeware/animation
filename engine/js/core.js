@@ -35,10 +35,12 @@ export function noise1(x, seed = 1) {
 
 export const C = {
   bg: '#0E1216', bgDeep: '#05090D', sq1: '#1E2427', sq2: '#2C3438',
-  lime: '#B8E65A', red: '#FF6B4F', blue: '#6CB8FF', gold: '#F5C451', amber: '#E8A23A',
-  teal: '#2FD3B5', cream: '#F3EBDD', white: '#F2F2F2',
+  // muted film palette for on-screen graphics (no neon)
+  lime: '#A8C66C', red: '#E0603F', blue: '#7AA6D6', gold: '#E9B654', amber: '#D9902F',
+  teal: '#5FA8A0', cream: '#F2E8D6', white: '#F2F2F2', ink: '#16120E',
 };
-export const capColor = { lime: C.lime, red: C.red, blue: C.blue, gold: C.gold };
+// karaoke caption colours stay bright for legibility
+export const capColor = { lime: '#B8E65A', red: '#FF6B4F', blue: '#6CB8FF', gold: '#F5C451' };
 
 export function rgba(hex, a = 1) {
   const h = hex.replace('#', '');

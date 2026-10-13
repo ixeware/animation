@@ -28,6 +28,12 @@ export const CAST = {
   dealer: { face: [0.98, 1.04, 0.9], hair: 'receding', hairC: '#A39C90', brow: '#6E685E', suit: '#6A5A42', suitD: '#4E4230', shirt: 'tie', tie: '#5A2A22', glasses: true, mustache: '#8E877C', ears: 1 },
   daughter: { face: [0.95, 1.02, 0.88], hair: 'updo', hairC: '#B9AFA2', brow: '#857B70', suit: '#5E6F78', suitD: '#45535B', shirt: 'gown', ears: 0.9, female: true },
   auctioneer: { face: [0.94, 1.05, 0.86], hair: 'swept', hairC: '#3A3530', brow: '#2A2622', suit: '#1E2430', suitD: '#141922', shirt: 'tie', tie: '#8E1E2A', ears: 1 },
+  witty: { face: [0.92, 1.07, 0.84], hair: 'messy', hairC: '#2A211C', brow: '#221A15', suit: '#2B2E38', suitD: '#1D2028', shirt: 'hoodie', logo: '#8FD16A', headphones: '#15171C', ears: 1.02 },
+  wittyTorn: { face: [0.92, 1.07, 0.84], hair: 'messy', hairC: '#2A211C', brow: '#221A15', suit: '#2B2E38', suitD: '#1D2028', shirt: 'hoodie', logo: '#8FD16A', headphones: '#15171C', torn: true, ears: 1.02 },
+  wittyTeen: { face: [0.92, 1.05, 0.84], hair: 'messy', hairC: '#2A211C', brow: '#221A15', suit: '#3A3F48', suitD: '#2A2E36', shirt: 'hoodie', ears: 1.02 },
+  wittyKid: { face: [0.98, 0.94, 0.92], hair: 'messy', hairC: '#3A2C22', brow: '#2E2119', suit: '#6E7F5A', suitD: '#55654A', shirt: 'polo', ears: 1.08 },
+  brother: { face: [0.95, 1.0, 0.88], hair: 'fringe', hairC: '#33261D', brow: '#2E2119', suit: '#7A5A44', suitD: '#5E4434', shirt: 'polo', ears: 1.04 },
+  magnus: { face: [0.96, 1.07, 0.88], hair: 'curly', hairC: '#6E4A2E', brow: '#4E3420', suit: '#F2F2EE', suitD: '#D2D6D6', shirt: 'open', beard: '#7A5A3A', ears: 1 },
   doctor: { face: [0.98, 1.04, 0.9], hair: 'receding', hairC: '#8E8A84', brow: '#6E6A64', suit: '#F2F2EE', suitD: '#D3D8D4', shirt: 'labcoat', glasses: true, ears: 1 },
   operator: { face: [0.94, 1.04, 0.84], hair: 'tied', hairC: '#3A2A20', brow: '#2E2119', suit: '#E8E0CF', suitD: '#C2B8A3', shirt: 'sleeves', vest: '#3B2E26', ears: 1 },
 };
@@ -99,6 +105,24 @@ function body(g, c, open) {
     g.fillStyle = 'rgba(255,255,255,0.35)';
     for (let y = 190; y < 520; y += 44) { g.save(); g.clip(p); g.fillRect(-220, y, 440, 18); g.restore(); }
     g.fillStyle = '#F4F2EE'; g.beginPath(); g.moveTo(-46, 146); g.lineTo(0, 196); g.lineTo(-30, 205); g.closePath(); g.moveTo(46, 146); g.lineTo(0, 196); g.lineTo(30, 205); g.closePath(); g.fill();
+  }
+  if (c.shirt === 'hoodie') {  // hood folded around the neck, drawstrings, alien logo on the chest
+    g.fillStyle = c.suitD; g.beginPath(); g.ellipse(0, 160, 96, 36, 0, 0, 7); g.fill();
+    g.fillStyle = c.suit; g.beginPath(); g.ellipse(0, 152, 62, 20, 0, 0, 7); g.fill();
+    g.strokeStyle = '#D9D4CC'; g.lineWidth = 5; g.lineCap = 'round';
+    for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(sd * 22, 172); g.lineTo(sd * 26, 250); g.stroke(); }
+    if (c.logo && !c.torn) {  // a little alien head
+      g.fillStyle = c.logo; g.beginPath(); g.ellipse(70, 330, 30, 36, 0, 0, 7); g.fill();
+      g.fillStyle = '#10140E'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(70 + sd * 12, 326, 9, 13, sd * -0.5, 0, 7); g.fill(); }
+    }
+    if (c.torn) {  // ripped down the middle: skin and a jagged edge
+      const tp = new Path2D(); tp.moveTo(-26, 150);
+      for (let y = 150, i = 0; y <= 520; y += 26, i++) tp.lineTo(-58 - (i % 2) * 26 - y * 0.05, y);
+      for (let y = 520, i = 0; y >= 150; y -= 26, i++) tp.lineTo(58 + (i % 2) * 26 + y * 0.05, y);
+      tp.closePath();
+      const sk = g.createLinearGradient(-90, 0, 90, 0); sk.addColorStop(0, SKIN.base); sk.addColorStop(1, SKIN.shade);
+      g.fillStyle = sk; g.fill(tp); g.strokeStyle = c.suitD; g.lineWidth = 6; g.stroke(tp);
+    }
   }
   if (c.shirt === 'puffer') {
     g.save(); g.clip(p); g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 6;
@@ -270,6 +294,14 @@ function hairFront(g, c, fw, fh) {
   if (c.crown) {  // small imperial crown on the updo
     g.fillStyle = '#E2B14A'; g.beginPath(); g.moveTo(-40, -h - 18); g.lineTo(-46, -h - 58); g.lineTo(-20, -h - 38); g.lineTo(0, -h - 68); g.lineTo(20, -h - 38); g.lineTo(46, -h - 58); g.lineTo(40, -h - 18); g.closePath(); g.fill();
     g.fillStyle = '#C8283A'; g.beginPath(); g.arc(0, -h - 34, 7, 0, 7); g.fill();
+  }
+  if (c.headphones) {  // gaming headset: band over the hair, big cups over the ears
+    g.strokeStyle = c.headphones; g.lineWidth = 22; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-w - 6, -10); g.bezierCurveTo(-w - 10, -h - 70, w + 10, -h - 70, w + 6, -10); g.stroke();
+    for (const sd of [-1, 1]) {
+      g.fillStyle = c.headphones; g.beginPath(); g.roundRect(sd * (w + 8) - 26, -30, 52, 86, 22); g.fill();
+      g.fillStyle = '#8FD16A'; g.beginPath(); g.roundRect(sd * (w + 8) - 6, -6, 12, 38, 6); g.fill();
+    }
   }
   if (c.hair === 'cap') {
     g.fillStyle = c.cap; g.beginPath(); g.moveTo(-w - 6, -48); g.bezierCurveTo(-w - 4, -h - 40, w + 4, -h - 40, w + 6, -48); g.closePath(); g.fill();

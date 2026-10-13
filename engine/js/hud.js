@@ -9,63 +9,85 @@ const sans = (s, w = 800) => `${w} ${s}px Rubik`;
 // typewriter reveal of a string over [t0, t0+d]
 const typed = (s, lt, t0, d) => s.slice(0, Math.round(s.length * clamp((lt - t0) / d)));
 
-// "NEW YORK · 1956" small serif caps, year in gold
+// Editorial on-screen type: solid blocks, hard drop shadows, no glows. Text colour on a block is chosen
+// for contrast; the accent colours come from the muted film palette in core.js.
+const HARD = 'rgba(8,6,4,0.55)';
+const hard = (ctx, dy = 6) => { ctx.shadowColor = HARD; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = dy; };
+const unhard = ctx => { ctx.shadowColor = 'transparent'; ctx.shadowOffsetY = 0; };
+const lum = hex => { const n = parseInt(hex.replace('#', '').slice(0, 6), 16); return ((n >> 16) * 0.299 + ((n >> 8) & 255) * 0.587 + (n & 255) * 0.114) / 255; };
+
+// "NEW YORK · 1956": small caps on a thin rule, year in the accent colour
 export function placeStamp(ctx, lt, place, year, { y = 150, a = 1, t0 = 0 } = {}) {
   const u = ease.out(clamp((lt - t0) / 0.35)) * a;
   if (u <= 0) return;
-  ctx.save(); ctx.globalAlpha *= u; ctx.font = serif(34, 700); ctx.letterSpacing = '4px';
-  const s1 = place.toUpperCase() + '  ·  ', w1 = ctx.measureText(s1).width, w2 = ctx.measureText(year).width;
-  const x0 = W / 2 - (w1 + w2) / 2;
-  ctx.textAlign = 'left'; ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 12;
-  ctx.fillStyle = C.cream; ctx.fillText(s1, x0, y + (1 - u) * 14);
-  ctx.fillStyle = C.gold; ctx.fillText(year, x0 + w1, y + (1 - u) * 14);
+  ctx.save(); ctx.globalAlpha *= u; ctx.font = sans(30, 800); ctx.letterSpacing = '6px';
+  const s1 = place.toUpperCase(), w1 = ctx.measureText(s1).width, w2 = ctx.measureText(year).width, gap = 46;
+  const x0 = W / 2 - (w1 + gap + w2) / 2, yy = y + (1 - u) * 14;
+  ctx.textAlign = 'left'; hard(ctx, 3);
+  ctx.fillStyle = C.cream; ctx.fillText(s1, x0, yy);
+  ctx.fillStyle = C.gold; ctx.fillRect(x0 + w1 + gap / 2 - 3, yy - 22, 6, 6); ctx.fillText(year, x0 + w1 + gap, yy);
+  unhard(ctx); ctx.fillStyle = rgba(C.cream, 0.5); ctx.fillRect(W / 2 - (w1 + gap + w2) / 2 * u, yy + 16, (w1 + gap + w2) * u, 2);
   ctx.restore();
 }
 
-// character title: serif name + mono subtitle (typed)
-export function nameTitle(ctx, lt, name, sub, { y = 230, a = 1, t0 = 0, subColor = C.lime, size = 64 } = {}) {
+// character title: serif name, a short accent bar, small-caps subtitle (typed)
+export function nameTitle(ctx, lt, name, sub, { y = 230, a = 1, t0 = 0, subColor = C.gold, size = 64 } = {}) {
   const u = ease.out(clamp((lt - t0) / 0.4)) * a;
   if (u <= 0) return;
-  ctx.save(); ctx.globalAlpha *= u;
-  glowText(ctx, name, W / 2, y + (1 - u) * 18, { font: serif(size, 700), fill: C.cream, glow: 'rgba(0,0,0,0.9)', blur: 16, spacing: 1 });
-  if (sub) glowText(ctx, typed(sub, lt, t0 + 0.25, 0.5), W / 2, y + 50, { font: mono(26, 700), fill: subColor, glow: 'rgba(0,0,0,0.9)', blur: 10, spacing: 5 });
+  ctx.save(); ctx.globalAlpha *= u; ctx.textAlign = 'center';
+  ctx.font = serif(size, 700); ctx.letterSpacing = '1px'; hard(ctx, 5); ctx.fillStyle = C.cream;
+  ctx.fillText(name, W / 2, y + (1 - u) * 18); unhard(ctx);
+  ctx.fillStyle = subColor; ctx.fillRect(W / 2 - 40 * u, y + 22, 80 * u, 5);
+  if (sub) { ctx.font = sans(24, 800); ctx.letterSpacing = '6px'; hard(ctx, 3); ctx.fillStyle = C.cream; ctx.fillText(typed(sub, lt, t0 + 0.25, 0.5), W / 2, y + 62); }
   ctx.restore();
 }
 
-// big glowing number with a small mono label under it
-export function counter(ctx, value, label, { x = W / 2, y = 330, size = 150, color = '#EAF7F3', glow = C.teal, a = 1, labelColor = C.teal } = {}) {
+// big number: heavy sans in cream with a hard shadow; the label sits on a small accent block
+export function counter(ctx, value, label, { x = W / 2, y = 330, size = 150, color = C.cream, glow = null, a = 1, labelColor = C.gold } = {}) {
   if (a <= 0) return;
-  ctx.save(); ctx.globalAlpha *= a;
-  glowText(ctx, value, x, y, { font: mono(size, 800), fill: color, glow, blur: 34 });
-  if (label) glowText(ctx, label, x, y + 52, { font: mono(26, 700), fill: labelColor, glow: 'rgba(0,0,0,0.8)', blur: 8, spacing: 6 });
+  ctx.save(); ctx.globalAlpha *= a; ctx.textAlign = 'center';
+  ctx.font = sans(size * 0.92, 900); ctx.letterSpacing = '0px';
+  ctx.lineJoin = 'round'; ctx.lineWidth = size * 0.06; ctx.strokeStyle = 'rgba(10,8,6,0.55)'; ctx.strokeText(value, x, y);
+  hard(ctx, size * 0.06); ctx.fillStyle = color === '#EAF7F3' ? C.cream : color; ctx.fillText(value, x, y); unhard(ctx);
+  if (label) {
+    ctx.font = sans(24, 800); ctx.letterSpacing = '5px'; const w = ctx.measureText(label).width + 30;
+    ctx.fillStyle = labelColor; hard(ctx, 4); ctx.fillRect(x - w / 2, y + 26, w, 40); unhard(ctx);
+    ctx.fillStyle = lum(labelColor) > 0.55 ? C.ink : C.cream; ctx.textBaseline = 'middle'; ctx.fillText(label, x + 2, y + 47);
+  }
   ctx.restore();
 }
 
-// rounded badge with glowing border
-export function badge(ctx, text, x, y, { color = C.gold, size = 40, a = 1, scale = 1, sub = null, fill = 'rgba(12,14,16,0.85)' } = {}) {
+// solid label block (slightly tilted), dark or light text for contrast, optional small subline
+export function badge(ctx, text, x, y, { color = C.gold, size = 40, a = 1, scale = 1, sub = null, fill = null } = {}) {
   if (a <= 0) return;
-  ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y); ctx.scale(scale, scale);
-  ctx.font = sans(size, 900); const w = ctx.measureText(text).width + size * 1.1, h = size * (sub ? 2.0 : 1.55);
-  ctx.shadowColor = color; ctx.shadowBlur = 26; ctx.fillStyle = fill;
-  ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 14); ctx.fill();
-  ctx.lineWidth = 4; ctx.strokeStyle = color; ctx.stroke(); ctx.shadowBlur = 0;
-  ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(text, 0, sub ? -size * 0.28 : 2);
-  if (sub) { ctx.font = mono(size * 0.42, 700); ctx.fillStyle = rgba('#ffffff', 0.75); ctx.letterSpacing = '3px'; ctx.fillText(sub, 0, size * 0.52); }
+  ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y); ctx.rotate(-0.018); ctx.scale(scale, scale);
+  ctx.font = sans(size, 900); ctx.letterSpacing = '1px';
+  const w = ctx.measureText(text).width + size * 0.9, h = size * (sub ? 1.95 : 1.42);
+  hard(ctx, Math.max(4, size * 0.14)); ctx.fillStyle = color;
+  ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 6); ctx.fill(); unhard(ctx);
+  const ink = lum(color) > 0.55 ? C.ink : C.cream;
+  ctx.fillStyle = ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, 0, sub ? -size * 0.3 : size * 0.04);
+  if (sub) { ctx.font = sans(size * 0.4, 800); ctx.letterSpacing = '3px'; ctx.globalAlpha *= 0.8; ctx.fillText(sub, 0, size * 0.5); }
   ctx.restore();
 }
 
-// rubber stamp that slams in (FORFEIT, WARRANT...)
+// rubber stamp that slams in (SOLD, FORFEIT…): ink outline with a worn texture, no glow
 export function stamp(ctx, text, x, y, lt, t0, { color = C.red, size = 96, rot = -0.18, sub = null } = {}) {
   const u = clamp((lt - t0) / 0.18);
   if (lt < t0) return;
   const s = lerp(2.4, 1, ease.out(u));
-  ctx.save(); ctx.globalAlpha *= clamp(u * 1.5); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
-  ctx.font = sans(size, 900); const w = ctx.measureText(text).width + 60, h = size * (sub ? 1.75 : 1.35);
-  ctx.strokeStyle = color; ctx.lineWidth = 10; ctx.shadowColor = rgba(color, 0.6); ctx.shadowBlur = 20;
-  ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 16); ctx.stroke();
+  ctx.save(); ctx.globalAlpha *= clamp(u * 1.5) * 0.92; ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
+  ctx.font = sans(size, 900); ctx.letterSpacing = '4px'; const w = ctx.measureText(text).width + 64, h = size * (sub ? 1.75 : 1.35);
+  ctx.strokeStyle = color; ctx.lineWidth = 9;
+  ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 10); ctx.stroke();
+  ctx.lineWidth = 3; ctx.beginPath(); ctx.roundRect(-w / 2 + 12, -h / 2 + 12, w - 24, h - 24, 6); ctx.stroke();
   ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 0, sub ? -size * 0.18 : 4);
-  if (sub) { ctx.font = mono(size * 0.26, 800); ctx.letterSpacing = '4px'; ctx.fillText(sub, 0, size * 0.5); }
+  if (sub) { ctx.font = sans(size * 0.24, 800); ctx.letterSpacing = '5px'; ctx.fillText(sub, 0, size * 0.5); }
+  // worn ink: knock out small specks
+  ctx.globalCompositeOperation = 'destination-out';
+  let r = 7; for (let i = 0; i < 70; i++) { r = (r * 16807) % 2147483647; const px = (r % 1000) / 1000 * w - w / 2; r = (r * 16807) % 2147483647; const py = (r % 1000) / 1000 * h - h / 2;
+    ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.beginPath(); ctx.arc(px, py, 2 + (r % 5), 0, 7); ctx.fill(); }
   ctx.restore();
 }
 

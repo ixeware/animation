@@ -4,6 +4,7 @@ import { W, H, FPS, makeCanvas, clamp, inv } from './core.js';
 import { grain, vignette, lightLeak, flash, tvOff } from './draw.js';
 import { screenShatter } from './fx.js';
 import { buildChunks, drawCaptions } from './captions.js';
+import { finish } from './post.js';
 
 const q = new URLSearchParams(location.search);
 const ep = q.get('ep') || 'fischer';
@@ -103,6 +104,7 @@ function compose(t, frame) {
     const prev = shots[s.i - 1];
     if (prev) { drawShot(prev, s.a - 0.001, hctx); screenShatter(ctx, hold, lt / 0.8, { seed: s.i * 7 + 3 }); }
   }
+  finish(ctx, main, s.grade ?? film.grade ?? 'neutral', { amount: film.finish ?? 1 });
   if (s.post) s.post(ctx, lt, t);
   // light leak straddles the cut into this shot (and into the next one, if it asks)
   const nx = shots[s.i + 1];
