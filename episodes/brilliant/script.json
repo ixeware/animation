@@ -1,0 +1,197 @@
+{
+ "title": "Most Brilliant Moves",
+ "post": "Who has the most brilliant moves on Chess.com? #chess #brilliantmove #naroditsky #wittyalien #hikaru #chesstok",
+ "lead_in": 0.05,
+ "tail": 1.6,
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\""
+ },
+ "voice_fx": {
+  "tempo": 1.24,
+  "max_gap": 0.16
+ },
+ "mix": {
+  "bed_gap": 7.0
+ },
+ "phrases": [
+  {
+   "id": "hook1",
+   "text": "Who has played the most brilliant moves on Chess.com?",
+   "say": "[curious] Who has played the most brilliant moves on Chess.com?",
+   "pause": 0.2,
+   "colors": {
+    "most": "gold",
+    "brilliant": "blue",
+    "moves": "blue"
+   }
+  },
+  {
+   "id": "hook2",
+   "text": "It's not who you think.",
+   "say": "[mysterious] It's not who you think.",
+   "pause": 0.35,
+   "colors": {
+    "not": "red"
+   }
+  },
+  {
+   "id": "what",
+   "text": "A brilliant move is a sacrifice that actually works. You give away a piece, and you come out on top.",
+   "say": "[storytelling] A brilliant move is a sacrifice that actually works. You give away a piece... [excited] and you come out on top.",
+   "pause": 0.25,
+   "colors": {
+    "brilliant": "blue",
+    "sacrifice": "gold",
+    "works.": "lime",
+    "top.": "lime"
+   }
+  },
+  {
+   "id": "icon",
+   "text": "The engine gives it two exclamation marks. And everybody wants one.",
+   "say": "The engine gives it two exclamation marks. [laughs] And everybody wants one.",
+   "pause": 0.3,
+   "colors": {
+    "two": "blue",
+    "exclamation": "blue",
+    "marks.": "blue",
+    "everybody": "gold"
+   }
+  },
+  {
+   "id": "hikaru",
+   "text": "Hikaru Nakamura? Over five thousand. And that was back in 2021.",
+   "say": "[impressed] Hikaru Nakamura? Over five thousand. And that was back in 2021.",
+   "pause": 0.25,
+   "colors": {
+    "Hikaru": "gold",
+    "Nakamura?": "gold",
+    "five": "lime",
+    "thousand.": "lime"
+   }
+  },
+  {
+   "id": "witty",
+   "text": "Witty Alien? Around fifteen thousand. The most of any active player.",
+   "say": "[excited] Witty Alien? Around fifteen thousand. The most of any active player.",
+   "pause": 0.25,
+   "colors": {
+    "Witty": "lime",
+    "Alien?": "lime",
+    "fifteen": "gold",
+    "thousand.": "gold"
+   }
+  },
+  {
+   "id": "witty27",
+   "text": "He once played twenty-seven brilliant moves in a single game.",
+   "say": "He once played twenty-seven brilliant moves... in a single game.",
+   "pause": 0.25,
+   "colors": {
+    "twenty-seven": "gold",
+    "single": "red",
+    "game.": "red"
+   }
+  },
+  {
+   "id": "engine",
+   "text": "Two chess engines at the computer championship managed eighteen. Humans one, robots zero.",
+   "say": "[dry] Two chess engines at the computer championship managed eighteen. [laughs] Humans one, robots zero.",
+   "pause": 0.35,
+   "colors": {
+    "engines": "blue",
+    "eighteen.": "blue",
+    "Humans": "lime",
+    "one,": "lime",
+    "zero.": "red"
+   }
+  },
+  {
+   "id": "twist",
+   "text": "But the all-time king is someone else.",
+   "say": "[serious] But the all-time king... is someone else.",
+   "pause": 0.35,
+   "colors": {
+    "all-time": "gold",
+    "king": "gold"
+   }
+  },
+  {
+   "id": "naro",
+   "text": "Daniel Naroditsky.",
+   "say": "[reverently] Daniel Naroditsky.",
+   "pause": 0.35,
+   "colors": {
+    "Daniel": "gold",
+    "Naroditsky.": "gold"
+   }
+  },
+  {
+   "id": "naro2",
+   "text": "By early 2023, Chess.com counted nearly ten thousand brilliant moves. Just in blitz and bullet.",
+   "say": "By early 2023, Chess.com counted nearly ten thousand brilliant moves. Just in blitz and bullet.",
+   "pause": 0.25,
+   "colors": {
+    "ten": "gold",
+    "thousand": "gold",
+    "blitz": "blue",
+    "bullet.": "blue"
+   }
+  },
+  {
+   "id": "naro3",
+   "text": "Fans put his final number above twenty thousand.",
+   "say": "[amazed] Fans put his final number above twenty thousand.",
+   "pause": 0.3,
+   "colors": {
+    "twenty": "gold",
+    "thousand.": "gold"
+   }
+  },
+  {
+   "id": "who",
+   "text": "He wrote a chess book at fourteen. Became a grandmaster at eighteen. And won the US blitz title, fourteen out of fourteen.",
+   "say": "[impressed] He wrote a chess book at fourteen. Became a grandmaster at eighteen. And won the US blitz title... fourteen out of fourteen.",
+   "pause": 0.3,
+   "colors": {
+    "book": "gold",
+    "grandmaster": "gold",
+    "fourteen.": "lime"
+   }
+  },
+  {
+   "id": "teacher",
+   "text": "And he spent years teaching anyone who wanted to learn. For free.",
+   "say": "[warmly] And he spent years teaching anyone who wanted to learn. For free.",
+   "pause": 0.45,
+   "colors": {
+    "teaching": "gold",
+    "free.": "lime"
+   }
+  },
+  {
+   "id": "death",
+   "text": "In October 2025, Danya died. He was twenty-nine.",
+   "say": "[softly] In October 2025, Danya died. He was twenty-nine.",
+   "pause": 0.6,
+   "colors": {
+    "twenty-nine.": "red"
+   }
+  },
+  {
+   "id": "final",
+   "text": "So next time you see that brilliant icon, that one's for Danya.",
+   "say": "[warmly] So next time you see that brilliant icon... that one's for Danya.",
+   "pause": 0.0,
+   "colors": {
+    "brilliant": "blue",
+    "Danya.": "gold"
+   }
+  }
+ ]
+}

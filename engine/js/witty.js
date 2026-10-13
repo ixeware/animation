@@ -178,13 +178,13 @@ export function evalBar(g, x, y, w, h, v, { a = 1, flip = false, label = true } 
 
 // chat messages rising in a column (stream chat)
 const CHAT = [['alien_fan', 'ALIEN GAMBIT LETS GO'], ['caro_kann_main', 'knight sac?? again??'], ['blitz_goblin', 'NO WAY'], ['pawnstorm', 'he did it again lol'], ['gm_wannabe', 'engine says -2 lmao'], ['f7_enjoyer', 'Nxf7!!!'], ['chesskid99', 'GG'], ['night_owl', 'how is this working']];
-export function chat(g, x, y, t, t0, { n = 6, a = 1, w = 420 } = {}) {
+export function chat(g, x, y, t, t0, { n = 6, a = 1, w = 420, lines = CHAT } = {}) {
   if (a <= 0 || t < t0) return;
   const k = (t - t0) * 3.2;
   g.save(); g.globalAlpha *= a; g.font = '700 24px Rubik';
   for (let i = 0; i < n; i++) {
     const j = Math.floor(k) - i; if (j < 0) continue;
-    const [u, m] = CHAT[j % CHAT.length], yy = y - i * 64 - (k % 1) * 64 * (i === 0 ? 0 : 1);
+    const [u, m] = lines[j % lines.length], yy = y - i * 64 - (k % 1) * 64 * (i === 0 ? 0 : 1);
     const al = clamp(1 - i / n) * (i === 0 ? clamp((k % 1) * 4) : 1);
     g.globalAlpha = a * al; g.fillStyle = 'rgba(14,12,22,0.82)'; g.beginPath(); g.roundRect(x, yy - 40, w, 52, 10); g.fill();
     g.fillStyle = ['#B48CFF', '#8FD16A', '#E9B654', '#7AA6D6'][j % 4]; g.fillText(u + ':', x + 14, yy - 6);

@@ -34,6 +34,8 @@ export const CAST = {
   wittyKid: { face: [0.98, 0.94, 0.92], hair: 'messy', hairC: '#3A2C22', brow: '#2E2119', suit: '#6E7F5A', suitD: '#55654A', shirt: 'polo', ears: 1.08 },
   brother: { face: [0.95, 1.0, 0.88], hair: 'fringe', hairC: '#33261D', brow: '#2E2119', suit: '#7A5A44', suitD: '#5E4434', shirt: 'polo', ears: 1.04 },
   magnus: { face: [0.96, 1.07, 0.88], hair: 'curly', hairC: '#6E4A2E', brow: '#4E3420', suit: '#F2F2EE', suitD: '#D2D6D6', shirt: 'open', beard: '#7A5A3A', ears: 1 },
+  danya: { face: [0.9, 1.1, 0.82], hair: 'swept', hairC: '#2A1E16', brow: '#1E1510', suit: '#262B36', suitD: '#1A1E26', shirt: 'open', ears: 1.04 },
+  hikaru: { face: [0.98, 1.02, 0.9], hair: 'fringe', hairC: '#16110E', brow: '#120D0A', suit: '#3A3D46', suitD: '#2A2D34', shirt: 'hoodie', ears: 1 },
   doctor: { face: [0.98, 1.04, 0.9], hair: 'receding', hairC: '#8E8A84', brow: '#6E6A64', suit: '#F2F2EE', suitD: '#D3D8D4', shirt: 'labcoat', glasses: true, ears: 1 },
   operator: { face: [0.94, 1.04, 0.84], hair: 'tied', hairC: '#3A2A20', brow: '#2E2119', suit: '#E8E0CF', suitD: '#C2B8A3', shirt: 'sleeves', vest: '#3B2E26', ears: 1 },
 };
