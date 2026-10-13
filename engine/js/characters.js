@@ -25,6 +25,9 @@ export const CAST = {
   talOld: { face: [0.88, 1.12, 0.78], hair: 'wild', hairC: '#BDB8AE', brow: '#77726A', suit: '#3A3F46', suitD: '#2A2E34', shirt: 'tie', tie: '#2A2D33', ears: 1.05, gaunt: true },
   botvinnik: { face: [0.96, 1.0, 0.9], hair: 'receding', hairC: '#5A4A3A', brow: '#4A3C2E', suit: '#55585C', suitD: '#3E4145', shirt: 'tie', tie: '#3A3F46', glasses: true, ears: 1 },
   kasparov: { face: [0.98, 1.04, 0.9], hair: 'curly', hairC: '#1C1612', brow: '#120D0A', suit: '#1E2228', suitD: '#14171C', shirt: 'tie', tie: '#7A1F2B', ears: 1 },
+  dealer: { face: [0.98, 1.04, 0.9], hair: 'receding', hairC: '#A39C90', brow: '#6E685E', suit: '#6A5A42', suitD: '#4E4230', shirt: 'tie', tie: '#5A2A22', glasses: true, mustache: '#8E877C', ears: 1 },
+  daughter: { face: [0.95, 1.02, 0.88], hair: 'updo', hairC: '#B9AFA2', brow: '#857B70', suit: '#5E6F78', suitD: '#45535B', shirt: 'gown', ears: 0.9, female: true },
+  auctioneer: { face: [0.94, 1.05, 0.86], hair: 'swept', hairC: '#3A3530', brow: '#2A2622', suit: '#1E2430', suitD: '#141922', shirt: 'tie', tie: '#8E1E2A', ears: 1 },
   doctor: { face: [0.98, 1.04, 0.9], hair: 'receding', hairC: '#8E8A84', brow: '#6E6A64', suit: '#F2F2EE', suitD: '#D3D8D4', shirt: 'labcoat', glasses: true, ears: 1 },
   operator: { face: [0.94, 1.04, 0.84], hair: 'tied', hairC: '#3A2A20', brow: '#2E2119', suit: '#E8E0CF', suitD: '#C2B8A3', shirt: 'sleeves', vest: '#3B2E26', ears: 1 },
 };

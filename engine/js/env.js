@@ -174,7 +174,7 @@ export function picture(g, b, img, tl, tr, bl, { tone = 'bw', fx = 0.5, fy = 0.4
   const sx = clamp(fx * img.width - sw / 2, 0, img.width - sw), sy = clamp(fy * img.height - sh / 2, 0, img.height - sh);
   b.poly(g, [tl, tr, br, bl]); g.clip();
   g.transform(P[1].x - P[0].x, P[1].y - P[0].y, P[2].x - P[0].x, P[2].y - P[0].y, P[0].x, P[0].y);
-  g.filter = tone === 'sepia' ? 'sepia(0.55) contrast(1.08) brightness(0.95)' : tone === 'warm' ? 'sepia(0.25) contrast(1.05)' : 'grayscale(1) contrast(1.08)';
+  g.filter = tone === 'color' ? 'none' : tone === 'sepia' ? 'sepia(0.55) contrast(1.08) brightness(0.95)' : tone === 'warm' ? 'sepia(0.25) contrast(1.05)' : 'grayscale(1) contrast(1.08)';
   g.drawImage(img, sx, sy, sw, sh, 0, 0, 1, 1);
   g.restore();
 }

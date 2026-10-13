@@ -351,10 +351,101 @@ def beep():  # one heart-monitor beep
     return norm(np.sin(2 * np.pi * 1050 * t) * np.minimum(1, t / 0.004) * np.exp(-t / 0.09), 0.5)
 
 
+def kaching():  # cash register: key clunk, drawer bell
+    d = 1.3
+    out = np.zeros(int(d * SR))
+    k = np.sin(2 * np.pi * 120 * t_(0.08)) * env_exp(0.08, 0.02) + bp(noise(0.08), 400, 3000) * env_exp(0.08, 0.01)
+    out[:len(k)] += k
+    t = t_(0.9)
+    bell = sum(np.sin(2 * np.pi * f * t) * a for f, a in [(2637, 1), (3951, 0.6), (5274, 0.3), (1318, 0.4)]) * env_exp(0.9, 0.25)
+    s0 = int(0.12 * SR); out[s0:s0 + len(bell)] += bell * 0.6
+    s1 = int(0.3 * SR); b2 = sum(np.sin(2 * np.pi * f * t) * a for f, a in [(3136, 1), (4699, 0.5)]) * env_exp(0.9, 0.3)
+    out[s1:s1 + len(b2)] += b2[:len(out) - s1] * 0.5
+    return norm(out)
+
+
+def drawer():  # a wooden drawer sliding, then knocking home
+    d = 0.75
+    t = t_(d)
+    rub = bp(noise(d), 250, 2200) * (0.6 + 0.4 * np.sin(2 * np.pi * 23 * t) ** 2) * np.sin(np.pi * np.minimum(1, t / 0.55)) ** 0.8
+    out = rub * 0.6
+    s0 = int(0.55 * SR); k = thud()[: len(out) - s0]
+    out[s0:s0 + len(k)] += k * 0.8
+    return norm(out)
+
+
+def gavel():  # hardwood gavel on the block, with a short room tail
+    d = 0.9
+    t = t_(d)
+    x = np.sin(2 * np.pi * (520 + 300 * np.exp(-t * 60)) * t) * env_exp(d, 0.03) + bp(noise(d), 900, 6000) * env_exp(d, 0.008) * 1.4
+    x += np.sin(2 * np.pi * 160 * t) * env_exp(d, 0.06) * 0.8
+    tail = lp(noise(d), 2500) * env_exp(d, 0.25) * 0.08
+    return norm(np.tanh(1.6 * (x + tail)))
+
+
+def waves():  # surf washing up the sand
+    d = 3.2
+    t = t_(d)
+    sw = np.sin(np.pi * np.minimum(1, t / 2.2)) ** 1.5
+    x = lp(noise(d), 700) * 0.7 + bp(noise(d), 1500, 6000) * 0.35 * sw ** 2
+    e = np.minimum(1, t / 0.2) * np.minimum(1, (d - t) / 0.6)
+    return norm(x * (0.25 + 0.75 * sw) * e, 0.8)
+
+
+def wind():  # gusting wind over the dunes
+    d = 3.0
+    t = t_(d)
+    x = noise(d)
+    lo = bp(x, 200, 900) * (0.5 + 0.5 * np.sin(2 * np.pi * 0.6 * t + 1))
+    hi = bp(x, 900, 2400) * (0.3 + 0.3 * np.sin(2 * np.pi * 0.9 * t)) ** 2
+    e = np.minimum(1, t / 0.4) * np.minimum(1, (d - t) / 0.6)
+    return norm((lo + hi) * e, 0.7)
+
+
+def scribble():  # a pen writing a line in a ledger
+    d = 1.3
+    out = np.zeros(int(d * SR))
+    pos = 0.0
+    while pos < d - 0.12:
+        L = rng.uniform(0.05, 0.14); n = int(L * SR); s0 = int(pos * SR)
+        st = bp(noise(L), 2500, 9000) * np.sin(np.pi * np.arange(n) / n) * rng.uniform(0.4, 1)
+        out[s0:s0 + n] += st[: len(out) - s0]
+        pos += L + rng.uniform(0.01, 0.05)
+    return norm(out, 0.6)
+
+
+def coins():  # a few coins dropped on a counter
+    d = 0.9
+    out = np.zeros(int(d * SR))
+    for i in range(4):
+        s0 = int((0.02 + i * 0.11 + rng.uniform(0, 0.03)) * SR); t = t_(0.4)
+        c = sum(np.sin(2 * np.pi * f * t) for f in rng.uniform(3000, 7000, 3)) * env_exp(0.4, 0.06) * 0.4 + bp(noise(0.4), 3000, 9000) * env_exp(0.4, 0.004)
+        out[s0:s0 + len(c)] += c[: len(out) - s0]
+    return norm(out, 0.7)
+
+
+def honk():  # a walrus bellow, for comic relief
+    d = 0.8
+    t = t_(d)
+    f = 95 + 25 * np.sin(2 * np.pi * 6 * t) + 30 * np.sin(np.pi * t / d)
+    x = sum(np.sin(2 * np.pi * np.cumsum(f * k) / SR) / k for k in range(1, 9))
+    e = np.minimum(1, t / 0.05) * np.minimum(1, (d - t) / 0.2)
+    return norm(lp(x, 1400) * e * (1 + 0.3 * lp(noise(d), 60)), 0.8)
+
+
+def chomp():  # teeth on a shield rim
+    d = 0.35
+    out = np.zeros(int(d * SR))
+    for s, a in [(0.0, 1), (0.09, 0.7)]:
+        s0 = int(s * SR); c = bp(noise(0.06), 1500, 8000) * env_exp(0.06, 0.01) + np.sin(2 * np.pi * 220 * t_(0.06)) * env_exp(0.06, 0.02) * 0.6
+        out[s0:s0 + len(c)] += c * a
+    return norm(out)
+
+
 BANK = {name: fn for name, fn in globals().items()
         if callable(fn) and name in ('boom hit clack whoosh ting static shield tick alarm pluck riser shimmer thud buzz '
                                      'whirr shutter stamp clock lamp cheer confetti poof heartbeat sting spit splat tvoff glass sparkle '
-                                     'creak fire scatter ratchet typewriter flatline beep').split()}
+                                     'creak fire scatter ratchet typewriter flatline beep kaching drawer gavel waves wind scribble coins honk chomp').split()}
 
 
 def render_all():

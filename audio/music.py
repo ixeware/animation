@@ -318,6 +318,27 @@ def m_digital(S, a, b):  # modern pulse for the present day
         S.add(t, pad(chord_at(t, ['Dm', 'Bb', 'F', 'C']), BEAT * 4, cut=2200, att=0.3), 0.25, rev=0.4, until=b)
 
 
+# --- The Lewis chessmen ---
+def m_norse(S, a, b):  # the medieval north: open drone, frame drum, a bowed Dorian tune
+    S.add(a, pad([note('D2'), note('A2'), note('D3')], b - a + 0.6, cut=1100, att=1.0), 0.45, rev=0.5, until=b + 0.3)
+    tune = ['D4', 'E4', 'F4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4', 'D4', 'E4', 'A3']
+    d = BEAT * 0.95
+    for i, t in enumerate(beats(a, b, 1)):
+        x = lp(saw(hz(note(tune[i % len(tune)])), d, voices=2, det=0.004), 2200) * np.minimum(1, t_(d) / 0.06) * np.minimum(1, (d - t_(d)) / 0.1)
+        S.add(t, x, 0.12, pan=-0.2, rev=0.6, until=b)
+    for i, t in enumerate(beats(a, b, 2)):
+        if i % 4 in (0, 3):
+            S.add(t, timpani(note('D2'), 0.6), 0.35 if i % 4 == 0 else 0.22, rev=0.3, until=b)
+
+
+def m_auction(S, a, b):  # the saleroom: pizzicato ostinato over ticking, a slow rising string pad
+    for i, t in enumerate(beats(a, b, 2)):
+        S.add(t, pizz(chord_at(t, ['Dm', 'Dm', 'Bb', 'A'])[i % 3] + (12 if i % 2 else 0), 0.5), 0.35, pan=0.3 * ((-1) ** i), rev=0.25, until=b)
+    for t in beats(a, b, 1):
+        S.add(t, bp(noise(0.02), 2000, 7000) * env_exp(0.02, 0.004), 0.4, pan=0.2, rev=0.1, until=b)
+    S.add(a, strings([note('D3'), note('A3'), note('D4')], b - a + 0.4, cut=3000, att=max(0.3, (b - a) * 0.8)), 0.3, rev=0.5, until=b + 0.2)
+
+
 MOODS = {k[2:]: v for k, v in globals().items() if k.startswith('m_')}
 
 

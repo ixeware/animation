@@ -1,0 +1,222 @@
+{
+ "title": "The £5 Chess Piece",
+ "post": "Bought for £5. Kept in a drawer for 55 years. #chess #history #story #lewischessmen",
+ "lead_in": 0.05,
+ "tail": 1.4,
+ "voice": {
+  "provider": "chatterbox",
+  "reference_fish_id": "f6a86fbea5f64970abd883813072ec6d",
+  "exaggeration": 0.6,
+  "cfg_weight": 0.35,
+  "temperature": 0.8,
+  "seed": 7,
+  "_name": "Trailet narrador (Fish sample) cloned locally with Chatterbox",
+  "_fish": {
+   "provider": "fish",
+   "reference_id": "f6a86fbea5f64970abd883813072ec6d",
+   "model": "s1"
+  },
+  "_alternatives": {
+   "3081f4a3f88943d791deda5cec39997b": "Paramount Feature Presentation Announcer",
+   "c8ccdaacb27049e29f2f69b5fac6b9f4": "DEEP STORY",
+   "69f5f158321f4f7f8f945148a6b7d17f": "Pierrot",
+   "d67524ad1936410896ad120583cb1117": "Andrew: English Man (US) - Storytelling, Deep"
+  },
+  "fallback": {
+   "provider": "kokoro",
+   "name": "am_michael",
+   "speed": 0.9,
+   "pitch_semitones": -1.5
+  }
+ },
+ "mix": {
+  "bed_gap": 7.0
+ },
+ "voice_fx": {
+  "tempo": 1.1,
+  "sts": {
+   "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+   "_name": "Callum (ElevenLabs premade)",
+   "model": "eleven_english_sts_v2",
+   "stability": 0.5,
+   "similarity_boost": 0.85
+  }
+ },
+ "phrases": [
+  {
+   "id": "hook1",
+   "text": "In 1964, a man bought this chess piece for five pounds.",
+   "pause": 0.4,
+   "colors": {
+    "1964,": "gold",
+    "five": "lime",
+    "pounds.": "lime"
+   }
+  },
+  {
+   "id": "hook2",
+   "text": "His family kept it in a drawer for fifty-five years.",
+   "pause": 0.4,
+   "colors": {
+    "drawer": "gold",
+    "fifty-five": "red",
+    "years.": "red"
+   }
+  },
+  {
+   "id": "hook3",
+   "text": "Then they found out what it was.",
+   "pause": 0.9,
+   "colors": {
+    "found": "gold",
+    "out": "gold"
+   }
+  },
+  {
+   "id": "lewis",
+   "text": "Isle of Lewis. 1831.",
+   "pause": 0.4,
+   "colors": {
+    "Lewis.": "blue",
+    "1831.": "gold"
+   }
+  },
+  {
+   "id": "hoard",
+   "text": "A sand dune gives up a hidden hoard. Ninety-three pieces, carved from walrus tusk.",
+   "pause": 0.4,
+   "colors": {
+    "hoard.": "gold",
+    "Ninety-three": "gold",
+    "walrus": "blue",
+    "tusk.": "blue"
+   }
+  },
+  {
+   "id": "old",
+   "text": "Over eight hundred years old.",
+   "pause": 0.45,
+   "colors": {
+    "eight": "red",
+    "hundred": "red"
+   }
+  },
+  {
+   "id": "cast",
+   "text": "Kings with swords. Worried queens. Warriors biting their shields.",
+   "pause": 0.45,
+   "colors": {
+    "swords.": "gold",
+    "queens.": "blue",
+    "biting": "red",
+    "shields.": "red"
+   }
+  },
+  {
+   "id": "famous",
+   "text": "They become the most famous chessmen in the world.",
+   "pause": 0.35,
+   "colors": {
+    "most": "gold",
+    "famous": "gold"
+   }
+  },
+  {
+   "id": "potter",
+   "text": "Copies even show up in the first Harry Potter film.",
+   "pause": 0.45,
+   "colors": {
+    "Harry": "gold",
+    "Potter": "gold"
+   }
+  },
+  {
+   "id": "missing",
+   "text": "But five pieces were never found.",
+   "pause": 0.8,
+   "colors": {
+    "five": "red",
+    "never": "red",
+    "found.": "red"
+   }
+  },
+  {
+   "id": "dealer",
+   "text": "The dealer's ledger just says: walrus tusk warrior. He had no idea.",
+   "pause": 0.45,
+   "colors": {
+    "walrus": "blue",
+    "tusk": "blue",
+    "warrior.": "blue",
+    "no": "red",
+    "idea.": "red"
+   }
+  },
+  {
+   "id": "drawer",
+   "text": "After he died, his daughter kept it in a drawer.",
+   "pause": 0.5,
+   "colors": {
+    "daughter": "gold",
+    "drawer.": "gold"
+   }
+  },
+  {
+   "id": "sothebys",
+   "text": "2019. The family takes it to Sotheby's.",
+   "pause": 0.4,
+   "colors": {
+    "2019.": "gold",
+    "Sotheby's.": "gold"
+   }
+  },
+  {
+   "id": "experts",
+   "text": "Experts believe it's one of the missing pieces.",
+   "pause": 0.5,
+   "colors": {
+    "missing": "red",
+    "pieces.": "red"
+   }
+  },
+  {
+   "id": "hammer",
+   "text": "The hammer falls at...",
+   "pause": 0.35,
+   "colors": {
+    "hammer": "gold"
+   }
+  },
+  {
+   "id": "price",
+   "text": "seven hundred and thirty-five thousand pounds.",
+   "pause": 0.7,
+   "colors": {
+    "seven": "lime",
+    "hundred": "lime",
+    "thirty-five": "lime",
+    "thousand": "lime",
+    "pounds.": "lime"
+   }
+  },
+  {
+   "id": "still",
+   "text": "Which means four may still be out there.",
+   "pause": 0.5,
+   "colors": {
+    "four": "red",
+    "out": "gold",
+    "there.": "gold"
+   }
+  },
+  {
+   "id": "final",
+   "text": "So... check your drawer.",
+   "pause": 0.0,
+   "colors": {
+    "check": "gold",
+    "drawer.": "gold"
+   }
+  }
+ ]
+}
