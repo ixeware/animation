@@ -338,10 +338,23 @@ def typewriter():  # five keys and a bell
     return norm(out)
 
 
+def flatline():  # monitor flatline tone
+    d = 2.2
+    t = t_(d)
+    x = np.sin(2 * np.pi * 980 * t) * 0.6 + np.sin(2 * np.pi * 1960 * t) * 0.12
+    return norm(x * np.minimum(1, t / 0.01) * np.minimum(1, (d - t) / 0.25), 0.55)
+
+
+def beep():  # one heart-monitor beep
+    d = 0.18
+    t = t_(d)
+    return norm(np.sin(2 * np.pi * 1050 * t) * np.minimum(1, t / 0.004) * np.exp(-t / 0.09), 0.5)
+
+
 BANK = {name: fn for name, fn in globals().items()
         if callable(fn) and name in ('boom hit clack whoosh ting static shield tick alarm pluck riser shimmer thud buzz '
                                      'whirr shutter stamp clock lamp cheer confetti poof heartbeat sting spit splat tvoff glass sparkle '
-                                     'creak fire scatter ratchet typewriter').split()}
+                                     'creak fire scatter ratchet typewriter flatline beep').split()}
 
 
 def render_all():

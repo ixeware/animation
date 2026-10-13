@@ -15,6 +15,7 @@ export const ENV = {
   cold: { base: '#05080B', wall: ['#24323C', '#1C2830'], seam: '#121A20', floor: ['#10171C', '#0D1318'], light: '#CFE6FF', lightA: 0.2, windows: true },
   palace: { base: '#100B06', wall: ['#A8956C', '#9C8962'], panels: '#D9B565', rail: '#C9A05A', floor: ['#3A2817', '#2C1E11'], light: '#FFE6B0', lightA: 0.42,
     frames: true, chandeliers: true, table: ['#5A3A1E', '#3A2412', '#2A1A0C'] },
+  hospital: { base: '#060D0B', wall: ['#5C786E', '#526C63'], seam: '#3E554D', rail: '#7FA195', floor: ['#2E3B38', '#283430'], light: '#E6FFF4', lightA: 0.3, ceilingLights: true },
   dark: { base: '#020304', wall: ['#0E1215', '#0B0E10'], floor: ['#08090B', '#060708'], light: '#9FB7C9', lightA: 0.07 },
 };
 
@@ -68,6 +69,8 @@ function shell(g, b, env, t, lights) {
   }
   if (env.rail) for (const [z, x0, x1, fx] of [[fz1 - 0.05, LEFT_X, RIGHT_X, 0], [fz0 + 0.05, LEFT_X, RIGHT_X, 0]])
     strip(g, b, [[x0, 1.6, z], [x1, 1.6, z], [x1, 1.9, z], [x0, 1.9, z]], fogged(b, env, env.rail, 4, 2, z));
+  if (env.ceilingLights) for (let x = LEFT_X + 3; x < RIGHT_X - 2; x += 6) for (let z = fz0 + 3; z < fz1 - 1; z += 6)
+    if (b.poly(g, [[x, CEIL_Y - 0.02, z], [x + 2.6, CEIL_Y - 0.02, z], [x + 2.6, CEIL_Y - 0.02, z + 1], [x, CEIL_Y - 0.02, z + 1]])) { g.save(); g.fillStyle = rgba(env.light, 0.9); g.shadowColor = env.light; g.shadowBlur = 30; g.fill(); g.restore(); }
   if (env.panels) {  // palace wainscoting: gilded moulding rectangles on every wall panel
     const mould = q => { if (b.poly(g, q)) { g.strokeStyle = fogged(b, env, env.panels, ...q[0]); g.lineWidth = Math.max(1.5, b.project(...q[0]).s * 0.05); g.stroke(); } };
     for (let x = LEFT_X; x < RIGHT_X; x += 2) for (const [ya, yb] of [[-2.6, 0.9], [2.3, 10.5]]) {
@@ -223,10 +226,10 @@ export function box(g, b, [x0, y0, z0], [x1, y1, z1], { top = '#2A2018', side = 
 }
 
 // the table under the board: a top with a lip and a solid pedestal that hides the players' lower bodies
-export function table(g, b, env = ENV.cold) {
+export function table(g, b, env = ENV.cold, { x1 = 8.4 } = {}) {
   const [top, side, front] = env.table || [mix(env.wall[0], '#000000', 0.35), mix(env.base, '#000000', 0.2), mix(env.wall[1], '#000000', 0.5)];
-  box(g, b, [-0.4, FLOOR_Y, -0.4], [8.4, -0.75, 8.4], { top: side, side: mix(side, '#000000', 0.3), front: side });
-  box(g, b, [-1.1, -0.75, -1.1], [9.1, -0.35, 9.1], { top, side: front, front });
+  box(g, b, [-0.4, FLOOR_Y, -0.4], [x1, -0.75, 8.4], { top: side, side: mix(side, '#000000', 0.3), front: side });
+  box(g, b, [-1.1, -0.75, -1.1], [x1 + 0.7, -0.35, 9.1], { top, side: front, front });
 }
 
 // a chair facing +z (face=1) or -z (face=-1); seat center (x, z)
@@ -352,4 +355,78 @@ export function cabinet(g, b, { open = 0, xray = 0, t = 0, inside = null, wood =
   }
   // top lip under the board
   box(g, b, [-1.1, -0.75, -1.1], [9.1, -0.35, 9.1], { top, side: front, front });
+}
+
+// ---- hospital props ----
+// bed along z (head end at z1); draw parts behind the patient with part='back', the blanket in front with part='front'
+export function bed(g, b, { x0 = 1.6, x1 = 6.4, z0 = 6.2, z1 = 12.2, part = 'all', blanket = 1, sheet = '#E8EEEC', cover = '#8FB3C9' } = {}) {
+  if (part !== 'front') {
+    box(g, b, [x0 - 0.15, FLOOR_Y, z1 - 0.2], [x1 + 0.15, 2.0, z1], { top: '#9AA5A8', side: '#6E787B', front: '#8A9497' });  // headboard
+    box(g, b, [x0, FLOOR_Y + 0.5, z0], [x1, -1.5, z1 - 0.2], { top: '#7F8A8D', side: '#5E676A', front: '#6E777A' });          // frame
+    box(g, b, [x0 + 0.1, -1.5, z0 + 0.1], [x1 - 0.1, -0.95, z1 - 0.3], { top: sheet, side: mix(sheet, '#000000', 0.18), front: mix(sheet, '#000000', 0.1) });
+    box(g, b, [x0 + 0.6, -0.95, z1 - 1.5], [x1 - 0.6, -0.45, z1 - 0.35], { top: '#F6F8F7', side: '#CDD3D1', front: '#DFE4E2' });  // pillow
+  }
+  if (part !== 'back' && blanket > 0) {
+    const zb = lerp(z0 + 0.1, z0 + (z1 - z0) * 0.62, blanket);
+    box(g, b, [x0 + 0.05, -0.95, z0 + 0.05], [x1 - 0.05, -0.62, zb], { top: cover, side: mix(cover, '#000000', 0.25), front: mix(cover, '#000000', 0.12) });
+  }
+}
+
+// IV drip stand with a bag and a tube; sway in radians
+export function ivStand(g, b, x, z, { sway = 0, t = 0 } = {}) {
+  const top = [x + Math.sin(sway) * 0.4, 5.2, z];
+  if (b.toCam(...top)[2] < 0.5 || b.toCam(x, FLOOR_Y, z)[2] < 0.5) return;
+  const p0 = b.project(x, FLOOR_Y, z), p1 = b.project(...top);
+  g.save(); g.strokeStyle = '#A9B3B6'; g.lineWidth = Math.max(2, p1.s * 0.05); g.lineCap = 'round';
+  g.beginPath(); g.moveTo(p0.x, p0.y); g.lineTo(p1.x, p1.y); g.stroke();
+  for (const dx of [-0.6, 0.6]) { const q = b.project(x + dx, FLOOR_Y, z + dx * 0.4); g.beginPath(); g.moveTo(p0.x, p0.y); g.lineTo(q.x, q.y); g.stroke(); }
+  const hook = b.project(top[0] + 0.35, top[1], z);
+  g.beginPath(); g.moveTo(p1.x, p1.y); g.lineTo(hook.x, hook.y); g.stroke();
+  const bag = b.project(top[0] + 0.35, top[1] - 0.8, z), s = bag.s;
+  g.fillStyle = 'rgba(210,235,245,0.75)'; g.strokeStyle = 'rgba(160,190,200,0.9)'; g.lineWidth = 2;
+  g.beginPath(); g.roundRect(bag.x - s * 0.28, bag.y - s * 0.55, s * 0.56, s * 0.95, s * 0.12); g.fill(); g.stroke();
+  g.strokeStyle = 'rgba(200,225,235,0.6)'; g.lineWidth = Math.max(1.5, s * 0.025);
+  g.beginPath(); g.moveTo(bag.x, bag.y + s * 0.4); g.quadraticCurveTo(bag.x + s * 0.4, bag.y + s * 2.2, bag.x - s * 0.6, bag.y + s * 3.4); g.stroke();
+  g.restore();
+}
+
+// bedside heart monitor on a pole: screen faces -z; flat = flatline
+export function monitor(g, b, x, y, z, t, { flat = false, color = '#5CFF9D', bpm = 72, flatColor = '#FF5A4F' } = {}) {
+  box(g, b, [x - 0.05, FLOOR_Y, z + 0.2], [x + 0.05, y - 0.7, z + 0.3], { top: '#555', side: '#444', front: '#505050' });
+  box(g, b, [x - 1.1, y - 0.75, z], [x + 1.1, y + 0.75, z + 0.5], { top: '#3A4246', side: '#272D30', front: '#30373A' });
+  if (b.E[2] > z || b.toCam(x, y, z)[2] < 0.6) return;
+  if (!b.poly(g, [[x - 0.95, y + 0.6, z - 0.01], [x + 0.95, y + 0.6, z - 0.01], [x + 0.95, y - 0.6, z - 0.01], [x - 0.95, y - 0.6, z - 0.01]])) return;
+  g.save(); g.fillStyle = '#04120C'; g.fill(); g.clip();
+  g.strokeStyle = flat ? flatColor : color; g.shadowColor = g.strokeStyle; g.shadowBlur = 12; g.lineWidth = Math.max(2, b.project(x, y, z).s * 0.04);
+  g.beginPath();
+  for (let i = 0; i <= 60; i++) {
+    const u = i / 60, ph = (u * 2 + t * bpm / 60) % 1;
+    const v = flat ? 0 : (ph > 0.42 && ph < 0.46 ? 0.45 : ph > 0.46 && ph < 0.5 ? -0.35 : ph > 0.5 && ph < 0.53 ? 0.12 : 0) + Math.sin(ph * 6.28) * 0.03;
+    const p = b.project(x - 0.9 + u * 1.8, y - 0.1 + v, z - 0.02);
+    i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y);
+  }
+  g.stroke(); g.restore();
+}
+
+// chess clock standing on the table (dials face -z); tl/tr in seconds left; flag: 0..1 the right flag falls
+export function chessClock(g, b, x, y, z, { tl = 120, tr = 120, flagR = 0, press = 0 } = {}) {
+  box(g, b, [x - 1.0, y, z - 0.35], [x + 1.0, y + 1.15, z + 0.35], { top: '#6B4A2A', side: '#4A321C', front: '#5A3E23' });
+  for (const [sd, down] of [[-1, press < 0], [1, press > 0]])
+    box(g, b, [x + sd * 0.5 - 0.15, y + 1.15, z - 0.12], [x + sd * 0.5 + 0.15, y + (down ? 1.2 : 1.35), z + 0.12], { top: '#C9A05A', side: '#8A6A35', front: '#A8843F' });
+  if (b.E[2] > z - 0.35) return;
+  for (const [sd, left, fl] of [[-1, tl, 0], [1, tr, flagR]]) {
+    const cx = x + sd * 0.47, cy = y + 0.58, zz = z - 0.37, r = 0.36;
+    const ring = [], k = 28;
+    for (let i = 0; i < k; i++) ring.push([cx + Math.cos(i / k * 6.283) * r, cy + Math.sin(i / k * 6.283) * r, zz]);
+    if (!b.poly(g, ring)) continue;
+    g.fillStyle = '#F4F0E6'; g.fill(); g.strokeStyle = '#2A2016'; g.lineWidth = 2; g.stroke();
+    const c = b.project(cx, cy, zz), s = c.s;
+    const mins = left / 60, am = -Math.PI / 2 + (1 - (mins % 60) / 60) * 6.283, as = -Math.PI / 2 + (1 - ((left % 60) / 60)) * 6.283;
+    g.strokeStyle = '#1A1410'; g.lineCap = 'round';
+    g.lineWidth = Math.max(2, s * 0.05); g.beginPath(); g.moveTo(c.x, c.y); g.lineTo(c.x + Math.cos(am) * r * 0.75 * s, c.y + Math.sin(am) * r * 0.75 * s); g.stroke();
+    g.strokeStyle = '#C8283A'; g.lineWidth = Math.max(1.5, s * 0.025); g.beginPath(); g.moveTo(c.x, c.y); g.lineTo(c.x + Math.cos(as) * r * 0.9 * s, c.y + Math.sin(as) * r * 0.9 * s); g.stroke();
+    // little red flag hanging at 12 o'clock; it drops when the time is up
+    const fa = -0.5 + fl * 1.9, px = c.x + r * 0.15 * s, py = c.y - r * 0.82 * s;
+    g.save(); g.translate(px, py); g.rotate(fa); g.fillStyle = '#E2302B'; g.beginPath(); g.moveTo(0, 0); g.lineTo(-r * 0.32 * s, -r * 0.06 * s); g.lineTo(0, -r * 0.3 * s); g.closePath(); g.fill(); g.restore();
+  }
 }

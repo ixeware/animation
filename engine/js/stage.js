@@ -128,7 +128,7 @@ export class Moves {
     // reticle snaps in with overshoot after landing, then keeps rotating
     const rq = clamp((t - m.land + 0.05) / 0.3);
     if (rq > 0) b.reticle(g, m.to, t, m.color || C.teal, Math.min(1, rq * 2), 0.95 * (1 + 0.7 * (1 - ease.back(rq))));
-    if (labels && m.san) {
+    if (labels && m.san && (labels !== 'custom' || m.label)) {
       const lq = clamp((t - m.t0) / 0.2);
       b.label(g, m.to, m.label || m.san, m.labelColor || C.lime, lq, 1.9 + 0.3 * (1 - ease.back(lq)));
     }

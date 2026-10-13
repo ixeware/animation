@@ -1,0 +1,229 @@
+{
+ "title": "Mikhail Tal",
+ "post": "The last game of Mikhail Tal #chess #story #education",
+ "lead_in": 0.05,
+ "tail": 1.4,
+ "voice": {
+  "provider": "chatterbox",
+  "reference_fish_id": "f6a86fbea5f64970abd883813072ec6d",
+  "exaggeration": 0.6,
+  "cfg_weight": 0.35,
+  "temperature": 0.8,
+  "seed": 7,
+  "_name": "Trailet narrador (Fish sample) cloned locally with Chatterbox",
+  "_fish": {
+   "provider": "fish",
+   "reference_id": "f6a86fbea5f64970abd883813072ec6d",
+   "model": "s1"
+  },
+  "_alternatives": {
+   "3081f4a3f88943d791deda5cec39997b": "Paramount Feature Presentation Announcer",
+   "c8ccdaacb27049e29f2f69b5fac6b9f4": "DEEP STORY",
+   "69f5f158321f4f7f8f945148a6b7d17f": "Pierrot",
+   "d67524ad1936410896ad120583cb1117": "Andrew: English Man (US) - Storytelling, Deep"
+  },
+  "fallback": {
+   "provider": "kokoro",
+   "name": "am_michael",
+   "speed": 0.9,
+   "pitch_semitones": -1.5
+  }
+ },
+ "mix": {
+  "bed_gap": 7.0
+ },
+ "phrases": [
+  {
+   "id": "hook1",
+   "text": "This man escaped from a hospital to play chess.",
+   "pause": 0.4,
+   "colors": {
+    "escaped": "red",
+    "hospital": "red",
+    "chess.": "gold"
+   }
+  },
+  {
+   "id": "hook2",
+   "text": "Against the world champion.",
+   "pause": 0.45,
+   "colors": {
+    "world": "gold",
+    "champion.": "gold"
+   }
+  },
+  {
+   "id": "hook3",
+   "text": "A month later, he was dead.",
+   "pause": 0.9,
+   "colors": {
+    "month": "red",
+    "dead.": "red"
+   }
+  },
+  {
+   "id": "riga",
+   "text": "Riga. 1936.",
+   "pause": 0.4,
+   "colors": {
+    "Riga.": "blue",
+    "1936.": "gold"
+   }
+  },
+  {
+   "id": "tal",
+   "text": "Mikhail Tal plays chess like no one before him.",
+   "pause": 0.4,
+   "colors": {
+    "Mikhail": "gold",
+    "Tal": "gold",
+    "no": "lime",
+    "one": "lime"
+   }
+  },
+  {
+   "id": "gifts",
+   "text": "He throws pieces away. A knight. A rook. Then his queen.",
+   "pause": 0.5,
+   "colors": {
+    "away.": "red",
+    "knight.": "gold",
+    "rook.": "gold",
+    "queen.": "red"
+   }
+  },
+  {
+   "id": "joke",
+   "text": "There are two kinds of sacrifices, he said. Correct ones... and mine.",
+   "pause": 0.5,
+   "colors": {
+    "sacrifices,": "gold",
+    "Correct": "blue",
+    "mine.": "lime"
+   }
+  },
+  {
+   "id": "magician",
+   "text": "They call him the Magician from Riga.",
+   "pause": 0.6,
+   "colors": {
+    "Magician": "gold",
+    "Riga.": "blue"
+   }
+  },
+  {
+   "id": "champ",
+   "text": "1960. At twenty-three, he is world champion.",
+   "pause": 0.6,
+   "colors": {
+    "1960.": "gold",
+    "twenty-three,": "gold",
+    "world": "gold",
+    "champion.": "gold"
+   }
+  },
+  {
+   "id": "kidneys",
+   "text": "But his kidneys are failing.",
+   "pause": 0.35,
+   "colors": {
+    "kidneys": "red",
+    "failing.": "red"
+   }
+  },
+  {
+   "id": "hospitals",
+   "text": "Hospital after hospital. He keeps playing.",
+   "pause": 0.7,
+   "colors": {
+    "Hospital": "red",
+    "hospital.": "red",
+    "playing.": "lime"
+   }
+  },
+  {
+   "id": "y1992",
+   "text": "1992. Moscow. He is dying.",
+   "pause": 0.5,
+   "colors": {
+    "1992.": "gold",
+    "Moscow.": "blue",
+    "dying.": "red"
+   }
+  },
+  {
+   "id": "sneak",
+   "text": "So he sneaks out of the hospital...",
+   "pause": 0.3,
+   "colors": {
+    "sneaks": "lime",
+    "out": "lime"
+   }
+  },
+  {
+   "id": "blitz",
+   "text": "to play a blitz tournament.",
+   "pause": 0.5,
+   "colors": {
+    "blitz": "gold"
+   }
+  },
+  {
+   "id": "kasparov",
+   "text": "Across the board: Garry Kasparov. World champion.",
+   "pause": 0.5,
+   "colors": {
+    "Garry": "blue",
+    "Kasparov.": "blue",
+    "World": "gold",
+    "champion.": "gold"
+   }
+  },
+  {
+   "id": "attack",
+   "text": "The Magician attacks.",
+   "pause": 0.3,
+   "colors": {
+    "Magician": "gold",
+    "attacks.": "red"
+   }
+  },
+  {
+   "id": "flag",
+   "text": "Kasparov defends... and runs out of time.",
+   "pause": 0.4,
+   "colors": {
+    "defends...": "blue",
+    "time.": "red"
+   }
+  },
+  {
+   "id": "wins",
+   "text": "Tal wins.",
+   "pause": 0.9,
+   "colors": {
+    "Tal": "lime",
+    "wins.": "lime"
+   }
+  },
+  {
+   "id": "gone",
+   "text": "A month later, he is gone.",
+   "pause": 0.7,
+   "colors": {
+    "month": "red",
+    "gone.": "red"
+   }
+  },
+  {
+   "id": "final",
+   "text": "He did not escape to live longer. He escaped to play.",
+   "pause": 0.2,
+   "colors": {
+    "live": "blue",
+    "longer.": "blue",
+    "play.": "gold"
+   }
+  }
+ ]
+}
