@@ -1,6 +1,6 @@
 {
  "title": "The £5 Chess Piece",
- "post": "Bought for £5. Kept in a drawer for 55 years. #chess #history #story #lewischessmen",
+ "post": "It sat in a drawer for 55 years. Then it sold for almost $1,000,000. #chess #history #lewischessmen #antiques #storytime",
  "lead_in": 0.05,
  "tail": 1.4,
  "voice": {
@@ -45,18 +45,8 @@
  "phrases": [
   {
    "id": "hook1",
-   "text": "In 1964, a man bought this chess piece for five pounds.",
-   "pause": 0.4,
-   "colors": {
-    "1964,": "gold",
-    "five": "lime",
-    "pounds.": "lime"
-   }
-  },
-  {
-   "id": "hook2",
-   "text": "His family kept it in a drawer for fifty-five years.",
-   "pause": 0.4,
+   "text": "This chess piece sat in a drawer for fifty-five years.",
+   "pause": 0.3,
    "colors": {
     "drawer": "gold",
     "fifty-five": "red",
@@ -64,12 +54,41 @@
    }
   },
   {
-   "id": "hook3",
-   "text": "Then they found out what it was.",
-   "pause": 0.9,
+   "id": "hook2",
+   "text": "Then it sold for almost a million dollars.",
+   "pause": 0.45,
    "colors": {
-    "found": "gold",
-    "out": "gold"
+    "sold": "gold",
+    "million": "lime",
+    "dollars.": "lime"
+   }
+  },
+  {
+   "id": "hook3",
+   "text": "It cost five pounds.",
+   "pause": 0.45,
+   "colors": {
+    "five": "red",
+    "pounds.": "red"
+   }
+  },
+  {
+   "id": "bridge",
+   "text": "So what is it?",
+   "pause": 0.6,
+   "colors": {
+    "what": "gold",
+    "is": "gold",
+    "it?": "gold"
+   }
+  },
+  {
+   "id": "answer",
+   "text": "It's one of the Lewis chessmen.",
+   "pause": 0.45,
+   "colors": {
+    "Lewis": "gold",
+    "chessmen.": "gold"
    }
   },
   {
@@ -102,26 +121,6 @@
    }
   },
   {
-   "id": "cast",
-   "text": "Kings with swords. Worried queens. Warriors biting their shields.",
-   "pause": 0.45,
-   "colors": {
-    "swords.": "gold",
-    "queens.": "blue",
-    "biting": "red",
-    "shields.": "red"
-   }
-  },
-  {
-   "id": "famous",
-   "text": "They become the most famous chessmen in the world.",
-   "pause": 0.35,
-   "colors": {
-    "most": "gold",
-    "famous": "gold"
-   }
-  },
-  {
    "id": "potter",
    "text": "Copies even show up in the first Harry Potter film.",
    "pause": 0.45,
@@ -133,7 +132,7 @@
   {
    "id": "missing",
    "text": "But five pieces were never found.",
-   "pause": 0.8,
+   "pause": 0.6,
    "colors": {
     "five": "red",
     "never": "red",
@@ -141,8 +140,19 @@
    }
   },
   {
+   "id": "buy",
+   "text": "In 1964, an Edinburgh dealer bought this piece for five pounds.",
+   "pause": 0.35,
+   "colors": {
+    "1964,": "gold",
+    "Edinburgh": "blue",
+    "five": "lime",
+    "pounds.": "lime"
+   }
+  },
+  {
    "id": "dealer",
-   "text": "The dealer's ledger just says: walrus tusk warrior. He had no idea.",
+   "text": "His ledger just says: walrus tusk warrior. He had no idea.",
    "pause": 0.45,
    "colors": {
     "walrus": "blue",
@@ -172,9 +182,10 @@
   },
   {
    "id": "experts",
-   "text": "Experts believe it's one of the missing pieces.",
+   "text": "Experts believe it's one of the five missing pieces.",
    "pause": 0.5,
    "colors": {
+    "five": "red",
     "missing": "red",
     "pieces.": "red"
    }

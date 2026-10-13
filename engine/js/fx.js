@@ -167,3 +167,26 @@ export function embers(g, t, { n = 60, seed = 3, a = 1, color = '#FFB060' } = {}
   }
   g.restore();
 }
+
+// banknotes raining and tumbling (a jackpot): each bill sways, spins and flips edge-on as it falls
+export function bills(g, t, t0, { n = 40, seed = 7, life = 2.2, color = '#7CC47F', ink = '#2E6B33', sym = '$', a = 1 } = {}) {
+  const dt = t - t0;
+  if (dt < 0 || dt > life + 0.8) return;
+  const r = rng(seed);
+  g.save();
+  for (let i = 0; i < n; i++) {
+    const x0 = r() * W, delay = r() * 0.5, sp = 600 + r() * 800, w = 130 + r() * 70, h = w * 0.46, ph = r() * 6, sw = 50 + r() * 90, y0 = -120 - r() * 500;
+    const tt = dt - delay;
+    if (tt < 0) continue;
+    const y = y0 + tt * sp, x = x0 + Math.sin(tt * 3 + ph) * sw;
+    if (y > H + 120) continue;
+    g.save(); g.globalAlpha = a * clamp((life + 0.8 - dt) / 0.8);
+    g.translate(x, y); g.rotate(Math.sin(tt * 2.2 + ph) * 0.9); g.scale(1, Math.cos(tt * 5 + ph) * 0.9 + 0.1);
+    g.fillStyle = color; g.fillRect(-w / 2, -h / 2, w, h);
+    g.strokeStyle = ink; g.lineWidth = 4; g.strokeRect(-w / 2 + 7, -h / 2 + 7, w - 14, h - 14);
+    g.fillStyle = ink; g.beginPath(); g.ellipse(0, 0, h * 0.33, h * 0.33, 0, 0, 7); g.fill();
+    g.fillStyle = '#D8F0D2'; g.font = `900 ${Math.round(h * 0.46)}px Rubik`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(sym, 0, 2);
+    g.restore();
+  }
+  g.restore();
+}

@@ -334,9 +334,12 @@ const jug = col => cached('jug' + col, 220, 260, (g, w, h) => {
 const ITEMS = [[() => vase('#3E6E8E', 0), 1.3], [() => clock(), 1.6], [() => candle(), 1.7], [() => vase('#8E3E2E', 1), 1.1], [() => globe(), 1.9], [() => jug('#C9B48A'), 1.2], [() => vase('#4E7A4A', 2), 1.0], [() => jug('#6E6A64'), 1.0]];
 
 // shelves of antiques along the back wall and the side walls
-export function shelves(g, b, { seed = 3, blur = 0, z = BACK_Z - 0.05, sides = true } = {}) {
+const SHELF = makeCanvas(), shctx = SHELF.getContext('2d');
+export function shelves(g0, b, { seed = 3, blur = 0, z = BACK_Z - 0.05, sides = true } = {}) {
   const r = rng(seed);
-  if (blur > 0.5) { g.save(); g.filter = `blur(${blur.toFixed(1)}px)`; }
+  // defocus: draw everything sharp on a scratch layer, then blur it once (a filter per shape is very slow)
+  const g = blur > 0.5 ? shctx : g0;
+  if (g === shctx) { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H); }
   const wood = { top: '#5A3E26', side: '#2A1C10', front: '#3E2A18' };
   for (const y of [0.4, 3.4, 6.4, 9.4]) {
     box(g, b, [LEFT_X + 0.5, y - 0.25, z - 1.6], [RIGHT_X - 0.5, y, z], wood);
@@ -357,7 +360,7 @@ export function shelves(g, b, { seed = 3, blur = 0, z = BACK_Z - 0.05, sides = t
       g.drawImage(c, p.x - ww / 2, p.y - hh, ww, hh);
     }
   }
-  if (blur > 0.5) g.restore();
+  if (g === shctx) { g0.save(); g0.filter = `blur(${blur.toFixed(1)}px)`; g0.drawImage(SHELF, 0, 0); g0.restore(); }
 }
 
 // a counter top (y = 0) for the shop, pieces stand on it
@@ -367,7 +370,13 @@ export function counter(g, b, { x0 = -1.5, x1 = 9.5, z0 = 0.5, z1 = 7.5, top = '
 }
 
 // hand-written ledger page (canvas), written on up to u (0..1)
+const LEDGER = new Map();
 export function ledgerPage(u = 1) {
+  const key = Math.round(clamp(u) * 36);
+  if (!LEDGER.has(key)) LEDGER.set(key, paintLedger(key / 36));
+  return LEDGER.get(key);
+}
+function paintLedger(u) {
   const c = makeCanvas(900, 600), g = c.getContext('2d');
   g.fillStyle = '#EFE3C4'; g.fillRect(0, 0, 900, 600);
   g.strokeStyle = 'rgba(80,110,160,0.35)'; g.lineWidth = 2; for (let y = 90; y < 600; y += 56) { g.beginPath(); g.moveTo(0, y); g.lineTo(900, y); g.stroke(); }
@@ -595,7 +604,13 @@ export function rostrum(g, b, { x = 4, z = 11, w = 3.6 } = {}) {
   box(g, b, [x - w / 2 - 0.15, 1.5, z - 0.95], [x + w / 2 + 0.15, 1.75, z + 0.95], { top: '#6A4A2C', side: '#3A2614', front: '#4A301A' });
 }
 // the room's currency board (canvas): rows of converted amounts for a sterling bid
+const BOARDS = new Map();
 export function currencyBoard(gbp, { lit = 0 } = {}) {
+  const key = gbp + '|' + lit.toFixed(2);
+  if (!BOARDS.has(key)) { if (BOARDS.size > 40) BOARDS.clear(); BOARDS.set(key, paintBoard(gbp, lit)); }
+  return BOARDS.get(key);
+}
+function paintBoard(gbp, lit) {
   const c = makeCanvas(700, 900), g = c.getContext('2d');
   g.fillStyle = '#0B0F14'; g.fillRect(0, 0, 700, 900);
   g.strokeStyle = '#3A4654'; g.lineWidth = 8; g.strokeRect(4, 4, 692, 892);
