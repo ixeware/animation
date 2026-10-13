@@ -63,6 +63,14 @@ function shakeAmp(t) {
   return Math.min(a, 26) * (film.shake ?? 1);
 }
 
+function jumpAt({ every = 1.4, zooms = [1, 1.15, 1.06], shift = 50 }, lt, len, i) {
+  const n = Math.floor(lt / every), last = Math.floor((len - 0.45) / every);
+  const k = Math.min(n, Math.max(0, last));
+  if (k <= 0) return [1, 0, 0];
+  const sd = (k + i) % 2 ? 1 : -1;
+  return [zooms[k % zooms.length] || 1, sd * shift * (k % zooms.length ? 1 : 0), -shift * 0.6 * (k % zooms.length ? 1 : 0)];
+}
+
 function compose(t, frame) {
   const s = shots.find(s => t >= s.a && t < s.b) || shots[shots.length - 1];
   drawShot(s, t, lctx);
@@ -83,9 +91,11 @@ function compose(t, frame) {
     ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); ctx.drawImage(layer, 0, 0);
   } else {
     // every shot keeps moving: slow push-in across the shot + impact shake from the sound cues
-    const kb = s.kb ?? 0.04, z = 1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + shakeAmp(t) * 0.0015;
-    const a = shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
-    ctx.translate(W / 2 + sx, H / 2 + sy); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
+    const kb = s.kb ?? 0.04, a = shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
+    // dense editing: long shots get hard punch-in jump cuts every `every` seconds (film.jumpCut)
+    const J = film.jumpCut, [jz, jx, jy] = J && !s.noJump ? jumpAt(J, lt, s.b - s.a, s.i) : [1, 0, 0];
+    const z = (1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + a * 0.0015) * jz;
+    ctx.translate(W / 2 + sx + jx, H / 2 + sy + jy); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
     ctx.drawImage(layer, 0, 0);
   }
   ctx.restore();

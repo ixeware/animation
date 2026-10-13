@@ -335,5 +335,5 @@ export async function build(T) {
     { t: s('gone') - 0.1, m: 'drop' }, { t: s('gone') + 0.3, m: 'elegy' }, { t: playT2 - 0.1, m: 'finale' }, { t: T.duration, m: 'end' },
   ];
   music.sort((a, b) => a.t - b.t);
-  return { shots, cues, music, tvOff, duration: T.duration };
+  return { shots, cues, music, tvOff, duration: T.duration, jumpCut: { every: 1.6, zooms: [1, 1.16, 1.07], shift: 50 } };
 }

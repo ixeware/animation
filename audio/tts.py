@@ -11,6 +11,13 @@ Providers (script.json -> "voice": {"provider": ...}):
   elevenlabs  ElevenLabs, env ELEVENLABS_API_KEY.
               {"voice_id": "...", "model": "eleven_multilingual_v2", "stability": 0.4, ...}
 API responses are cached in build/tts_cache/, so re-runs cost no credits.
+
+Optional post-processing of every phrase (script.json -> "voice_fx"):
+  {"tempo": 1.1}                                   faster delivery, pitch kept (ffmpeg atempo)
+  {"sts": {"voice_id": "...", "model": "eleven_multilingual_sts_v2", "stability": 0.5, "similarity_boost": 0.85}}
+                                                   ElevenLabs speech-to-speech: our take keeps its timing and
+                                                   intonation, the timbre becomes the chosen narrator (env ELEVENLABS_API_KEY)
+Word timings are re-measured with whisper after post-processing.
 """
 import base64
 import hashlib
@@ -86,6 +93,39 @@ def align(caps, heard, dur):
         for k in range(i, j): times[k] = (edges[k - i], edges[k - i + 1])
         i = j
     return times
+
+
+def tempo(a, k):
+    """Change speed without changing pitch."""
+    if abs(k - 1) < 1e-3:
+        return a
+    p = subprocess.run(['ffmpeg', '-v', 'error', '-f', 'f32le', '-ar', str(SR), '-ac', '1', '-i', '-', '-af', f'atempo={k}',
+                        '-f', 'f32le', '-'], input=a.astype(np.float32).tobytes(), capture_output=True, check=True)
+    return np.frombuffer(p.stdout, np.float32).copy()
+
+
+class VoiceChanger:
+    """ElevenLabs speech-to-speech on one phrase; cached by input audio + settings."""
+    def __init__(self, v, cache):
+        self.v, self.cache = v, cache
+        cache.mkdir(parents=True, exist_ok=True)
+
+    def __call__(self, a):
+        key = hashlib.sha1(json.dumps(self.v, sort_keys=True).encode() + a.astype(np.float32).tobytes()).hexdigest()[:16]
+        f = self.cache / f'sts_{key}.mp3'
+        if not f.exists():
+            k = os.environ.get('ELEVENLABS_API_KEY') or sys.exit('ELEVENLABS_API_KEY is not set')
+            buf = io.BytesIO(); sf.write(buf, a, SR, format='WAV', subtype='PCM_16')
+            settings = {x: self.v[x] for x in ('stability', 'similarity_boost', 'style', 'use_speaker_boost') if x in self.v}
+            r = requests.post(f"https://api.elevenlabs.io/v1/speech-to-speech/{self.v['voice_id']}", headers={'xi-api-key': k},
+                              params={'output_format': 'mp3_44100_128'}, timeout=180,
+                              data={'model_id': self.v.get('model', 'eleven_multilingual_sts_v2'), 'voice_settings': json.dumps(settings),
+                                    'remove_background_noise': 'false'},
+                              files={'audio': ('phrase.wav', buf.getvalue(), 'audio/wav')})
+            if r.status_code != 200:
+                sys.exit(f'ElevenLabs speech-to-speech failed: {r.status_code} {r.text[:300]}')
+            f.write_bytes(r.content)
+        return decode(f.read_bytes())
 
 
 class Kokoro:
@@ -249,6 +289,8 @@ def main(ep):
         v = v['fallback']; prov = v['provider']
     tts = {'kokoro': lambda: Kokoro(v), 'fish': lambda: Fish(v, build / 'tts_cache'),
            'elevenlabs': lambda: ElevenLabs(v, build / 'tts_cache'), 'chatterbox': lambda: Chatterbox(v, build / 'tts_cache', ep)}[prov]()
+    fx = script.get('voice_fx', {})
+    sts = VoiceChanger(fx['sts'], build / 'tts_cache') if fx.get('sts') else None
     ph = script['phrases']
     out, phrases = [], []
     t = script.get('lead_in', 0.0)
@@ -256,6 +298,10 @@ def main(ep):
     for i, p in enumerate(ph):
         say = p.get('say', p['text'])
         audio, heard = tts(say, ph[i - 1].get('say', ph[i - 1]['text']) if i else '', ph[i + 1].get('say', ph[i + 1]['text']) if i + 1 < len(ph) else '')
+        if fx.get('tempo', 1) != 1 or sts:
+            audio = tempo(trim(audio)[0], fx.get('tempo', 1))
+            if sts: audio = sts(audio)
+            audio, heard = recognize(audio, say)  # timings change with tempo and voice: measure again
         audio, cut = trim(audio)
         dur = len(audio) / SR
         caps = p['text'].split()
