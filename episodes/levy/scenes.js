@@ -238,67 +238,77 @@ export async function build(T) {
   }, { trans: 'whip', grade: 'warm' });
   rookMv.cues(cue); cue(openT, 'sting', 0.5);
 
-  // 21.g4 attacks it; 21...e5!! — Levy ignores it
-  const attT = w('attack', 'attacked'), ignT = w('attack', 'ignored');
-  const att = new Moves(B, G, [{ k: 41, t0: attT - 0.2, color: C.red, label: '21.g4', labelColor: C.red }, { k: 42, t0: ignT - 0.25, color: TEAL, label: '21...e5!!', labelColor: TEAL }]);
+  // 21.g4 attacks it
+  const attT = w('attack', 'attacked'), pawnT = w('attack', 'pawn');
+  const att = new Moves(B, G, [{ k: 41, t0: attT - 0.2, color: C.red, label: '21.g4', labelColor: C.red }]);
   shot(s('attack') - 0.05, (g, lt, t, sh) => {
-    const m = att.current(t);
-    atBoard(g, lt, t, [[0, { yaw: -0.85, pitch: 0.55, dist: 8.5, cy: H * 0.53, target: [6.4, 0.6, 4.4] }], [ignT - 0.3 - (t - lt), { yaw: -0.7, pitch: 0.6, dist: 8 }], [len(sh), { yaw: -0.3, pitch: 0.66, dist: 9, target: [5.2, 0.6, 4.6] }]], {
-      e: exprAt([[0, { ...EXPR.focus, look: [0.6, 0.7] }], [ignT - 0.3 - (t - lt), { ...EXPR.smug, look: [-0.3, 0.6], lid: 0.55 }]], lt),
-      pieces: () => att.draw(g, t, { labels: 'custom', dof: 1.1 }), bump: att.bump(t), reach: m && m.k === 42 ? { sq: 'e5', u: (t - m.t0 + 0.15) / 0.6 } : null, ez: ease.inOut });
-    if (t > attT + 0.25 && t < ignT) B.laser(g, 'g4', 'h5', C.red, 0.9, 0.5, seg(t, attT + 0.25, attT + 0.5));
-    if (t > ignT + 0.2) brillAt(g, 'e5', ignT + 0.2, t, { r: 0.5 });
-    badge(g, 'THE ROOK IS HANGING', W / 2, 300, { color: C.red, size: 42, a: seg(t, attT + 0.3, attT + 0.4) * (1 - seg(t, ignT - 0.1, ignT)), scale: pop(t, attT + 0.3) });
-    badge(g, 'HE IGNORES IT', W / 2, 300, { color: TEAL, size: 46, a: seg(t, ignT, ignT + 0.1), scale: pop(t, ignT) });
+    atBoard(g, lt, t, [[0, { yaw: -0.85, pitch: 0.55, dist: 8.5, cy: H * 0.53, target: [6.4, 0.6, 4.4] }], [len(sh), { yaw: -0.7, pitch: 0.6, dist: 7.4, target: [6.8, 0.6, 4.4] }]], {
+      e: { ...EXPR.focus, look: [0.6, 0.7] }, pieces: () => att.draw(g, t, { labels: 'custom', dof: 1.1 }), bump: att.bump(t), ez: lin });
+    if (t > attT + 0.25) { B.laser(g, 'g4', 'h5', C.red, 0.9, 0.5, seg(t, attT + 0.25, attT + 0.5)); B.highlight(g, 'h5', C.red, 0.3 + 0.2 * Math.sin(t * 10)); }
+    badge(g, 'THE ROOK IS HANGING', W / 2, 300, { color: C.red, size: 44, a: seg(t, pawnT, pawnT + 0.1), scale: pop(t, pawnT) });
   }, { trans: 'zoom', grade: 'warm' });
-  att.cues(cue); cue(attT + 0.3, 'alarm', 0.4); cue(ignT + 0.2, 'sparkle', 0.9); cue(ignT + 0.2, 'shimmer', 0.6);
+  att.cues(cue); cue(pawnT, 'alarm', 0.4);
 
-  // SACRIFICE THE ROOOOK
-  const sacT = w('sac', 'Sacrifice'), rkT = w('sac', 'rook');
+  // "And Levy..." — a slow push into his face over the board, heartbeat
+  const andT = s('andlevy');
+  shot(andT - 0.05, (g, lt, t, sh) => {
+    atBoard(g, lt, t, [[0, { yaw: 0.12, pitch: 0.16, dist: 8.5, cy: H * 0.47, target: [4, 2.9, 9.2] }], [len(sh), { yaw: 0.05, pitch: 0.12, dist: 5.2, target: [4, 3.1, 9.3] }]], {
+      e: { ...EXPR.smug, look: [0, 0.1], lid: 0.42, browTilt: 0.6 }, pieces: piecesAt(G, 41), dof: 1.6, ez: ease.out,
+      env: { ...STUDY, light: '#FFC890', lightA: 0.18 } });
+    g.save(); const vg = g.createRadialGradient(W / 2, H * 0.4, 200, W / 2, H * 0.45, H * 0.75); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.75)'); g.fillStyle = vg; g.fillRect(0, 0, W, H); g.restore();
+  }, { trans: 'fade', transDur: 0.15, grade: 'night', noJump: true });
+  cue(andT, 'heartbeat', 0.9); cue(andT - 0.05, 'whoosh', 0.4);
+
+  // "He SACRIFICES... THE ROOOOOOOK!" — the board behind (defocused, e5!! lands, the rook on h5 sharp and glowing),
+  // Levy big in front, the words over the top; the scream stretches the word with echo copies
+  const sacT = w('sac', 'sacrifices'), r0 = s('rooook'), r1 = T.e('rooook');
+  const e5 = new Moves(B, G, [{ k: 42, t0: sacT - 0.3, color: TEAL }]);
+  const BGC = makeCanvas(), bgx = BGC.getContext('2d');
+  const [hx, hz] = sqXZ('h5');
   shot(s('sac') - 0.05, (g, lt, t, sh) => {
-    const bg = g.createRadialGradient(W / 2, H * 0.45, 40, W / 2, H * 0.45, H * 0.8); bg.addColorStop(0, '#8E2A1E'); bg.addColorStop(1, '#1A0605'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
-    rays(g, W / 2, H * 0.62, t, { n: 22, color: '#FFB27A', a: 0.16 });
-    speedlines(g, W / 2, H * 0.5, t, { a: 0.5, n: 50, r0: 380, color: '#FFE2C8' });
-    // the rook rises behind him, huge
-    const u = seg(t, sacT, rkT + 0.2, ease.out);
-    drawPiece(g, 'r', 'b', W / 2 + 230, H * 0.98 - u * 260, 900, { rot: 0.12 * Math.sin(t * 9) * u, alpha: 0.95 });
-    drawChar(g, 'levy', { x: W / 2 - 60, y: H * 0.56, s: 1.55 + 0.1 * u, e: { ...EXPR.shock, open: 1, mouth: 'o', brow: -0.7, browY: -20, shake: 0.8, look: [0.3, -0.2] }, t });
-    g.save(); const k = lerp(1.6, 1, seg(t, sacT, sacT + 0.2, ease.back)); g.translate(W / 2, 330); g.rotate(-0.04); g.scale(k, k);
-    g.textAlign = 'center'; g.font = sans(88, 900); g.letterSpacing = '2px'; g.lineJoin = 'round';
-    g.lineWidth = 14; g.strokeStyle = C.ink; g.fillStyle = C.cream; g.strokeText('SACRIFICE', 0, -40); g.fillText('SACRIFICE', 0, -40);
-    const ro = 'THE RO' + 'O'.repeat(1 + Math.floor(5 * seg(t, rkT - 0.1, rkT + 0.5))) + 'K!';
-    g.font = sans(104, 900); g.fillStyle = C.red; g.strokeText(ro, 0, 80); g.fillText(ro, 0, 80);
-    g.restore();
-  }, { trans: 'flash', grade: 'warm', noJump: true });
-  cue(sacT, 'boom', 1); cue(sacT, 'riser', 0.5); cue(rkT, 'hit', 0.9); cue(rkT, 'cheer', 0.4);
-
-  // THE ROOOOOOOK — the meme, shouted with an echo: the word stretches across the screen while the scream lasts
-  const r0 = s('rooook'), r1 = T.e('rooook');
-  shot(r0 - 0.04, (g, lt, t, sh) => {
-    const u = seg(t, r0, r0 + (r1 - r0) * 0.6), beat = 0.5 + 0.5 * Math.sin(t * 22);
-    const bg = g.createRadialGradient(W / 2, H * 0.42, 40, W / 2, H * 0.45, H * 0.85); bg.addColorStop(0, mix('#B8321E', '#E0603F', beat * 0.4)); bg.addColorStop(1, '#1A0605'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
-    rays(g, W / 2, H * 0.4, t * 3, { n: 26, color: '#FFD0A0', a: 0.2 });
-    speedlines(g, W / 2, H * 0.4, t, { a: 0.7, n: 60, r0: 300, color: '#FFE8D0' });
-    // the rook spins up out of the board toward the camera
-    const k = seg(t, r0, r1, ease.in);
-    drawPiece(g, 'r', 'b', W / 2 + Math.sin(t * 7) * 30, H * 0.62 + 300 * k, 420 + 1500 * k, { rot: t * 2.2, alpha: 1 - seg(t, r1 - 0.25, r1) });
-    drawChar(g, 'levy', { x: W / 2, y: H * 0.8, s: 1.9, e: { ...EXPR.shock, open: 1, mouth: 'o', brow: -0.8, browY: -24, shake: 1.2, look: [0, -0.3], pupil: 0.45 }, t });
-    // the word, fitted to the width; echo copies spread out behind it
-    const word = 'RO' + 'O'.repeat(Math.round(lerp(1, 10, u))) + 'K!';
-    g.save(); g.font = sans(200, 900); const tw = g.measureText(word).width, fs = Math.min(1, (W - 70) / tw);
-    for (let e = 3; e >= 0; e--) {
-      const de = seg(t, r0 + 0.16 * e, r0 + 0.16 * e + 0.5), sc = fs * (1 + e * 0.12 * de), al = e ? 0.35 * Math.pow(0.6, e) * (1 - de * 0.5) : 1;
-      if (e && de <= 0) continue;
-      g.save(); g.translate(W / 2 + Math.sin(t * 53 + e) * 8, 470 + Math.cos(t * 47 + e) * 6); g.rotate(-0.05); g.scale(sc, sc * 1.25);
-      g.globalAlpha = al; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
-      if (!e) { g.lineWidth = 22; g.strokeStyle = C.ink; g.strokeText(word, 0, 0); }
-      g.fillStyle = e ? '#FFD0A0' : C.cream; g.fillText(word, 0, 0); g.restore();
+    const sc = seg(t, r0 - 0.05, r0 + 0.1);  // 0 while "he sacrifices", 1 once the scream starts
+    // background: the board scene, defocused
+    bgx.setTransform(1, 0, 0, 1, 0, 0); bgx.fillStyle = '#05090D'; bgx.fillRect(0, 0, W, H);
+    rig(B, lt, [[0, { yaw: -0.55, pitch: 0.4, dist: 10, cy: H * 0.44, target: [6.4, 0.8, 4.6] }], [len(sh), { yaw: -0.35, pitch: 0.46, dist: 7.2, target: [6.8, 0.8, 4.6] }]], { t, e: lin, bump: e5.bump(t) + sc * 0.6 * Math.max(0, 1 - (t - r0) / 0.4) });
+    const E = room(bgx, B, STUDY, { t, blur: 0 }); table(bgx, B, E); B.drawSlab(bgx, COM);
+    e5.draw(bgx, t, { labels: false, dof: 0.6, fx: true });
+    g.save(); g.filter = `blur(${lerp(3, 6, sc).toFixed(1)}px)`; g.drawImage(BGC, 0, 0); g.restore();
+    g.save(); g.fillStyle = rgba('#3A0806', lerp(0.25, 0.45, sc)); g.fillRect(0, 0, W, H); g.restore();
+    if (sc > 0) { g.save(); g.globalCompositeOperation = 'screen'; rays(g, W / 2, H * 0.42, t * 3, { n: 26, color: '#FF9A6A', a: 0.14 * sc }); g.restore(); speedlines(g, W / 2, H * 0.42, t, { a: 0.6 * sc, n: 56, r0: 320, color: '#FFE8D0' }); }
+    // the rook on h5, sharp, with a glow that pulses with the scream
+    const rp = at(hx, 0.9, hz), gl = 0.35 + 0.5 * sc * (0.6 + 0.4 * Math.sin(t * 20));
+    g.save(); const rg = g.createRadialGradient(rp.x, rp.y, 10, rp.x, rp.y, rp.s * 1.6); rg.addColorStop(0, rgba('#FF6B4F', gl)); rg.addColorStop(1, 'rgba(255,107,79,0)'); g.fillStyle = rg; g.fillRect(rp.x - rp.s * 2, rp.y - rp.s * 2, rp.s * 4, rp.s * 4); g.restore();
+    B.drawPieces(g, [{ t: 'r', c: 'b', x: hx + Math.sin(t * 41) * 0.04 * sc, z: hz, y: 0.25 * sc }], { focus: B.dist, dof: 0 });
+    if (t > sacT + 0.1) brillAt(g, 'e5', sacT + 0.1, t, { r: 0.45 });
+    // Levy in front: a devilish smirk, then the scream
+    const up = seg(lt, 0, 0.25, ease.out);
+    const ex = sc > 0 ? { ...EXPR.shock, open: 1, mouth: 'o', brow: -0.8, browY: -24, shake: 1.2, look: [0, -0.3], pupil: 0.45 } : { ...EXPR.smug, lid: 0.4, browTilt: 0.7, look: [0.5, -0.2], curve: 0.9 };
+    drawChar(g, 'levy', { x: W / 2 - 40, y: H * 0.8 + (1 - up) * 300 + sc * 20, s: 1.7 + 0.12 * sc, e: ex, t });
+    // words
+    g.save(); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+    const k1 = lerp(1.7, 1, seg(t, sacT, sacT + 0.2, ease.back)) * lerp(1, 0.62, sc);
+    if (t >= sacT) {
+      g.save(); g.translate(W / 2, lerp(330, 200, sc)); g.rotate(-0.04); g.scale(k1, k1);
+      g.font = sans(96, 900); g.letterSpacing = '3px'; g.lineWidth = 16; g.strokeStyle = C.ink; g.strokeText('HE SACRIFICES...', 0, 0); g.fillStyle = C.cream; g.fillText('HE SACRIFICES...', 0, 0); g.restore();
     }
-    g.textAlign = 'center'; g.font = sans(84, 900); g.letterSpacing = '12px'; g.lineWidth = 12; g.strokeStyle = C.ink; g.lineJoin = 'round';
-    g.strokeText('THE', W / 2, 270); g.fillStyle = C.red; g.fillText('THE', W / 2, 270);
+    if (sc > 0) {
+      const u = seg(t, r0, r0 + (r1 - r0) * 0.6), word = 'RO' + 'O'.repeat(Math.round(lerp(1, 10, u))) + 'K!';
+      g.font = sans(84, 900); g.letterSpacing = '12px'; g.lineWidth = 12; g.strokeStyle = C.ink; g.globalAlpha = sc;
+      g.strokeText('THE', W / 2, 315); g.fillStyle = C.red; g.fillText('THE', W / 2, 315);
+      g.letterSpacing = '0px'; g.font = sans(200, 900); const tw = g.measureText(word).width, fs = Math.min(1, (W - 70) / tw);
+      for (let e = 3; e >= 0; e--) {
+        const de = seg(t, r0 + 0.16 * e, r0 + 0.16 * e + 0.5), s2 = fs * (1 + e * 0.12 * de), al = e ? 0.35 * Math.pow(0.6, e) * (1 - de * 0.5) : 1;
+        if (e && de <= 0) continue;
+        g.save(); g.translate(W / 2 + Math.sin(t * 53 + e) * 8, 470 + Math.cos(t * 47 + e) * 6); g.rotate(-0.05); g.scale(s2, s2 * 1.25);
+        g.globalAlpha = al * sc;
+        if (!e) { g.lineWidth = 22; g.strokeStyle = C.ink; g.strokeText(word, 0, 0); }
+        g.fillStyle = e ? '#FFD0A0' : C.cream; g.fillText(word, 0, 0); g.restore();
+      }
+    }
     g.restore();
-    if (lt < 0.15) flash(g, 0.7 * (1 - lt / 0.15));
+    if (t > r0 && t < r0 + 0.15) flash(g, 0.6 * (1 - (t - r0) / 0.15));
   }, { trans: 'flash', grade: 'warm', noJump: true });
+  e5.cues(cue); cue(sacT, 'boom', 0.9); cue(sacT + 0.1, 'sparkle', 0.8);
   cue(r0, 'boom', 1); cue(r0, 'hit', 0.9); cue(r0 + 0.05, 'cheer', 0.7); cue(r0 + 0.1, 'riser', 0.4); cue(r1 - 0.2, 'whoosh', 0.7);
 
   // 22.gxh5 — of course they took it
@@ -307,9 +317,8 @@ export async function build(T) {
   shot(s('take') - 0.05, (g, lt, t, sh) => {
     atBoard(g, lt, t, [[0, { yaw: -0.7, pitch: 0.62, dist: 9.5, cy: H * 0.5, target: [6.4, 0.6, 4.6] }], [len(sh), { yaw: -0.55, pitch: 0.66, dist: 8.2 }]], {
       e: { ...EXPR.smug, look: [0.5, 0.6], lid: 0.5 }, pieces: () => take.draw(g, t, { labels: 'custom', dof: 1.1 }), bump: take.bump(t), ez: lin });
-    crowd(g, t, { y0: H * 0.82, rows: 6, phones: 0.25, cheer: seg(t, tookT, tookT + 0.2), tint: '#E0603F' });
   }, { trans: 'whip', grade: 'warm' });
-  take.cues(cue); cue(tookT, 'cheer', 0.5);
+  take.cues(cue);
 
   // 22...Qg4+ 23.Kf1 Nf4! — mate on g2 is coming — 24.Qxf4 exf4: the World gives up its queen
   const qT = w('queen', 'Queen'), nT = w('queen', 'Knight'), mT = w('queen', 'Mate'), giveT = w('queen', 'give'), qEnd = T.w('queen', -1).s;
@@ -406,7 +415,7 @@ export async function build(T) {
   cue(tvOff, 'tvoff', 0.6);
   const music = [
     { t: 0, m: 'hook' }, { t: s('who') - 0.05, m: 'build' }, { t: s('vote') - 0.05, m: 'digital' }, { t: s('record') - 0.05, m: 'tension' }, { t: recT, m: 'hit' },
-    { t: s('caro') - 0.05, m: 'intrigue' }, { t: s('attack') - 0.05, m: 'tension' }, { t: s('sac') - 0.05, m: 'drop' }, { t: s('take') - 0.05, m: 'inferno' },
+    { t: s('caro') - 0.05, m: 'intrigue' }, { t: s('attack') - 0.05, m: 'tension' }, { t: s('andlevy') - 0.05, m: 'void' }, { t: s('sac') - 0.05, m: 'drop' }, { t: s('take') - 0.05, m: 'inferno' },
     { t: s('hunt') - 0.05, m: 'clockwork' }, { t: cmT, m: 'hit' }, { t: s('end') - 0.08, m: 'victory' }, { t: T.duration, m: 'end' },
   ];
   music.sort((a, b) => a.t - b.t);

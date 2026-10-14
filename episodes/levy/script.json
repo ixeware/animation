@@ -95,23 +95,30 @@
   },
   {
    "id": "attack",
-   "text": "The World attacked it with a pawn. And Levy just ignored it.",
-   "say": "The World attacked it with a pawn... [whispers] and Levy just ignored it.",
-   "pause": 0.15,
+   "text": "The World attacked it with a pawn.",
+   "say": "The World attacked it with a pawn.",
+   "pause": 0.35,
    "colors": {
     "attacked": "red",
-    "ignored": "blue"
+    "pawn.": "red"
+   }
+  },
+  {
+   "id": "andlevy",
+   "text": "And Levy...",
+   "say": "[whispers] And Levy...",
+   "pause": 0.3,
+   "colors": {
+    "Levy...": "gold"
    }
   },
   {
    "id": "sac",
-   "text": "Sacrifice the rook!",
-   "say": "[shouting] SACRIFICE THE ROOOOOK!",
-   "pause": 0.08,
+   "text": "He sacrifices...",
+   "say": "[dramatic] He SACRIFICES...",
+   "pause": 0.05,
    "colors": {
-    "Sacrifice": "red",
-    "the": "red",
-    "rook!": "red"
+    "sacrifices...": "red"
    }
   },
   {
