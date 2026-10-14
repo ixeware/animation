@@ -23,6 +23,7 @@ import base64
 import hashlib
 import io
 import json
+import shutil
 import os
 import re
 import subprocess
@@ -189,6 +190,9 @@ class Cached:
 class ElevenLabs(Cached):
     def __call__(self, text, prev, nxt):
         f = self.cache / f"el_{self.key(text, prev, nxt)}.json"
+        if self.v.get('model', '').startswith('eleven_v3'):  # v3 ignores the neighbours: key on the text alone
+            legacy, f = f, self.cache / f"el_{self.key(text)}.json"
+            if not f.exists() and legacy.exists(): shutil.copyfile(legacy, f)
         if not f.exists():
             key = os.environ.get('ELEVENLABS_API_KEY') or sys.exit('ELEVENLABS_API_KEY is not set')
             v = self.v
