@@ -155,7 +155,7 @@ export async function build(T) {
     const hands = seated(g, B, 'levyStream', { ...EXPR.happy, nod: 0.4, look: [0.2, 0.1] }, t, { z: 9.4 });
     table(g, B, { ...env, table: ['#1E1C28', '#121018', '#0C0A12'] }); hands();
     badge(g, 'BIGGEST CHESS CHANNEL', W / 2, 330, { color: C.red, size: 50, sub: 'ON YOUTUBE', a: seg(t, bigT, bigT + 0.1), scale: pop(t, bigT) });
-    chat(g, 560, 1230, t, bigT, { n: 5, w: 470, lines: [['rook_enjoyer', 'SACRIFICE THE ROOK'], ['caro_main', 'caro-kann gang'], ['pawn_pusher', 'hi levy!'], ['blunder_king', 'he hung it on purpose'], ['night_rider', 'GG']] });
+    chat(g, 590, 1640, t, bigT, { n: 4, w: 450, lines: [['rook_enjoyer', 'SACRIFICE THE ROOK'], ['caro_main', 'caro-kann gang'], ['pawn_pusher', 'hi levy!'], ['blunder_king', 'he hung it on purpose'], ['night_rider', 'GG']] });
   }, { trans: 'whip', grade: 'stream' });
   cue(bigT, 'hit', 0.7);
 
