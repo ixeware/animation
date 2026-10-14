@@ -274,16 +274,16 @@ export async function build(T) {
     e5.draw(bgx, t, { labels: false, dof: 0.6, fx: true });
     g.save(); g.filter = `blur(${lerp(3, 6, sc).toFixed(1)}px)`; g.drawImage(BGC, 0, 0); g.restore();
     g.save(); g.fillStyle = rgba('#3A0806', lerp(0.25, 0.45, sc)); g.fillRect(0, 0, W, H); g.restore();
-    if (sc > 0) { g.save(); g.globalCompositeOperation = 'screen'; rays(g, W / 2, H * 0.42, t * 3, { n: 26, color: '#FF9A6A', a: 0.14 * sc }); g.restore(); speedlines(g, W / 2, H * 0.42, t, { a: 0.6 * sc, n: 56, r0: 320, color: '#FFE8D0' }); }
-    // the rook on h5, sharp, with a glow that pulses with the scream
+    // the rook on h5, sharp, with a glow that pulses with the scream; rays and speed lines burst from it
     const rp = at(hx, 0.9, hz), gl = 0.35 + 0.5 * sc * (0.6 + 0.4 * Math.sin(t * 20));
+    if (sc > 0) { g.save(); g.globalCompositeOperation = 'screen'; rays(g, rp.x, rp.y, t * 3, { n: 26, color: '#FF9A6A', a: 0.14 * sc }); g.restore(); speedlines(g, rp.x, rp.y, t, { a: 0.6 * sc, n: 56, r0: 260, color: '#FFE8D0' }); }
     g.save(); const rg = g.createRadialGradient(rp.x, rp.y, 10, rp.x, rp.y, rp.s * 1.6); rg.addColorStop(0, rgba('#FF6B4F', gl)); rg.addColorStop(1, 'rgba(255,107,79,0)'); g.fillStyle = rg; g.fillRect(rp.x - rp.s * 2, rp.y - rp.s * 2, rp.s * 4, rp.s * 4); g.restore();
     B.drawPieces(g, [{ t: 'r', c: 'b', x: hx + Math.sin(t * 41) * 0.04 * sc, z: hz, y: 0.25 * sc }], { focus: B.dist, dof: 0 });
-    if (t > sacT + 0.1) brillAt(g, 'e5', sacT + 0.1, t, { r: 0.45 });
+    if (t > sacT + 0.1 && sc < 1) { g.save(); g.globalAlpha = 1 - sc; brillAt(g, 'e5', sacT + 0.1, t, { r: 0.45 }); g.restore(); }
     // Levy in front: a devilish smirk, then the scream
     const up = seg(lt, 0, 0.25, ease.out);
     const ex = sc > 0 ? { ...EXPR.shock, open: 1, mouth: 'o', brow: -0.8, browY: -24, shake: 1.2, look: [0, -0.3], pupil: 0.45 } : { ...EXPR.smug, lid: 0.4, browTilt: 0.7, look: [0.5, -0.2], curve: 0.9 };
-    drawChar(g, 'levy', { x: W / 2 - 40, y: H * 0.8 + (1 - up) * 300 + sc * 20, s: 1.7 + 0.12 * sc, e: ex, t });
+    drawChar(g, 'levy', { x: W / 2 - 40, y: H * 0.77 + (1 - up) * 300 + sc * 10, s: 1.6 + 0.1 * sc, e: ex, t });
     // words
     g.save(); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
     const k1 = lerp(1.7, 1, seg(t, sacT, sacT + 0.2, ease.back)) * lerp(1, 0.62, sc);
