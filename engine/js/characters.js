@@ -58,6 +58,9 @@ export const CAST = {
   ehsan: { face: [0.94, 1.08, 0.86], hair: 'swept', hairC: '#1E1612', brow: '#16100C', suit: '#2A2F38', suitD: '#1D2129', shirt: 'tie', tie: '#3A4A6A', beard: '#1E1612', ears: 1.02,
     skin: { base: '#E2B08A', shade: '#CF9874', deep: '#B07A58' } },
   timur: { face: [0.94, 1.06, 0.86], hair: 'messy', hairC: '#6E5034', brow: '#4E3824', suit: '#3A2E4A', suitD: '#2A2036', shirt: 'hoodie', beard: '#5E452E', beardStyle: 'goatee', ears: 1.04, blindfold: '#15151A' },
+  // generic players for the 269-move game (Belgrade 1989): late-80s suits and ties, no real likeness intended
+  ivan: { face: [0.95, 1.06, 0.86], hair: 'swept', hairC: '#2A1E16', brow: '#1E1610', suit: '#4A4038', suitD: '#3A322A', shirt: 'tie', tie: '#7A2A2A', ears: 1.02 },
+  goran: { face: [0.97, 1.04, 0.9], hair: 'messy', hairC: '#3A2C22', brow: '#2A2018', suit: '#2E3A4A', suitD: '#1E2836', shirt: 'tie', tie: '#2A3A2A', ears: 1.02 },
   doctor: { face: [0.98, 1.04, 0.9], hair: 'receding', hairC: '#8E8A84', brow: '#6E6A64', suit: '#F2F2EE', suitD: '#D3D8D4', shirt: 'labcoat', glasses: true, ears: 1 },
   operator: { face: [0.94, 1.04, 0.84], hair: 'tied', hairC: '#3A2A20', brow: '#2E2119', suit: '#E8E0CF', suitD: '#C2B8A3', shirt: 'sleeves', vest: '#3B2E26', ears: 1 },
 };

@@ -39,7 +39,7 @@ function bakeTimesSquare() {
   const out = document.createElement('canvas'); out.width = c.width; out.height = H; const o = out.getContext('2d');
   o.filter = 'blur(7px) brightness(0.7) saturate(0.85)'; o.drawImage(c, 0, 0); return out;
 }
-function timesSquare(g, t, { clock = null, pan = 0 } = {}) {
+export function timesSquare(g, t, { clock = null, pan = 0 } = {}) {
   TS ??= bakeTimesSquare();
   g.drawImage(TS, -120 + pan, 0);
   g.fillStyle = rgba('#FFD9A0', 0.03 + 0.03 * Math.sin(t * 5)); g.fillRect(0, 0, W, H);  // billboard flicker
@@ -80,7 +80,7 @@ function hall(g, t, walk) {
 }
 
 // an exercise bike seen from the front-side: flywheel, frame, saddle, handlebar
-function bike(g, x, y, s, t) {
+export function bike(g, x, y, s, t) {
   g.save(); g.translate(x, y); g.scale(s, s);
   g.strokeStyle = '#2A2E36'; g.lineWidth = 26; g.lineCap = 'round';
   g.beginPath(); g.moveTo(-220, 300); g.lineTo(220, 300); g.moveTo(-160, 300); g.lineTo(-40, 40); g.lineTo(140, 300); g.moveTo(-40, 40); g.lineTo(60, -120); g.stroke();
