@@ -262,10 +262,10 @@ export async function build(T) {
   cue(sevT, 'hit', 0.6); cue(supT, 'whirr', 0.7); cue(tbT, 'boom', 0.7);
 
   // a checkmate 549 moves long: the score sheet unrolls
-  const cmT = w('mate', 'checkmate'), n549 = w('mate', '549');
+  const cmT = w('mate', 'checkmate'), n549 = w('mate', '549'), m549 = T.w('mate', '549').e;
   shot(s('mate') - 0.05, (g, lt, t, sh) => {
     bg(g, '#2A2016', '#0A0806');
-    const u = seg(t, s('mate'), T.e('mate') + 0.2, ease.in), mv = Math.max(1, Math.round(549 * u)), lh = 70;
+    const u = seg(t, s('mate'), m549, ease.in), mv = Math.max(1, Math.round(549 * u)), lh = 70;
     g.save(); g.fillStyle = '#F2E8D6'; g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowBlur = 30; g.fillRect(W / 2 - 260, 0, 520, H); g.restore();
     g.save(); g.beginPath(); g.rect(W / 2 - 260, 0, 520, H); g.clip(); g.font = mono(40, 800); g.textBaseline = 'middle';
     for (let k = -2; k < H / lh + 2; k++) {
@@ -277,9 +277,9 @@ export async function build(T) {
     g.restore();
     if (t > cmT - 0.1) { g.save(); g.globalAlpha = seg(t, cmT - 0.1, cmT); g.fillStyle = 'rgba(14,10,6,0.9)'; g.fillRect(W / 2 - 330, 220, 660, 150); g.restore(); }
     counter(g, `MOVE ${mv}`, null, { y: 340, size: 120, a: seg(t, cmT - 0.1, cmT), color: mv >= 549 ? C.red : C.cream });
-    if (t > T.e('mate') - 0.1) stamp(g, 'CHECKMATE', W / 2, 1450, t, T.e('mate') - 0.1, { color: C.red, size: 110 });
+    if (t > m549 + 0.05) stamp(g, 'CHECKMATE', W / 2, 1450, t, m549 + 0.05, { color: C.red, size: 110 });
   }, { trans: 'zoom', grade: 'warm', info: true });
-  cue(cmT, 'riser', 0.6); for (let i = 0; i < 12; i++) cue(cmT + 0.2 + i * 0.12, 'tick', 0.3); cue(T.e('mate') - 0.1, 'stamp', 1);
+  cue(cmT, 'riser', 0.6); for (let i = 0; i < 12; i++) cue(cmT + 0.2 + i * 0.12, 'tick', 0.3); cue(m549 + 0.05, 'stamp', 1);
 
   // eight pieces: still running
   const eT = w('eight', 'Eight'), notT = w('eight', 'not');
