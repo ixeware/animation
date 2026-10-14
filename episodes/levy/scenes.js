@@ -189,11 +189,11 @@ export async function build(T) {
   const ROWS = [['KASPAROV vs THE WORLD', '50,000', '1999', 50000, C.blue], ['ANAND vs THE WORLD', '~70,000', '2024', 70000, C.teal], ['CARLSEN vs THE WORLD', '143,000', 'THE OLD RECORD', 143000, C.lime], ['ROZMAN vs THE WORLD', '225,054', '2025', 225054, C.gold]];
   shot(s('record') - 0.05, (g, lt, t, sh) => {
     const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#202A36'); bg.addColorStop(1, '#08090C'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
-    g.save(); g.font = sans(44, 900); g.letterSpacing = '5px'; g.textAlign = 'center'; g.fillStyle = C.cream; g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowOffsetY = 5; g.fillText('BIGGEST ONLINE GAME EVER', W / 2, 300); g.restore();
-    g.fillStyle = C.gold; g.fillRect(W / 2 - 50, 328, 100, 6);
+    g.save(); g.font = sans(44, 900); g.letterSpacing = '5px'; g.textAlign = 'center'; g.fillStyle = C.cream; g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowOffsetY = 5; g.fillText('BIGGEST ONLINE GAME EVER', W / 2, 250); g.restore();
+    g.fillStyle = C.gold; g.fillRect(W / 2 - 50, 278, 100, 6);
     ROWS.forEach(([name, val, sub, n, col], i) => {
       const last = i === 3, t0 = last ? twoT : s('record') + i * 0.12, u = seg(t, t0, t0 + (last ? smashT + 0.25 - twoT : 0.4), last ? ease.inOut : ease.out);
-      const y = 520 + i * 250, x0 = 110, wmax = W - 220, ww = Math.max(8, wmax * n / 225054 * u);
+      const y = 500 + i * 200, x0 = 110, wmax = W - 220, ww = Math.max(8, wmax * n / 225054 * u);
       g.save(); g.globalAlpha = seg(t, t0 - 0.1, t0 + 0.05);
       g.font = sans(36, 900); g.letterSpacing = '2px'; g.textAlign = 'left'; g.fillStyle = last ? C.gold : C.cream; g.fillText(name, x0, y - 20);
       g.fillStyle = 'rgba(255,255,255,0.07)'; g.fillRect(x0, y, wmax, 96);
@@ -203,8 +203,8 @@ export async function build(T) {
       g.font = sans(20, 800); g.letterSpacing = '3px'; g.fillStyle = 'rgba(243,235,221,0.7)'; g.fillText(sub, x0, y + 130);
       g.restore();
     });
-    if (t > smashT + 0.2) { const p = { x: 110 + (W - 220) * 143000 / 225054, y: 520 + 2 * 250 + 48 }; burst(g, p.x, p.y, t, smashT + 0.2, { n: 30, color: C.lime, speed: 900, size: 7, seed: 3 }); shockwave(g, p.x, p.y, t, smashT + 0.2, { r1: 260, color: '#FFFFFF', squash: 1 }); }
-    badge(g, 'IN 2 DAYS', W / 2, 420, { color: C.red, size: 44, a: seg(t, twoT, twoT + 0.1), scale: pop(t, twoT) });
+    if (t > smashT + 0.2) { const p = { x: 110 + (W - 220) * 143000 / 225054, y: 500 + 2 * 200 + 48 }; burst(g, p.x, p.y, t, smashT + 0.2, { n: 30, color: C.lime, speed: 900, size: 7, seed: 3 }); shockwave(g, p.x, p.y, t, smashT + 0.2, { r1: 260, color: '#FFFFFF', squash: 1 }); }
+    badge(g, 'IN 2 DAYS', W / 2, 370, { color: C.red, size: 44, a: seg(t, twoT, twoT + 0.1), scale: pop(t, twoT) });
     stamp(g, 'WORLD RECORD', W / 2, 1560, t, recT, { color: C.gold, size: 84, rot: -0.1 });
     credit(g, 'SOURCE: CHESS.COM', seg(lt, 0.3, 0.5));
   }, { trans: 'whip', grade: 'neutral', noJump: true });

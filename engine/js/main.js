@@ -36,7 +36,7 @@ const layer = makeCanvas(), lctx = layer.getContext('2d');
 const hold = makeCanvas(), hctx = hold.getContext('2d');
 
 await document.fonts.ready;
-for (const f of ['800 40px Rubik', '700 40px Cinzel', '700 40px "JetBrains Mono"', '900 40px Rubik', '600 40px Cinzel', '500 40px "JetBrains Mono"', '800 40px "JetBrains Mono"', '800 40px Cinzel'])
+for (const f of ['700 40px Rubik', '800 40px Rubik', '700 40px Cinzel', '700 40px "JetBrains Mono"', '900 40px Rubik', '600 40px Cinzel', '500 40px "JetBrains Mono"', '800 40px "JetBrains Mono"', '800 40px Cinzel'])
   await document.fonts.load(f);
 
 const tm = await fetch(`../episodes/${ep}/build/timings.json`).then(r => r.json());
