@@ -61,6 +61,12 @@ export const CAST = {
   // generic players for the 269-move game (Belgrade 1989): late-80s suits and ties, no real likeness intended
   ivan: { face: [0.95, 1.06, 0.86], hair: 'swept', hairC: '#2A1E16', brow: '#1E1610', suit: '#4A4038', suitD: '#3A322A', shirt: 'tie', tie: '#7A2A2A', ears: 1.02 },
   goran: { face: [0.97, 1.04, 0.9], hair: 'messy', hairC: '#3A2C22', brow: '#2A2018', suit: '#2E3A4A', suitD: '#1E2836', shirt: 'tie', tie: '#2A3A2A', ears: 1.02 },
+  // Magnus at the 2024 World Rapid & Blitz in New York: navy blazer over an open white shirt (the jeans are drawn by the episode)
+  magnusNY: { face: [0.96, 1.07, 0.88], hair: 'curly', hairC: '#6E4A2E', brow: '#4E3420', suit: '#24304A', suitD: '#18213A', shirt: 'open', beard: '#7A5A3A', ears: 1 },
+  // Ian Nepomniachtchi, stylized: auburn hair and a close beard, dark suit
+  nepo: { face: [0.98, 1.05, 0.9], hair: 'messy', hairC: '#8A5634', brow: '#6E4228', suit: '#2A2A30', suitD: '#1C1C22', shirt: 'open', beard: '#8A5634', beardStyle: 'full', ears: 1.02 },
+  // a generic tournament arbiter: grey hair, glasses, grey suit, red tie
+  arbiter: { face: [0.97, 1.05, 0.9], hair: 'receding', hairC: '#9A958C', brow: '#77726A', suit: '#4A4F58', suitD: '#363A42', shirt: 'tie', tie: '#8E1E22', glasses: true, ears: 1.02 },
   doctor: { face: [0.98, 1.04, 0.9], hair: 'receding', hairC: '#8E8A84', brow: '#6E6A64', suit: '#F2F2EE', suitD: '#D3D8D4', shirt: 'labcoat', glasses: true, ears: 1 },
   operator: { face: [0.94, 1.04, 0.84], hair: 'tied', hairC: '#3A2A20', brow: '#2E2119', suit: '#E8E0CF', suitD: '#C2B8A3', shirt: 'sleeves', vest: '#3B2E26', ears: 1 },
 };

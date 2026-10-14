@@ -1,0 +1,470 @@
+// Magnus quit the World Championship because of his jeans (FIDE World Rapid & Blitz, New York, December 2024): the $200 fine,
+// "I'll change tomorrow", not paired for round 9, the walk-out, FIDE backing down, the return in jeans, the shared blitz title
+// with Nepomniachtchi, and the jeans sold on eBay for $36,100 for charity.
+// Every shot is staged in 3D: a grand hall with columns, chandeliers and rows of tables; Magnus's table stands on legs so the
+// jeans show underneath; the dress code and the pairings board are objects in the room; a podium; the jeans in a glass case.
+import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas } from '../../engine/js/core.js';
+import { confetti } from '../../engine/js/draw.js';
+import { Board, piecesAt } from '../../engine/js/board.js';
+import { EXPR, exprAt, drawChar } from '../../engine/js/characters.js';
+import { counter, badge, stamp, placeStamp, sans, mono, serif } from '../../engine/js/hud.js';
+import { rig, seated, actor } from '../../engine/js/stage.js';
+import { room, box, pool, placeAt, picture, chandelier, FLOOR_Y } from '../../engine/js/env.js';
+
+const G = await fetch('../engine/data/gotham_world_2025.json').then(r => r.json());
+const B = new Board();
+const COM = { light: '#EEEED2', dark: '#769656', frame: '#2B2B2B', side: '#1A1A1A' };
+const lin = x => x;
+const quad = (g, pts, col) => { if (B.poly(g, pts)) { g.fillStyle = col; g.fill(); } };
+const HALL = { base: '#0B0907', light: '#FFE2B0', lightA: 0.4 };
+const fog = (col, d, near = 18, far = 95) => mix(col, HALL.base, clamp((d - near) / (far - near)) * 0.85);
+const depth = (x, y, z) => B.toCam(x, y, z)[2];
+
+// ---------- cached character sprites for the other players in the hall ----------
+const SPR = new Map();
+function sprite(who, e = 'focus', dark = false) {
+  const key = `${who}|${e}|${dark}`;
+  if (!SPR.has(key)) {
+    const c = makeCanvas(520, 720), g = c.getContext('2d');
+    drawChar(g, who, { x: 260, y: 260, s: 1, e: EXPR[e], t: 0, silhouette: dark, shade: 'brightness(0.16) saturate(0.4)' });
+    SPR.set(key, c);
+  }
+  return SPR.get(key);
+}
+function billboard(g, spr, x, y, z, k = 1, { alpha = 1, blur = 0 } = {}) {
+  if (depth(x, y, z) < 0.8) return;
+  const p = B.project(x, y, z), s = p.s * k / 100 * 1.05;
+  g.save(); g.globalAlpha *= alpha; if (blur > 0.6) g.filter = `blur(${blur.toFixed(1)}px)`;
+  g.drawImage(spr, p.x - 260 * s, p.y - 260 * s, 520 * s, 720 * s); g.restore();
+}
+const CROWD = ['rival', 'ivan', 'goran', 'ehsan', 'susan', 'sofia', 'brother', 'witty', 'shannon', 'danya', 'tunde', 'operator'];
+
+// ---------- jeans ----------
+const DENIM = { base: '#3E5C86', dark: '#2A4266', seam: '#9DB5D6', shoe: '#2A1E18' };
+// standing legs under a bust; (x, y) = the head centre on screen, sc = the character scale; walk 0..1 swings the legs
+function legs(g, x, y, sc, { jeans = true, walk = 0, phase = 0, dark = false } = {}) {
+  const col = dark ? ['#0E0E12', '#0A0A0D', '#16161B'] : jeans ? [DENIM.base, DENIM.dark, DENIM.seam] : ['#23262E', '#181A20', '#2E323B'];
+  for (const sd of Math.sin(phase) > 0 ? [-1, 1] : [1, -1]) {
+    const ang = walk * 0.3 * Math.sin(phase + (sd > 0 ? 0 : Math.PI));
+    g.save(); g.translate(x + sd * 56 * sc, y + 315 * sc); g.rotate(ang); g.scale(sc, sc);
+    const gr = g.createLinearGradient(-52, 0, 52, 0); gr.addColorStop(0, col[1]); gr.addColorStop(0.45, col[0]); gr.addColorStop(1, col[1]);
+    g.fillStyle = gr; g.beginPath(); g.moveTo(-54, 0); g.lineTo(54, 0); g.lineTo(42, 340); g.lineTo(-42, 340); g.closePath(); g.fill();
+    if (jeans && !dark) {
+      g.strokeStyle = rgba(col[2], 0.75); g.lineWidth = 3; g.setLineDash([7, 6]);
+      g.beginPath(); g.moveTo(sd * 45, 6); g.lineTo(sd * 35, 336); g.stroke(); g.setLineDash([]);
+      g.strokeStyle = rgba(col[2], 0.35); g.lineWidth = 2; for (const ky of [160, 172]) { g.beginPath(); g.moveTo(-32, ky); g.quadraticCurveTo(0, ky + 9, 32, ky); g.stroke(); }
+      g.fillStyle = rgba(col[2], 0.5); g.fillRect(-42, 324, 84, 12);  // turned-up hem
+    }
+    g.fillStyle = dark ? '#060608' : DENIM.shoe; g.beginPath(); g.ellipse(4, 352, 54, 22, 0, 0, 7); g.fill();
+    g.restore();
+  }
+}
+// a whole standing (or walking) person in world space: legs, then the bust; head centre at y = 3.9
+function standing(g, who, x, z, { e = 'neutral', t = 0, k = 1, walk = 0, phase = 0, jeans = true, back = false, face = -1, follow = 0.6 } = {}) {
+  if (depth(x, 3.9, z) < 0.8) return;
+  const p = B.project(x, 3.9, z), sc = p.s * k / 100 * 1.05, bob = walk ? Math.abs(Math.sin(phase)) * -10 * sc : 0;
+  legs(g, p.x, p.y + bob, sc, { jeans, walk, phase, dark: back });
+  if (back) { g.save(); g.filter = 'brightness(0.12) saturate(0.4)'; }
+  drawChar(g, who, { x: p.x, y: p.y + bob, s: sc, e: typeof e === 'string' ? EXPR[e] : e, t });
+  if (back) g.restore();
+}
+// knees and shins under a table, seen from the front: knee at world (x, ky, z), shins down to the floor
+function seatedJeans(g, x, z, { ky = -1.0 } = {}) {
+  for (const sd of [-1, 1]) {
+    const k = B.project(x + sd * 0.55, ky, z), f = B.project(x + sd * 0.6, FLOOR_Y + 0.25, z + 0.3), w = k.s * 0.42;
+    if (depth(x, ky, z) < 0.6) continue;
+    const gr = g.createLinearGradient(k.x - w, 0, k.x + w, 0); gr.addColorStop(0, DENIM.dark); gr.addColorStop(0.5, DENIM.base); gr.addColorStop(1, DENIM.dark);
+    g.fillStyle = gr; g.beginPath(); g.moveTo(k.x - w, k.y); g.lineTo(f.x - w * 0.82, f.y); g.lineTo(f.x + w * 0.82, f.y); g.lineTo(k.x + w, k.y); g.closePath(); g.fill();
+    g.beginPath(); g.ellipse(k.x, k.y, w, w * 0.55, 0, Math.PI, 0); g.fill();  // the knee
+    g.strokeStyle = rgba(DENIM.seam, 0.7); g.lineWidth = Math.max(1.5, w * 0.06); g.setLineDash([w * 0.16, w * 0.14]);
+    g.beginPath(); g.moveTo(k.x + sd * w * 0.82, k.y); g.lineTo(f.x + sd * w * 0.68, f.y); g.stroke(); g.setLineDash([]);
+    g.fillStyle = DENIM.shoe; g.beginPath(); g.ellipse(f.x, f.y + w * 0.1, w * 1.05, w * 0.42, 0, 0, 7); g.fill();
+  }
+}
+// a pair of jeans on its own (on a hanger in the glass case)
+function jeansProp(g, x, y, sc) {
+  g.save(); g.translate(x, y); g.scale(sc, sc);
+  g.strokeStyle = '#C9A05A'; g.lineWidth = 6; g.beginPath(); g.moveTo(0, -60); g.lineTo(0, -30); g.moveTo(-110, 0); g.lineTo(0, -34); g.lineTo(110, 0); g.stroke();
+  const gr = g.createLinearGradient(-110, 0, 110, 0); gr.addColorStop(0, DENIM.dark); gr.addColorStop(0.5, DENIM.base); gr.addColorStop(1, DENIM.dark);
+  g.fillStyle = gr; g.beginPath(); g.moveTo(-104, 0); g.lineTo(104, 0); g.lineTo(112, 470); g.lineTo(18, 470); g.lineTo(4, 120); g.lineTo(-10, 120); g.lineTo(-24, 470); g.lineTo(-118, 470); g.closePath(); g.fill();
+  g.fillStyle = DENIM.dark; g.fillRect(-104, 0, 208, 34);
+  g.strokeStyle = rgba(DENIM.seam, 0.8); g.lineWidth = 3; g.setLineDash([8, 7]);
+  g.beginPath(); g.moveTo(-104, 34); g.lineTo(104, 34); g.moveTo(-60, 34); g.quadraticCurveTo(-56, 90, -98, 96); g.moveTo(60, 34); g.quadraticCurveTo(56, 90, 98, 96);
+  g.moveTo(0, 34); g.lineTo(0, 118); g.moveTo(-96, 120); g.lineTo(-108, 466); g.moveTo(96, 120); g.lineTo(108, 466); g.stroke(); g.setLineDash([]);
+  g.fillStyle = '#C9A05A'; for (const bx of [-60, 0, 60]) { g.beginPath(); g.arc(bx, 17, 6, 0, 7); g.fill(); }
+  g.restore();
+}
+
+// ---------- documents and screens, drawn once and hung in the room ----------
+function rulePage(after) {
+  const c = makeCanvas(800, 1060), g = c.getContext('2d');
+  g.fillStyle = '#F4EFE2'; g.fillRect(0, 0, 800, 1060);
+  g.fillStyle = '#1E3A6E'; g.fillRect(0, 0, 800, 150);
+  g.fillStyle = '#FFFFFF'; g.font = sans(70, 900); g.textAlign = 'center'; g.fillText('FIDE', 400, 100);
+  g.fillStyle = '#2A2A2A'; g.font = sans(34, 800); g.fillText('WORLD RAPID & BLITZ 2024', 400, 220);
+  g.fillStyle = '#8E1E22'; g.font = sans(46, 900); g.fillText('DRESS CODE', 400, 300);
+  const rows = [['✓', 'JACKET, SHIRT, TROUSERS', '#2E6B3A'], ['✓', 'FORMAL SHOES', '#2E6B3A'], ['✗', 'SPORTS SHOES', '#8E1E22'], ['✗', 'JEANS', '#C0262C']];
+  g.textAlign = 'left';
+  rows.forEach(([m, txt, col], i) => {
+    const y = 420 + i * 120, big = txt === 'JEANS';
+    if (big) { g.fillStyle = after ? 'rgba(46,107,58,0.12)' : 'rgba(192,38,44,0.14)'; g.fillRect(60, y - 70, 680, 100); }
+    g.fillStyle = col; g.font = sans(big ? 64 : 40, 900); g.fillText(m, 90, y); g.fillStyle = big ? col : '#2A2A2A'; g.fillText(txt, 170, y);
+    if (big && after) { g.strokeStyle = '#C0262C'; g.lineWidth = 10; g.beginPath(); g.moveTo(80, y - 22); g.lineTo(420, y - 22); g.stroke(); }
+  });
+  if (after) { g.fillStyle = '#2E6B3A'; g.font = sans(40, 900); g.fillText('✓ APPROPRIATE JEANS', 90, 960); g.font = sans(30, 800); g.fillText('WITH A JACKET — ALLOWED', 130, 1010); }
+  for (let i = 0; i < 4; i++) { g.fillStyle = 'rgba(40,40,40,0.12)'; g.fillRect(90, 340 + i * 4 - 4, 0, 0); }
+  return c;
+}
+const PAGE = { before: rulePage(false), after: rulePage(true) };
+function pairingsScreen() {
+  const c = makeCanvas(1000, 640), g = c.getContext('2d');
+  g.fillStyle = '#0A1220'; g.fillRect(0, 0, 1000, 640);
+  g.fillStyle = '#E9B654'; g.font = sans(46, 900); g.textAlign = 'left'; g.fillText('ROUND 9 · PAIRINGS', 50, 80);
+  for (let i = 0; i < 7; i++) {
+    const y = 140 + i * 66; g.fillStyle = i % 2 ? '#12203A' : '#0F1A30'; g.fillRect(40, y - 40, 920, 58);
+    g.fillStyle = '#5A6A88'; g.font = mono(30, 800); g.fillText(String(i + 1).padStart(2, ' '), 60, y);
+    g.fillStyle = 'rgba(160,180,210,0.35)'; g.fillRect(140, y - 26, 300 - (i * 37) % 90, 20); g.fillRect(560, y - 26, 280 - (i * 53) % 110, 20);
+  }
+  g.fillStyle = 'rgba(192,38,44,0.9)'; g.fillRect(40, 572 - 46, 920, 70);
+  g.fillStyle = '#FFFFFF'; g.font = sans(40, 900); g.fillText('CARLSEN — NOT PAIRED', 70, 576);
+  return c;
+}
+const PAIR = pairingsScreen();
+
+// ---------- the grand hall ----------
+const TABLES = [[-20, 4], [28, 4], [-20, 24], [28, 24], [-20, 44], [28, 44]].map(([x, z], i) => {
+  const r = rng(70 + i); return { x, z, far: CROWD[Math.floor(r() * CROWD.length)], near: CROWD[Math.floor(r() * CROWD.length)], pos: piecesAt(G, 10 + Math.floor(r() * 60)) };
+});
+function hallShell(g, t, { dim = 0 } = {}) {
+  g.fillStyle = HALL.base; g.fillRect(0, 0, W, H);
+  // marble floor
+  for (let i = 0; i < 16; i++) for (let j = 0; j < 16; j++) {
+    const x0 = -40 + i * 6, z0 = -30 + j * 6, d = depth(x0 + 3, FLOOR_Y, z0 + 3); if (d < 0.3 || d > 140) continue;
+    quad(g, [[x0, FLOOR_Y, z0], [x0 + 6, FLOOR_Y, z0], [x0 + 6, FLOOR_Y, z0 + 6], [x0, FLOOR_Y, z0 + 6]], fog((i + j) % 2 ? '#3A332B' : '#2C2621', d));
+  }
+  // back wall with tall windows, side walls with panels
+  for (let i = 0; i < 11; i++) { const x0 = -40 + i * 8, d = depth(x0 + 4, 6, 60);
+    quad(g, [[x0, FLOOR_Y, 60], [x0 + 8, FLOOR_Y, 60], [x0 + 8, 20, 60], [x0, 20, 60]], fog(i % 2 ? '#8A7A5E' : '#7E6F55', d));
+    quad(g, [[x0 + 2, 0, 59.9], [x0 + 6, 0, 59.9], [x0 + 6, 13, 59.9], [x0 + 2, 13, 59.9]], fog('#22324E', d));
+    pool(g, B, x0 + 4, 7, 59.8, 4, '#7FA6D9', 0.18, true); }
+  for (const x of [-40, 48]) for (let i = 0; i < 12; i++) { const z0 = -30 + i * 7.5, d = depth(x, 6, z0 + 3.7);
+    quad(g, [[x, FLOOR_Y, z0], [x, FLOOR_Y, z0 + 7.5], [x, 20, z0 + 7.5], [x, 20, z0]], fog(i % 2 ? '#86775B' : '#7A6C52', d)); }
+  // the exit: bright double doors in the back wall
+  quad(g, [[0, FLOOR_Y, 59.8], [8, FLOOR_Y, 59.8], [8, 8, 59.8], [0, 8, 59.8]], '#FFF1D6');
+  pool(g, B, 4, 2, 59.5, 9, '#FFF1D6', 0.4, true); pool(g, B, 4, FLOOR_Y, 54, 9, '#FFF1D6', 0.25);
+  // columns
+  for (const x of [-30, -8, 16, 38]) for (const z of [-12, 14, 36]) { const d = depth(x, 6, z); if (d < 0.6) continue;
+    box(g, B, [x - 1.2, FLOOR_Y, z - 1.2], [x + 1.2, 18, z + 1.2], { top: fog('#D8CBB0', d), side: fog('#A89A7E', d), front: fog('#C2B497', d) });
+    box(g, B, [x - 1.6, 16.5, z - 1.6], [x + 1.6, 17.5, z + 1.6], { top: fog('#E2BE6A', d), side: fog('#B08A3A', d), front: fog('#C9A05A', d) }); }
+  for (const [x, z] of [[4, 4], [-16, 24], [24, 24], [4, 36]]) chandelier(g, B, x, 12, z, HALL, t);
+  if (dim) { g.fillStyle = `rgba(0,0,0,${dim})`; g.fillRect(0, 0, W, H); }
+}
+// another game in the hall: table, board, pieces and two players (sprites)
+function otherTable(g, T) {
+  const d = depth(T.x, 0, T.z); if (d < 1 || d > 120) return;
+  const tab = (c) => fog(c, d);
+  for (const [lx, lz] of [[-4.6, -4.6], [4.6, -4.6], [-4.6, 4.6], [4.6, 4.6]]) box(g, B, [T.x + lx - 0.25, FLOOR_Y, T.z + lz - 0.25], [T.x + lx + 0.25, -0.75, T.z + lz + 0.25], { top: tab('#2A1C12'), side: tab('#1E140D'), front: tab('#24180F') });
+  box(g, B, [T.x - 5.1, -0.75, T.z - 5.1], [T.x + 5.1, -0.35, T.z + 5.1], { top: tab('#4A3322'), side: tab('#2A1C12'), front: tab('#3A2818') });
+  const x0 = T.x - 4, z0 = T.z - 4;
+  quad(g, [[x0, -0.34, z0], [x0 + 8, -0.34, z0], [x0 + 8, -0.34, z0 + 8], [x0, -0.34, z0 + 8]], tab('#EEEED2'));
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) if ((i + j) % 2 === 0) quad(g, [[x0 + i, -0.33, z0 + j], [x0 + i + 1, -0.33, z0 + j], [x0 + i + 1, -0.33, z0 + j + 1], [x0 + i, -0.33, z0 + j + 1]], tab('#769656'));
+  if (d < 70) B.drawPieces(g, T.pos.map(p => ({ ...p, x: x0 + p.x, z: z0 + p.z, y: -0.33 })), { dof: 0 });
+}
+function hallCrowd(g, { skipMain = true } = {}) {
+  const items = [];
+  for (const T of TABLES) {
+    items.push({ d: depth(T.x, 0, T.z), f: () => otherTable(g, T) });
+    const farFront = B.E[2] < T.z + 5.4, nearFront = B.E[2] > T.z - 5.4;
+    items.push({ d: depth(T.x, 3, T.z + 5.4), f: () => billboard(g, sprite(T.far, 'focus', !farFront), T.x, 3.1, T.z + 5.4, 1.0) });
+    items.push({ d: depth(T.x, 3, T.z - 5.4), f: () => billboard(g, sprite(T.near, 'focus', !nearFront), T.x, 3.1, T.z - 5.4, 1.0) });
+  }
+  return items;
+}
+// Magnus's table on legs (so the jeans show), the board, Magnus seated at the far side; opponent optional at the near side
+function mainTable(g, t, { who = 'magnusNY', e = 'focus', opp = null, oppE = 'focus', pieces, jeans = true, focus = null } = {}) {
+  const h1 = who ? seated(g, B, who, e, t, { z: 9.4 }) : () => {};
+  const leg = ([lx, lz]) => box(g, B, [lx - 0.3, FLOOR_Y, lz - 0.3], [lx + 0.3, -0.75, lz + 0.3], { top: '#2A1C12', side: '#1E140D', front: '#24180F' });
+  leg([-0.6, 8.6]); leg([8.6, 8.6]);
+  if (jeans && who) seatedJeans(g, 4, 8.3);
+  leg([-0.6, -0.6]); leg([8.6, -0.6]);
+  box(g, B, [-1.1, -0.75, -1.1], [9.1, -0.35, 9.1], { top: '#4A3322', side: '#2A1C12', front: '#3A2818' });
+  const h2 = opp ? seated(g, B, opp, oppE, t, { z: -1.4, face: 1 }) : () => {};
+  B.drawSlab(g, COM); B.drawPieces(g, pieces, { focus: focus ?? B.dist, dof: 1.0 }); h1(); h2();
+}
+// the whole hall with Magnus's table among the others, depth-sorted
+function hall(g, lt, t, keys, { ez = lin, main = {}, extra = [], dim = 0 } = {}) {
+  rig(B, lt, keys, { t, e: ez });
+  hallShell(g, t, { dim });
+  const items = hallCrowd(g);
+  if (main) items.push({ d: depth(4, 0, 4), f: () => mainTable(g, t, main) });
+  items.push(...extra.map(x => ({ d: x.p ? depth(...x.p) : x.d, f: x.f })));  // depth after the camera is set
+  items.sort((a, b) => b.d - a.d).forEach(it => it.f());
+}
+// a speech bubble pointing at a world point
+function bubble(g, x, y, z, text, a = 1, { side = -1 } = {}) {
+  if (a <= 0 || depth(x, y, z) < 0.6) return;
+  const p = B.project(x, y, z);
+  g.save(); g.globalAlpha *= a; g.font = sans(46, 900);
+  const w = g.measureText(text).width + 70, h = 92, bx = clamp(p.x + side * 60 - (side < 0 ? w : 0), 30, W - 30 - w), by = p.y - 260;
+  g.fillStyle = '#FFFFFF'; g.shadowColor = 'rgba(0,0,0,0.4)'; g.shadowOffsetY = 8; g.beginPath(); g.roundRect(bx, by, w, h, 26); g.fill(); g.shadowColor = 'transparent';
+  g.beginPath(); g.moveTo(clamp(p.x, bx + 40, bx + w - 40) - 22, by + h - 2); g.lineTo(p.x, p.y - 140); g.lineTo(clamp(p.x, bx + 40, bx + w - 40) + 22, by + h - 2); g.fill();
+  g.fillStyle = C.ink; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, bx + w / 2, by + h / 2 + 2); g.restore();
+}
+// a red target ring around something on screen
+function ring(g, x, y, r, t, t0, a = 1) {
+  const u = seg(t, t0, t0 + 0.25, ease.back); if (u <= 0 || a <= 0) return;
+  g.save(); g.globalAlpha *= a; g.strokeStyle = C.red; g.lineWidth = 10; g.beginPath(); g.arc(x, y, r * lerp(1.6, 1, u), 0, 7); g.stroke();
+  g.lineWidth = 6; for (let k = 0; k < 4; k++) { const an = k * Math.PI / 2 + 0.4; g.beginPath(); g.moveTo(x + Math.cos(an) * r * 0.85, y + Math.sin(an) * r * 0.85); g.lineTo(x + Math.cos(an) * r * 1.2, y + Math.sin(an) * r * 1.2); g.stroke(); }
+  g.restore();
+}
+function trophy(g, x, y, sc) {
+  g.save(); g.translate(x, y); g.scale(sc, sc);
+  const gr = g.createLinearGradient(-60, 0, 60, 0); gr.addColorStop(0, '#9A7420'); gr.addColorStop(0.5, '#F5D27A'); gr.addColorStop(1, '#9A7420');
+  g.fillStyle = gr; g.beginPath(); g.moveTo(-70, -200); g.lineTo(70, -200); g.quadraticCurveTo(70, -90, 12, -70); g.lineTo(12, -30); g.lineTo(40, -10); g.lineTo(-40, -10); g.lineTo(-12, -30); g.lineTo(-12, -70); g.quadraticCurveTo(-70, -90, -70, -200); g.fill();
+  g.strokeStyle = '#C9A05A'; g.lineWidth = 10; g.beginPath(); g.arc(-74, -160, 26, Math.PI * 0.5, Math.PI * 1.5); g.stroke(); g.beginPath(); g.arc(74, -160, 26, -Math.PI * 0.5, Math.PI * 0.5); g.stroke();
+  g.fillStyle = '#3A2A14'; g.fillRect(-50, -10, 100, 22);
+  g.restore();
+}
+
+export async function build(T) {
+  const s = id => T.s(id), w = (id, k) => T.w(id, k).s, e_ = id => T.e(id);
+  const cues = [];
+  const cue = (t, id, gain = 1) => cues.push({ t: +t.toFixed(3), id, gain });
+  const shots = [];
+  const shot = (a, draw, o = {}) => shots.push({ a, draw, ...o });
+  const len = sh => sh.b - sh.a + 0.35;
+  const pop = (t, t0, d = 0.25) => lerp(1.5, 1, seg(t, t0, t0 + d, ease.back));
+  const credit = (g, text, a = 1) => { if (a <= 0) return; g.save(); g.globalAlpha *= a; g.font = sans(16, 700); g.letterSpacing = '1px'; g.textAlign = 'right'; g.fillStyle = 'rgba(243,235,221,0.72)'; g.fillText(text, W - 28, H - 36); g.restore(); };
+  const scrim = (g, a = 0.45, h = 640) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, `rgba(6,4,2,${a})`); gr.addColorStop(1, 'rgba(6,4,2,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, h); };
+  const EV = 'FIDE WORLD RAPID & BLITZ · NEW YORK · DECEMBER 2024';
+  const MID = piecesAt(G, 24);
+
+  // ======================= HOOK =======================
+  const quitT = w('hook1', 'quit'), jeansT = w('hook2', 'jeans');
+  shot(0, (g, lt, t, sh) => {  // the champion standing in the hall, in jeans
+    hall(g, lt, t, [[0, { yaw: 0.25, pitch: 0.1, dist: 12, fov: 1500, cy: H * 0.5, target: [4, 1.4, 16] }], [len(sh), { yaw: 0.1, pitch: 0.08, dist: 10.5 }]], {
+      main: null,
+      extra: [{ p: [4, 2, 16], f: () => standing(g, 'magnusNY', 4, 16, { e: { ...EXPR.smug, look: [0, 0] }, t }) }] });
+    scrim(g, 0.6);
+    counter(g, 'MAGNUS CARLSEN', 'WORLD CHAMPION', { y: 330, size: 96, color: C.cream, labelColor: C.gold });
+    stamp(g, 'QUIT', W / 2, 1530, t, quitT, { color: C.red, size: 150, rot: -0.1 });
+  }, { grade: 'warm', noJump: true, info: true });
+  shot(jeansT - 0.55, (g, lt, t, sh) => {  // low and close: the jeans
+    hall(g, lt, t, [[0, { yaw: -0.1, pitch: 0.04, dist: 8, fov: 1500, cy: H * 0.4, target: [4, -1.9, 16] }], [len(sh), { yaw: 0.06, pitch: 0.02, dist: 7 }]], {
+      main: null, extra: [{ p: [4, 2, 16], f: () => standing(g, 'magnusNY', 4, 16, { e: 'smug', t }) }] });
+    const hip = B.project(4, -1.7, 16); ring(g, hip.x, hip.y, 300, t, jeansT, 1);
+    scrim(g, 0.6);
+    counter(g, 'BECAUSE OF', 'HIS JEANS', { y: 300, size: 110, color: C.cream, labelColor: C.blue });
+  }, { trans: 'whip', grade: 'warm', info: true });
+  cue(0.05, 'boom', 0.7); cue(quitT, 'stamp', 1); cue(jeansT, 'hit', 0.8);
+
+  // ======================= NEW YORK, DECEMBER 2024: HE SHOWS UP IN JEANS =======================
+  const nyT = w('s1', 'New'), magT = w('s1', 'Magnus'), rapT = w('s1', 'Rapid'), j1T = w('s1', 'jeans');
+  shot(s('s1') - 0.1, (g, lt, t, sh) => {  // crane down into the hall
+    hall(g, lt, t, [[0, { yaw: 0.5, pitch: 0.75, dist: 60, fov: 1400, cy: H * 0.55, target: [4, 0, 20] }], [len(sh), { yaw: 0.3, pitch: 0.4, dist: 42 }]], { ez: ease.inOut, main: { pieces: MID, who: null } });
+    scrim(g, 0.5);
+    placeStamp(g, lt, 'New York', 'December 2024', { y: 330, t0: nyT - (t - lt) });
+  }, { trans: 'whip', grade: 'warm' });
+  shot(magT - 0.15, (g, lt, t, sh) => {  // he walks in, the camera backs off in front of him
+    const z = lerp(30, 20, clamp(lt / len(sh)));
+    hall(g, lt, t, [[0, { yaw: 0.0, pitch: 0.08, dist: 13, fov: 1500, cy: H * 0.5, target: [4, 1.2, 30] }], [len(sh), { yaw: 0.0, pitch: 0.08, dist: 13, target: [4, 1.2, 20] }]], {
+      main: null, extra: [{ p: [4, 2, z], f: () => standing(g, 'magnusNY', 4, z, { e: { ...EXPR.happy, look: [0, 0] }, t, walk: 1, phase: t * 7 }) }] });
+    const hip = B.project(4, -1.3, z); ring(g, hip.x, hip.y, 260, t, j1T, 1);
+    scrim(g, 0.5);
+    badge(g, 'WORLD RAPID CHAMPIONSHIP', W / 2, 330, { color: C.gold, size: 44, a: seg(t, rapT - 0.2, rapT - 0.1), scale: pop(t, rapT - 0.2) });
+    stamp(g, 'JEANS', W / 2, 520, t, j1T, { color: C.blue, size: 120, rot: -0.08 });
+    credit(g, EV, 1);
+  }, { trans: 'cut', grade: 'warm', info: true });
+  cue(nyT, 'hit', 0.6); cue(j1T, 'stamp', 0.9);
+
+  // ======================= THE DRESS CODE SAYS NO JEANS =======================
+  const noT = w('s2', 'no');
+  const pageAt = (g, img, x0, z0, a = 1) => picture(g, B, img, [x0, -0.33, z0 + 4.2], [x0 + 3.2, -0.33, z0 + 4.2], [x0, -0.33, z0], { tone: 'color', border: '#E8E0CC', pad: 0.06, a });
+  const arbDesk = (g, img) => {  // the arbiters' desk with the rules on it
+    box(g, B, [-15, FLOOR_Y, -10], [-7, -0.75, -4], { top: '#2A1C12', side: '#1E140D', front: '#24180F' });
+    box(g, B, [-15.4, -0.75, -10.4], [-6.6, -0.35, -3.6], { top: '#1E2A44', side: '#14203A', front: '#18243C' });
+    pageAt(g, img, -12.6, -9.2);
+  };
+  shot(s('s2') - 0.1, (g, lt, t, sh) => {
+    hall(g, lt, t, [[0, { yaw: -0.2, pitch: 1.0, dist: 9, fov: 1500, cy: H * 0.5, target: [-11, -0.3, -7] }], [len(sh), { yaw: -0.05, pitch: 1.1, dist: 6.5 }]], {
+      main: { pieces: MID, jeans: false }, extra: [{ p: [-11, 0, -7], f: () => arbDesk(g, PAGE.before) }] });
+    scrim(g, 0.5);
+    counter(g, 'DRESS CODE', null, { y: 300, size: 110, color: C.cream });
+    stamp(g, 'NO JEANS', W / 2, 1520, t, noT, { color: C.red, size: 110, rot: -0.08 });
+  }, { trans: 'whip', grade: 'warm', info: true });
+  cue(noT, 'stamp', 1);
+
+  // ======================= $200 FINE, CHANGE NOW =======================
+  const fineT = w('s3', '200'), nowT = w('s3', 'Right');
+  shot(s('s3') - 0.1, (g, lt, t, sh) => {  // the arbiter comes to his board
+    hall(g, lt, t, [[0, { yaw: -0.65, pitch: 0.16, dist: 15, fov: 1400, cy: H * 0.55, target: [3, 1.2, 8] }], [len(sh), { yaw: -0.45, pitch: 0.14, dist: 13 }]], {
+      main: { pieces: MID, e: { ...EXPR.neutral, look: [-0.8, -0.3] } },
+      extra: [{ p: [0.6, 2, 12.5], f: () => standing(g, 'arbiter', 0.6, 12.5, { e: exprAt([[0, 'focus'], [nowT - (t - lt), 'angry']], lt), t, jeans: false }) }] });
+    scrim(g, 0.55);
+    stamp(g, '$200 FINE', W / 2, 360, t, fineT, { color: C.red, size: 120, rot: -0.08 });
+    badge(g, 'CHANGE. NOW.', W / 2, 1540, { color: C.gold, size: 54, a: seg(t, nowT, nowT + 0.1), scale: pop(t, nowT) });
+    credit(g, EV, 1);
+  }, { trans: 'whip', grade: 'warm', info: true });
+  cue(fineT, 'stamp', 1); cue(nowT, 'hit', 0.7);
+
+  // ======================= "I'LL CHANGE TOMORROW" =======================
+  const tomT = w('s4', "I'll");
+  shot(s('s4') - 0.1, (g, lt, t, sh) => {
+    hall(g, lt, t, [[0, { yaw: 0.25, pitch: 0.12, dist: 9, fov: 1500, cy: H * 0.56, target: [4, 2.6, 9] }], [len(sh), { yaw: 0.15, pitch: 0.1, dist: 7.8 }]], {
+      main: { pieces: MID, e: { ...EXPR.smug, look: [0.3, -0.1], curve: 0.8 } } });
+    bubble(g, 4, 3.8, 9.4, "I'll change tomorrow.", seg(t, tomT - 0.15, tomT), { side: 1 });
+  }, { trans: 'cut', grade: 'warm' });
+
+  // ======================= NOT PAIRED =======================
+  const fnoT = w('s5', 'no'), parT = w('s5', 'paired');
+  shot(s('s5') - 0.1, (g, lt, t, sh) => {  // the pairings board on its stand in the hall
+    const scr = { p: [-14, 5, 28], f: () => {
+      box(g, B, [-14.4, FLOOR_Y, 27.6], [-13.6, 2, 28.4], { top: '#1A1A1E', side: '#121216', front: '#16161A' });
+      picture(g, B, PAIR, [-20, 10, 28], [-8, 10, 28], [-20, 2.3, 28], { tone: 'color', border: '#101014', pad: 0.3 });
+      if (t > parT) pool(g, B, -14, 3, 27.6, 5, C.red, 0.25 * seg(t, parT, parT + 0.2), true);
+    } };
+    hall(g, lt, t, [[0, { yaw: -0.12, pitch: 0.1, dist: 24, fov: 1500, cy: H * 0.48, target: [-14, 6, 28] }], [len(sh), { yaw: 0.0, pitch: 0.08, dist: 19 }]], { main: { pieces: MID, who: null }, extra: [scr] });
+    scrim(g, 0.5);
+    counter(g, 'FIDE: NO', null, { y: 300, size: 120, color: C.cream, a: seg(t, fnoT - 0.1, fnoT) });
+    stamp(g, 'NOT PAIRED', W / 2, 1540, t, parT, { color: C.red, size: 110, rot: -0.08 });
+  }, { trans: 'whip', grade: 'cold', info: true });
+  cue(fnoT, 'hit', 0.7); cue(parT, 'stamp', 1);
+
+  // ======================= HE WALKS OUT =======================
+  const outT = w('s6', 'walks'), wholeT = w('s6', 'whole');
+  shot(s('s6') - 0.1, (g, lt, t, sh) => {  // a silhouette walking into the light of the doors
+    const z = lerp(20, 46, clamp(lt / len(sh)));
+    hall(g, lt, t, [[0, { yaw: 0.05, pitch: 0.06, dist: 15, fov: 1500, cy: H * 0.52, target: [4, 2, 20] }], [len(sh), { yaw: -0.02, pitch: 0.05, dist: 17, target: [4, 2, 40] }]], {
+      main: null, extra: [{ p: [4, 2, z], f: () => standing(g, 'magnusNY', 4, z, { t, walk: 1, phase: t * 7, back: true }) }] });
+    scrim(g, 0.55);
+    stamp(g, 'WITHDRAWN', W / 2, 330, t, outT, { color: C.red, size: 120, rot: -0.08 });
+    badge(g, 'RAPID: OUT', W / 2 - 200, 500, { color: C.red, size: 42, a: seg(t, wholeT, wholeT + 0.1), scale: pop(t, wholeT) });
+    badge(g, 'BLITZ: OUT', W / 2 + 200, 500, { color: C.red, size: 42, a: seg(t, wholeT + 0.15, wholeT + 0.25), scale: pop(t, wholeT + 0.15) });
+  }, { trans: 'whip', grade: 'warm', info: true });
+  cue(outT, 'stamp', 1); cue(wholeT, 'pluck', 0.6); cue(wholeT + 0.15, 'pluck', 0.6);
+
+  // ======================= FIDE BACKS DOWN: JEANS ALLOWED =======================
+  const daysT = w('s7', 'Two'), downT = w('s7', 'backs'), allT = w('s7', 'allowed');
+  shot(s('s7') - 0.1, (g, lt, t, sh) => {
+    const img = t >= downT + 0.4 ? PAGE.after : PAGE.before;
+    hall(g, lt, t, [[0, { yaw: 0.35, pitch: 0.95, dist: 8, fov: 1500, cy: H * 0.52, target: [-11, -0.3, -7] }], [len(sh), { yaw: 0.15, pitch: 1.05, dist: 6.6 }]], {
+      main: { pieces: MID, jeans: false }, extra: [{ p: [-11, 0, -7], f: () => arbDesk(g, img) }] });
+    scrim(g, 0.5);
+    badge(g, '2 DAYS LATER', W / 2, 300, { color: C.blue, size: 44, a: seg(t, daysT, daysT + 0.1), scale: pop(t, daysT) });
+    stamp(g, 'ALLOWED', W / 2, 1520, t, allT, { color: C.lime, size: 120, rot: -0.08 });
+  }, { trans: 'zoom', grade: 'warm', info: true });
+  cue(downT, 'glass', 0.5); cue(allT, 'stamp', 1);
+
+  // ======================= HE COMES BACK. IN JEANS =======================
+  const backT = w('s8', 'back'), inJT = w('s8', 'jeans');
+  shot(s('s8') - 0.1, (g, lt, t, sh) => {
+    const z = lerp(52, 30, clamp(lt / len(sh)));
+    hall(g, lt, t, [[0, { yaw: 0.0, pitch: 0.05, dist: 14, fov: 1500, cy: H * 0.52, target: [4, 1.4, 44] }], [len(sh), { yaw: 0.05, pitch: 0.06, dist: 12, target: [4, 1.4, 28] }]], {
+      main: null, extra: [{ p: [4, 2, z], f: () => standing(g, 'magnusNY', 4, z, { e: { ...EXPR.smug, look: [0, 0], curve: 0.9 }, t, walk: 1, phase: t * 7 }) }] });
+    const hip = B.project(4, -1.3, z); ring(g, hip.x, hip.y, 240, t, inJT, 1);
+    scrim(g, 0.5);
+    counter(g, "HE'S BACK", null, { y: 320, size: 120, color: C.lime, a: seg(t, backT - 0.1, backT) });
+  }, { trans: 'flash', grade: 'warm', info: true });
+  cue(backT, 'boom', 0.7); cue(inJT, 'stamp', 0.8);
+
+  // ======================= THE BLITZ FINAL vs NEPOMNIACHTCHI =======================
+  const finT = w('s9', 'final'), ianT = w('s9', 'Ian');
+  const SIDE = { yaw: 1.5, pitch: 0.26, dist: 14, fov: 950, cy: H * 0.6, target: [4, 2.2, 4] };
+  const final = (g, lt, t, keys, o = {}) => hall(g, lt, t, keys, { main: { pieces: o.pieces || MID, e: o.e || { ...EXPR.focus, look: [-0.6, 0.5] }, opp: 'nepo', oppE: o.oppE || { ...EXPR.focus, look: [0.6, 0.5] }, jeans: false }, extra: o.extra || [] });
+  shot(s('s9') - 0.1, (g, lt, t, sh) => {
+    final(g, lt, t, [[0, { ...SIDE, dist: 15 }], [len(sh), { ...SIDE, yaw: 1.42, dist: 13 }]]);
+    scrim(g, 0.55);
+    badge(g, 'WORLD BLITZ · FINAL', W / 2, 330, { color: C.gold, size: 48, a: seg(t, finT, finT + 0.1), scale: pop(t, finT) });
+    badge(g, 'NEPOMNIACHTCHI', 260, 1500, { color: C.red, size: 36, a: seg(t, ianT, ianT + 0.1), scale: pop(t, ianT) });
+    badge(g, 'CARLSEN', W - 230, 1500, { color: C.blue, size: 36, a: seg(t, ianT + 0.1, ianT + 0.2), scale: pop(t, ianT + 0.1) });
+    credit(g, EV, 1);
+  }, { trans: 'whip', grade: 'warm', info: true });
+  cue(finT, 'hit', 0.7); cue(ianT, 'pluck', 0.6);
+
+  // ======================= THREE SUDDEN-DEATH GAMES, THREE DRAWS =======================
+  const sdT = w('s10', 'sudden-death');
+  const d3 = w('s10', 'draws');
+  shot(s('s10') - 0.1, (g, lt, t, sh) => {  // over the board, the games fly by
+    const k = Math.floor(lerp(30, 80, lt / len(sh)));
+    final(g, lt, t, [[0, { yaw: 0.6, pitch: 0.95, dist: 13, fov: 1500, cy: H * 0.56, target: [4, 0, 4] }], [len(sh), { yaw: 0.9, pitch: 0.9, dist: 12 }]], { pieces: piecesAt(G, Math.min(k, G.length - 1)) });
+    scrim(g, 0.55);
+    badge(g, 'SUDDEN DEATH', W / 2, 300, { color: C.red, size: 48, a: seg(t, sdT, sdT + 0.1), scale: pop(t, sdT) });
+    for (let i = 0; i < 3; i++) { const t0 = d3 - 0.25 + i * 0.18, a = seg(t, t0, t0 + 0.1); if (a <= 0) continue;
+      g.save(); g.globalAlpha = a; const x = W / 2 + (i - 1) * 250, y = 470, sc = pop(t, t0); g.translate(x, y); g.scale(sc, sc);
+      g.fillStyle = 'rgba(10,8,6,0.9)'; g.beginPath(); g.roundRect(-100, -60, 200, 120, 14); g.fill();
+      g.fillStyle = C.cream; g.font = mono(64, 800); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('½–½', 0, 4); g.restore(); }
+  }, { trans: 'cut', grade: 'warm', info: true });
+  cue(sdT, 'hit', 0.7); for (let i = 0; i < 3; i++) cue(d3 - 0.25 + i * 0.18, 'clack', 0.6);
+
+  // ======================= "CAN WE JUST SHARE THE TITLE?" — "YES" =======================
+  const shT = w('s11', 'share'), yesT = w('s11', 'yes');
+  shot(s('s11') - 0.1, (g, lt, t, sh) => {
+    final(g, lt, t, [[0, { yaw: 1.1, pitch: 0.2, dist: 15, fov: 1100, cy: H * 0.6, target: [4, 2.4, 4] }], [len(sh), { yaw: 1.25, pitch: 0.18, dist: 13.5 }]], {
+      e: { ...EXPR.happy, look: [-0.9, 0.1] }, oppE: exprAt([[0, { ...EXPR.focus, look: [0.6, 0.5] }], [shT + 0.4 - (t - lt), { ...EXPR.shock, look: [0.8, 0] }], [yesT - (t - lt), { ...EXPR.happy, look: [0.6, 0] }]], lt),
+      extra: [{ p: [-4, 2, 4], f: () => standing(g, 'arbiter', -4, 4, { e: exprAt([[0, 'focus'], [yesT - (t - lt), { ...EXPR.happy, nod: 1 }]], lt), t, jeans: false }) }] });
+    bubble(g, 4, 3.6, 9.4, 'Share the title?', seg(t, shT - 0.2, shT), { side: 1 });
+    scrim(g, 0.5, 520);
+    stamp(g, 'FIDE: YES', W / 2, 330, t, yesT, { color: C.lime, size: 120, rot: -0.08 });
+  }, { trans: 'whip', grade: 'warm', info: true });
+  cue(shT, 'pluck', 0.6); cue(yesT, 'stamp', 1);
+
+  // ======================= THE FIRST SHARED WORLD TITLE =======================
+  const firstT = w('s12', 'first');
+  shot(s('s12') - 0.1, (g, lt, t, sh) => {  // both on the podium with two trophies
+    const pod = { p: [4, 0, 20], f: () => {
+      standing(g, 'nepo', 1.4, 21.5, { e: 'happy', t, jeans: false }); standing(g, 'magnusNY', 6.6, 21.5, { e: { ...EXPR.triumph }, t });
+      box(g, B, [-3, FLOOR_Y, 19], [11, -0.2, 21], { top: '#E2BE6A', side: '#7A5A20', front: '#B08A3A' });
+      for (const x of [1.4, 6.6]) placeAt(B, x, -0.2, 19.6, (px, py, sc) => trophy(g, px, py, sc * 1.1));
+    } };
+    hall(g, lt, t, [[0, { yaw: -0.2, pitch: 0.1, dist: 17, fov: 1500, cy: H * 0.52, target: [4, 1.8, 20] }], [len(sh), { yaw: 0.1, pitch: 0.1, dist: 15 }]], { main: null, extra: [pod] });
+    pool(g, B, 4, 6, 20.5, 10, '#FFE6B8', 0.3, true);
+    if (t > firstT - 0.3) confetti(g, t, firstT - 0.3, { n: 90 });
+    scrim(g, 0.55);
+    counter(g, 'CO-CHAMPIONS', 'WORLD BLITZ 2024', { y: 330, size: 100, color: C.gold, labelColor: C.blue });
+    badge(g, 'FIRST SHARED WORLD TITLE', W / 2, 1520, { color: C.gold, size: 44, sub: 'IN CHESS HISTORY', a: seg(t, firstT, firstT + 0.1), scale: pop(t, firstT) });
+  }, { trans: 'flash', grade: 'warm', info: true });
+  cue(firstT, 'sparkle', 0.8); cue(firstT, 'boom', 0.5);
+
+  // ======================= THE JEANS: eBAY, $36,100, FOR CHARITY =======================
+  const ebT = w('s13', 'eBay'), bidT = w('s13', '36,100'), solT = w('s13', 'dollars'), chT = w('s13', 'charity');
+  shot(s('s13') - 0.1, (g, lt, t, sh) => {  // a glass case under a spotlight
+    rig(B, lt, [[0, { yaw: -0.45, pitch: 0.12, dist: 13, fov: 1400, cy: H * 0.55, target: [4, 2.2, 4] }], [len(sh), { yaw: 0.35, pitch: 0.1, dist: 11 }]], { t, e: lin });
+    room(g, B, 'backroom', { t, blur: 3, over: { light: '#FFE6B8', lightA: 0.25 } });
+    box(g, B, [2, FLOOR_Y, 2], [6, -0.6, 6], { top: '#2A2A30', side: '#141418', front: '#1E1E24' });
+    placeAt(B, 4, 6.2, 4, (px, py, sc) => jeansProp(g, px, py, sc * 0.95));
+    g.save(); g.globalAlpha = 0.16; box(g, B, [2.2, -0.6, 2.2], [5.8, 8.6, 5.8], { top: '#DDEEFF', side: '#A9C4DD', front: '#C9DDEE' }); g.restore();
+    pool(g, B, 4, 3, 4, 7, '#FFF1D6', 0.25, true);
+    scrim(g, 0.6);
+    badge(g, 'eBAY AUCTION', W / 2, 300, { color: C.gold, size: 44, a: seg(t, ebT, ebT + 0.1), scale: pop(t, ebT) });
+    const bid = Math.round(lerp(8200, 36100, seg(t, bidT - 0.2, bidT + 1.3, ease.inOut)) / 100) * 100;
+    counter(g, '$' + bid.toLocaleString('en-US'), t >= solT ? 'SOLD' : 'CURRENT BID', { y: 470, size: 130, color: t >= solT ? C.lime : C.cream, a: seg(t, bidT - 0.3, bidT - 0.2), labelColor: t >= solT ? C.lime : C.gold });
+    stamp(g, 'SOLD', W / 2, 1470, t, solT, { color: C.red, size: 120, rot: -0.1 });
+    badge(g, 'FOR CHARITY', W / 2, 1640, { color: C.blue, size: 40, a: seg(t, chT, chT + 0.1), scale: pop(t, chT) });
+    credit(g, 'PROCEEDS: BIG BROTHERS BIG SISTERS OF AMERICA · 2025', seg(t, chT, chT + 0.2));
+  }, { trans: 'whip', grade: 'warm', info: true });
+  cue(ebT, 'pluck', 0.6); for (let i = 0; i < 10; i++) cue(bidT - 0.2 + i * 0.15, 'tick', 0.3); cue(solT, 'stamp', 1); cue(chT, 'sparkle', 0.6);
+
+  // ======================= WOULD YOU HAVE CHANGED? FOLLOW =======================
+  const chgT = w('cta', 'changed'), folT = w('cta', 'Follow');
+  shot(s('cta') - 0.1, (g, lt, t, sh) => {
+    hall(g, lt, t, [[0, { yaw: -0.3, pitch: 0.1, dist: 14, fov: 1500, cy: H * 0.52, target: [4, 1.6, 16] }], [len(sh), { yaw: 0.2, pitch: 0.1, dist: 12 }]], {
+      main: null, extra: [{ p: [4, 2, 16], f: () => standing(g, 'magnusNY', 4, 16, { e: { ...EXPR.smug, look: [0, 0], curve: 0.9 }, t }) }] });
+    scrim(g, 0.65);
+    counter(g, 'WOULD YOU', 'HAVE CHANGED?', { y: 320, size: 110, color: C.cream, labelColor: C.gold, a: seg(t, s('cta'), s('cta') + 0.1) });
+    badge(g, 'YES — CHANGE', W / 2 - 220, 500, { color: '#8A8F98', size: 38, a: seg(t, chgT, chgT + 0.1), scale: pop(t, chgT) });
+    badge(g, 'NO — KEEP JEANS', W / 2 + 210, 500, { color: C.blue, size: 38, a: seg(t, chgT + 0.12, chgT + 0.22), scale: pop(t, chgT + 0.12) });
+    badge(g, 'FOLLOW FOR MORE', W / 2, 1500, { color: C.gold, size: 48, sub: 'THE 64 FILES', a: seg(t, folT, folT + 0.1), scale: pop(t, folT) });
+  }, { trans: 'whip', grade: 'warm', info: true });
+  cue(chgT, 'pluck', 0.5); cue(folT, 'sparkle', 0.7);
+
+  const tvOff = T.duration - 0.55;
+  cue(tvOff, 'tvoff', 0.6);
+  const music = [
+    { t: 0, m: 'hook' }, { t: s('s1') - 0.1, m: 'build' }, { t: fineT, m: 'tension' }, { t: s('s6') - 0.1, m: 'drop' }, { t: s('s7') - 0.1, m: 'clockwork' },
+    { t: s('s8') - 0.1, m: 'victory' }, { t: s('s10') - 0.1, m: 'tension' }, { t: yesT, m: 'hit' }, { t: s('s12') - 0.1, m: 'victory' }, { t: s('s13') - 0.1, m: 'digital' },
+    { t: s('cta') - 0.1, m: 'finale' }, { t: T.duration, m: 'end' },
+  ];
+  music.sort((a, b) => a.t - b.t);
+  shots.sort((a, b) => a.a - b.a);
+  return { shots, cues, music, tvOff, duration: T.duration, jumpCut: { every: 1.6, zooms: [1, 1.14, 1.06], shift: 46 } };
+}
