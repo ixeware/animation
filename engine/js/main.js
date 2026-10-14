@@ -92,9 +92,10 @@ function compose(t, frame) {
     ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); ctx.drawImage(layer, 0, 0);
   } else {
     // every shot keeps moving: slow push-in across the shot + impact shake from the sound cues
-    const kb = s.kb ?? 0.04, a = shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
+    // info shots (tables, leaderboards, panels, quotes) stay framed: no jump cuts, barely any push-in
+    const kb = s.info ? 0.01 : s.kb ?? 0.04, a = shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
     // dense editing: long shots get hard punch-in jump cuts every `every` seconds (film.jumpCut)
-    const J = film.jumpCut, [jz, jx, jy] = J && !s.noJump ? jumpAt(J, lt, s.b - s.a, s.i) : [1, 0, 0];
+    const J = film.jumpCut, [jz, jx, jy] = J && !s.noJump && !s.info ? jumpAt(J, lt, s.b - s.a, s.i) : [1, 0, 0];
     const z = (1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + a * 0.0015) * jz;
     ctx.translate(W / 2 + sx + jx, H / 2 + sy + jy); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
     ctx.drawImage(layer, 0, 0);
