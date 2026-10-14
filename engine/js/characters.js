@@ -40,6 +40,8 @@ export const CAST = {
   // glasses, blue eyes, moustache joined to a goatee (circle beard) over light stubble, dark red hoodie
   levy: { face: [0.93, 1.08, 0.8], hair: 'quiff', hairC: '#2B2420', brow: '#231A15', suit: '#93232A', suitD: '#6B151B', shirt: 'hoodie', beard: '#2E2420', beardStyle: 'goatee', glasses: 'white', iris: '#4F86B8', nose: 1.2, lip: '#B86A66', lids: 0.1, ears: 1.04 },
   levyStream: { face: [0.93, 1.08, 0.8], hair: 'quiff', hairC: '#2B2420', brow: '#231A15', suit: '#93232A', suitD: '#6B151B', shirt: 'hoodie', beard: '#2E2420', beardStyle: 'goatee', glasses: 'white', iris: '#4F86B8', nose: 1.2, lip: '#B86A66', lids: 0.1, ears: 1.04 },
+  // Can Chess Be Solved: Claude Shannon around 1950, long narrow face, dark hair combed back, big ears, grey tweed jacket
+  shannon: { face: [0.88, 1.14, 0.78], hair: 'swept', hairC: '#2E241E', brow: '#2A201A', suit: '#77726A', suitD: '#5A564F', shirt: 'tie', tie: '#9A948A', ears: 1.14 },
   doctor: { face: [0.98, 1.04, 0.9], hair: 'receding', hairC: '#8E8A84', brow: '#6E6A64', suit: '#F2F2EE', suitD: '#D3D8D4', shirt: 'labcoat', glasses: true, ears: 1 },
   operator: { face: [0.94, 1.04, 0.84], hair: 'tied', hairC: '#3A2A20', brow: '#2E2119', suit: '#E8E0CF', suitD: '#C2B8A3', shirt: 'sleeves', vest: '#3B2E26', ears: 1 },
 };
