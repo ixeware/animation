@@ -1,0 +1,33 @@
+{
+ "title": "What If Magnus Raised a Chess Baby?",
+ "post": "What if Magnus Carlsen taught a baby chess from day one? Someone already tried it: the Polgar experiment. #chess #magnuscarlsen #juditpolgar #chesstok #prodigy",
+ "lead_in": 0.05,
+ "tail": 1.6,
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\""
+ },
+ "voice_fx": {"tempo": 1.3, "max_gap": 0.13},
+ "mix": {"bed_gap": 7.0},
+ "phrases": [
+  {"id": "hook1", "text": "What if Magnus Carlsen taught a baby chess from day one?", "say": "[curious] What if Magnus Carlsen taught a baby chess... from day one?", "pause": 0.2,
+   "colors": {"Magnus": "gold", "Carlsen": "gold", "baby": "blue", "day": "lime", "one?": "lime"}},
+  {"id": "hook2", "text": "Someone already tried it.", "say": "[mysterious] Someone already tried it.", "pause": 0.3, "colors": {"already": "red", "tried": "red"}},
+  {"id": "polgar", "text": "In 1970, László Polgár said geniuses are made, not born. So his three daughters were homeschooled, mostly in chess.",
+   "say": "In 1970, László Polgár said geniuses are made, not born. So his three daughters were homeschooled... mostly in chess.", "pause": 0.2,
+   "colors": {"László": "gold", "Polgár": "gold", "made,": "lime", "born.": "red", "three": "blue", "chess.": "lime"}},
+  {"id": "judit", "text": "The youngest, Judit, became a grandmaster at 15. Younger than Bobby Fischer.", "say": "[impressed] The youngest, Judit, became a grandmaster at fifteen. Younger than Bobby Fischer.", "pause": 0.2,
+   "colors": {"Judit,": "gold", "grandmaster": "lime", "15.": "lime", "Fischer.": "gold"}},
+  {"id": "beat", "text": "Later she beat Kasparov. And Magnus.", "say": "Later, she beat Kasparov... [whispers] and Magnus.", "pause": 0.25, "colors": {"Kasparov.": "red", "Magnus.": "red"}},
+  {"id": "magnus", "text": "Magnus started at five. Grandmaster at thirteen.", "say": "Magnus started at five. Grandmaster at thirteen.", "pause": 0.2, "colors": {"five.": "blue", "thirteen.": "lime"}},
+  {"id": "baby", "text": "So a baby with Magnus as its coach? The youngest grandmaster ever was 12. That record would be in trouble.",
+   "say": "So a baby with Magnus as its coach? The youngest grandmaster ever was twelve... [laughs] that record would be in trouble.", "pause": 0.2,
+   "colors": {"baby": "blue", "youngest": "gold", "12.": "gold", "trouble.": "red"}},
+  {"id": "cta", "text": "Could it ever beat Magnus? Tell me, and follow.", "say": "[playful] Could it ever beat Magnus? Tell me... and follow.", "pause": 0.1,
+   "colors": {"beat": "red", "Magnus?": "gold", "follow.": "gold"}}
+ ]
+}
