@@ -107,11 +107,25 @@
    "id": "sac",
    "text": "Sacrifice the rook!",
    "say": "[shouting] SACRIFICE THE ROOOOOK!",
-   "pause": 0.2,
+   "pause": 0.08,
    "colors": {
     "Sacrifice": "red",
     "the": "red",
     "rook!": "red"
+   }
+  },
+  {
+   "id": "rooook",
+   "text": "THE ROOOOOOOK!",
+   "say": "[shouting] THE ROOOOOOOOOOOOK!",
+   "pause": 0.15,
+   "echo": [
+    0.16,
+    0.42
+   ],
+   "colors": {
+    "THE": "red",
+    "ROOOOOOOK!": "red"
    }
   },
   {

@@ -36,10 +36,10 @@ export const CAST = {
   magnus: { face: [0.96, 1.07, 0.88], hair: 'curly', hairC: '#6E4A2E', brow: '#4E3420', suit: '#F2F2EE', suitD: '#D2D6D6', shirt: 'open', beard: '#7A5A3A', ears: 1 },
   danya: { face: [0.9, 1.1, 0.82], hair: 'swept', hairC: '#2A1E16', brow: '#1E1510', suit: '#262B36', suitD: '#1A1E26', shirt: 'open', ears: 1.04 },
   hikaru: { face: [0.98, 1.02, 0.9], hair: 'fringe', hairC: '#16110E', brow: '#120D0A', suit: '#3A3D46', suitD: '#2A2D34', shirt: 'hoodie', ears: 1 },
-  // GothamChess episode: Levy Rozman as in the 2024 Collision photos. Curly top with short sides, clear acrylic
-  // glasses, close full beard with a moustache, grey-blue eyes, long nose, maroon print shirt with a collar
-  levy: { face: [0.93, 1.09, 0.82], hair: 'levy', hairC: '#2A1D16', brow: '#22160F', suit: '#6E1E36', suitD: '#4E1226', shirt: 'print', beard: '#36271E', beardStyle: 'full', glasses: 'clear', iris: '#6F8798', nose: 1.3, lip: '#B86A66', lids: 0.14, ears: 1.04 },
-  levyStream: { face: [0.93, 1.09, 0.82], hair: 'levy', hairC: '#2A1D16', brow: '#22160F', suit: '#22252C', suitD: '#16181D', shirt: 'tee', beard: '#36271E', beardStyle: 'full', glasses: 'clear', iris: '#6F8798', nose: 1.3, lip: '#B86A66', lids: 0.14, ears: 1.04 },
+  // GothamChess episode: Levy Rozman after his own channel avatar. Swept-up quiff with short faded sides, thick white
+  // glasses, blue eyes, moustache joined to a goatee (circle beard) over light stubble, dark red hoodie
+  levy: { face: [0.93, 1.08, 0.8], hair: 'quiff', hairC: '#2B2420', brow: '#231A15', suit: '#93232A', suitD: '#6B151B', shirt: 'hoodie', beard: '#2E2420', beardStyle: 'goatee', glasses: 'white', iris: '#4F86B8', nose: 1.2, lip: '#B86A66', lids: 0.1, ears: 1.04 },
+  levyStream: { face: [0.93, 1.08, 0.8], hair: 'quiff', hairC: '#2B2420', brow: '#231A15', suit: '#93232A', suitD: '#6B151B', shirt: 'hoodie', beard: '#2E2420', beardStyle: 'goatee', glasses: 'white', iris: '#4F86B8', nose: 1.2, lip: '#B86A66', lids: 0.1, ears: 1.04 },
   doctor: { face: [0.98, 1.04, 0.9], hair: 'receding', hairC: '#8E8A84', brow: '#6E6A64', suit: '#F2F2EE', suitD: '#D3D8D4', shirt: 'labcoat', glasses: true, ears: 1 },
   operator: { face: [0.94, 1.04, 0.84], hair: 'tied', hairC: '#3A2A20', brow: '#2E2119', suit: '#E8E0CF', suitD: '#C2B8A3', shirt: 'sleeves', vest: '#3B2E26', ears: 1 },
 };
@@ -221,6 +221,7 @@ function hairBack(g, c, fw) {
   }
   if (c.hair === 'curly') { g.beginPath(); g.ellipse(0, -36, 116 * fw, 112, 0, 0, 7); g.fill(); }
   if (c.hair === 'levy') { g.beginPath(); g.ellipse(0, -52, 104 * fw, 100, 0, 0, 7); g.fill(); }
+  if (c.hair === 'quiff') { g.beginPath(); g.ellipse(4, -70, 98 * fw, 92, 0, 0, 7); g.fill(); }
   if (c.hair === 'wild') {  // untamed grey hair at the sides and back, thin on top
     for (let i = 0; i < 12; i++) { const a = Math.PI * (0.85 + i / 11 * 1.3), r = 104 + (i % 3) * 8; g.beginPath(); g.arc(Math.cos(a) * r * fw, -6 + Math.sin(a) * r * 0.85, 34 + (i % 2) * 8, 0, 7); g.fill(); }
   }
@@ -294,6 +295,13 @@ function hairFront(g, c, fw, fh) {
       p.quadraticCurveTo(-w + 22, -112, -w + 14, -84); p.closePath();
       break;
     }
+    case 'quiff':  // swept-up quiff peaking at the front right; the faded sides are drawn after
+      p.moveTo(-w + 2, -74); p.bezierCurveTo(-w - 4, -h + 2, -w + 18, -h - 30, -34, -h - 44);
+      p.bezierCurveTo(-4, -h - 58, 40, -h - 66, 62, -h - 50);
+      p.bezierCurveTo(78, -h - 40, w + 4, -h - 14, w + 2, -74);
+      p.lineTo(w - 14, -86); p.quadraticCurveTo(w - 20, -110, 58, -114); p.quadraticCurveTo(6, -100, -48, -112);
+      p.quadraticCurveTo(-w + 20, -110, -w + 14, -86); p.closePath();
+      break;
     case 'wild':  // tufts sticking out over the ears, a few strands on the crown
       for (let i = 0; i < 4; i++) for (const sd of [-1, 1]) { const y = -70 + i * 26; p.moveTo(sd * (w + 8) + 22, y); p.arc(sd * (w + 8), y, 22 + (i % 2) * 6, 0, 7); }
       p.moveTo(-40, -h + 6); p.quadraticCurveTo(0, -h - 26, 40, -h + 6); p.quadraticCurveTo(0, -h - 6, -40, -h + 6);
@@ -304,6 +312,17 @@ function hairFront(g, c, fw, fh) {
       p.moveTo(w + 10, 30); p.bezierCurveTo(w + 22, -10, w + 10, -60, w - 14, -70); p.lineTo(w - 20, 20); p.closePath(); break;
   }
   g.fill(p);
+  if (c.hair === 'quiff') {  // short faded sides, a sheen sweeping up into the quiff and a few strands
+    for (const sd of [-1, 1]) {
+      const fg = g.createLinearGradient(0, -100, 0, -2); fg.addColorStop(0, rgba(c.hairC, 0.9)); fg.addColorStop(1, rgba(c.hairC, 0.35));
+      g.fillStyle = fg; g.beginPath(); g.moveTo(sd * (w + 3), -96); g.lineTo(sd * (w + 3), -4); g.lineTo(sd * (w - 6), -4); g.lineTo(sd * (w - 14), -88); g.closePath(); g.fill();
+    }
+    g.save(); g.clip(p); g.lineCap = 'round';
+    g.strokeStyle = rgba('#FFFFFF', 0.13); g.lineWidth = 16; g.beginPath(); g.moveTo(-50, -h + 4); g.bezierCurveTo(-30, -h - 30, 10, -h - 50, 56, -h - 46); g.stroke();
+    g.strokeStyle = rgba('#000000', 0.28); g.lineWidth = 4;
+    for (const [x0, y0, x1, y1] of [[-70, -100, 20, -h - 52], [-40, -104, 44, -h - 50], [-10, -102, 64, -h - 40], [20, -106, 80, -h - 24]]) { g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo((x0 + x1) / 2 - 20, (y0 + y1) / 2 - 20, x1, y1); g.stroke(); }
+    g.restore();
+  }
   if (c.hair === 'levy') {  // short faded sides down to the beard, then curl texture on the top
     g.fillStyle = rgba(c.hairC, 0.62);
     for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(sd * (w + 4), -92); g.lineTo(sd * (w + 3), -4); g.lineTo(sd * (w - 5), -4); g.lineTo(sd * (w - 13), -86); g.closePath(); g.fill(); }
@@ -317,7 +336,7 @@ function hairFront(g, c, fw, fh) {
     g.restore();
   }
   // a few highlight strands
-  if (!['cap', 'receding', 'turban', 'franklin', 'wild', 'curly', 'levy'].includes(c.hair)) {
+  if (!['cap', 'receding', 'turban', 'franklin', 'wild', 'curly', 'levy', 'quiff'].includes(c.hair)) {
     g.save(); g.clip(p); g.strokeStyle = rgba('#ffffff', 0.07); g.lineWidth = 5; g.lineCap = 'round';
     for (let i = 1; i < 3; i++) { g.beginPath(); g.moveTo(-60 + i * 30, -h + 4); g.quadraticCurveTo(-30 + i * 34, -h + 40, -10 + i * 36, -h + 30); g.stroke(); }
     g.restore();
@@ -424,6 +443,9 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
     g.fillStyle = rgba('#000000', 0.2); for (let i = 0; i < 40; i++) { const x = Math.sin(i * 51.3) * 80, y = 74 + (Math.sin(i * 17.9) * 0.5 + 0.5) * 56; g.fillRect(x, y, 4, 4); }
     g.fillStyle = rgba('#8A6A54', 0.25); for (let i = 0; i < 30; i++) { const x = Math.sin(i * 23.1 + 2) * 76, y = 70 + (Math.sin(i * 41.7) * 0.5 + 0.5) * 60; g.fillRect(x, y, 3, 3); }
     g.restore();
+  } else if (c.beardStyle === 'goatee') {  // light stubble shadow on the jaw; the goatee itself is drawn with the mouth
+    g.save(); g.clip(hp); const sg = g.createLinearGradient(0, 10, 0, 140); sg.addColorStop(0, rgba(c.beard, 0)); sg.addColorStop(0.45, rgba(c.beard, 0.1)); sg.addColorStop(1, rgba(c.beard, 0.16));
+    g.fillStyle = sg; g.fillRect(-130, 10, 260, 140); g.restore();
   } else if (c.beard && !c.beardBig) { // short dark beard
     g.save(); g.clip(hp); g.fillStyle = c.beard; g.beginPath(); g.moveTo(-110, 20); g.bezierCurveTo(-90, 60, -60, 50, -30, 52); g.quadraticCurveTo(0, 46, 30, 52);
     g.bezierCurveTo(60, 50, 90, 60, 110, 20); g.lineTo(110, 200); g.lineTo(-110, 200); g.closePath(); g.fill(); g.restore();
@@ -467,6 +489,14 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
       for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(sd * 70, 30); g.quadraticCurveTo(sd * 62, 62, sd * 48, 86); g.stroke(); g.beginPath(); g.arc(sd * 38, 22, 20, 0.25 * Math.PI, 0.75 * Math.PI); g.stroke(); }
     }
     if (c.sideburns) { g.fillStyle = c.hairC; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(sd * 88 * fw, 30, 16, 52, sd * -0.1, 0, 7); g.fill(); } }
+    if (c.beardStyle === 'goatee') {  // moustache joined to a chin beard around the mouth (even-odd hole for the lips)
+      const op = clamp(e.open ?? 0), gp = new Path2D();
+      gp.moveTo(0, 49); gp.quadraticCurveTo(20, 46, 33, 58); gp.lineTo(34, 82); gp.quadraticCurveTo(30, 106, 0, 126);
+      gp.quadraticCurveTo(-30, 106, -34, 82); gp.lineTo(-33, 58); gp.quadraticCurveTo(-20, 46, 0, 49); gp.closePath();
+      gp.roundRect(-26, 58, 52, 24 + op * 22, 11);
+      g.fillStyle = c.beard; g.fill(gp, 'evenodd');
+      g.fillStyle = rgba('#000000', 0.18); for (let i = 0; i < 18; i++) { const x = Math.sin(i * 51.3) * 18, y = 92 + (Math.sin(i * 17.9) * 0.5 + 0.5) * 22; g.fillRect(x, y, 3, 3); }
+    }
     mouth(g, e, c);
     if (c.mustache) {  // curled moustache over the mouth
       g.fillStyle = c.mustache;
@@ -480,6 +510,14 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
       g.strokeStyle = '#4A3F33'; g.lineWidth = 4;
       for (const sd of [-1, 1]) { g.beginPath(); g.arc(sd * 36, 8, 22, 0, 7); g.stroke(); }
       g.beginPath(); g.moveTo(-14, 6); g.quadraticCurveTo(0, 0, 14, 6); g.stroke();
+    } else if (c.glasses === 'white') {  // thick white rectangular frames
+      for (const sd of [-1, 1]) {
+        g.fillStyle = rgba('#E4F0F8', 0.12); g.beginPath(); g.roundRect(sd * 41 - 36, -31, 72, 52, 13); g.fill();
+        g.strokeStyle = '#F4F3F0'; g.lineWidth = 10; g.stroke();
+        g.strokeStyle = rgba('#000000', 0.16); g.lineWidth = 2; g.beginPath(); g.roundRect(sd * 41 - 30, -25, 60, 40, 9); g.stroke();
+        g.strokeStyle = '#F4F3F0'; g.lineWidth = 9; g.beginPath(); g.moveTo(sd * 77, -18); g.lineTo(sd * 94, -22); g.stroke();
+      }
+      g.strokeStyle = '#F4F3F0'; g.lineWidth = 8; g.beginPath(); g.moveTo(-6, -10); g.quadraticCurveTo(0, -15, 6, -10); g.stroke();
     } else if (c.glasses === 'clear') {  // clear champagne acrylic frames: pale thick rim, darker inner edge, a glint
       for (const sd of [-1, 1]) {
         g.fillStyle = rgba('#DDEBF2', 0.14); g.beginPath(); g.roundRect(sd * 40 - 33, -33, 66, 58, 20); g.fill();

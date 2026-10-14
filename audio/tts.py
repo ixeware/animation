@@ -341,6 +341,11 @@ def main(ep):
             if sts: audio = sts(audio)
             audio, heard = recognize(audio, untag(say))  # timings change with tempo and voice: measure again
         audio, cut = trim(audio)
+        if p.get('echo'):  # [delay s, decay]: a shouted line rings out like in a hall
+            dl, dk = p['echo']; n = int(dl * SR)
+            out_e = np.concatenate([audio, np.zeros(n * 4)])
+            for k in range(1, 5): out_e[n * k:n * k + len(audio)] += audio * dk ** k
+            audio = out_e
         dur = len(audio) / SR
         caps = p['text'].split()
         heard = [(w, s - cut, e - cut) for w, s, e in heard]

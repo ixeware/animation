@@ -272,6 +272,35 @@ export async function build(T) {
   }, { trans: 'flash', grade: 'warm', noJump: true });
   cue(sacT, 'boom', 1); cue(sacT, 'riser', 0.5); cue(rkT, 'hit', 0.9); cue(rkT, 'cheer', 0.4);
 
+  // THE ROOOOOOOK — the meme, shouted with an echo: the word stretches across the screen while the scream lasts
+  const r0 = s('rooook'), r1 = T.e('rooook');
+  shot(r0 - 0.04, (g, lt, t, sh) => {
+    const u = seg(t, r0, r0 + (r1 - r0) * 0.6), beat = 0.5 + 0.5 * Math.sin(t * 22);
+    const bg = g.createRadialGradient(W / 2, H * 0.42, 40, W / 2, H * 0.45, H * 0.85); bg.addColorStop(0, mix('#B8321E', '#E0603F', beat * 0.4)); bg.addColorStop(1, '#1A0605'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    rays(g, W / 2, H * 0.4, t * 3, { n: 26, color: '#FFD0A0', a: 0.2 });
+    speedlines(g, W / 2, H * 0.4, t, { a: 0.7, n: 60, r0: 300, color: '#FFE8D0' });
+    // the rook spins up out of the board toward the camera
+    const k = seg(t, r0, r1, ease.in);
+    drawPiece(g, 'r', 'b', W / 2 + Math.sin(t * 7) * 30, H * 0.62 + 300 * k, 420 + 1500 * k, { rot: t * 2.2, alpha: 1 - seg(t, r1 - 0.25, r1) });
+    drawChar(g, 'levy', { x: W / 2, y: H * 0.8, s: 1.9, e: { ...EXPR.shock, open: 1, mouth: 'o', brow: -0.8, browY: -24, shake: 1.2, look: [0, -0.3], pupil: 0.45 }, t });
+    // the word, fitted to the width; echo copies spread out behind it
+    const word = 'RO' + 'O'.repeat(Math.round(lerp(1, 10, u))) + 'K!';
+    g.save(); g.font = sans(200, 900); const tw = g.measureText(word).width, fs = Math.min(1, (W - 70) / tw);
+    for (let e = 3; e >= 0; e--) {
+      const de = seg(t, r0 + 0.16 * e, r0 + 0.16 * e + 0.5), sc = fs * (1 + e * 0.12 * de), al = e ? 0.35 * Math.pow(0.6, e) * (1 - de * 0.5) : 1;
+      if (e && de <= 0) continue;
+      g.save(); g.translate(W / 2 + Math.sin(t * 53 + e) * 8, 470 + Math.cos(t * 47 + e) * 6); g.rotate(-0.05); g.scale(sc, sc * 1.25);
+      g.globalAlpha = al; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+      if (!e) { g.lineWidth = 22; g.strokeStyle = C.ink; g.strokeText(word, 0, 0); }
+      g.fillStyle = e ? '#FFD0A0' : C.cream; g.fillText(word, 0, 0); g.restore();
+    }
+    g.textAlign = 'center'; g.font = sans(84, 900); g.letterSpacing = '12px'; g.lineWidth = 12; g.strokeStyle = C.ink; g.lineJoin = 'round';
+    g.strokeText('THE', W / 2, 270); g.fillStyle = C.red; g.fillText('THE', W / 2, 270);
+    g.restore();
+    if (lt < 0.15) flash(g, 0.7 * (1 - lt / 0.15));
+  }, { trans: 'flash', grade: 'warm', noJump: true });
+  cue(r0, 'boom', 1); cue(r0, 'hit', 0.9); cue(r0 + 0.05, 'cheer', 0.7); cue(r0 + 0.1, 'riser', 0.4); cue(r1 - 0.2, 'whoosh', 0.7);
+
   // 22.gxh5 — of course they took it
   const tookT = w('take', 'took');
   const take = new Moves(B, G, [{ k: 43, t0: tookT - 0.35, color: C.red, label: '22.gxh5', labelColor: C.red }]);
