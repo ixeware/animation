@@ -1,6 +1,6 @@
 {
  "title": "Chess Records That Sound Fake",
- "post": "Chess records that sound fake: a 269-move game that lasted over 20 hours and ended in a draw, Magnus going 125 games without a loss, Fischer's 20 wins in a row, 64 hours nonstop in Times Square and 48 blindfold games on an exercise bike. #chess #chesstok #worldrecord #magnuscarlsen #bobbyfischer",
+ "post": "This man played dozens of chess games at once, blindfolded, on an exercise bike. How many? Watch till number one. Plus a 269-move draw, Magnus going 125 games without a loss, Fischer's 20 wins in a row and 64 hours nonstop in Times Square. #chess #chesstok #worldrecord #magnuscarlsen #bobbyfischer",
  "lead_in": 0.05,
  "tail": 1.6,
  "voice": {
@@ -11,30 +11,137 @@
   "similarity": 0.8,
   "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\""
  },
- "voice_fx": {"tempo": 1.3, "max_gap": 0.13},
- "mix": {"bed_gap": 7.0},
+ "voice_fx": {
+  "tempo": 1.3,
+  "max_gap": 0.13
+ },
+ "mix": {
+  "bed_gap": 7.0
+ },
  "phrases": [
-  {"id": "hook1", "text": "One chess game lasted over 20 hours.", "say": "[excited] One chess game lasted over twenty hours.", "pause": 0.15,
-   "colors": {"20": "gold", "hours.": "gold"}},
-  {"id": "hook2", "text": "And that's only number five.", "say": "[deadpan] And that's only number five.", "pause": 0.3, "colors": {"five.": "red"}},
-  {"id": "n5", "text": "Belgrade, 1989. Two players made 269 moves. And it ended in a draw.",
-   "say": "Belgrade, nineteen eighty-nine. Two players made two hundred sixty-nine moves. And it ended... [sighs] in a draw.", "pause": 0.2,
-   "colors": {"Belgrade,": "blue", "269": "lime", "moves.": "lime", "draw.": "red"}},
-  {"id": "n4", "text": "Number four. Magnus Carlsen didn't lose a classical game for over two years. 125 games in a row.",
-   "say": "Number four. Magnus Carlsen didn't lose a classical game for over two years. A hundred and twenty-five games in a row.", "pause": 0.2,
-   "colors": {"four.": "gold", "Magnus": "gold", "Carlsen": "gold", "lose": "red", "two": "blue", "years.": "blue", "125": "lime"}},
-  {"id": "n3", "text": "Number three. Bobby Fischer won 20 games in a row on his way to the world title.",
-   "say": "Number three. Bobby Fischer won twenty games in a row on his way to the world title.", "pause": 0.15,
-   "colors": {"three.": "gold", "Bobby": "gold", "Fischer": "gold", "20": "lime", "row": "lime"}},
-  {"id": "n3b", "text": "Two of his matches ended six to zero.", "say": "[impressed] Two of his matches ended... six to zero.", "pause": 0.25,
-   "colors": {"six": "lime", "zero.": "red"}},
-  {"id": "n2", "text": "Number two. Two players in Times Square played for 64 hours straight. 473 games.",
-   "say": "Number two. Two players in Times Square played for sixty-four hours straight. Four hundred seventy-three games.", "pause": 0.2,
-   "colors": {"two.": "gold", "Times": "blue", "Square": "blue", "64": "lime", "hours": "lime", "473": "lime"}},
-  {"id": "n1", "text": "Number one. Timur Gareyev played 48 games at the same time. Blindfolded. While riding an exercise bike.",
-   "say": "[impressed] Number one. Timur Gareyev played forty-eight games at the same time... blindfolded... while riding an exercise bike.", "pause": 0.15,
-   "colors": {"one.": "gold", "Timur": "gold", "Gareyev": "gold", "48": "lime", "Blindfolded.": "red", "bike.": "blue"}},
-  {"id": "n1b", "text": "He won 35 of them.", "say": "He won thirty-five of them.", "pause": 0.25, "colors": {"won": "lime", "35": "lime"}},
-  {"id": "cta", "text": "Which one sounds the most fake? Follow for more.", "say": "[playful] Which one sounds the most fake? Follow for more.", "pause": 0.1, "colors": {"fake?": "gold", "Follow": "gold"}}
+  {
+   "id": "hook1",
+   "text": "This man played dozens of chess games at once. Blindfolded.",
+   "say": "[excited] This man played dozens of chess games at once... blindfolded.",
+   "pause": 0.15,
+   "colors": {
+    "dozens": "gold",
+    "once.": "gold",
+    "Blindfolded.": "red"
+   }
+  },
+  {
+   "id": "hook2",
+   "text": "How many? Stay until number one.",
+   "say": "[mischievously] How many? Stay until number one.",
+   "pause": 0.3,
+   "colors": {
+    "How": "lime",
+    "many?": "lime",
+    "one.": "gold"
+   }
+  },
+  {
+   "id": "n5",
+   "text": "Number five. Belgrade, 1989. Two players made 269 moves in over 20 hours. And it ended in a draw.",
+   "say": "Number five. Belgrade, nineteen eighty-nine. Two players made two hundred sixty-nine moves in over twenty hours. And it ended... [sighs] in a draw.",
+   "pause": 0.2,
+   "colors": {
+    "five.": "gold",
+    "Belgrade,": "blue",
+    "269": "lime",
+    "moves": "lime",
+    "20": "blue",
+    "hours.": "blue",
+    "draw.": "red"
+   }
+  },
+  {
+   "id": "n4",
+   "text": "Number four. Magnus Carlsen didn't lose a classical game for over two years. 125 games in a row.",
+   "say": "Number four. Magnus Carlsen didn't lose a classical game for over two years. A hundred and twenty-five games in a row.",
+   "pause": 0.2,
+   "colors": {
+    "four.": "gold",
+    "Magnus": "gold",
+    "Carlsen": "gold",
+    "lose": "red",
+    "two": "blue",
+    "years.": "blue",
+    "125": "lime"
+   }
+  },
+  {
+   "id": "n3",
+   "text": "Number three. Bobby Fischer won 20 games in a row on his way to the world title.",
+   "say": "Number three. Bobby Fischer won twenty games in a row on his way to the world title.",
+   "pause": 0.15,
+   "colors": {
+    "three.": "gold",
+    "Bobby": "gold",
+    "Fischer": "gold",
+    "20": "lime",
+    "row": "lime"
+   }
+  },
+  {
+   "id": "n3b",
+   "text": "Two of his matches ended six to zero.",
+   "say": "[impressed] Two of his matches ended... six to zero.",
+   "pause": 0.25,
+   "colors": {
+    "six": "lime",
+    "zero.": "red"
+   }
+  },
+  {
+   "id": "n2",
+   "text": "Number two. Two players in Times Square played for 64 hours straight. 473 games.",
+   "say": "Number two. Two players in Times Square played for sixty-four hours straight. Four hundred seventy-three games.",
+   "pause": 0.2,
+   "colors": {
+    "two.": "gold",
+    "Times": "blue",
+    "Square": "blue",
+    "64": "lime",
+    "hours": "lime",
+    "473": "lime"
+   }
+  },
+  {
+   "id": "n1",
+   "text": "Number one. Timur Gareyev played 48 games at the same time. Blindfolded. While riding an exercise bike.",
+   "say": "[impressed] Number one. Timur Gareyev played forty-eight games at the same time... blindfolded... while riding an exercise bike.",
+   "pause": 0.15,
+   "colors": {
+    "one.": "gold",
+    "Timur": "gold",
+    "Gareyev": "gold",
+    "48": "lime",
+    "Blindfolded.": "red",
+    "bike.": "blue"
+   }
+  },
+  {
+   "id": "n1b",
+   "text": "He won 35 of them.",
+   "say": "He won thirty-five of them.",
+   "pause": 0.25,
+   "colors": {
+    "won": "lime",
+    "35": "lime"
+   }
+  },
+  {
+   "id": "cta",
+   "text": "Did you guess right? Follow for more.",
+   "say": "[playful] Did you guess right? Follow for more.",
+   "pause": 0.1,
+   "colors": {
+    "guess": "gold",
+    "right?": "gold",
+    "Follow": "gold"
+   }
+  }
  ]
 }
