@@ -1,0 +1,197 @@
+{
+ "title": "Bill Gates vs Magnus Carlsen",
+ "post": "The richest man in the world played Magnus Carlsen at chess. Gates had 2 minutes, Magnus had 30 seconds. It lasted 9 moves. Would you have taken the knight? #chess #magnuscarlsen #billgates #chesstok #checkmate",
+ "lead_in": 0.05,
+ "tail": 1.6,
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\""
+ },
+ "voice_fx": {
+  "tempo": 1.3,
+  "max_gap": 0.13
+ },
+ "mix": {
+  "engine": "v2",
+  "music_gap": 8,
+  "sfx_gap": 0.5,
+  "reverb": 0.45,
+  "reverb_sec": 2.3,
+  "duck": 0.45
+ },
+ "phrases": [
+  {
+   "id": "hook1",
+   "text": "The richest man in the world played Magnus Carlsen at chess.",
+   "say": "[serious] The richest man in the world... played Magnus Carlsen at chess.",
+   "pause": 0.1,
+   "colors": {
+    "richest": "gold",
+    "Magnus": "gold",
+    "Carlsen": "gold"
+   }
+  },
+  {
+   "id": "hook2",
+   "text": "Magnus needed twelve seconds.",
+   "say": "[deadpan] Magnus needed twelve seconds.",
+   "pause": 0.3,
+   "colors": {
+    "twelve": "red",
+    "seconds.": "red"
+   }
+  },
+  {
+   "id": "s1",
+   "text": "London, January 2014. Magnus has just become world champion.",
+   "say": "London, January twenty fourteen. Magnus has just become world champion.",
+   "pause": 0.1,
+   "colors": {
+    "world": "gold",
+    "champion.": "gold"
+   }
+  },
+  {
+   "id": "s2",
+   "text": "Bill Gates. Number one on the billionaires list.",
+   "say": "Bill Gates. Number one on the billionaires list.",
+   "pause": 0.1,
+   "colors": {
+    "Bill": "blue",
+    "Gates.": "blue",
+    "one": "gold"
+   }
+  },
+  {
+   "id": "s3",
+   "text": "On a TV talk show, they sit down for a game of blitz.",
+   "say": "On a TV talk show, they sit down for a game of blitz.",
+   "pause": 0.1,
+   "colors": {
+    "blitz.": "lime"
+   }
+  },
+  {
+   "id": "s4",
+   "text": "Gates gets two minutes. Magnus gets thirty seconds.",
+   "say": "Gates gets two minutes. Magnus gets... thirty seconds.",
+   "pause": 0.15,
+   "colors": {
+    "two": "blue",
+    "minutes.": "blue",
+    "thirty": "red",
+    "seconds.": "red"
+   }
+  },
+  {
+   "id": "s5",
+   "text": "Gates opens with e4.",
+   "say": "Gates opens with e four.",
+   "pause": 0.05,
+   "colors": {
+    "e4.": "lime"
+   }
+  },
+  {
+   "id": "s6",
+   "text": "Magnus moves so fast he knocks over a pawn. Two seconds, gone.",
+   "say": "Magnus moves so fast he knocks over a pawn. [laughs] Two seconds, gone.",
+   "pause": 0.1,
+   "colors": {
+    "pawn.": "lime",
+    "gone.": "red"
+   }
+  },
+  {
+   "id": "s7",
+   "text": "But Gates is holding his own. He castles.",
+   "say": "But Gates is holding his own. He castles.",
+   "pause": 0.05,
+   "colors": {
+    "own.": "lime"
+   }
+  },
+  {
+   "id": "s8",
+   "text": "Then Magnus does something he never does. He leaves a knight hanging. For free.",
+   "say": "Then Magnus does something he never does. [whispers] He leaves a knight hanging. For free.",
+   "pause": 0.1,
+   "colors": {
+    "never": "red",
+    "knight": "gold",
+    "free.": "gold"
+   }
+  },
+  {
+   "id": "s9",
+   "text": "Gates takes the bishop instead. The engine says he's winning.",
+   "say": "Gates takes the bishop instead. The engine says... he's winning.",
+   "pause": 0.1,
+   "colors": {
+    "winning.": "lime"
+   }
+  },
+  {
+   "id": "s10",
+   "text": "Then he takes the free knight.",
+   "say": "Then he takes the free knight.",
+   "pause": 0.05,
+   "colors": {
+    "free": "gold",
+    "knight.": "gold"
+   }
+  },
+  {
+   "id": "s11",
+   "text": "Queen h2. Checkmate.",
+   "say": "[dramatic] Queen h two. Checkmate.",
+   "pause": 0.35,
+   "colors": {
+    "Checkmate.": "red"
+   }
+  },
+  {
+   "id": "s12",
+   "text": "Nine moves. Magnus used twelve of his thirty seconds.",
+   "say": "Nine moves. Magnus used twelve of his thirty seconds.",
+   "pause": 0.1,
+   "colors": {
+    "Nine": "gold",
+    "twelve": "red"
+   }
+  },
+  {
+   "id": "s13",
+   "text": "Gates still had more than a minute on his clock.",
+   "say": "Gates still had more than a minute on his clock.",
+   "pause": 0.15,
+   "colors": {
+    "minute": "blue"
+   }
+  },
+  {
+   "id": "s14",
+   "text": "Magnus later admitted he broke his own rule: never win with cheap tricks.",
+   "say": "Magnus later admitted he broke his own rule... never win with cheap tricks.",
+   "pause": 0.2,
+   "colors": {
+    "cheap": "red",
+    "tricks.": "red"
+   }
+  },
+  {
+   "id": "cta",
+   "text": "Would you have taken the knight? Follow for more.",
+   "say": "Would you have taken the knight? Follow for more.",
+   "pause": 0.0,
+   "colors": {
+    "knight?": "gold",
+    "Follow": "lime"
+   }
+  }
+ ]
+}

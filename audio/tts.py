@@ -246,10 +246,19 @@ def recognize(a, text):
     if _asr is None:
         import whisper
         _asr = whisper.load_model('small')
-    res = _asr.transcribe(resample_poly(a, 160, 441).astype(np.float32), language='en',
-                          word_timestamps=True, initial_prompt=text, fp16=False)
-    return a, [(w['word'].strip(), max(w['start'], onset if i == 0 else 0), w['end'])
-               for i, w in enumerate(w for s in res['segments'] for w in s['words'])]
+    x = resample_poly(a, 160, 441).astype(np.float32)
+
+    def heard(prompt):
+        res = _asr.transcribe(x, language='en', word_timestamps=True, initial_prompt=prompt, fp16=False)
+        return [(w['word'].strip(), max(w['start'], onset if i == 0 else 0), w['end'])
+                for i, w in enumerate(w for s in res['segments'] for w in s['words'])]
+    h = heard(text)
+    # the prompt can make whisper skip the opening sentence (it "already read" it), which piles those words onto
+    # one instant; the unprompted pass then has the true times
+    if text and len(h) < len(text.split()) - 1:
+        hb = heard(None)
+        if len(hb) > len(h): h = hb
+    return a, h
 
 
 class Chatterbox(Cached):

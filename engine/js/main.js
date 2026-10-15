@@ -74,6 +74,24 @@ function jumpAt({ every = 1.4, zooms = [1, 1.15, 1.06], shift = 50 }, lt, len, i
   return [zooms[k % zooms.length] || 1, sd * shift * (k % zooms.length ? 1 : 0), -shift * 0.6 * (k % zooms.length ? 1 : 0)];
 }
 
+// dissolve a frozen frame into square specks: a front sweeps across, cells behind it fly up and away, shrinking
+function dustOut(g, src, p, seed, dir) {
+  const cs = 30, nx = Math.ceil(W / cs), ny = Math.ceil(H / cs), e = p * 1.45;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    const h1 = Math.sin((i * 12.9898 + j * 78.233 + seed) * 43758.5453), r = h1 - Math.floor(h1);
+    const fx = dir > 0 ? i / nx : 1 - i / nx, thr = fx * 0.75 + r * 0.25, k = (e - thr) / 0.45;
+    const sx = i * cs, sy = j * cs;
+    if (k <= 0) { g.drawImage(src, sx, sy, cs, cs, sx, sy, cs, cs); continue; }
+    if (k >= 1) continue;
+    const s = cs * (1 - k) * (0.6 + r * 0.4), ux = dir * (220 + r * 380) * k, uy = -(60 + r * 260) * k * k;
+    g.globalAlpha = 1 - k;
+    g.drawImage(src, sx, sy, cs, cs, sx + ux + (cs - s) / 2, sy + uy + (cs - s) / 2, s, s);
+    if (r > 0.82) { g.fillStyle = 'rgba(190,235,240,0.8)'; g.fillRect(sx + ux * 1.15, sy + uy * 1.2, 4, 4); }
+  }
+  g.restore();
+}
+
 function compose(t, frame) {
   const s = shots.find(s => t >= s.a && t < s.b) || shots[shots.length - 1];
   QA.items = []; QA.M = null; QA.skip = false; QA.shot = s.i; QA.allow = s.qaAllow || [];
@@ -85,7 +103,7 @@ function compose(t, frame) {
     if (prev) { drawShot(prev, t, hctx); ctx.drawImage(hold, 0, 0); }
     ctx.globalAlpha = clamp(lt / (s.transDur || 0.35));
   }
-  if (['whip', 'zoom', 'fade', 'flash', 'shatter'].includes(tr) && lt < 0.3) QA.skip = true;
+  if (['whip', 'zoom', 'fade', 'flash', 'shatter', 'dust'].includes(tr) && lt < 0.3) QA.skip = true;
   if (tr === 'whip' && lt < 0.22) {
     const u = 1 - lt / 0.22;
     ctx.filter = `blur(${(u * 26).toFixed(1)}px)`;
@@ -110,6 +128,12 @@ function compose(t, frame) {
     const prev = shots[s.i - 1];
     if (prev) { drawShot(prev, s.a - 0.001, hctx); screenShatter(ctx, hold, lt / 0.8, { seed: s.i * 7 + 3 }); }
   }
+  if (tr === 'dust' && lt < 0.6) {  // LOOK v2: the previous shot crumbles into specks drifting off (from s.dustFrom, default left)
+    const prev = shots[s.i - 1];
+    if (prev) { drawShot(prev, s.a - 0.001, hctx); dustOut(ctx, hold, lt / 0.6, s.i, s.dustDir || 1); }
+  }
+  // on-screen text that must not ride the camera (push-in, jump-cut zooms): the shot's hud, drawn on the screen itself
+  if (s.hud) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); s.hud(ctx, lt, t, s); ctx.restore(); }
   finish(ctx, main, s.grade ?? film.grade ?? 'neutral', { amount: film.finish ?? 1 });
   if (s.post) s.post(ctx, lt, t);
   // light leak straddles the cut into this shot (and into the next one, if it asks)
@@ -137,7 +161,7 @@ window.renderFrame = renderFrame;
 window.qaFrame = t => { renderFrame(t); return { items: QA.items, M: QA.M, skip: QA.skip, shot: QA.shot, allow: QA.allow }; };
 // every stylized cut gets a soft whoosh; glass breaks get their crash
 const autoCues = shots.slice(1).flatMap(s => s.trans === 'shatter' ? [{ t: s.a, id: 'glass', gain: 1 }, { t: s.a, id: 'hit', gain: 0.7 }]
-  : ['leak', 'whip', 'zoom', 'flash'].includes(s.trans) ? [{ t: Math.max(0, s.a - 0.12), id: 'whoosh', gain: 0.45 }] : []);
+  : ['leak', 'whip', 'zoom', 'flash', 'dust'].includes(s.trans) ? [{ t: Math.max(0, s.a - 0.12), id: 'whoosh', gain: 0.45 }] : []);
 window.CUES = [...(film.cues || []), ...(film.autoWhoosh === false ? [] : autoCues)];
 window.MUSIC = film.music || [];
 window.READY = true;

@@ -4,6 +4,8 @@ import { outlinedText } from './draw.js';
 
 const FONT = s => `800 ${s}px Rubik`;
 const SIZE = 66, Y = Math.round(H * 0.68), MAXW = 860;
+// the band the captions occupy (with room for the jump-cut zoom), for labels that must keep out of it
+export const CAP_BAND = [Y - SIZE * 0.82 - 40, Y + SIZE * 0.3 + 40];
 
 export function buildChunks(phrases, ctx) {
   ctx.font = FONT(SIZE);

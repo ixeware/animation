@@ -7,7 +7,9 @@
 //
 // Per frame: pieces = piecesAt(G, k, slide(lt), SLIDE_OPTS); draw the board, moveUnder(), the pieces, moveOver().
 import { W, clamp, lerp, ease, seg, rgba, qaRect } from './core.js';
+import { CAP_BAND } from './captions.js';
 import { sqXZ } from './board.js';
+import { LOOK } from './look.js';
 
 export const MOVE_COL = { w: '#3FE0C5', b: '#E9B654', x: '#FF5A4F' };
 export const SLIDE = 0.24;                       // the slide, seconds
@@ -70,13 +72,14 @@ export function moveOver(ctx, B, m, lt, { dur = SLIDE, hold = 1.3, label = true 
   ctx.save(); ctx.globalAlpha *= ra; ctx.strokeStyle = col; ctx.lineWidth = Math.max(2, p.s * 0.035); ctx.shadowColor = col; ctx.shadowBlur = 14;
   ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
   if (label && m.label) {
-    const fs = Math.round(clamp(p.s * 0.34, 26, 48)), ly = p.y - r * 1.02;
+    let fs = Math.round(clamp(p.s * 0.34, 26, 48)), ly = p.y - r * 1.02;
+    if (ly + fs * 0.2 > CAP_BAND[0] && ly - fs < CAP_BAND[1]) ly = CAP_BAND[0] - fs * 0.2;  // keep out of the captions: sit just above them
     ctx.save(); ctx.globalAlpha *= ra; ctx.font = `800 ${fs}px "JetBrains Mono"`; ctx.textBaseline = 'alphabetic';
     const tw = ctx.measureText(m.label).width;            // right of the ring, or left of it near the right edge
-    const lx = p.x + r * 0.55 + tw > W - 28 ? p.x - r * 0.55 - tw : p.x + r * 0.55;
+    const lx = p.x + r * 0.55 + tw > W - 120 ? p.x - r * 0.55 - tw : p.x + r * 0.55;  // leave room for the jump-cut zoom at the edge
     ctx.fillStyle = col; ctx.shadowColor = 'rgba(0,0,0,0.85)'; ctx.shadowBlur = 6; ctx.fillText(m.label, lx, ly);
     qaRect(ctx, lx, ly - fs, tw, fs * 1.2, 'text', 'move ' + m.label);
-    ctx.shadowColor = col; ctx.shadowBlur = 10; ctx.globalAlpha *= 0.5; ctx.fillText(m.label, lx, ly);
+    if (!LOOK.v2) { ctx.shadowColor = col; ctx.shadowBlur = 10; ctx.globalAlpha *= 0.5; ctx.fillText(m.label, lx, ly); }  // LOOK v2: no glowing text
     ctx.restore();
   }
   if (ll < 0.55) {                                                       // sparks from the landing point

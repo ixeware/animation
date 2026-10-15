@@ -13,6 +13,7 @@ export const GRADES = {
   stream: { con: 1.1, sat: 1.12, bri: 1.0, tone: ['#C68CFF', 0.10], lift: ['#0E1432', 0.14], bloom: 0.45 },   // RGB streamer room
   gold: { con: 1.1, sat: 1.1, bri: 1.04, tone: ['#FFC060', 0.2], lift: ['#24140A', 0.08], bloom: 0.5 },
   bw: { con: 1.28, sat: 0, bri: 1.02, tone: null, lift: ['#101010', 0.08], bloom: 0.25 },
+  slate: { con: 1.06, sat: 0.9, bri: 0.98, tone: ['#FFC090', 0.1], lift: ['#0E1A24', 0.12], bloom: 0.24 },  // LOOK v2: muted slate, warm skin
 };
 
 const COPY = makeCanvas(), cctx = COPY.getContext('2d');
