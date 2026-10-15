@@ -9,7 +9,7 @@ import { Board, piecesAt } from '../../engine/js/board.js';
 import { EXPR, exprAt, drawChar } from '../../engine/js/characters.js';
 import { counter, badge, stamp, placeStamp, nameTitle, sans, mono, serif } from '../../engine/js/hud.js';
 import { rig, seated, actor } from '../../engine/js/stage.js';
-import { room, box, pool, placeAt, picture, chandelier, chair, lamp, FLOOR_Y } from '../../engine/js/env.js';
+import { room, box, pool, placeAt, picture, chandelier, chair, lamp, texTri, FLOOR_Y } from '../../engine/js/env.js';
 
 const G = await fetch('../engine/data/gotham_world_2025.json').then(r => r.json());
 const B = new Board();
@@ -260,17 +260,55 @@ const WOOD = noiseCanvas(512, 512, 5, (g, r, w, h) => {
   for (let n = 0; n < 4; n++) { const x = r() * w, y = r() * h; g.strokeStyle = 'rgba(30,18,10,0.25)'; for (let k = 1; k < 6; k++) { g.lineWidth = 1; g.beginPath(); g.ellipse(x, y, k * 5, k * 18, 0, 0, 7); g.stroke(); } }
   g.fillStyle = 'rgba(255,220,170,0.06)'; g.fillRect(0, 0, w, h * 0.4);
 });
-// map a texture onto a world quad (tl, tr, bl; the 4th corner is implied); fog darkens it with distance
-function texQuad(g, img, tl, tr, bl, { d = 0, fogA = 0 } = {}) {
+// average colour of a texture: the under-fill that hides the hairlines between mapped triangles and covers cells too
+// close to the lens to map
+const AVG = new Map();
+function avgColor(img) {
+  if (!AVG.has(img)) {
+    const d = img.getContext('2d').getImageData(0, 0, img.width, img.height).data, n = d.length / 4, c = [0, 0, 0];
+    for (let i = 0; i < d.length; i += 4) { c[0] += d[i]; c[1] += d[i + 1]; c[2] += d[i + 2]; }
+    AVG.set(img, '#' + c.map(v => Math.round(v / n).toString(16).padStart(2, '0')).join(''));
+  }
+  return AVG.get(img);
+}
+// map a texture onto a world quad (tl, tr, bl; the 4th corner is implied). An affine map of the whole quad is wrong in
+// perspective (the texture misses wedges of the quad), so the quad is cut into a grid — finer where the depth changes
+// more — and every cell is drawn as two exactly mapped triangles. fogA darkens the whole quad evenly (small objects);
+// big planes leave fogA at 0 and get planeFog() over the whole surface instead.
+function texQuad(g, img, tl, tr, bl, { fogA = 0, under = true, near = 0.5 } = {}) {
   const br = [tr[0] + bl[0] - tl[0], tr[1] + bl[1] - tl[1], tr[2] + bl[2] - tl[2]];
-  const cs = [tl, tr, bl, br].map(p => depth(...p));
-  if (Math.min(...cs) < 0.4) { if (B.poly(g, [tl, tr, br, bl])) { g.fillStyle = mix('#2E2822', HALL.base, fogA); g.fill(); } return; }
-  const P = [tl, tr, bl].map(p => B.project(...p));
-  g.save(); B.poly(g, [tl, tr, br, bl]); g.clip();
-  g.transform(P[1].x - P[0].x, P[1].y - P[0].y, P[2].x - P[0].x, P[2].y - P[0].y, P[0].x, P[0].y);
-  g.drawImage(img, 0, 0, 1, 1);
-  if (fogA > 0) { g.fillStyle = rgba(HALL.base, fogA); g.fillRect(0, 0, 1, 1); }
-  g.restore();
+  const cs = [tl, tr, bl, br].map(p => depth(...p)), dmax = Math.max(...cs);
+  if (dmax < near) return;
+  if (under) { if (!B.poly(g, [tl, tr, br, bl])) return; g.fillStyle = mix(avgColor(img), HALL.base, fogA); g.fill(); }
+  const dmin = Math.max(near, Math.min(...cs)), n = clamp(Math.ceil((dmax / dmin - 1) * 6), 1, 16);
+  const pts = [];
+  for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) {
+    const u = i / n, v = j / n, w = [0, 1, 2].map(k => tl[k] + (tr[k] - tl[k]) * u + (bl[k] - tl[k]) * v);
+    pts.push(depth(...w) < near ? null : B.project(...w));
+  }
+  const iw = img.width / n, ih = img.height / n;
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+    const a = pts[j * (n + 1) + i], b = pts[j * (n + 1) + i + 1], c = pts[(j + 1) * (n + 1) + i], e = pts[(j + 1) * (n + 1) + i + 1];
+    if (!a || !b || !c || !e) continue;
+    texTri(g, img, i * iw, j * ih, iw, ih, a, b, c, false);
+    texTri(g, img, i * iw, j * ih, iw, ih, e, c, b, true);
+  }
+  if (fogA > 0.004 && B.poly(g, [tl, tr, br, bl])) { g.fillStyle = rgba(HALL.base, fogA); g.fill(); }
+}
+// distance fog over a whole planar polygon (normal N): across a plane 1/depth is an affine function of the screen
+// position, so a linear gradient along its slope gives the exact fog everywhere — no steps between tiles or panels
+function planeFog(g, poly, N) {
+  if (!B.poly(g, poly)) return;
+  const nc = [N[0] * B.R[0] + N[1] * B.R[1] + N[2] * B.R[2], N[0] * B.U[0] + N[1] * B.U[1] + N[2] * B.U[2], N[0] * B.F[0] + N[1] * B.F[1] + N[2] * B.F[2]];
+  const k = N[0] * (poly[0][0] - B.E[0]) + N[1] * (poly[0][1] - B.E[1]) + N[2] * (poly[0][2] - B.E[2]);
+  const A = nc[0] / (B.f * k), Bq = -nc[1] / (B.f * k), Cq = (nc[2] - nc[0] * B.cx / B.f + nc[1] * B.cy / B.f) / k;
+  const wAt = (x, y) => A * x + Bq * y + Cq, fogAt = w => w > 1e-6 ? fogK(1 / w) : 0.85;
+  const l = Math.hypot(A, Bq);
+  if (l < 1e-9) { g.fillStyle = rgba(HALL.base, fogAt(Cq)); g.fill(); return; }
+  const dx = A / l, dy = Bq / l, L = Math.hypot(W, H), x0 = W / 2 - dx * L, y0 = H / 2 - dy * L, x1 = W / 2 + dx * L, y1 = H / 2 + dy * L;
+  const gr = g.createLinearGradient(x0, y0, x1, y1);
+  for (let i = 0; i <= 96; i++) { const t = i / 96; gr.addColorStop(t, rgba(HALL.base, fogAt(wAt(lerp(x0, x1, t), lerp(y0, y1, t))))); }
+  g.fillStyle = gr; g.fill();
 }
 const fogK = (d, near = 18, far = 95) => clamp((d - near) / (far - near)) * 0.85;
 
@@ -280,19 +318,31 @@ const TABLES = [[-20, 4], [28, 4], [-20, 24], [28, 24], [-20, 44], [28, 44]].map
 });
 function hallShell(g, t, { dim = 0, doorsOpen = false } = {}) {
   g.fillStyle = HALL.base; g.fillRect(0, 0, W, H);
-  // carpeted floor (seamless texture, 12-unit pieces)
+  // carpeted floor: one under-fill, the seamless texture in 12-unit pieces, then exact distance fog over the whole floor
+  const FLOOR = [[-40, FLOOR_Y, 66], [56, FLOOR_Y, 66], [56, FLOOR_Y, -30], [-40, FLOOR_Y, -30]];
+  if (B.poly(g, FLOOR)) { g.fillStyle = avgColor(CARPET); g.fill(); }
   for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
     const x0 = -40 + i * 12, z0 = -30 + j * 12, d = depth(x0 + 6, FLOOR_Y, z0 + 6); if (d > 150) continue;
-    texQuad(g, CARPET, [x0, FLOOR_Y, z0 + 12], [x0 + 12, FLOOR_Y, z0 + 12], [x0, FLOOR_Y, z0], { d, fogA: fogK(d) });
+    texQuad(g, CARPET, [x0, FLOOR_Y, z0 + 12], [x0 + 12, FLOOR_Y, z0 + 12], [x0, FLOOR_Y, z0], { under: false });
   }
-  // back wall: wallpaper between tall night windows; side walls papered too
+  planeFog(g, FLOOR, [0, 1, 0]);
+  // side walls, papered, fogged as whole planes
+  for (const x of [-40, 48]) {
+    const WALL = [[x, 20, -30], [x, 20, 60], [x, FLOOR_Y, 60], [x, FLOOR_Y, -30]];
+    if (B.poly(g, WALL)) { g.fillStyle = avgColor(PAPER_WALL); g.fill(); }
+    for (let i = 0; i < 12; i++) { const z0 = -30 + i * 7.5;
+      texQuad(g, PAPER_WALL, [x, 20, x < 0 ? z0 : z0 + 7.5], [x, 20, x < 0 ? z0 + 7.5 : z0], [x, FLOOR_Y, x < 0 ? z0 : z0 + 7.5], { under: false }); }
+    planeFog(g, WALL, [1, 0, 0]);
+  }
+  // back wall: wallpaper between tall night windows
+  const BACK = [[-40, 20, 60], [48, 20, 60], [48, FLOOR_Y, 60], [-40, FLOOR_Y, 60]];
+  if (B.poly(g, BACK)) { g.fillStyle = avgColor(PAPER_WALL); g.fill(); }
+  for (let i = 0; i < 11; i++) { const x0 = -40 + i * 8; texQuad(g, PAPER_WALL, [x0, 20, 60], [x0 + 8, 20, 60], [x0, FLOOR_Y, 60], { under: false }); }
+  planeFog(g, BACK, [0, 0, 1]);
   for (let i = 0; i < 11; i++) { const x0 = -40 + i * 8, d = depth(x0 + 4, 6, 60);
-    texQuad(g, PAPER_WALL, [x0, 20, 60], [x0 + 8, 20, 60], [x0, FLOOR_Y, 60], { d, fogA: fogK(d) });
     quad(g, [[x0 + 2, 0, 59.9], [x0 + 6, 0, 59.9], [x0 + 6, 13, 59.9], [x0 + 2, 13, 59.9]], fog('#1C2A44', d));
     quad(g, [[x0 + 1.8, 13, 59.92], [x0 + 6.2, 13, 59.92], [x0 + 6.2, 13.4, 59.92], [x0 + 1.8, 13.4, 59.92]], fog('#C9A05A', d));
     pool(g, B, x0 + 4, 7, 59.8, 4, '#7FA6D9', 0.18, true); }
-  for (const x of [-40, 48]) for (let i = 0; i < 12; i++) { const z0 = -30 + i * 7.5, d = depth(x, 6, z0 + 3.7);
-    texQuad(g, PAPER_WALL, [x, 20, x < 0 ? z0 : z0 + 7.5], [x, 20, x < 0 ? z0 + 7.5 : z0], [x, FLOOR_Y, x < 0 ? z0 : z0 + 7.5], { d, fogA: fogK(d) }); }
   // the exit: carved double doors in the back wall, in a stone frame
   quad(g, [[-0.8, FLOOR_Y, 59.85], [8.8, FLOOR_Y, 59.85], [8.8, 9.2, 59.85], [-0.8, 9.2, 59.85]], fog('#B8A88A', depth(4, 3, 60)));
   texQuad(g, doorsOpen ? DOORS.open : DOORS.shut, [0, 8.4, 59.8], [8, 8.4, 59.8], [0, FLOOR_Y, 59.8]);
@@ -322,7 +372,7 @@ function otherTable(g, T) {
   const tab = (c) => fog(c, d);
   for (const [lx, lz] of [[-4.6, -4.6], [4.6, -4.6], [-4.6, 4.6], [4.6, 4.6]]) box(g, B, [T.x + lx - 0.25, FLOOR_Y, T.z + lz - 0.25], [T.x + lx + 0.25, -0.75, T.z + lz + 0.25], { top: tab('#2A1C12'), side: tab('#1E140D'), front: tab('#24180F') });
   box(g, B, [T.x - 5.1, -0.75, T.z - 5.1], [T.x + 5.1, -0.35, T.z + 5.1], { top: tab('#4A3322'), side: tab('#2A1C12'), front: tab('#3A2818') });
-  if (B.E[1] > -0.35) texQuad(g, WOOD, [T.x - 5.1, -0.35, T.z + 5.1], [T.x + 5.1, -0.35, T.z + 5.1], [T.x - 5.1, -0.35, T.z - 5.1], { d, fogA: fogK(d) });
+  if (B.E[1] > -0.35) texQuad(g, WOOD, [T.x - 5.1, -0.35, T.z + 5.1], [T.x + 5.1, -0.35, T.z + 5.1], [T.x - 5.1, -0.35, T.z - 5.1], { fogA: fogK(d) });
   const x0 = T.x - 4, z0 = T.z - 4;
   quad(g, [[x0, -0.34, z0], [x0 + 8, -0.34, z0], [x0 + 8, -0.34, z0 + 8], [x0, -0.34, z0 + 8]], tab('#EEEED2'));
   for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) if ((i + j) % 2 === 0) quad(g, [[x0 + i, -0.33, z0 + j], [x0 + i + 1, -0.33, z0 + j], [x0 + i + 1, -0.33, z0 + j + 1], [x0 + i, -0.33, z0 + j + 1]], tab('#769656'));

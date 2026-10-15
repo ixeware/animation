@@ -158,7 +158,27 @@ function frame(g, b, env, tl, tr, bl) {
   strip(g, b, [ins(tl, 0.14), ins(tr, 0.14), ins(br, 0.14), ins(bl, 0.14)], fogged(b, env, mix(env.wall[1], '#000000', 0.45), ...tl));
 }
 
-// a real photo hung in the set: corners tl, tr, bl (world). Affine-mapped, clipped to the projected quad.
+// one triangle of an image, mapped exactly: unit-square (0,0)->a, (1,0)->b, (0,1)->c (flip: (1,1)->a, (0,1)->b, (1,0)->c);
+// the source rectangle (sx, sy, sw, sh) fills the unit square. The clip triangle is grown by ~0.7 px so neighbours overlap.
+export function texTri(g, img, sx, sy, sw, sh, a, b, c, flip) {
+  const mx = (a.x + b.x + c.x) / 3, my = (a.y + b.y + c.y) / 3, grow = p => { const dx = p.x - mx, dy = p.y - my, l = Math.hypot(dx, dy) || 1; return [p.x + dx / l * 0.7, p.y + dy / l * 0.7]; };
+  g.save(); g.beginPath(); g.moveTo(...grow(a)); g.lineTo(...grow(b)); g.lineTo(...grow(c)); g.closePath(); g.clip();
+  if (!flip) g.transform(b.x - a.x, b.y - a.y, c.x - a.x, c.y - a.y, a.x, a.y);
+  else g.transform(a.x - b.x, a.y - b.y, a.x - c.x, a.y - c.y, b.x + c.x - a.x, b.y + c.y - a.y);
+  g.drawImage(img, sx, sy, sw, sh, 0, 0, 1, 1); g.restore();
+}
+// an image drawn once through a tone filter and cached, so mapping it as many triangles does not refilter every piece
+const TONES = { sepia: 'sepia(0.55) contrast(1.08) brightness(0.95)', warm: 'sepia(0.25) contrast(1.05)', bw: 'grayscale(1) contrast(1.08)' };
+const TONED = new WeakMap();
+function toned(img, tone) {
+  if (tone === 'color') return img;
+  let m = TONED.get(img); if (!m) TONED.set(img, m = {});
+  if (!m[tone]) { const c = makeCanvas(img.naturalWidth || img.width, img.naturalHeight || img.height), x = c.getContext('2d'); x.filter = TONES[tone] || TONES.bw; x.drawImage(img, 0, 0); m[tone] = c; }
+  return m[tone];
+}
+// a real photo hung in the set: corners tl, tr, bl (world). An affine map of the whole quad is wrong in perspective
+// (wedges of the quad stay empty), so the quad is cut into a grid — finer where the depth changes more — and each
+// cell is drawn as two exactly mapped triangles.
 export function picture(g, b, img, tl, tr, bl, { tone = 'bw', fx = 0.5, fy = 0.4, zoom = 1, border = '#C9A05A', pad = 0.18, a = 1, glow = 0 } = {}) {
   const br = [tr[0] + bl[0] - tl[0], tr[1] + bl[1] - tl[1], tr[2] + bl[2] - tl[2]];
   if ([tl, tr, bl, br].some(p => b.toCam(...p)[2] < 0.4) || a <= 0) return;
@@ -168,14 +188,18 @@ export function picture(g, b, img, tl, tr, bl, { tone = 'bw', fx = 0.5, fy = 0.4
   if (b.poly(g, [ex(tl, kk), ex(tr, kk), ex(br, kk), ex(bl, kk)])) {
     g.save(); g.shadowColor = glow ? border : 'rgba(0,0,0,0.6)'; g.shadowBlur = glow ? 40 * glow : 30; g.fillStyle = border; g.fill(); g.restore();
   }
-  const P = [tl, tr, bl].map(p => b.project(...p));
+  const src = toned(img, tone), iw = src.naturalWidth || src.width, ih = src.naturalHeight || src.height;
   const wq = Math.hypot(tr[0] - tl[0], tr[1] - tl[1], tr[2] - tl[2]), hq = Math.hypot(bl[0] - tl[0], bl[1] - tl[1], bl[2] - tl[2]);
-  const s = Math.max(wq / img.width, hq / img.height) * zoom, sw = wq / s, sh = hq / s;
-  const sx = clamp(fx * img.width - sw / 2, 0, img.width - sw), sy = clamp(fy * img.height - sh / 2, 0, img.height - sh);
-  b.poly(g, [tl, tr, br, bl]); g.clip();
-  g.transform(P[1].x - P[0].x, P[1].y - P[0].y, P[2].x - P[0].x, P[2].y - P[0].y, P[0].x, P[0].y);
-  g.filter = tone === 'color' ? 'none' : tone === 'sepia' ? 'sepia(0.55) contrast(1.08) brightness(0.95)' : tone === 'warm' ? 'sepia(0.25) contrast(1.05)' : 'grayscale(1) contrast(1.08)';
-  g.drawImage(img, sx, sy, sw, sh, 0, 0, 1, 1);
+  const s = Math.max(wq / iw, hq / ih) * zoom, sw = wq / s, sh = hq / s;
+  const sx = clamp(fx * iw - sw / 2, 0, iw - sw), sy = clamp(fy * ih - sh / 2, 0, ih - sh);
+  const ds = [tl, tr, bl, br].map(p => b.toCam(...p)[2]), n = clamp(Math.ceil((Math.max(...ds) / Math.min(...ds) - 1) * 6), 1, 12);
+  const P = [];
+  for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) P.push(b.project(...[0, 1, 2].map(k => tl[k] + (tr[k] - tl[k]) * i / n + (bl[k] - tl[k]) * j / n)));
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+    const p00 = P[j * (n + 1) + i], p10 = P[j * (n + 1) + i + 1], p01 = P[(j + 1) * (n + 1) + i], p11 = P[(j + 1) * (n + 1) + i + 1];
+    const cx = sx + sw * i / n, cy = sy + sh * j / n, cw = sw / n, ch = sh / n;
+    texTri(g, src, cx, cy, cw, ch, p00, p10, p01, false); texTri(g, src, cx, cy, cw, ch, p11, p01, p10, true);
+  }
   g.restore();
 }
 
