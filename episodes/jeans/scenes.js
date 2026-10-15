@@ -461,7 +461,7 @@ export async function build(T) {
   // ======================= THE DRESS CODE SAYS NO JEANS =======================
   const noT = w('s2', 'no');
   const pageAt = (g, img, x0, z0, a = 1) => picture(g, B, img, [x0, -0.33, z0 + 4.2], [x0 + 3.2, -0.33, z0 + 4.2], [x0, -0.33, z0], { tone: 'color', border: '#E8E0CC', pad: 0.06, a });
-  const arbDesk = (g, img, cup = [-8.4, -4.4]) => {  // the arbiters' desk: the rules on top of a booklet, a pen, a coffee cup, a desk lamp
+  const arbDesk = (g, img, cup = [-9.3, -4.7]) => {  // the arbiters' desk: the rules on top of a booklet, a pen, a coffee cup, a desk lamp
     box(g, B, [-15, FLOOR_Y, -10], [-7, -0.75, -4], { top: '#2A1C12', side: '#1E140D', front: '#24180F' });
     box(g, B, [-15.4, -0.75, -10.4], [-6.6, -0.35, -3.6], { top: '#1E2A44', side: '#14203A', front: '#18243C' });
     pool(g, B, -11.5, -0.3, -7.2, 5, '#FFE2B0', 0.3);
@@ -470,9 +470,9 @@ export async function build(T) {
     const pa = B.project(-9.0, -0.3, -8.6), pb = B.project(-8.7, -0.3, -6.2);  // pen
     g.save(); g.lineCap = 'round'; g.strokeStyle = '#141A2A'; g.lineWidth = pa.s * 0.16; g.beginPath(); g.moveTo(pa.x, pa.y); g.lineTo(pb.x, pb.y); g.stroke();
     g.strokeStyle = '#C9A05A'; g.lineWidth = pa.s * 0.05; g.beginPath(); g.moveTo(pa.x, pa.y); g.lineTo(lerp(pa.x, pb.x, 0.25), lerp(pa.y, pb.y, 0.25)); g.stroke(); g.restore();
-    const cb = B.project(cup[0], -0.35, cup[1]), ct = B.project(cup[0], 0.55, cup[1]), rr = cb.s * 0.5;  // coffee cup
+    if (cup) { const cb = B.project(cup[0], -0.35, cup[1]), ct = B.project(cup[0], 0.55, cup[1]), rr = cb.s * 0.5;  // coffee cup
     g.save(); g.fillStyle = '#E8E2D6'; g.fillRect(cb.x - rr, ct.y, rr * 2, cb.y - ct.y); g.beginPath(); g.ellipse(cb.x, cb.y, rr, rr * 0.35, 0, 0, Math.PI); g.fill();
-    g.fillStyle = '#3A2214'; g.beginPath(); g.ellipse(ct.x, ct.y, rr, rr * 0.35, 0, 0, 7); g.fill(); g.strokeStyle = '#E8E2D6'; g.lineWidth = rr * 0.2; g.beginPath(); g.arc(cb.x + rr * 1.1, (cb.y + ct.y) / 2, rr * 0.4, -1.2, 1.2); g.stroke(); g.restore();
+    g.fillStyle = '#3A2214'; g.beginPath(); g.ellipse(ct.x, ct.y, rr, rr * 0.35, 0, 0, 7); g.fill(); g.strokeStyle = '#E8E2D6'; g.lineWidth = rr * 0.2; g.beginPath(); g.arc(cb.x + rr * 1.1, (cb.y + ct.y) / 2, rr * 0.4, -1.2, 1.2); g.stroke(); g.restore(); }
   };
   shot(s('s2') - 0.1, (g, lt, t, sh) => {
     hall(g, lt, t, [[0, { yaw: -0.2, pitch: 1.0, dist: 9, fov: 1500, cy: H * 0.44, target: [-11, -0.3, -7] }], [len(sh), { yaw: -0.05, pitch: 1.1, dist: 7 }]], {
@@ -552,7 +552,7 @@ export async function build(T) {
   shot(s('s7') - 0.1, (g, lt, t, sh) => {
     const img = t >= downT + 0.4 ? PAGE.after : PAGE.before;
     hall(g, lt, t, [[0, { yaw: 0.35, pitch: 0.95, dist: 8.6, fov: 1500, cy: H * 0.42, target: [-11, -0.3, -7.3] }], [len(sh), { yaw: 0.15, pitch: 1.05, dist: 7.4 }]], {
-      main: { pieces: MID, who: null }, tables: false, extra: [{ p: [-11, 0, -7], f: () => arbDesk(g, img, [-14.3, -4.7]) }], dof: 5 });
+      main: { pieces: MID, who: null }, tables: false, extra: [{ p: [-11, 0, -7], f: () => arbDesk(g, img, null) }], dof: 5 });
     scrim(g, 0.5);
     badge(g, '2 DAYS LATER', W / 2, 300, { color: C.blue, size: 44, a: seg(t, daysT, daysT + 0.1), scale: pop(t, daysT) });
     stamp(g, 'ALLOWED', W / 2, 1520, t, allT, { color: C.lime, size: 120, rot: -0.08 });
