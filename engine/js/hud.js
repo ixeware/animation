@@ -64,7 +64,8 @@ export function badge(ctx, text, x, y, { color = C.gold, size = 40, a = 1, scale
   if (a <= 0) return;
   ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y); ctx.rotate(-0.018); ctx.scale(scale, scale);
   ctx.font = sans(size, 900); ctx.letterSpacing = '1px';
-  const w = ctx.measureText(text).width + size * 0.9, h = size * (sub ? 1.95 : 1.42);
+  let w = ctx.measureText(text).width + size * 0.9; const h = size * (sub ? 1.95 : 1.42);
+  if (sub) { ctx.save(); ctx.font = sans(size * 0.4, 800); ctx.letterSpacing = '3px'; w = Math.max(w, ctx.measureText(sub).width + size * 0.9); ctx.restore(); }  // the subline must fit too
   hard(ctx, Math.max(4, size * 0.14)); ctx.fillStyle = color;
   ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 6); ctx.fill(); unhard(ctx); qaRect(ctx, -w / 2, -h / 2, w, h, 'text', text);
   const ink = lum(color) > 0.55 ? C.ink : C.cream;

@@ -68,17 +68,34 @@ function standing(g, who, x, z, { e = 'neutral', t = 0, k = 1, walk = 0, phase =
   drawChar(g, who, { x: p.x, y: p.y + bob, s: sc, e: typeof e === 'string' ? EXPR[e] : e, t });
   if (back) g.restore();
 }
+// a leather shoe seen from the front: (cx, ty) = the middle of the hem, s = the projected scale there
+function shoe(g, cx, ty, s) {
+  const hw = s * 0.4, h = s * 0.3, top = ty - s * 0.06;
+  const gr = g.createLinearGradient(cx - hw, 0, cx + hw, 0); gr.addColorStop(0, '#1A0F09'); gr.addColorStop(0.45, '#4A2C1A'); gr.addColorStop(1, '#1A0F09');
+  g.fillStyle = gr; g.beginPath(); g.moveTo(cx - hw * 0.82, top); g.lineTo(cx + hw * 0.82, top);
+  g.quadraticCurveTo(cx + hw * 1.12, top + h * 0.5, cx + hw * 1.02, top + h * 0.84); g.lineTo(cx - hw * 1.02, top + h * 0.84);
+  g.quadraticCurveTo(cx - hw * 1.12, top + h * 0.5, cx - hw * 0.82, top); g.closePath(); g.fill();
+  g.fillStyle = '#0C0705'; g.beginPath(); g.roundRect(cx - hw * 1.06, top + h * 0.8, hw * 2.12, h * 0.22, h * 0.08); g.fill();  // sole
+  g.fillStyle = 'rgba(255,228,196,0.16)'; g.beginPath(); g.ellipse(cx - hw * 0.28, top + h * 0.5, hw * 0.34, h * 0.13, -0.1, 0, 7); g.fill();  // toe-cap shine
+}
+// a soft contact shadow on the carpet under a foot; fades as the foot lifts
+function footShadow(g, x, z, r, a) {
+  if (a <= 0.02 || depth(x, FLOOR_Y, z) < 0.6) return;
+  const p = B.project(x, FLOOR_Y, z), w = p.s * r, gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, w);
+  gr.addColorStop(0, `rgba(0,0,0,${0.55 * a})`); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.save(); g.fillStyle = gr; g.translate(p.x, p.y); g.scale(1, 0.3); g.translate(-p.x, -p.y); g.fillRect(p.x - w, p.y - w, w * 2, w * 2); g.restore();
+}
 // knees and shins under a table, seen from the front: knee at world (x, ky, z), shins down to the floor
 function seatedJeans(g, x, z, { ky = -1.0 } = {}) {
   for (const sd of [-1, 1]) {
-    const k = B.project(x + sd * 0.55, ky, z), f = B.project(x + sd * 0.6, FLOOR_Y + 0.25, z + 0.3), w = k.s * 0.42;
+    const k = B.project(x + sd * 0.55, ky, z), f = B.project(x + sd * 0.6, FLOOR_Y + 0.3, z + 0.3), w = k.s * 0.42;
     if (depth(x, ky, z) < 0.6) continue;
+    footShadow(g, x + sd * 0.6, z + 0.3, 0.7, 1); shoe(g, f.x, f.y, f.s * 1.05);
     const gr = g.createLinearGradient(k.x - w, 0, k.x + w, 0); gr.addColorStop(0, DENIM.dark); gr.addColorStop(0.5, DENIM.base); gr.addColorStop(1, DENIM.dark);
     g.fillStyle = gr; g.beginPath(); g.moveTo(k.x - w, k.y); g.lineTo(f.x - w * 0.82, f.y); g.lineTo(f.x + w * 0.82, f.y); g.lineTo(k.x + w, k.y); g.closePath(); g.fill();
     g.beginPath(); g.ellipse(k.x, k.y, w, w * 0.55, 0, Math.PI, 0); g.fill();  // the knee
     g.strokeStyle = rgba(DENIM.seam, 0.7); g.lineWidth = Math.max(1.5, w * 0.06); g.setLineDash([w * 0.16, w * 0.14]);
     g.beginPath(); g.moveTo(k.x + sd * w * 0.82, k.y); g.lineTo(f.x + sd * w * 0.68, f.y); g.stroke(); g.setLineDash([]);
-    g.fillStyle = DENIM.shoe; g.beginPath(); g.ellipse(f.x, f.y + w * 0.1, w * 1.05, w * 0.42, 0, 0, 7); g.fill();
   }
 }
 // legs only, walking toward the camera (front view): the hips stay level, each leg swings forward and lifts at the knee
@@ -94,8 +111,10 @@ function walkingLegs(g, x, z, phase) {
   g.fillStyle = DENIM.dark; g.fillRect(bl.x, bl.y, br.x - bl.x, bb.y - bl.y + 4);
   g.fillStyle = '#3A2414'; g.fillRect(bl.x, bl.y, br.x - bl.x, (bb.y - bl.y) * 0.45);
   g.fillStyle = '#18213A'; const jt = B.project(x, 2.2 - bob, z); g.fillRect(bl.x - (br.x - bl.x) * 0.06, jt.y, (br.x - bl.x) * 1.12, bl.y - jt.y + 2);
+  for (const L of legsArr) footShadow(g, L.ankle[0], L.ankle[2], 0.75, 1 - clamp((L.ankle[1] + 2.95) / 0.4));
   for (const L of legsArr) {
     const [h, k, a] = [L.hip, L.knee, L.ankle].map(p => B.project(...p));
+    shoe(g, a.x, a.y, a.s);
     const seg2 = (p, q, w0, w1) => {
       const gr = g.createLinearGradient(p.x - w0, 0, p.x + w0, 0); gr.addColorStop(0, DENIM.dark); gr.addColorStop(0.45, DENIM.base); gr.addColorStop(1, DENIM.dark);
       g.fillStyle = gr; g.beginPath(); g.moveTo(p.x - w0, p.y); g.lineTo(p.x + w0, p.y); g.lineTo(q.x + w1, q.y); g.lineTo(q.x - w1, q.y); g.closePath(); g.fill();
@@ -107,9 +126,6 @@ function walkingLegs(g, x, z, phase) {
     g.beginPath(); g.moveTo(h.x + L.sd * wh * 0.85, h.y); g.lineTo(k.x + L.sd * wk * 0.85, k.y); g.lineTo(a.x + L.sd * wa * 0.85, a.y); g.stroke(); g.setLineDash([]);
     g.strokeStyle = rgba(DENIM.seam, 0.3); g.lineWidth = Math.max(1, k.s * 0.02); for (const dy of [-0.18, -0.1]) { g.beginPath(); g.moveTo(k.x - wk * 0.6, k.y + dy * k.s); g.quadraticCurveTo(k.x, k.y + dy * k.s + k.s * 0.05, k.x + wk * 0.6, k.y + dy * k.s); g.stroke(); }
     g.fillStyle = rgba(DENIM.seam, 0.45); g.fillRect(a.x - wa, a.y - a.s * 0.12, wa * 2, a.s * 0.12);  // turned-up hem
-    const sh = B.project(L.ankle[0], L.ankle[1] - 0.15, L.ankle[2] - 0.3);
-    g.fillStyle = DENIM.shoe; g.beginPath(); g.ellipse(sh.x, sh.y, sh.s * 0.48, sh.s * 0.22, 0, 0, 7); g.fill();
-    g.fillStyle = 'rgba(255,255,255,0.08)'; g.beginPath(); g.ellipse(sh.x - sh.s * 0.1, sh.y - sh.s * 0.07, sh.s * 0.22, sh.s * 0.07, 0, 0, 7); g.fill();
   }
 }
 // a pair of jeans on its own (on a hanger in the glass case)
@@ -171,9 +187,9 @@ function fineSlip(stamped) {
   [['PLAYER', 'CARLSEN, MAGNUS'], ['REASON', 'DRESS CODE: JEANS'], ['AMOUNT', '$200']].forEach(([k, v], i) => { g.fillStyle = '#6A6A6A'; g.fillText(k, 24, 160 + i * 42); g.fillStyle = '#1A1A1A'; g.fillText(v, 170, 160 + i * 42); });
   g.strokeStyle = '#2A2A2A'; g.lineWidth = 2; g.beginPath(); g.moveTo(470, 262); g.lineTo(690, 262); g.stroke(); g.font = mono(16, 700); g.fillStyle = '#6A6A6A'; g.fillText('CHIEF ARBITER', 520, 284);
   g.strokeStyle = '#2A3A6A'; g.lineWidth = 3; g.beginPath(); g.moveTo(480, 250); g.bezierCurveTo(520, 210, 540, 270, 580, 236); g.bezierCurveTo(610, 214, 630, 262, 680, 238); g.stroke();
-  if (stamped) { g.save(); g.translate(520, 140); g.rotate(-0.16); g.strokeStyle = 'rgba(192,38,44,0.9)'; g.lineWidth = 7; g.strokeRect(-150, -52, 300, 104); g.lineWidth = 3; g.strokeRect(-140, -42, 280, 84);
-    g.fillStyle = 'rgba(192,38,44,0.92)'; g.font = sans(64, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('$200', 0, 4);
-    g.globalCompositeOperation = 'destination-out'; for (let i = 0; i < 90; i++) { g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.arc((Math.random() - 0.5) * 300, (Math.random() - 0.5) * 104, 1 + Math.random() * 3, 0, 7); g.fill(); } g.restore(); }
+  if (stamped) { g.save(); g.translate(578, 138); g.rotate(-0.16); g.strokeStyle = 'rgba(192,38,44,0.9)'; g.lineWidth = 7; g.strokeRect(-128, -46, 256, 92); g.lineWidth = 3; g.strokeRect(-119, -37, 238, 74);
+    g.fillStyle = 'rgba(192,38,44,0.92)'; g.font = sans(58, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('$200', 0, 4);
+    g.globalCompositeOperation = 'destination-out'; for (let i = 0; i < 90; i++) { g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.arc((Math.random() - 0.5) * 256, (Math.random() - 0.5) * 92, 1 + Math.random() * 3, 0, 7); g.fill(); } g.restore(); }
   return c;
 }
 const FINE = { before: fineSlip(false), after: fineSlip(true) };
@@ -214,6 +230,28 @@ const PAPER_WALL = noiseCanvas(256, 512, 9, (g, r, w, h) => {
   g.fillStyle = '#3A2414'; g.fillRect(0, h - 92, w, 92); g.fillStyle = '#C9A05A'; g.fillRect(0, h - 96, w, 5);
   for (let x = 8; x < w; x += 64) { g.strokeStyle = 'rgba(201,160,90,0.35)'; g.lineWidth = 2; g.strokeRect(x, h - 78, 48, 62); }
 });
+// tournament carpet: deep burgundy with a faint diamond lattice (seamless, so no tile joints show)
+const CARPET = noiseCanvas(512, 512, 17, (g, r, w, h) => {
+  g.fillStyle = '#3E1A1E'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 6000; i++) { g.fillStyle = `rgba(${r() > 0.5 ? '90,40,44' : '24,10,12'},${0.25 + r() * 0.3})`; g.fillRect(r() * w, r() * h, 2, 2); }
+  g.strokeStyle = 'rgba(201,160,90,0.10)'; g.lineWidth = 3;
+  for (let k = -4; k <= 4; k++) { g.beginPath(); g.moveTo(k * 128, 0); g.lineTo(k * 128 + 512, 512); g.stroke(); g.beginPath(); g.moveTo(k * 128 + 512, 0); g.lineTo(k * 128, 512); g.stroke(); }
+  for (let x = 0; x <= w; x += 128) for (let y = 0; y <= h; y += 128) { g.fillStyle = 'rgba(201,160,90,0.12)'; g.beginPath(); g.arc(x, y, 7, 0, 7); g.fill(); }
+});
+// carved double doors: walnut leaves with raised panels and brass handles; `open` shows light between them
+function doorTex(open) {
+  const c = makeCanvas(400, 420), g = c.getContext('2d');
+  g.fillStyle = '#FFF1D6'; g.fillRect(0, 0, 400, 420);
+  const leaf = (x0, w) => {
+    const gr = g.createLinearGradient(x0, 0, x0 + w, 0); gr.addColorStop(0, '#3A2414'); gr.addColorStop(0.5, '#5A3A22'); gr.addColorStop(1, '#3A2414');
+    g.fillStyle = gr; g.fillRect(x0, 0, w, 420);
+    g.strokeStyle = 'rgba(20,10,4,0.6)'; g.lineWidth = 4; for (const [py, ph] of [[30, 160], [220, 170]]) g.strokeRect(x0 + w * 0.15, py, w * 0.7, ph);
+    g.strokeStyle = 'rgba(201,160,90,0.35)'; g.lineWidth = 2; for (const [py, ph] of [[36, 148], [226, 158]]) g.strokeRect(x0 + w * 0.18, py, w * 0.64, ph);
+  };
+  if (open) { leaf(0, 70); leaf(330, 70); } else { leaf(0, 198); leaf(202, 198); g.fillStyle = '#C9A05A'; g.fillRect(180, 200, 12, 40); g.fillRect(208, 200, 12, 40); }
+  return c;
+}
+const DOORS = { shut: doorTex(false), open: doorTex(true) };
 // walnut table top: long grain with growth rings
 const WOOD = noiseCanvas(512, 512, 5, (g, r, w, h) => {
   const gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, '#4A2F1C'); gr.addColorStop(0.5, '#5A3A22'); gr.addColorStop(1, '#46301E'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
@@ -240,12 +278,12 @@ const fogK = (d, near = 18, far = 95) => clamp((d - near) / (far - near)) * 0.85
 const TABLES = [[-20, 4], [28, 4], [-20, 24], [28, 24], [-20, 44], [28, 44]].map(([x, z], i) => {
   const r = rng(70 + i); return { x, z, far: CROWD[Math.floor(r() * CROWD.length)], near: CROWD[Math.floor(r() * CROWD.length)], pos: piecesAt(G, 10 + Math.floor(r() * 60)) };
 });
-function hallShell(g, t, { dim = 0 } = {}) {
+function hallShell(g, t, { dim = 0, doorsOpen = false } = {}) {
   g.fillStyle = HALL.base; g.fillRect(0, 0, W, H);
-  // marble floor (12-unit textured slabs, each texture holds 2x2 tiles)
+  // carpeted floor (seamless texture, 12-unit pieces)
   for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) {
     const x0 = -40 + i * 12, z0 = -30 + j * 12, d = depth(x0 + 6, FLOOR_Y, z0 + 6); if (d > 150) continue;
-    texQuad(g, MARBLE[(i + j) % 2], [x0, FLOOR_Y, z0 + 12], [x0 + 12, FLOOR_Y, z0 + 12], [x0, FLOOR_Y, z0], { d, fogA: fogK(d) });
+    texQuad(g, CARPET, [x0, FLOOR_Y, z0 + 12], [x0 + 12, FLOOR_Y, z0 + 12], [x0, FLOOR_Y, z0], { d, fogA: fogK(d) });
   }
   // back wall: wallpaper between tall night windows; side walls papered too
   for (let i = 0; i < 11; i++) { const x0 = -40 + i * 8, d = depth(x0 + 4, 6, 60);
@@ -255,15 +293,28 @@ function hallShell(g, t, { dim = 0 } = {}) {
     pool(g, B, x0 + 4, 7, 59.8, 4, '#7FA6D9', 0.18, true); }
   for (const x of [-40, 48]) for (let i = 0; i < 12; i++) { const z0 = -30 + i * 7.5, d = depth(x, 6, z0 + 3.7);
     texQuad(g, PAPER_WALL, [x, 20, x < 0 ? z0 : z0 + 7.5], [x, 20, x < 0 ? z0 + 7.5 : z0], [x, FLOOR_Y, x < 0 ? z0 : z0 + 7.5], { d, fogA: fogK(d) }); }
-  // the exit: bright double doors in the back wall
-  quad(g, [[0, FLOOR_Y, 59.8], [8, FLOOR_Y, 59.8], [8, 8, 59.8], [0, 8, 59.8]], '#FFF1D6');
-  pool(g, B, 4, 2, 59.5, 9, '#FFF1D6', 0.4, true); pool(g, B, 4, FLOOR_Y, 54, 9, '#FFF1D6', 0.25);
-  // columns
-  for (const x of [-30, -8, 16, 38]) for (const z of [-12, 14, 36]) { const d = depth(x, 6, z); if (d < 0.6) continue;
-    box(g, B, [x - 1.2, FLOOR_Y, z - 1.2], [x + 1.2, 18, z + 1.2], { top: fog('#D8CBB0', d), side: fog('#A89A7E', d), front: fog('#C2B497', d) });
-    box(g, B, [x - 1.6, 16.5, z - 1.6], [x + 1.6, 17.5, z + 1.6], { top: fog('#E2BE6A', d), side: fog('#B08A3A', d), front: fog('#C9A05A', d) }); }
+  // the exit: carved double doors in the back wall, in a stone frame
+  quad(g, [[-0.8, FLOOR_Y, 59.85], [8.8, FLOOR_Y, 59.85], [8.8, 9.2, 59.85], [-0.8, 9.2, 59.85]], fog('#B8A88A', depth(4, 3, 60)));
+  texQuad(g, doorsOpen ? DOORS.open : DOORS.shut, [0, 8.4, 59.8], [8, 8.4, 59.8], [0, FLOOR_Y, 59.8]);
+  if (doorsOpen) { pool(g, B, 4, 2, 59.5, 9, '#FFF1D6', 0.45, true); pool(g, B, 4, FLOOR_Y, 54, 9, '#FFF1D6', 0.3); }
+  // round columns: shaded shaft with flutes, a base and a gilded capital
+  for (const x of [-30, -8, 16, 38]) for (const z of [-12, 14, 36]) { const d = depth(x, 6, z); if (d < 3) continue; column(g, x, z, d); }
   for (const [x, z] of [[4, 4], [-16, 24], [24, 24], [4, 36]]) chandelier(g, B, x, 12, z, HALL, t);
   if (dim) { g.fillStyle = `rgba(0,0,0,${dim})`; g.fillRect(0, 0, W, H); }
+}
+function column(g, x, z, d) {
+  const seg3 = (y0, y1, r, cols, flutes = 0) => {
+    if (depth(x, y0, z) < 1 || depth(x, y1, z) < 1) return;
+    const a = B.project(x, y0, z), b = B.project(x, y1, z), wa = r * a.s, wb = r * b.s;
+    const gr = g.createLinearGradient(a.x - wa, 0, a.x + wa, 0); gr.addColorStop(0, fog(cols[2], d)); gr.addColorStop(0.35, fog(cols[0], d)); gr.addColorStop(0.6, fog(cols[1], d)); gr.addColorStop(1, fog(cols[2], d));
+    g.fillStyle = gr; g.beginPath(); g.moveTo(a.x - wa, a.y); g.lineTo(a.x + wa, a.y); g.lineTo(b.x + wb, b.y); g.lineTo(b.x - wb, b.y); g.closePath(); g.fill();
+    g.beginPath(); g.ellipse(b.x, b.y, wb, wb * 0.18, 0, 0, 7); g.fill();
+    if (flutes) { g.strokeStyle = rgba('#000000', 0.12); g.lineWidth = Math.max(1, wa * 0.05); for (let k = 1; k < flutes; k++) { const f = -1 + 2 * k / flutes, s2 = Math.sin(f * Math.PI / 2); g.beginPath(); g.moveTo(a.x + s2 * wa, a.y); g.lineTo(b.x + s2 * wb, b.y); g.stroke(); } }
+  };
+  seg3(FLOOR_Y, FLOOR_Y + 0.9, 1.55, ['#E2D6BC', '#C9BC9F', '#8E8268']);
+  seg3(FLOOR_Y + 0.9, 16.2, 1.05, ['#E8DCC2', '#D2C5A8', '#8E8268'], 9);
+  seg3(16.2, 17.2, 1.5, ['#F5D27A', '#C9A05A', '#7A5A20']);
+  seg3(17.2, 17.6, 1.7, ['#E2BE6A', '#B08A3A', '#6A4A18']);
 }
 // another game in the hall: table, board, pieces and two players (sprites)
 function otherTable(g, T) {
@@ -289,8 +340,18 @@ function hallCrowd(g, { skipMain = true } = {}) {
 }
 // Magnus's table on legs (so the jeans show), the board, Magnus seated at the far side; opponent optional at the near side
 function mainTable(g, t, { who = 'magnusNY', e = 'focus', opp = null, oppE = 'focus', pieces, jeans = true, focus = null, chairSeat = false, lift = 3.1, alpha = 1 } = {}) {
-  if (chairSeat) chair(g, B, 4, 10.2, { face: -1, color: '#4A2E1E' });
-  const h1 = who && alpha > 0 ? seated(g, B, who, e, t, { z: 9.4, lift, alpha }) : () => {};
+  if (chairSeat) {  // upholstered chair: walnut frame, red velvet back and seat
+    box(g, B, [2.7, FLOOR_Y, 10.6], [5.3, 2.7, 11.0], { top: '#4A2E1E', side: '#2A1A10', front: '#3A2414' });
+    quad(g, [[3.0, 2.4, 10.58], [5.0, 2.4, 10.58], [5.0, -0.7, 10.58], [3.0, -0.7, 10.58]], '#7A1E28');
+    quad(g, [[3.15, 2.2, 10.57], [4.85, 2.2, 10.57], [4.85, 1.8, 10.57], [3.15, 1.8, 10.57]], 'rgba(255,200,190,0.10)');
+    if (depth(4, 1, 10.56) > 0.6) for (let i = 0; i < 3; i++) for (let j = 0; j < 4; j++) {
+      const p = B.project(3.4 + i * 0.6 + (j % 2) * 0.3 - 0.15, -0.25 + j * 0.65, 10.56); if (j % 2 && i === 2) continue;
+      g.fillStyle = 'rgba(30,6,10,0.55)'; g.beginPath(); g.arc(p.x, p.y, Math.max(1.5, p.s * 0.055), 0, 7); g.fill();
+    }
+    quad(g, [[2.6, 2.7, 10.55], [5.4, 2.7, 10.55], [5.4, 2.95, 10.55], [2.6, 2.95, 10.55]], '#5A3A22');  // crest rail
+  }
+  const under = B.E[1] < -0.35;  // camera under the table: only the legs show, the torso is above the table top
+  const h1 = who && alpha > 0 && !under ? seated(g, B, who, e, t, { z: 9.4, lift, alpha, hands: false }) : () => {};
   const leg = ([lx, lz]) => box(g, B, [lx - 0.3, FLOOR_Y, lz - 0.3], [lx + 0.3, -0.75, lz + 0.3], { top: '#2A1C12', side: '#1E140D', front: '#24180F' });
   leg([-0.6, 8.6]); leg([8.6, 8.6]);
   if (jeans && who && alpha > 0) { g.save(); g.globalAlpha *= alpha; seatedJeans(g, 4, 8.3); g.restore(); }
@@ -298,20 +359,21 @@ function mainTable(g, t, { who = 'magnusNY', e = 'focus', opp = null, oppE = 'fo
   box(g, B, [-1.1, -0.75, -1.1], [9.1, -0.35, 9.1], { top: '#4A3322', side: '#2A1C12', front: '#3A2818' });
   if (B.E[1] > -0.35) texQuad(g, WOOD, [-1.1, -0.35, 9.1], [9.1, -0.35, 9.1], [-1.1, -0.35, -1.1]);
   pool(g, B, 4, -0.3, 4, 7, '#FFE2B0', 0.18);
-  const h2 = opp ? seated(g, B, opp, oppE, t, { z: -1.4, face: 1 }) : () => {};
-  B.drawSlab(g, COM); B.drawPieces(g, pieces, { focus: focus ?? B.dist, dof: 1.0 }); h1(); h2();
+  const h2 = opp ? seated(g, B, opp, oppE, t, { z: -1.4, face: 1, hands: false }) : () => {};
+  if (B.E[1] > -0.35) { B.drawSlab(g, COM); B.drawPieces(g, pieces, { focus: focus ?? B.dist, dof: 1.0 }); }
+  h1(); h2();
 }
 // the whole hall with Magnus's table among the others, depth-sorted
 const DOFC = makeCanvas(), dofx = DOFC.getContext('2d');
-function hall(g, lt, t, keys, { ez = lin, main = {}, extra = [], dim = 0, dof = 3.5, focus = null } = {}) {
+function hall(g, lt, t, keys, { ez = lin, main = {}, extra = [], dim = 0, dof = 3.5, focus = null, tables = true, doorsOpen = false } = {}) {
   rig(B, lt, keys, { t, e: ez });
-  const items = hallCrowd(g);
+  const items = tables ? hallCrowd(g) : [];
   if (main) items.push({ d: depth(4, 0, 4), f: () => mainTable(g, t, main) });
   items.push(...extra.map(x => ({ d: x.p ? depth(...x.p) : x.d, f: x.f })));  // depth after the camera is set
   items.sort((a, b) => b.d - a.d);
   // depth of field: the room and everything well behind the subject, drawn first and blurred as one layer
   const fz = (focus ?? B.dist) + 7;
-  hallShell(g, t, { dim });
+  hallShell(g, t, { dim, doorsOpen });
   const far = items.filter(it => it.d > fz), near = items.filter(it => it.d <= fz);
   far.forEach(it => it.f());
   if (dof > 0.5) {
@@ -357,21 +419,22 @@ export async function build(T) {
   const credit = (g, text, a = 1) => { if (a <= 0) return; g.save(); g.globalAlpha *= a; g.font = sans(16, 700); g.letterSpacing = '1px'; g.textAlign = 'right'; g.fillStyle = 'rgba(243,235,221,0.72)'; g.fillText(text, W - 28, H - 36); g.restore(); };
   const scrim = (g, a = 0.45, h = 640) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, `rgba(6,4,2,${a})`); gr.addColorStop(1, 'rgba(6,4,2,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, h); };
   const EV = 'FIDE WORLD RAPID & BLITZ · NEW YORK · DECEMBER 2024';
-  const MID = piecesAt(G, 24);
+  const MID = piecesAt(G, 24), SP = piecesAt(G, 66).filter(p => p.z > 2.6);  // SP: a sparse late position for close shots, so few pieces block the view
+  const FAR = SP.filter(p => p.z > 5);  // for the closest shots: only the pieces on Magnus's half
 
   // ======================= HOOK =======================
   const quitT = w('hook1', 'quit'), jeansT = w('hook2', 'jeans');
   shot(0, (g, lt, t, sh) => {  // the champion at his board, low enough to see the jeans under the table
-    hall(g, lt, t, [[0, { yaw: 0.3, pitch: 0.16, dist: 12, fov: 1500, cy: H * 0.47, target: [4, 2.9, 9] }], [len(sh), { yaw: 0.15, pitch: 0.14, dist: 10.5 }]], {
-      main: { pieces: MID, e: { ...EXPR.smug, look: [0, 0], curve: 0.7 }, chairSeat: true } });
+    hall(g, lt, t, [[0, { yaw: 0.16, pitch: 0.52, dist: 16, fov: 1500, cy: H * 0.47, target: [4, 1.4, 6.8] }], [len(sh), { yaw: 0.06, pitch: 0.48, dist: 14.2 }]], {
+      main: { pieces: SP, e: { ...EXPR.smug, look: [0, -0.2], curve: 0.7 }, chairSeat: true } });
     scrim(g, 0.6);
     nameTitle(g, lt, 'MAGNUS CARLSEN', 'WORLD CHAMPION', { y: 300, size: 78 });
     stamp(g, 'QUIT', W / 2, 1560, t, quitT, { color: C.red, size: 150, rot: -0.1 });
   }, { grade: 'warm', noJump: true, info: true });
   shot(jeansT - 0.55, (g, lt, t, sh) => {  // under the table: the jeans
-    hall(g, lt, t, [[0, { yaw: 0.18, pitch: 0.05, dist: 7.5, fov: 1500, cy: H * 0.42, target: [4, -1.9, 8.3] }], [len(sh), { yaw: 0.05, pitch: 0.04, dist: 6.6 }]], {
+    hall(g, lt, t, [[0, { yaw: 0.14, pitch: 0.04, dist: 11, fov: 2300, cy: H * 0.4, target: [4, -1.9, 8.3] }], [len(sh), { yaw: 0.04, pitch: 0.03, dist: 10.5, fov: 2500 }]], {
       main: { pieces: MID, e: 'smug', chairSeat: true } });
-    const kn = B.project(4, -1.9, 8.4); ring(g, kn.x, kn.y, 300, t, jeansT, 1);
+    const kn = B.project(4, -1.9, 8.4); ring(g, kn.x, kn.y, 330, t, jeansT, 1);
     scrim(g, 0.6);
     counter(g, 'BECAUSE OF', 'HIS JEANS', { y: 1530, size: 110, color: C.cream, labelColor: C.blue });
   }, { trans: 'whip', grade: 'warm', info: true, qaAllow: ['face cut by frame'] });
@@ -380,14 +443,14 @@ export async function build(T) {
   // ======================= NEW YORK, DECEMBER 2024: HE SHOWS UP IN JEANS =======================
   const nyT = w('s1', 'New'), magT = w('s1', 'Magnus'), rapT = w('s1', 'Rapid'), j1T = w('s1', 'jeans');
   shot(s('s1') - 0.1, (g, lt, t, sh) => {  // crane down into the hall
-    hall(g, lt, t, [[0, { yaw: 0.5, pitch: 0.75, dist: 60, fov: 1400, cy: H * 0.55, target: [4, 0, 20] }], [len(sh), { yaw: 0.3, pitch: 0.4, dist: 42 }]], { ez: ease.inOut, main: { pieces: MID, who: null } });
+    hall(g, lt, t, [[0, { yaw: 0.1, pitch: 0.17, dist: 46, fov: 1150, cy: H * 0.5, target: [4, 3, 32] }], [len(sh), { yaw: 0.0, pitch: 0.13, dist: 38 }]], { ez: ease.inOut, main: null, dof: 0 });
     scrim(g, 0.5);
     placeStamp(g, lt, 'New York', 'December 2024', { y: 330, t0: nyT - (t - lt) });
   }, { trans: 'whip', grade: 'warm' });
   shot(magT - 0.15, (g, lt, t, sh) => {  // he walks in: a low shot of just the legs, the camera backing off in front of them
     const z = lerp(36, 26, clamp(lt / len(sh))), ph = t * 6.5;
     hall(g, lt, t, [[0, { yaw: 0.22, pitch: 0.03, dist: 5.2, fov: 1500, cy: H * 0.36, target: [4, -1.6, 36] }], [len(sh), { yaw: 0.12, pitch: 0.03, dist: 5.2, target: [4, -1.6, 26] }]], {
-      main: null, extra: [{ p: [4, -1, z], f: () => walkingLegs(g, 4, z, ph) }] });
+      main: null, doorsOpen: true, extra: [{ p: [4, -1, z], f: () => walkingLegs(g, 4, z, ph) }] });
     const kn = B.project(4, -1.3, z); ring(g, kn.x, kn.y, 330, t, j1T, 1);
     badge(g, 'WORLD RAPID CHAMPIONSHIP', W / 2, 1480, { color: C.gold, size: 44, a: seg(t, rapT - 0.2, rapT - 0.1), scale: pop(t, rapT - 0.2) });
     stamp(g, 'JEANS', W / 2, 1640, t, j1T, { color: C.blue, size: 110, rot: -0.08 });
@@ -398,23 +461,22 @@ export async function build(T) {
   // ======================= THE DRESS CODE SAYS NO JEANS =======================
   const noT = w('s2', 'no');
   const pageAt = (g, img, x0, z0, a = 1) => picture(g, B, img, [x0, -0.33, z0 + 4.2], [x0 + 3.2, -0.33, z0 + 4.2], [x0, -0.33, z0], { tone: 'color', border: '#E8E0CC', pad: 0.06, a });
-  const arbDesk = (g, img) => {  // the arbiters' desk: the rules on top of a booklet, a pen, a coffee cup, a desk lamp
+  const arbDesk = (g, img, cup = [-8.4, -4.4]) => {  // the arbiters' desk: the rules on top of a booklet, a pen, a coffee cup, a desk lamp
     box(g, B, [-15, FLOOR_Y, -10], [-7, -0.75, -4], { top: '#2A1C12', side: '#1E140D', front: '#24180F' });
     box(g, B, [-15.4, -0.75, -10.4], [-6.6, -0.35, -3.6], { top: '#1E2A44', side: '#14203A', front: '#18243C' });
     pool(g, B, -11.5, -0.3, -7.2, 5, '#FFE2B0', 0.3);
     picture(g, B, PAGE.before, [-12.4, -0.345, -4.9], [-9.2, -0.345, -4.9], [-12.4, -0.345, -9.1], { tone: 'warm', border: '#CFC6B0', pad: 0.05, a: 0.9 });
     pageAt(g, img, -12.6, -9.2);
-    const pa = B.project(-8.6, -0.3, -8.8), pb = B.project(-8.0, -0.3, -6.0);  // pen
+    const pa = B.project(-9.0, -0.3, -8.6), pb = B.project(-8.7, -0.3, -6.2);  // pen
     g.save(); g.lineCap = 'round'; g.strokeStyle = '#141A2A'; g.lineWidth = pa.s * 0.16; g.beginPath(); g.moveTo(pa.x, pa.y); g.lineTo(pb.x, pb.y); g.stroke();
     g.strokeStyle = '#C9A05A'; g.lineWidth = pa.s * 0.05; g.beginPath(); g.moveTo(pa.x, pa.y); g.lineTo(lerp(pa.x, pb.x, 0.25), lerp(pa.y, pb.y, 0.25)); g.stroke(); g.restore();
-    const cb = B.project(-14.2, -0.35, -5.0), ct = B.project(-14.2, 0.55, -5.0), rr = cb.s * 0.55;  // coffee cup
+    const cb = B.project(cup[0], -0.35, cup[1]), ct = B.project(cup[0], 0.55, cup[1]), rr = cb.s * 0.5;  // coffee cup
     g.save(); g.fillStyle = '#E8E2D6'; g.fillRect(cb.x - rr, ct.y, rr * 2, cb.y - ct.y); g.beginPath(); g.ellipse(cb.x, cb.y, rr, rr * 0.35, 0, 0, Math.PI); g.fill();
     g.fillStyle = '#3A2214'; g.beginPath(); g.ellipse(ct.x, ct.y, rr, rr * 0.35, 0, 0, 7); g.fill(); g.strokeStyle = '#E8E2D6'; g.lineWidth = rr * 0.2; g.beginPath(); g.arc(cb.x + rr * 1.1, (cb.y + ct.y) / 2, rr * 0.4, -1.2, 1.2); g.stroke(); g.restore();
-    lamp(g, B, { p: [-14.6, 1.6, -9.6], r: 1.4 }, HALL, 0);
   };
   shot(s('s2') - 0.1, (g, lt, t, sh) => {
-    hall(g, lt, t, [[0, { yaw: -0.2, pitch: 1.0, dist: 9, fov: 1500, cy: H * 0.5, target: [-11, -0.3, -7] }], [len(sh), { yaw: -0.05, pitch: 1.1, dist: 6.5 }]], {
-      main: { pieces: MID, who: null }, extra: [{ p: [-11, 0, -7], f: () => arbDesk(g, PAGE.before) }], dof: 5 });
+    hall(g, lt, t, [[0, { yaw: -0.2, pitch: 1.0, dist: 9, fov: 1500, cy: H * 0.44, target: [-11, -0.3, -7] }], [len(sh), { yaw: -0.05, pitch: 1.1, dist: 7 }]], {
+      main: { pieces: MID, who: null }, tables: false, extra: [{ p: [-11, 0, -7], f: () => arbDesk(g, PAGE.before) }], dof: 5 });
     scrim(g, 0.5);
     counter(g, 'DRESS CODE', null, { y: 300, size: 110, color: C.cream });
     stamp(g, 'NO JEANS', W / 2, 1520, t, noT, { color: C.red, size: 110, rot: -0.08 });
@@ -425,15 +487,22 @@ export async function build(T) {
   const fineT = w('s3', '200'), nowT = w('s3', 'Right');
   shot(s('s3') - 0.1, (g, lt, t, sh) => {  // insert: the fine notice slides onto his table and gets stamped
     const sl = ease.out(seg(t, s('s3') + 0.1, s('s3') + 0.5)), dz = (1 - sl) * -3.5;
-    hall(g, lt, t, [[0, { yaw: 0.15, pitch: 1.05, dist: 6.2, fov: 1500, cy: H * 0.5, target: [6.7, -0.35, -0.55] }], [len(sh), { yaw: 0.05, pitch: 1.12, dist: 4.6 }]], {
-      main: { pieces: MID, who: null }, dof: 5, focus: 5.5, extra: [{ p: [6.7, 0, -0.6], f: () => picture(g, B, t >= fineT ? FINE.after : FINE.before, [5.5, -0.34, -0.05 + dz], [7.9, -0.34, -0.05 + dz], [5.5, -0.34, -1.05 + dz], { tone: 'color', border: '#E6DFCF', pad: 0.03 }) }] });
+    hall(g, lt, t, [[0, { yaw: 0.12, pitch: 1.28, dist: 4.6, fov: 1500, cy: H * 0.5, target: [6.7, -0.35, -0.55] }], [len(sh), { yaw: 0.04, pitch: 1.32, dist: 3.9 }]], {
+      main: null, tables: false, dof: 5, focus: 4.2, extra: [{ p: [6.7, 0, -0.6], f: () => {
+        box(g, B, [0, -0.75, -4], [13, -0.35, 4], { top: '#4A3322', side: '#2A1C12', front: '#3A2818' });
+        texQuad(g, WOOD, [0, -0.35, 4], [13, -0.35, 4], [0, -0.35, -4]);
+        pool(g, B, 6.7, -0.3, -0.5, 4, '#FFE2B0', 0.22);
+        const pa = B.project(8.4, -0.3, -1.2), pb = B.project(8.7, -0.3, 0.3);  // the arbiter's pen
+        g.save(); g.lineCap = 'round'; g.strokeStyle = '#141A2A'; g.lineWidth = pa.s * 0.09; g.beginPath(); g.moveTo(pa.x, pa.y); g.lineTo(pb.x, pb.y); g.stroke(); g.restore();
+        picture(g, B, t >= fineT ? FINE.after : FINE.before, [5.5, -0.34, -0.05 + dz], [7.9, -0.34, -0.05 + dz], [5.5, -0.34, -1.05 + dz], { tone: 'color', border: '#E6DFCF', pad: 0.03 });
+      } }] });
     scrim(g, 0.5);
     counter(g, 'FINED', null, { y: 300, size: 120, color: C.cream, a: seg(t, s('s3') + 0.2, s('s3') + 0.3) });
     credit(g, EV, 1);
   }, { trans: 'whip', grade: 'warm', info: true });
   shot(nowT - 1.15, (g, lt, t, sh) => {  // the arbiter at his board: change, now
     hall(g, lt, t, [[0, { yaw: -0.65, pitch: 0.16, dist: 15, fov: 1400, cy: H * 0.55, target: [3, 1.2, 8] }], [len(sh), { yaw: -0.45, pitch: 0.14, dist: 13 }]], {
-      main: { pieces: MID, e: { ...EXPR.neutral, look: [-0.8, -0.3] } },
+      main: { pieces: SP, e: { ...EXPR.neutral, look: [-0.8, -0.3] } },
       extra: [{ p: [0.6, 2, 12.5], f: () => standing(g, 'arbiter', 0.6, 12.5, { e: exprAt([[0, 'focus'], [nowT - (t - lt), 'angry']], lt), t, jeans: false }) }] });
     scrim(g, 0.55);
     badge(g, 'CHANGE. NOW.', W / 2, 1540, { color: C.gold, size: 54, a: seg(t, nowT, nowT + 0.1), scale: pop(t, nowT) });
@@ -444,8 +513,8 @@ export async function build(T) {
   // ======================= "I'LL CHANGE TOMORROW" =======================
   const tomT = w('s4', "I'll");
   shot(s('s4') - 0.1, (g, lt, t, sh) => {
-    hall(g, lt, t, [[0, { yaw: 0.25, pitch: 0.12, dist: 9, fov: 1500, cy: H * 0.56, target: [4, 2.6, 9] }], [len(sh), { yaw: 0.15, pitch: 0.1, dist: 7.8 }]], {
-      main: { pieces: MID, e: { ...EXPR.smug, look: [0.3, -0.1], curve: 0.8 } } });
+    hall(g, lt, t, [[0, { yaw: 0.24, pitch: 0.38, dist: 12.5, fov: 1500, cy: H * 0.48, target: [4, 2.4, 9] }], [len(sh), { yaw: 0.16, pitch: 0.36, dist: 11 }]], {
+      main: { pieces: FAR.filter(p => p.x > 1.2 && p.x < 6.8), e: { ...EXPR.smug, look: [0.3, -0.1], curve: 0.8 }, chairSeat: true } });
     bubble(g, 4, 3.8, 9.4, "I'll change tomorrow.", seg(t, tomT - 0.15, tomT), { side: 1 });
   }, { trans: 'cut', grade: 'warm' });
   cue(tomT - 0.15, 'sparkle_pop', 0.6); cue(tomT + 0.5, 'laugh', 0.3);
@@ -458,7 +527,7 @@ export async function build(T) {
       picture(g, B, PAIR, [-20, 10, 28], [-8, 10, 28], [-20, 2.3, 28], { tone: 'color', border: '#101014', pad: 0.3 });
       if (t > parT) pool(g, B, -14, 3, 27.6, 5, C.red, 0.25 * seg(t, parT, parT + 0.2), true);
     } };
-    hall(g, lt, t, [[0, { yaw: -0.12, pitch: 0.1, dist: 24, fov: 1500, cy: H * 0.48, target: [-14, 6, 28] }], [len(sh), { yaw: 0.0, pitch: 0.08, dist: 19 }]], { main: { pieces: MID, who: null }, extra: [scr] });
+    hall(g, lt, t, [[0, { yaw: -0.12, pitch: 0.1, dist: 24, fov: 1500, cy: H * 0.48, target: [-14, 6, 28] }], [len(sh), { yaw: 0.0, pitch: 0.08, dist: 19 }]], { main: null, tables: false, extra: [scr] });
     scrim(g, 0.5);
     counter(g, 'FIDE: NO', null, { y: 300, size: 120, color: C.cream, a: seg(t, fnoT - 0.1, fnoT) });
     stamp(g, 'NOT PAIRED', W / 2, 1540, t, parT, { color: C.red, size: 110, rot: -0.08 });
@@ -469,8 +538,8 @@ export async function build(T) {
   const outT = w('s6', 'walks'), wholeT = w('s6', 'whole');
   shot(s('s6') - 0.1, (g, lt, t, sh) => {  // he stands up and leaves: an empty chair at the board
     const u = seg(t, outT - 0.5, outT + 0.5, ease.inOut);
-    hall(g, lt, t, [[0, { yaw: -0.3, pitch: 0.1, dist: 15, fov: 1500, cy: H * 0.55, target: [4, 1.6, 7] }], [len(sh), { yaw: -0.15, pitch: 0.12, dist: 13 }]], {
-      main: { pieces: MID, e: { ...EXPR.smug, look: [0.6, -0.4] }, chairSeat: true, lift: 3.1 + 1.2 * u, alpha: 1 - seg(t, outT - 0.1, outT + 0.35) } });
+    hall(g, lt, t, [[0, { yaw: -0.3, pitch: 0.24, dist: 15, fov: 1500, cy: H * 0.55, target: [4, 1.6, 7] }], [len(sh), { yaw: -0.15, pitch: 0.24, dist: 13 }]], {
+      main: { pieces: SP, e: { ...EXPR.smug, look: [0.6, -0.4] }, chairSeat: true, lift: 3.1 + 1.2 * u, alpha: 1 - seg(t, outT - 0.1, outT + 0.35) } });
     scrim(g, 0.55);
     stamp(g, 'WITHDRAWN', W / 2, 330, t, outT, { color: C.red, size: 120, rot: -0.08 });
     badge(g, 'RAPID: OUT', W / 2 - 200, 500, { color: C.red, size: 42, a: seg(t, wholeT, wholeT + 0.1), scale: pop(t, wholeT) });
@@ -482,8 +551,8 @@ export async function build(T) {
   const daysT = w('s7', 'Two'), downT = w('s7', 'backs'), allT = w('s7', 'allowed');
   shot(s('s7') - 0.1, (g, lt, t, sh) => {
     const img = t >= downT + 0.4 ? PAGE.after : PAGE.before;
-    hall(g, lt, t, [[0, { yaw: 0.35, pitch: 0.95, dist: 8, fov: 1500, cy: H * 0.52, target: [-11, -0.3, -7] }], [len(sh), { yaw: 0.15, pitch: 1.05, dist: 6.6 }]], {
-      main: { pieces: MID, who: null }, extra: [{ p: [-11, 0, -7], f: () => arbDesk(g, img) }], dof: 5 });
+    hall(g, lt, t, [[0, { yaw: 0.35, pitch: 0.95, dist: 8.6, fov: 1500, cy: H * 0.42, target: [-11, -0.3, -7.3] }], [len(sh), { yaw: 0.15, pitch: 1.05, dist: 7.4 }]], {
+      main: { pieces: MID, who: null }, tables: false, extra: [{ p: [-11, 0, -7], f: () => arbDesk(g, img, [-14.3, -4.7]) }], dof: 5 });
     scrim(g, 0.5);
     badge(g, '2 DAYS LATER', W / 2, 300, { color: C.blue, size: 44, a: seg(t, daysT, daysT + 0.1), scale: pop(t, daysT) });
     stamp(g, 'ALLOWED', W / 2, 1520, t, allT, { color: C.lime, size: 120, rot: -0.08 });
@@ -495,7 +564,7 @@ export async function build(T) {
   shot(s('s8') - 0.1, (g, lt, t, sh) => {  // the legs again, walking out of the light of the doors
     const z = lerp(54, 45, clamp(lt / len(sh))), ph = t * 6.5;
     hall(g, lt, t, [[0, { yaw: -0.15, pitch: 0.03, dist: 5.2, fov: 1500, cy: H * 0.36, target: [4, -1.6, 54] }], [len(sh), { yaw: -0.05, pitch: 0.03, dist: 5.2, target: [4, -1.6, 45] }]], {
-      main: null, extra: [{ p: [4, -1, z], f: () => walkingLegs(g, 4, z, ph) }] });
+      main: null, doorsOpen: true, extra: [{ p: [4, -1, z], f: () => walkingLegs(g, 4, z, ph) }] });
     const kn = B.project(4, -1.3, z); ring(g, kn.x, kn.y, 330, t, inJT, 1);
     counter(g, "HE'S BACK", null, { y: 1520, size: 120, color: C.lime, a: seg(t, backT - 0.1, backT) });
   }, { trans: 'flash', grade: 'warm', info: true });
@@ -520,7 +589,7 @@ export async function build(T) {
   const d3 = w('s10', 'draws');
   shot(s('s10') - 0.1, (g, lt, t, sh) => {  // over the board, the games fly by
     const k = Math.floor(lerp(30, 80, lt / len(sh)));
-    final(g, lt, t, [[0, { yaw: 0.6, pitch: 0.95, dist: 13, fov: 1500, cy: H * 0.56, target: [4, 0, 4] }], [len(sh), { yaw: 0.9, pitch: 0.9, dist: 12 }]], { pieces: piecesAt(G, Math.min(k, G.length - 1)) });
+    hall(g, lt, t, [[0, { yaw: 0.5, pitch: 1.15, dist: 17.5, fov: 1500, cy: H * 0.5, target: [4, 0, 4] }], [len(sh), { yaw: 0.62, pitch: 1.12, dist: 16.3 }]], { main: { pieces: piecesAt(G, Math.min(k, G.length - 1)), who: null, jeans: false }, tables: false });
     scrim(g, 0.55);
     badge(g, 'SUDDEN DEATH', W / 2, 300, { color: C.red, size: 48, a: seg(t, sdT, sdT + 0.1), scale: pop(t, sdT) });
     for (let i = 0; i < 3; i++) { const t0 = d3 - 0.25 + i * 0.18, a = seg(t, t0, t0 + 0.1); if (a <= 0) continue;
@@ -533,10 +602,10 @@ export async function build(T) {
   // ======================= "CAN WE JUST SHARE THE TITLE?" — "YES" =======================
   const shT = w('s11', 'share'), yesT = w('s11', 'yes');
   shot(s('s11') - 0.1, (g, lt, t, sh) => {
-    final(g, lt, t, [[0, { yaw: 1.1, pitch: 0.2, dist: 15, fov: 1100, cy: H * 0.6, target: [4, 2.4, 4] }], [len(sh), { yaw: 1.25, pitch: 0.18, dist: 13.5 }]], {
+    final(g, lt, t, [[0, { ...SIDE, dist: 15 }], [len(sh), { ...SIDE, yaw: 1.44, dist: 13.5 }]], {
       e: { ...EXPR.happy, look: [-0.9, 0.1] }, oppE: exprAt([[0, { ...EXPR.focus, look: [0.6, 0.5] }], [shT + 0.4 - (t - lt), { ...EXPR.shock, look: [0.8, 0] }], [yesT - (t - lt), { ...EXPR.happy, look: [0.6, 0] }]], lt),
-      extra: [{ p: [-4, 2, 4], f: () => standing(g, 'arbiter', -4, 4, { e: exprAt([[0, 'focus'], [yesT - (t - lt), { ...EXPR.happy, nod: 1 }]], lt), t, jeans: false }) }] });
-    bubble(g, 4, 3.6, 9.4, 'Share the title?', seg(t, shT - 0.2, shT), { side: 1 });
+      extra: [{ p: [-3.5, 2, 4], f: () => standing(g, 'arbiter', -3.5, 4, { e: exprAt([[0, 'focus'], [yesT - (t - lt), { ...EXPR.happy, nod: 1 }]], lt), t, jeans: false }) }] });
+    bubble(g, 4, 3.6, 9.4, 'Share the title?', seg(t, shT - 0.2, shT), { side: -1 });
     scrim(g, 0.5, 520);
     stamp(g, 'FIDE: YES', W / 2, 330, t, yesT, { color: C.lime, size: 120, rot: -0.08 });
   }, { trans: 'whip', grade: 'warm', info: true });
@@ -546,7 +615,7 @@ export async function build(T) {
   const firstT = w('s12', 'first');
   shot(s('s12') - 0.1, (g, lt, t, sh) => {  // both on the podium with two trophies
     const pod = { p: [4, 0, 20], f: () => {
-      picture(g, B, BANNER, [-3.5, 10, 26], [11.5, 10, 26], [-3.5, 6.1, 26], { tone: 'color', border: '#0E1A30', pad: 0.2 });
+      picture(g, B, BANNER, [-3.5, 12.4, 26], [11.5, 12.4, 26], [-3.5, 8.5, 26], { tone: 'color', border: '#0E1A30', pad: 0.2 });
       standing(g, 'nepo', 1.4, 21.5, { e: 'happy', t, jeans: false }); standing(g, 'magnusNY', 6.6, 21.5, { e: { ...EXPR.triumph }, t });
       box(g, B, [-3, FLOOR_Y, 19], [11, -0.2, 21], { top: '#E2BE6A', side: '#7A5A20', front: '#B08A3A' });
       for (const x of [1.4, 6.6]) placeAt(B, x, -0.2, 19.6, (px, py, sc) => trophy(g, px, py, sc * 1.1));
@@ -561,15 +630,14 @@ export async function build(T) {
       if (k === 0 || k === 3) { g.save(); g.fillStyle = `rgba(255,255,255,${0.18 * a})`; g.fillRect(0, 0, W, H); g.restore(); }
     }
     scrim(g, 0.55);
-    counter(g, 'CO-CHAMPIONS', 'WORLD BLITZ 2024', { y: 330, size: 100, color: C.gold, labelColor: C.blue });
-    badge(g, 'FIRST SHARED WORLD TITLE', W / 2, 1520, { color: C.gold, size: 44, sub: 'IN CHESS HISTORY', a: seg(t, firstT, firstT + 0.1), scale: pop(t, firstT) });
+    badge(g, 'CO-CHAMPIONS', W / 2, 1500, { color: C.gold, size: 52, sub: 'FIRST SHARED WORLD TITLE IN HISTORY', a: seg(t, firstT, firstT + 0.1), scale: pop(t, firstT) });
   }, { trans: 'flash', grade: 'warm', info: true });
   cue(firstT, 'reveal_bell', 0.8); cue(firstT, 'applause', 0.8); cue(firstT - 0.3, 'confetti', 0.8); for (let k = 0; k < 7; k++) cue(firstT + 0.15 + k * 0.33 + (k % 3) * 0.07, 'camera', 0.45);
 
   // ======================= THE JEANS: eBAY, $36,100, FOR CHARITY =======================
   const ebT = w('s13', 'eBay'), bidT = w('s13', '36,100'), solT = w('s13', 'dollars'), chT = w('s13', 'charity');
   shot(s('s13') - 0.1, (g, lt, t, sh) => {  // a glass case under a spotlight
-    rig(B, lt, [[0, { yaw: -0.45, pitch: 0.12, dist: 13, fov: 1400, cy: H * 0.55, target: [4, 2.2, 4] }], [len(sh), { yaw: 0.35, pitch: 0.1, dist: 11 }]], { t, e: lin });
+    rig(B, lt, [[0, { yaw: -0.45, pitch: 0.12, dist: 14, fov: 1400, cy: H * 0.6, target: [4, 2.4, 4] }], [len(sh), { yaw: 0.35, pitch: 0.1, dist: 12.5 }]], { t, e: lin });
     room(g, B, 'backroom', { t, blur: 3, over: { light: '#FFE6B8', lightA: 0.25 } });
     box(g, B, [2, FLOOR_Y, 2], [6, -0.6, 6], { top: '#2A2A30', side: '#141418', front: '#1E1E24' });
     picture(g, B, PLAQUE, [3, -1.2, 1.97], [5, -1.2, 1.97], [3, -1.83, 1.97], { tone: 'color', border: '#4A3A1A', pad: 0.06 });
@@ -577,11 +645,10 @@ export async function build(T) {
     g.save(); g.globalAlpha = 0.16; box(g, B, [2.2, -0.6, 2.2], [5.8, 8.6, 5.8], { top: '#DDEEFF', side: '#A9C4DD', front: '#C9DDEE' }); g.restore();
     pool(g, B, 4, 3, 4, 7, '#FFF1D6', 0.25, true);
     scrim(g, 0.6);
-    badge(g, 'eBAY AUCTION', W / 2, 300, { color: C.gold, size: 44, a: seg(t, ebT, ebT + 0.1), scale: pop(t, ebT) });
+    badge(g, 'eBAY AUCTION', W / 2, 170, { color: C.gold, size: 44, a: seg(t, ebT, ebT + 0.1), scale: pop(t, ebT) });
     const bid = Math.round(lerp(8200, 36100, seg(t, bidT - 0.2, bidT + 1.3, ease.inOut)) / 100) * 100;
-    counter(g, '$' + bid.toLocaleString('en-US'), t >= solT ? 'SOLD' : 'CURRENT BID', { y: 470, size: 130, color: t >= solT ? C.lime : C.cream, a: seg(t, bidT - 0.3, bidT - 0.2), labelColor: t >= solT ? C.lime : C.gold });
-    stamp(g, 'SOLD', W / 2, 1470, t, solT, { color: C.red, size: 120, rot: -0.1 });
-    badge(g, 'FOR CHARITY', W / 2, 1640, { color: C.blue, size: 40, a: seg(t, chT, chT + 0.1), scale: pop(t, chT) });
+    counter(g, '$' + bid.toLocaleString('en-US'), t >= solT ? 'SOLD' : 'CURRENT BID', { y: 320, size: 120, color: t >= solT ? C.lime : C.cream, a: seg(t, bidT - 0.3, bidT - 0.2), labelColor: t >= solT ? C.lime : C.gold });
+    badge(g, 'FOR CHARITY', W / 2, 1500, { color: C.blue, size: 40, a: seg(t, chT, chT + 0.1), scale: pop(t, chT) });
     credit(g, 'PROCEEDS: BIG BROTHERS BIG SISTERS OF AMERICA · 2025', seg(t, chT, chT + 0.2));
   }, { trans: 'whip', grade: 'warm', info: true });
   cue(s('s13') - 0.1, 'glass', 0.6); cue(ebT, 'notify', 0.8); for (let i = 0; i < 8; i++) cue(bidT - 0.2 + i * 0.18, 'clock_press', 0.35); cue(solT, 'gavel', 1); cue(solT + 0.05, 'cash', 0.8); cue(chT, 'shimmer', 0.7);
@@ -589,8 +656,8 @@ export async function build(T) {
   // ======================= WOULD YOU HAVE CHANGED? FOLLOW =======================
   const chgT = w('cta', 'changed'), folT = w('cta', 'Follow');
   shot(s('cta') - 0.1, (g, lt, t, sh) => {
-    hall(g, lt, t, [[0, { yaw: -0.25, pitch: 0.16, dist: 12, fov: 1500, cy: H * 0.5, target: [4, 2.9, 9] }], [len(sh), { yaw: 0.0, pitch: 0.14, dist: 10.5 }]], {
-      main: { pieces: MID, e: { ...EXPR.smug, look: [0, 0], curve: 0.9 }, chairSeat: true } });
+    hall(g, lt, t, [[0, { yaw: -0.2, pitch: 0.5, dist: 15.5, fov: 1500, cy: H * 0.5, target: [4, 1.4, 6.8] }], [len(sh), { yaw: 0.0, pitch: 0.47, dist: 13.8 }]], {
+      main: { pieces: SP, e: { ...EXPR.smug, look: [0, 0], curve: 0.9 }, chairSeat: true } });
     scrim(g, 0.65);
     counter(g, 'WOULD YOU', 'HAVE CHANGED?', { y: 320, size: 110, color: C.cream, labelColor: C.gold, a: seg(t, s('cta'), s('cta') + 0.1) });
     badge(g, 'YES — CHANGE', W / 2 - 220, 500, { color: '#8A8F98', size: 38, a: seg(t, chgT, chgT + 0.1), scale: pop(t, chgT) });
