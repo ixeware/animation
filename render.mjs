@@ -54,6 +54,8 @@ function qaCheck(fr, t, W = 1080, H = 1920) {
     for (const f of faces) if (inter(x, f) / area(f) > 0.12) out.push(['text over face', `"${x.label}" / ${f.label}`]);
     for (const c of caps) if (inter(x, c) / Math.min(area(x), area(c)) > 0.1) out.push(['text over captions', `"${x.label}"`]);
     if (x.x < -4 || x.y < -4 || x.x + x.w > W + 4 || x.y + x.h > H + 4) out.push(['text off frame', `"${x.label}"`]);
+    // a person's name title belongs at the top, above the head (as in the reference), never down over the board
+    if (x.label.startsWith('name: ') && x.y + x.h / 2 > H * 0.33) out.push(['name title low', `"${x.label}"`]);
     for (const y of texts) if (x !== y && x.label < y.label && inter(x, y) / Math.min(area(x), area(y)) > 0.2) out.push(['texts overlap', `"${x.label}" / "${y.label}"`]);
   }
   for (const f of faces) {

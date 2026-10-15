@@ -37,7 +37,7 @@ export function nameTitle(ctx, lt, name, sub, { y = 230, a = 1, t0 = 0, subColor
   ctx.save(); ctx.globalAlpha *= u; ctx.textAlign = 'center';
   ctx.font = serif(size, 700); ctx.letterSpacing = '1px'; hard(ctx, 5); ctx.fillStyle = C.cream;
   ctx.fillText(name, W / 2, y + (1 - u) * 18); unhard(ctx);
-  { const nw = ctx.measureText(name).width; qaRect(ctx, W / 2 - nw / 2, y - size * 0.75, nw, size * 0.75 + (sub ? 72 : 28), 'text', name); }
+  { const nw = ctx.measureText(name).width; qaRect(ctx, W / 2 - nw / 2, y - size * 0.75, nw, size * 0.75 + (sub ? 72 : 28), 'text', 'name: ' + name); }
   ctx.fillStyle = subColor; ctx.fillRect(W / 2 - 40 * u, y + 22, 80 * u, 5);
   if (sub) { ctx.font = sans(24, 800); ctx.letterSpacing = '6px'; hard(ctx, 3); ctx.fillStyle = C.cream; ctx.fillText(typed(sub, lt, t0 + 0.25, 0.5), W / 2, y + 62); }
   ctx.restore();
