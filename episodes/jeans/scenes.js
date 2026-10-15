@@ -10,6 +10,7 @@ import { EXPR, exprAt, drawChar } from '../../engine/js/characters.js';
 import { counter, badge, stamp, placeStamp, nameTitle, sans, mono, serif } from '../../engine/js/hud.js';
 import { rig, seated, actor } from '../../engine/js/stage.js';
 import { room, box, pool, placeAt, picture, chandelier, chair, lamp, texTri, FLOOR_Y } from '../../engine/js/env.js';
+import { moveUnder, moveOver, playRun, SLIDE, MOVE_HIT } from '../../engine/js/movefx.js';
 
 const G = await fetch('../engine/data/gotham_world_2025.json').then(r => r.json());
 const B = new Board();
@@ -389,7 +390,7 @@ function hallCrowd(g, { skipMain = true } = {}) {
   return items;
 }
 // Magnus's table on legs (so the jeans show), the board, Magnus seated at the far side; opponent optional at the near side
-function mainTable(g, t, { who = 'magnusNY', e = 'focus', opp = null, oppE = 'focus', pieces, jeans = true, focus = null, chairSeat = false, lift = 3.1, alpha = 1 } = {}) {
+function mainTable(g, t, { who = 'magnusNY', e = 'focus', opp = null, oppE = 'focus', pieces, jeans = true, focus = null, chairSeat = false, lift = 3.1, alpha = 1, under: fxUnder = null, over: fxOver = null } = {}) {
   if (chairSeat) {  // upholstered chair: walnut frame, red velvet back and seat
     box(g, B, [2.7, FLOOR_Y, 10.6], [5.3, 2.7, 11.0], { top: '#4A2E1E', side: '#2A1A10', front: '#3A2414' });
     quad(g, [[3.0, 2.4, 10.58], [5.0, 2.4, 10.58], [5.0, -0.7, 10.58], [3.0, -0.7, 10.58]], '#7A1E28');
@@ -410,7 +411,7 @@ function mainTable(g, t, { who = 'magnusNY', e = 'focus', opp = null, oppE = 'fo
   if (B.E[1] > -0.35) texQuad(g, WOOD, [-1.1, -0.35, 9.1], [9.1, -0.35, 9.1], [-1.1, -0.35, -1.1]);
   pool(g, B, 4, -0.3, 4, 7, '#FFE2B0', 0.18);
   const h2 = opp ? seated(g, B, opp, oppE, t, { z: -1.4, face: 1, hands: false }) : () => {};
-  if (B.E[1] > -0.35) { B.drawSlab(g, COM); B.drawPieces(g, pieces, { focus: focus ?? B.dist, dof: 1.0 }); }
+  if (B.E[1] > -0.35) { B.drawSlab(g, COM); if (fxUnder) fxUnder(); B.drawPieces(g, pieces, { focus: focus ?? B.dist, dof: 1.0 }); if (fxOver) fxOver(); }
   h1(); h2();
 }
 // the whole hall with Magnus's table among the others, depth-sorted
@@ -469,6 +470,10 @@ export async function build(T) {
   const credit = (g, text, a = 1) => { if (a <= 0) return; g.save(); g.globalAlpha *= a; g.font = sans(16, 700); g.letterSpacing = '1px'; g.textAlign = 'right'; g.fillStyle = 'rgba(243,235,221,0.72)'; g.fillText(text, W - 28, H - 36); g.restore(); };
   const scrim = (g, a = 0.45, h = 640) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, `rgba(6,4,2,${a})`); gr.addColorStop(1, 'rgba(6,4,2,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, h); };
   const EV = 'FIDE WORLD RAPID & BLITZ · NEW YORK · DECEMBER 2024';
+  // a run of moves on the main board with the move accent: returns the main-table options for time t
+  const run = (g, k0, at, t, o = {}) => { const R = playRun(G, k0, at, t, piecesAt);
+    return { pieces: R.pieces, under: () => R.active.forEach(a => moveUnder(g, B, a.m, a.lt, { hold: a.hold })), over: () => R.active.forEach(a => moveOver(g, B, a.m, a.lt, { hold: a.hold, label: (o.label ?? true) && a.label })) }; };
+  const runCues = (k0, at, gain = 0.85) => at.forEach((tm, j) => { const m = G[k0 + j + 1], cap = G[k0 + j].pieces.length > m.pieces.length; cue(tm + SLIDE - MOVE_HIT, cap ? 'move_capture' : 'move', gain); });
   const MID = piecesAt(G, 24), SP = piecesAt(G, 66).filter(p => p.z > 2.6);  // SP: a sparse late position for close shots, so few pieces block the view
   const FAR = SP.filter(p => p.z > 5);  // for the closest shots: only the pieces on Magnus's half
 
@@ -623,23 +628,24 @@ export async function build(T) {
   // ======================= THE BLITZ FINAL vs NEPOMNIACHTCHI =======================
   const finT = w('s9', 'final'), ianT = w('s9', 'Ian');
   const SIDE = { yaw: 1.5, pitch: 0.26, dist: 14, fov: 950, cy: H * 0.6, target: [4, 2.2, 4] };
-  const final = (g, lt, t, keys, o = {}) => hall(g, lt, t, keys, { main: { pieces: o.pieces || MID, e: o.e || { ...EXPR.focus, look: [-0.6, 0.5] }, opp: 'nepo', oppE: o.oppE || { ...EXPR.focus, look: [0.6, 0.5] }, jeans: false }, extra: o.extra || [] });
+  const final = (g, lt, t, keys, o = {}) => hall(g, lt, t, keys, { main: { pieces: o.pieces || MID, e: o.e || { ...EXPR.focus, look: [-0.6, 0.5] }, opp: 'nepo', oppE: o.oppE || { ...EXPR.focus, look: [0.6, 0.5] }, jeans: false, ...(o.main || {}) }, extra: o.extra || [] });
+  const finMoves = [finT + 0.05, ianT + 0.1];
   shot(s('s9') - 0.1, (g, lt, t, sh) => {
-    final(g, lt, t, [[0, { ...SIDE, dist: 15 }], [len(sh), { ...SIDE, yaw: 1.42, dist: 13 }]]);
+    final(g, lt, t, [[0, { ...SIDE, dist: 15 }], [len(sh), { ...SIDE, yaw: 1.42, dist: 13 }]], { main: run(g, 24, finMoves, t, { label: false }) });
     scrim(g, 0.55);
     badge(g, 'WORLD BLITZ · FINAL', W / 2, 330, { color: C.gold, size: 48, a: seg(t, finT, finT + 0.1), scale: pop(t, finT) });
     badge(g, 'NEPOMNIACHTCHI', 260, 1500, { color: C.red, size: 36, a: seg(t, ianT, ianT + 0.1), scale: pop(t, ianT) });
     badge(g, 'CARLSEN', W - 230, 1500, { color: C.blue, size: 36, a: seg(t, ianT + 0.1, ianT + 0.2), scale: pop(t, ianT + 0.1) });
     credit(g, EV, 1);
   }, { trans: 'whip', grade: 'warm', info: true });
-  cue(finT, 'hit_punch', 0.7); cue(finT + 0.1, 'murmur', 0.4); cue(ianT, 'camera', 0.6); cue(ianT + 0.35, 'camera', 0.5);
+  cue(finT, 'hit_punch', 0.7); cue(finT + 0.1, 'murmur', 0.4); runCues(24, finMoves, 0.7); cue(ianT, 'camera', 0.6); cue(ianT + 0.35, 'camera', 0.5);
 
   // ======================= THREE SUDDEN-DEATH GAMES, THREE DRAWS =======================
   const sdT = w('s10', 'sudden-death');
   const d3 = w('s10', 'draws');
-  shot(s('s10') - 0.1, (g, lt, t, sh) => {  // over the board, the games fly by
-    const k = Math.floor(lerp(30, 80, lt / len(sh)));
-    hall(g, lt, t, [[0, { yaw: 0.5, pitch: 1.15, dist: 17.5, fov: 1500, cy: H * 0.5, target: [4, 0, 4] }], [len(sh), { yaw: 0.62, pitch: 1.12, dist: 16.3 }]], { main: { pieces: piecesAt(G, Math.min(k, G.length - 1)), who: null, jeans: false }, tables: false });
+  const sdMoves = []; for (let tm = s('s10') + 0.15; tm < d3 - 0.3; tm += 0.36) sdMoves.push(tm);
+  shot(s('s10') - 0.1, (g, lt, t, sh) => {  // over the board: the moves fly, each with the accent and its sound
+    hall(g, lt, t, [[0, { yaw: 0.16, pitch: 1.12, dist: 14.2, fov: 1500, cy: H * 0.5, target: [3.75, 0, 4] }], [len(sh), { yaw: 0.24, pitch: 1.1, dist: 13.4 }]], { main: { ...run(g, 30, sdMoves, t), who: null, jeans: false }, tables: false });
     scrim(g, 0.55);
     badge(g, 'SUDDEN DEATH', W / 2, 300, { color: C.red, size: 48, a: seg(t, sdT, sdT + 0.1), scale: pop(t, sdT) });
     for (let i = 0; i < 3; i++) { const t0 = d3 - 0.25 + i * 0.18, a = seg(t, t0, t0 + 0.1); if (a <= 0) continue;
@@ -647,7 +653,7 @@ export async function build(T) {
       g.fillStyle = 'rgba(10,8,6,0.9)'; g.beginPath(); g.roundRect(-100, -60, 200, 120, 14); g.fill(); qaRect(g, -100, -60, 200, 120, 'text', '½–½ ' + i);
       g.fillStyle = C.cream; g.font = mono(64, 800); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('½–½', 0, 4); g.restore(); }
   }, { trans: 'cut', grade: 'warm', info: true, qaAllow: ['face cut by frame'] });
-  cue(sdT, 'heartbeat', 0.8); cue(sdT + 0.1, 'clock_tick', 0.5); for (let i = 0; i < 3; i++) { cue(d3 - 0.25 + i * 0.18, 'piece', 0.8); cue(d3 - 0.2 + i * 0.18, 'clock_press', 0.5); }
+  cue(sdT, 'heartbeat', 0.8); runCues(30, sdMoves); for (let i = 0; i < 3; i++) { cue(d3 - 0.25 + i * 0.18, 'piece', 0.8); cue(d3 - 0.2 + i * 0.18, 'clock_press', 0.5); }
 
   // ======================= "CAN WE JUST SHARE THE TITLE?" — "YES" =======================
   const shT = w('s11', 'share'), yesT = w('s11', 'yes');

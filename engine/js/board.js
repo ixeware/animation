@@ -169,17 +169,17 @@ export function drawBow(ctx, x, y, s, a = 1) {
 
 // Interpolate piece placement between plies k-1 -> k with progress u (0..1).
 // plies: from tools/pgn_to_json.py. Returns world-space piece list.
-export function piecesAt(plies, k, u = 1, { arc = 0.7, opts = {}, keepCaptured = true } = {}) {
+export function piecesAt(plies, k, u = 1, { arc = 0.7, opts = {}, keepCaptured = true, e: ef = ease.inOut, trail = true } = {}) {
   const cur = plies[Math.max(0, k)].pieces;
   if (k <= 0 || u >= 1) return cur.map(p => ({ ...p, ...xz(p.sq), ...(opts[p.id] || {}) }));
   const prev = new Map(plies[k - 1].pieces.map(p => [p.id, p]));
   const out = [];
-  const e = ease.inOut(clamp(u));
+  const e = ef(clamp(u));
   for (const p of cur) {
     const q = prev.get(p.id), [x1, z1] = sqXZ(p.sq);
     if (q && q.sq !== p.sq) {
       const [x0, z0] = sqXZ(q.sq);
-      out.push({ ...p, x: lerp(x0, x1, e), z: lerp(z0, z1, e), y: Math.sin(Math.PI * e) * arc, trail: [x0, z0], trailA: Math.sin(Math.PI * clamp(u)), ...(opts[p.id] || {}) });
+      out.push({ ...p, x: lerp(x0, x1, e), z: lerp(z0, z1, e), y: Math.sin(Math.PI * e) * arc, ...(trail ? { trail: [x0, z0], trailA: Math.sin(Math.PI * clamp(u)) } : {}), ...(opts[p.id] || {}) });
     } else out.push({ ...p, x: x1, z: z1, ...(opts[p.id] || {}) });
     prev.delete(p.id);
   }

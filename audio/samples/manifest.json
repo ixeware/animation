@@ -284,5 +284,23 @@
   ],
   "prompt": "Soft airy swoosh transition, gentle and smooth, clean, no music",
   "source": "ElevenLabs sound generation"
+ },
+ "move": {
+  "files": [
+   "move_0.flac",
+   "move_1.flac",
+   "move_2.flac",
+   "move_3.flac"
+  ],
+  "prompt": "own layered design: swish into a wooden knock, a sub thump, a high glint",
+  "source": "synthesized by audio/sfx_move.py"
+ },
+ "move_capture": {
+  "files": [
+   "move_capture_0.flac",
+   "move_capture_1.flac"
+  ],
+  "prompt": "own layered design: swish into a wooden knock, a sub thump, a high glint, heavier with a crunch (capture)",
+  "source": "synthesized by audio/sfx_move.py"
  }
 }

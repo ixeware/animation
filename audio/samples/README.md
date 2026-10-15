@@ -13,3 +13,7 @@ Ids: whoosh_fast, whoosh_soft, whoosh_deep, swipe_card, boom_cine, hit_punch, st
 shimmer, reveal_bell, success, sparkle_pop, riser, error, dun_dun, record_scratch, paper, pen, typewriter, page_flip,
 piece, piece_slide, clock_press, clock_tick, gasp, murmur, applause, laugh, cash, coins, fabric, footsteps, camera,
 confetti, notify, tvoff, glass, heartbeat.
+
+`move_*` and `move_capture_*` are not from ElevenLabs: they are synthesized from scratch by `audio/sfx_move.py`
+(a swish into a wooden knock, a sub thump and a high glint; the capture is heavier, with a crunch). Their hit sits
+85 ms into the file, so cue them at landing − 0.085 s (`MOVE_HIT` in `engine/js/movefx.js`).
