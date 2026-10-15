@@ -11,36 +11,188 @@
   "similarity": 0.8,
   "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\""
  },
- "voice_fx": {"tempo": 1.3, "max_gap": 0.13},
- "mix": {"bed_gap": 7.0},
+ "voice_fx": {
+  "tempo": 1.3,
+  "max_gap": 0.13
+ },
+ "mix": {
+  "engine": "v2",
+  "music_gap": 8,
+  "sfx_gap": 0.5,
+  "reverb": 0.45,
+  "reverb_sec": 2.3,
+  "duck": 0.45
+ },
  "phrases": [
-  {"id": "hook1", "text": "Magnus Carlsen quit the World Championship.", "say": "[serious] Magnus Carlsen quit the World Championship...", "pause": 0.1,
-   "colors": {"Magnus": "gold", "Carlsen": "gold", "quit": "red"}},
-  {"id": "hook2", "text": "Because of his jeans.", "say": "[deadpan] Because of his jeans.", "pause": 0.3, "colors": {"jeans.": "blue"}},
-  {"id": "s1", "text": "New York, December 2024. Magnus shows up to the World Rapid Championship in jeans.",
-   "say": "New York, December twenty twenty-four. Magnus shows up to the World Rapid Championship... in jeans.", "pause": 0.15,
-   "colors": {"New": "blue", "York,": "blue", "jeans.": "blue"}},
-  {"id": "s2", "text": "But the dress code says: no jeans.", "say": "But the dress code says... no jeans.", "pause": 0.15, "colors": {"no": "red", "jeans.": "red"}},
-  {"id": "s3", "text": "The arbiter fines him 200 dollars and tells him to change. Right now.",
-   "say": "The arbiter fines him two hundred dollars, and tells him to change. Right now.", "pause": 0.15,
-   "colors": {"200": "red", "dollars": "red", "Right": "gold", "now.": "gold"}},
-  {"id": "s4", "text": "Magnus says: I'll change tomorrow.", "say": "Magnus says... [casual] I'll change tomorrow.", "pause": 0.15, "colors": {"tomorrow.": "lime"}},
-  {"id": "s5", "text": "FIDE says no. So he isn't paired for the next round.", "say": "FIDE says no. So he isn't paired for the next round.", "pause": 0.15,
-   "colors": {"no.": "red", "isn't": "red", "paired": "red"}},
-  {"id": "s6", "text": "And Magnus just walks out. Of the whole championship.", "say": "[laughs] And Magnus just walks out... of the whole championship.", "pause": 0.25,
-   "colors": {"walks": "red", "out.": "red", "whole": "gold"}},
-  {"id": "s7", "text": "Two days later, FIDE backs down. Jeans are now allowed.", "say": "Two days later... FIDE backs down. Jeans are now allowed.", "pause": 0.15,
-   "colors": {"backs": "gold", "down.": "gold", "allowed.": "lime"}},
-  {"id": "s8", "text": "Magnus comes back. In jeans.", "say": "[excited] Magnus comes back... in jeans.", "pause": 0.15, "colors": {"back.": "lime", "jeans.": "blue"}},
-  {"id": "s9", "text": "He reaches the blitz final against Ian Nepomniachtchi.", "say": "He reaches the blitz final... against Ian Nepomniachtchi.", "pause": 0.15,
-   "colors": {"final": "gold", "Ian": "gold", "Nepomniachtchi.": "gold"}},
-  {"id": "s10", "text": "Three sudden-death games. Three draws.", "say": "Three sudden-death games. Three draws.", "pause": 0.15, "colors": {"sudden-death": "red", "draws.": "blue"}},
-  {"id": "s11", "text": "So Magnus asks: can we just share the title? And FIDE says yes.", "say": "So Magnus asks... can we just share the title? [surprised] And FIDE says yes.", "pause": 0.15,
-   "colors": {"share": "gold", "title?": "gold", "yes.": "lime"}},
-  {"id": "s12", "text": "The first shared world title in chess history.", "say": "The first shared world title in chess history.", "pause": 0.25, "colors": {"first": "gold", "shared": "gold"}},
-  {"id": "s13", "text": "And the jeans? He sold them on eBay. For 36,100 dollars. For charity.",
-   "say": "And the jeans? He sold them on eBay... for thirty-six thousand, one hundred dollars. For charity.", "pause": 0.2,
-   "colors": {"jeans?": "blue", "eBay.": "gold", "36,100": "lime", "dollars.": "lime", "charity.": "gold"}},
-  {"id": "cta", "text": "Would you have changed? Follow for more.", "say": "[playful] Would you have changed? Follow for more.", "pause": 0.1, "colors": {"changed?": "gold", "Follow": "gold"}}
+  {
+   "id": "hook1",
+   "text": "Magnus Carlsen quit the World Championship.",
+   "say": "[serious] Magnus Carlsen quit the World Championship...",
+   "pause": 0.1,
+   "colors": {
+    "Magnus": "gold",
+    "Carlsen": "gold",
+    "quit": "red"
+   }
+  },
+  {
+   "id": "hook2",
+   "text": "Because of his jeans.",
+   "say": "[deadpan] Because of his jeans.",
+   "pause": 0.3,
+   "colors": {
+    "jeans.": "blue"
+   }
+  },
+  {
+   "id": "s1",
+   "text": "New York, December 2024. Magnus shows up to the World Rapid Championship in jeans.",
+   "say": "New York, December twenty twenty-four. Magnus shows up to the World Rapid Championship... in jeans.",
+   "pause": 0.15,
+   "colors": {
+    "New": "blue",
+    "York,": "blue",
+    "jeans.": "blue"
+   }
+  },
+  {
+   "id": "s2",
+   "text": "But the dress code says: no jeans.",
+   "say": "But the dress code says... no jeans.",
+   "pause": 0.15,
+   "colors": {
+    "no": "red",
+    "jeans.": "red"
+   }
+  },
+  {
+   "id": "s3",
+   "text": "The arbiter fines him 200 dollars and tells him to change. Right now.",
+   "say": "The arbiter fines him two hundred dollars, and tells him to change. Right now.",
+   "pause": 0.15,
+   "colors": {
+    "200": "red",
+    "dollars": "red",
+    "Right": "gold",
+    "now.": "gold"
+   }
+  },
+  {
+   "id": "s4",
+   "text": "Magnus says: I'll change tomorrow.",
+   "say": "Magnus says... [casual] I'll change tomorrow.",
+   "pause": 0.15,
+   "colors": {
+    "tomorrow.": "lime"
+   }
+  },
+  {
+   "id": "s5",
+   "text": "FIDE says no. So he isn't paired for the next round.",
+   "say": "FIDE says no. So he isn't paired for the next round.",
+   "pause": 0.15,
+   "colors": {
+    "no.": "red",
+    "isn't": "red",
+    "paired": "red"
+   }
+  },
+  {
+   "id": "s6",
+   "text": "And Magnus just walks out. Of the whole championship.",
+   "say": "[laughs] And Magnus just walks out... of the whole championship.",
+   "pause": 0.25,
+   "colors": {
+    "walks": "red",
+    "out.": "red",
+    "whole": "gold"
+   }
+  },
+  {
+   "id": "s7",
+   "text": "Two days later, FIDE backs down. Jeans are now allowed.",
+   "say": "Two days later... FIDE backs down. Jeans are now allowed.",
+   "pause": 0.15,
+   "colors": {
+    "backs": "gold",
+    "down.": "gold",
+    "allowed.": "lime"
+   }
+  },
+  {
+   "id": "s8",
+   "text": "Magnus comes back. In jeans.",
+   "say": "[excited] Magnus comes back... in jeans.",
+   "pause": 0.15,
+   "colors": {
+    "back.": "lime",
+    "jeans.": "blue"
+   }
+  },
+  {
+   "id": "s9",
+   "text": "He reaches the blitz final against Ian Nepomniachtchi.",
+   "say": "He reaches the blitz final... against Ian Nepomniachtchi.",
+   "pause": 0.15,
+   "colors": {
+    "final": "gold",
+    "Ian": "gold",
+    "Nepomniachtchi.": "gold"
+   }
+  },
+  {
+   "id": "s10",
+   "text": "Three sudden-death games. Three draws.",
+   "say": "Three sudden-death games. Three draws.",
+   "pause": 0.15,
+   "colors": {
+    "sudden-death": "red",
+    "draws.": "blue"
+   }
+  },
+  {
+   "id": "s11",
+   "text": "So Magnus asks: can we just share the title? And FIDE says yes.",
+   "say": "So Magnus asks... can we just share the title? [surprised] And FIDE says yes.",
+   "pause": 0.15,
+   "colors": {
+    "share": "gold",
+    "title?": "gold",
+    "yes.": "lime"
+   }
+  },
+  {
+   "id": "s12",
+   "text": "The first shared world title in chess history.",
+   "say": "The first shared world title in chess history.",
+   "pause": 0.25,
+   "colors": {
+    "first": "gold",
+    "shared": "gold"
+   }
+  },
+  {
+   "id": "s13",
+   "text": "And the jeans? He sold them on eBay. For 36,100 dollars. For charity.",
+   "say": "And the jeans? He sold them on eBay... for thirty-six thousand, one hundred dollars. For charity.",
+   "pause": 0.2,
+   "colors": {
+    "jeans?": "blue",
+    "eBay.": "gold",
+    "36,100": "lime",
+    "dollars.": "lime",
+    "charity.": "gold"
+   }
+  },
+  {
+   "id": "cta",
+   "text": "Would you have changed? Follow for more.",
+   "say": "[playful] Would you have changed? Follow for more.",
+   "pause": 0.1,
+   "colors": {
+    "changed?": "gold",
+    "Follow": "gold"
+   }
+  }
  ]
 }

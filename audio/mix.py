@@ -1,5 +1,8 @@
 """Mix narration + procedural score + SFX cues and mux with the rendered video.
 
+script.json "mix": {"engine": "v2"} uses the sample library in audio/samples (ElevenLabs-generated SFX), a separate SFX bus
+with a hall reverb, and levels matched to @chess.history (bed ~7 LU under the voice, big hits about as loud as the voice).
+
     python3 audio/mix.py episodes/fischer       (needs build/narration.wav, build/cues.json, build/video.mp4)
 
 Levels follow the reference: voice on top, music+SFX bed 6–8 LU under it, master ~ -16 LUFS.
@@ -35,6 +38,86 @@ def envelope(x, win=0.08):
     return e / max(1e-6, e.max())
 
 
+# ---------------------------------------------------------------- v2: real samples, SFX bus with reverb, music ducked
+SAMPLES = Path(__file__).parent / 'samples'
+# old synth cue ids -> sample ids, so scenes written for the synth bank use the library
+ALIAS = {'whoosh': 'whoosh_fast', 'boom': 'boom_cine', 'hit': 'hit_punch', 'clack': 'piece', 'tick': 'clock_press', 'ting': 'reveal_bell',
+         'pluck': 'success', 'sparkle': 'shimmer', 'clock': 'clock_tick', 'shutter': 'camera', 'cheer': 'applause', 'sting': 'dun_dun'}
+
+
+def load_samples():
+    man = json.loads((SAMPLES / 'manifest.json').read_text())
+    bank = {}
+    for sid, d in man.items():
+        bank[sid] = []
+        for f in d['files']:
+            x, sr = sf.read(SAMPLES / f, dtype='float32', always_2d=True)
+            if sr != SR:
+                from math import gcd
+                g = gcd(SR, sr); x = resample_poly(x, SR // g, sr // g, axis=0)
+            bank[sid].append(x if x.shape[1] == 2 else np.repeat(x, 2, 1))
+    return bank
+
+
+def reverb_ir(sec=1.9, seed=7):
+    """Synthetic hall: a few early reflections, then decorrelated noise with an exponential decay, darker as it decays."""
+    from scipy.signal import butter, sosfilt
+    n = int(sec * SR); t = np.arange(n) / SR; r = np.random.default_rng(seed)
+    ir = r.standard_normal((n, 2)) * np.exp(-6.9 * t / sec)[:, None]
+    ir = sosfilt(butter(2, 5500, 'low', fs=SR, output='sos'), ir, axis=0)
+    for d, g in [(0.011, 0.5), (0.019, 0.35), (0.027, 0.3), (0.041, 0.22)]:
+        k = int(d * SR); ir[k, 0] += g; ir[int(k * 1.13), 1] += g
+    ir[:int(0.008 * SR)] = 0
+    return ir / np.sqrt((ir ** 2).sum(0, keepdims=True))
+
+
+def short_term(x, meter, win=0.4):
+    n = int(win * SR); out = []
+    for s0 in range(0, len(x) - n, n // 2):
+        seg_ = x[s0:s0 + n]
+        out.append(meter.integrated_loudness(seg_) if np.abs(seg_).max() > 1e-4 else -99)
+    return np.array(out)
+
+
+def mix_v2(b, meta, vv, n, dur, cfg):
+    import pyloudnorm as pyln
+    from scipy.signal import fftconvolve
+    meter = pyln.Meter(SR)
+    lv = meter.integrated_loudness(vv)
+    # music, ducked under the voice and set `music_gap` LU below it
+    m = music.render(meta['music'], dur)[:n]
+    m = np.pad(m, ((0, n - len(m)), (0, 0)))
+    m = m * (1 - cfg.get('duck', 0.45) * np.clip(envelope(vv[:, 0], 0.25) * 2.2, 0, 1))[:, None]
+    m = ffilter(m, 'highshelf=f=5000:g=4,equalizer=f=250:t=q:w=1:g=-2.5')[:n]
+    lm = meter.integrated_loudness(m)
+    m *= 10 ** ((lv - cfg.get('music_gap', 8) - lm) / 20)
+    # SFX from the sample library (variants in turn), synth bank as the fallback
+    bank, synth = load_samples(), sfx.render_all()
+    fx = np.zeros((n, 2)); used = {}; r = np.random.default_rng(3)
+    for c in sorted(meta['cues'], key=lambda c: c['t']):
+        sid = c['id'] if c['id'] in bank else ALIAS.get(c['id'], c['id'])
+        if sid in bank:
+            k = used.get(sid, 0); used[sid] = k + 1; x = bank[sid][k % len(bank[sid])]
+        elif c['id'] in synth:
+            x = np.repeat(synth[c['id']][:, None], 2, 1)
+        else:
+            print('  unknown sfx', c['id']); continue
+        s = int(c['t'] * SR)
+        if s >= n: continue
+        x = x[:n - s] * c.get('gain', 1); pan = r.uniform(-0.3, 0.3)
+        fx[s:s + len(x), 0] += x[:, 0] * np.sqrt(0.5 * (1 - pan)) * 1.41
+        fx[s:s + len(x), 1] += x[:, 1] * np.sqrt(0.5 * (1 + pan)) * 1.41
+    ir = reverb_ir(cfg.get('reverb_sec', 2.3))
+    wet = np.stack([fftconvolve(fx[:, ch], ir[:, ch])[:n] for ch in range(2)], 1)
+    fx = fx + wet * cfg.get('reverb', 0.45)
+    fx = ffilter(fx, 'acompressor=threshold=-20dB:ratio=2.5:attack=4:release=140:makeup=1')[:n]
+    st = short_term(fx, meter); act = st[st > -70]
+    if len(act):  # the loud moments of the SFX bus land `sfx_gap` LU under the voice
+        fx *= 10 ** ((lv - cfg.get('sfx_gap', 0.5) - np.percentile(act, 90)) / 20)
+    print(f'  v2: voice {lv:.1f} LUFS, music {lv - cfg.get("music_gap", 8):.1f}, sfx p90 {lv - cfg.get("sfx_gap", 0.5):.1f} LUFS; samples used: {sum(used.values())}')
+    return m, fx
+
+
 def main(ep):
     b = Path(ep) / 'build'
     meta = json.loads((b / 'cues.json').read_text())
@@ -53,6 +136,14 @@ def main(ep):
                    'aecho=0.8:0.5:28|47:0.12|0.08')
     v = v[:n]
 
+    script = json.loads((Path(ep) / 'script.json').read_text())
+    cfg = script.get('mix', {})
+    if cfg.get('engine') == 'v2':
+        vv = np.stack([v, v], 1)
+        m, fx = mix_v2(b, meta, vv, n, dur, cfg)
+        mixd = vv + m + fx
+        sf.write(b / 'stems_voice.wav', vv, SR); sf.write(b / 'stems_music.wav', m, SR); sf.write(b / 'stems_sfx.wav', fx, SR)
+        return finish(b, mixd)
     # music with ducking under the voice
     m = music.render(meta['music'], dur)[:n]
     m = np.pad(m, ((0, n - len(m)), (0, 0)))
@@ -81,7 +172,6 @@ def main(ep):
     meter = pyln.Meter(SR)
     bed = m * 0.62 + fx * 0.38
     bed = ffilter(bed, 'highshelf=f=5000:g=4,equalizer=f=250:t=q:w=1:g=-2')[:n]
-    script = json.loads((Path(ep) / 'script.json').read_text())
     gap = script.get('mix', {}).get('bed_gap', meta.get('bed_gap', 4.0))
     lv, lb = meter.integrated_loudness(vv), meter.integrated_loudness(bed)
     bed *= 10 ** ((lv - gap - lb) / 20)
@@ -100,6 +190,10 @@ def main(ep):
     m, fx = bed, np.zeros_like(bed)
     mixd = vv * 1.0 + bed
     sf.write(b / 'stems_voice.wav', vv, SR); sf.write(b / 'stems_music.wav', m, SR); sf.write(b / 'stems_sfx.wav', fx, SR)
+    return finish(b, mixd)
+
+
+def finish(b, mixd):
     sf.write(b / 'mix_raw.wav', (mixd / max(1e-6, np.abs(mixd).max()) * 0.9).astype(np.float32), SR)
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', b / 'mix_raw.wav', '-af',
                     'alimiter=limit=0.9:attack=3:release=50,loudnorm=I=-16:TP=-1.5:LRA=11', '-ar', '44100', b / 'mix.wav'], check=True)

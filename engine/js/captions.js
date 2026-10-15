@@ -1,5 +1,5 @@
 // Word-by-word karaoke captions: 1–4 words on screen, the spoken word lights up in its color.
-import { W, H, capColor, clamp, ease } from './core.js';
+import { W, H, capColor, clamp, ease, qaRect } from './core.js';
 import { outlinedText } from './draw.js';
 
 const FONT = s => `800 ${s}px Rubik`;
@@ -39,6 +39,7 @@ export function drawCaptions(ctx, chunks, t, { y = Y, hide = false } = {}) {
   const big = c.words.length === 1 && /checkmate/i.test(c.words[0].w);
   const pop = ease.back(clamp((t - c.s) / 0.12));
   let x = W / 2 - total / 2;
+  qaRect(ctx, x - 10, y - SIZE * 0.82, total + 20, SIZE * 1.12, 'caption', c.words.map(w => w.w).join(' '));
   c.words.forEach((w, i) => {
     const next = c.words[i + 1];
     const active = t >= w.s - 0.03 && (next ? t < next.s - 0.03 : true);

@@ -1,6 +1,6 @@
 // Flat cartoon character rig: big head, bust, ball hands, expressive brows/lids/mouth.
 // drawChar(ctx, who, {x, y, s, e: expression, t}) — (x, y) is the head center, s scale (head ~210px wide at s=1).
-import { rgba, clamp, lerp, smooth, track } from './core.js';
+import { rgba, clamp, lerp, smooth, track, qaRect } from './core.js';
 import { sweatDrop } from './draw.js';
 
 const SKIN = { base: '#F2C39C', shade: '#E2A984', deep: '#C98B66', blush: '#F28B82', hi: '#FFE2CB' };
@@ -480,6 +480,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   x += Math.sin(t * 47) * sh * 6 * s; tilt += Math.sin(t * 39) * sh * 0.03; y += Math.abs(Math.sin(t * 9)) * nod * -10 * s;
   g.save(); g.globalAlpha *= alpha; g.translate(x, y); g.scale(s, s); g.rotate(tilt);
   if (silhouette) g.filter = shade;
+  if (!silhouette) qaRect(g, -118 * fw, -165, 236 * fw, 300, 'face', who);
   if (!noBody) { if (c.bodyScale) { g.save(); g.translate(0, 96); g.scale(c.bodyScale, c.bodyScale); g.translate(0, -96); body(g, c); g.restore(); } else body(g, c); }
   hairBack(g, c, fw);
   // ears

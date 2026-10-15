@@ -1,6 +1,7 @@
 // Render an episode with headless Chromium.
 //   node render.mjs fischer --stills 0.5,12,30      -> build/stills/t*.jpg (+ contact sheet)
 //   node render.mjs fischer [--workers 4] [--from 0 --to 10]  -> build/video.mp4 (silent) + cues.json
+//   node render.mjs fischer --qa [--step 0.1]       -> build/qa.json: text over faces / captions, text off frame, faces cut
 import { chromium } from 'playwright';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -23,11 +24,11 @@ const server = http.createServer((req, res) => {
 }).listen(0);
 const PORT = server.address().port;
 
-async function openPage(browser) {
+async function openPage(browser, extra = '') {
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
   page.on('console', m => { if (m.type() === 'error') console.error('[page]', m.text()); });
   page.on('pageerror', e => console.error('[pageerror]', e.message));
-  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}`);
+  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}`);
   await page.waitForFunction('window.READY === true', null, { timeout: 120000 });
   return page;
 }
@@ -35,9 +36,57 @@ async function openPage(browser) {
 const shot = (page, t, f) => page.evaluate(([t, f]) => window.renderFrame(t, f), [t, f])
   .then(() => page.screenshot({ type: 'jpeg', quality: 93, clip: { x: 0, y: 0, width: 1080, height: 1920 } }));
 
+
+// ---- QA: step through the film and flag layout mistakes from the rectangles the engine logs in QA mode
+function qaCheck(fr, t, W = 1080, H = 1920) {
+  if (fr.skip) return [];
+  const M = fr.M, tf = r => {
+    if (r.screen || !M) return r;
+    const pts = [[r.x, r.y], [r.x + r.w, r.y], [r.x, r.y + r.h], [r.x + r.w, r.y + r.h]].map(([x, y]) => [M[0] * x + M[2] * y + M[4], M[1] * x + M[3] * y + M[5]]);
+    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+    return { ...r, x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+  };
+  const it = fr.items.map(tf), area = r => Math.max(1, r.w * r.h);
+  const inter = (a, b) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+  const texts = it.filter(r => r.kind === 'text'), faces = it.filter(r => r.kind === 'face' && r.w > 60), caps = it.filter(r => r.kind === 'caption');
+  const out = [];
+  for (const x of texts) {
+    for (const f of faces) if (inter(x, f) / area(f) > 0.12) out.push(['text over face', `"${x.label}" / ${f.label}`]);
+    for (const c of caps) if (inter(x, c) / Math.min(area(x), area(c)) > 0.1) out.push(['text over captions', `"${x.label}"`]);
+    if (x.x < -4 || x.y < -4 || x.x + x.w > W + 4 || x.y + x.h > H + 4) out.push(['text off frame', `"${x.label}"`]);
+    for (const y of texts) if (x !== y && x.label < y.label && inter(x, y) / Math.min(area(x), area(y)) > 0.2) out.push(['texts overlap', `"${x.label}" / "${y.label}"`]);
+  }
+  for (const f of faces) {
+    for (const c of caps) if (inter(f, c) / area(f) > 0.25) out.push(['captions over face', f.label]);
+    const inside = inter(f, { x: 0, y: 0, w: W, h: H }) / area(f);
+    if (inside < 0.55 && area(f) < W * H * 0.5) out.push(['face cut by frame', f.label]);
+  }
+  return out.filter(([type]) => !(fr.allow || []).includes(type)).map(([type, what]) => ({ t, type, what, shot: fr.shot }));
+}
+
 const browser = await chromium.launch({ args: ['--disable-gpu-vsync', '--force-color-profile=srgb', '--disable-web-security'] });
 try {
-  if (opt('stills')) {
+  if (args.includes('--qa')) {
+    const step = +(opt('step') || 0.1), N = +(opt('workers') || 4);
+    const p0 = await openPage(browser, '&qa=1'); const dur = await p0.evaluate('window.DURATION'); await p0.close();
+    const ts = []; for (let t = 0.05; t < dur - 0.6; t += step) ts.push(+t.toFixed(3));
+    const per = Math.ceil(ts.length / N);
+    const found = (await Promise.all([...Array(N)].map(async (_, w) => {
+      const page = await openPage(browser, '&qa=1'), mine = ts.slice(w * per, (w + 1) * per), res = [];
+      for (const t of mine) res.push(...qaCheck(await page.evaluate(t => window.qaFrame(t), t), t));
+      await page.close(); return res;
+    }))).flat().sort((a, b) => a.t - b.t);
+    // merge each (type, what) into time ranges
+    const ranges = [];
+    for (const f of found) {
+      const r = ranges.find(r => r.type === f.type && r.what === f.what && f.t - r.to <= step * 1.6);
+      if (r) r.to = f.t; else ranges.push({ type: f.type, what: f.what, from: f.t, to: f.t, shot: f.shot });
+    }
+    ranges.sort((a, b) => a.from - b.from);
+    fs.writeFileSync(path.join(BUILD, 'qa.json'), JSON.stringify(ranges, null, 1));
+    console.log(ranges.length ? ranges.map(r => `${r.from.toFixed(2)}–${r.to.toFixed(2)}s  [${r.type}] ${r.what}  (shot ${r.shot})`).join('\n') : 'QA: no issues');
+    console.log(`QA: ${ranges.length} issue(s), ${ts.length} frames checked -> ${path.join(BUILD, 'qa.json')}`);
+  } else if (opt('stills')) {
     const dir = path.join(BUILD, 'stills'); fs.mkdirSync(dir, { recursive: true });
     const page = await openPage(browser);
     const ts = opt('stills').split(',').map(Number);

@@ -1,5 +1,5 @@
 // On-screen graphics: name titles, place/date stamps, counters, scoreboard, health bar, badges, stamps.
-import { W, H, C, rgba, clamp, ease, inv, lerp } from './core.js';
+import { W, H, C, rgba, clamp, ease, inv, lerp, qaRect } from './core.js';
 import { glowText, outlinedText } from './draw.js';
 
 const serif = (s, w = 700) => `${w} ${s}px Cinzel`;
@@ -24,7 +24,7 @@ export function placeStamp(ctx, lt, place, year, { y = 150, a = 1, t0 = 0 } = {}
   const s1 = place.toUpperCase(), w1 = ctx.measureText(s1).width, w2 = ctx.measureText(year).width, gap = 46;
   const x0 = W / 2 - (w1 + gap + w2) / 2, yy = y + (1 - u) * 14;
   ctx.textAlign = 'left'; hard(ctx, 3);
-  ctx.fillStyle = C.cream; ctx.fillText(s1, x0, yy);
+  ctx.fillStyle = C.cream; ctx.fillText(s1, x0, yy); qaRect(ctx, x0, yy - 26, w1 + gap + w2, 46, 'text', place);
   ctx.fillStyle = C.gold; ctx.fillRect(x0 + w1 + gap / 2 - 3, yy - 22, 6, 6); ctx.fillText(year, x0 + w1 + gap, yy);
   unhard(ctx); ctx.fillStyle = rgba(C.cream, 0.5); ctx.fillRect(W / 2 - (w1 + gap + w2) / 2 * u, yy + 16, (w1 + gap + w2) * u, 2);
   ctx.restore();
@@ -37,6 +37,7 @@ export function nameTitle(ctx, lt, name, sub, { y = 230, a = 1, t0 = 0, subColor
   ctx.save(); ctx.globalAlpha *= u; ctx.textAlign = 'center';
   ctx.font = serif(size, 700); ctx.letterSpacing = '1px'; hard(ctx, 5); ctx.fillStyle = C.cream;
   ctx.fillText(name, W / 2, y + (1 - u) * 18); unhard(ctx);
+  { const nw = ctx.measureText(name).width; qaRect(ctx, W / 2 - nw / 2, y - size * 0.75, nw, size * 0.75 + (sub ? 72 : 28), 'text', name); }
   ctx.fillStyle = subColor; ctx.fillRect(W / 2 - 40 * u, y + 22, 80 * u, 5);
   if (sub) { ctx.font = sans(24, 800); ctx.letterSpacing = '6px'; hard(ctx, 3); ctx.fillStyle = C.cream; ctx.fillText(typed(sub, lt, t0 + 0.25, 0.5), W / 2, y + 62); }
   ctx.restore();
@@ -49,9 +50,10 @@ export function counter(ctx, value, label, { x = W / 2, y = 330, size = 150, col
   ctx.font = sans(size * 0.92, 900); ctx.letterSpacing = '0px';
   ctx.lineJoin = 'round'; ctx.lineWidth = size * 0.06; ctx.strokeStyle = 'rgba(10,8,6,0.55)'; ctx.strokeText(value, x, y);
   hard(ctx, size * 0.06); ctx.fillStyle = color === '#EAF7F3' ? C.cream : color; ctx.fillText(value, x, y); unhard(ctx);
+  { const vw = ctx.measureText(value).width; qaRect(ctx, x - vw / 2, y - size * 0.7, vw, size * 0.72, 'text', value); }
   if (label) {
     ctx.font = sans(24, 800); ctx.letterSpacing = '5px'; const w = ctx.measureText(label).width + 30;
-    ctx.fillStyle = labelColor; hard(ctx, 4); ctx.fillRect(x - w / 2, y + 26, w, 40); unhard(ctx);
+    ctx.fillStyle = labelColor; hard(ctx, 4); ctx.fillRect(x - w / 2, y + 26, w, 40); unhard(ctx); qaRect(ctx, x - w / 2, y + 26, w, 40, 'text', label);
     ctx.fillStyle = lum(labelColor) > 0.55 ? C.ink : C.cream; ctx.textBaseline = 'middle'; ctx.fillText(label, x + 2, y + 47);
   }
   ctx.restore();
@@ -64,7 +66,7 @@ export function badge(ctx, text, x, y, { color = C.gold, size = 40, a = 1, scale
   ctx.font = sans(size, 900); ctx.letterSpacing = '1px';
   const w = ctx.measureText(text).width + size * 0.9, h = size * (sub ? 1.95 : 1.42);
   hard(ctx, Math.max(4, size * 0.14)); ctx.fillStyle = color;
-  ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 6); ctx.fill(); unhard(ctx);
+  ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 6); ctx.fill(); unhard(ctx); qaRect(ctx, -w / 2, -h / 2, w, h, 'text', text);
   const ink = lum(color) > 0.55 ? C.ink : C.cream;
   ctx.fillStyle = ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(text, 0, sub ? -size * 0.3 : size * 0.04);
@@ -80,7 +82,7 @@ export function stamp(ctx, text, x, y, lt, t0, { color = C.red, size = 96, rot =
   ctx.save(); ctx.globalAlpha *= clamp(u * 1.5) * 0.92; ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
   ctx.font = sans(size, 900); ctx.letterSpacing = '4px'; const w = ctx.measureText(text).width + 64, h = size * (sub ? 1.75 : 1.35);
   ctx.strokeStyle = color; ctx.lineWidth = 9;
-  ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 10); ctx.stroke();
+  ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 10); ctx.stroke(); if (u >= 1) qaRect(ctx, -w / 2, -h / 2, w, h, 'text', text);
   ctx.lineWidth = 3; ctx.beginPath(); ctx.roundRect(-w / 2 + 12, -h / 2 + 12, w - 24, h - 24, 6); ctx.stroke();
   ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 0, sub ? -size * 0.18 : 4);
   if (sub) { ctx.font = sans(size * 0.24, 800); ctx.letterSpacing = '5px'; ctx.fillText(sub, 0, size * 0.5); }

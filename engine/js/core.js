@@ -71,3 +71,13 @@ export function makeCanvas(w = W, h = H) {
   c.width = w; c.height = h;
   return c;
 }
+
+// QA mode (render.mjs --qa): drawing helpers log screen rectangles of faces, on-screen text and captions here,
+// so overlaps (text over a face, text under the captions, text cut by the frame) can be found automatically.
+export const QA = { on: false, items: [] };
+export function qaRect(g, x, y, w, h, kind, label = '') {
+  if (!QA.on || g.globalAlpha < 0.35 || !(g.canvas?.id === 'c' || g.canvas?.dataset?.qa)) return;  // only the film layer and the screen
+  const m = g.getTransform(), pts = [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([px, py]) => [m.a * px + m.c * py + m.e, m.b * px + m.d * py + m.f]);
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  QA.items.push({ kind, label: String(label).slice(0, 40), x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys), screen: g.canvas?.id === 'c' });
+}

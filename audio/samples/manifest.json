@@ -1,0 +1,288 @@
+{
+ "applause": {
+  "files": [
+   "applause_0.flac"
+  ],
+  "prompt": "Audience applause and cheering in a big hall",
+  "source": "ElevenLabs sound generation"
+ },
+ "boom_cine": {
+  "files": [
+   "boom_cine_0.flac"
+  ],
+  "prompt": "Deep cinematic boom impact with a long reverb tail, movie trailer hit, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "camera": {
+  "files": [
+   "camera_0.flac"
+  ],
+  "prompt": "Press camera shutter click with a flash pop",
+  "source": "ElevenLabs sound generation"
+ },
+ "cash": {
+  "files": [
+   "cash_0.flac"
+  ],
+  "prompt": "Cash register cha-ching",
+  "source": "ElevenLabs sound generation"
+ },
+ "clock_press": {
+  "files": [
+   "clock_press_0.flac"
+  ],
+  "prompt": "Chess clock button press, mechanical click",
+  "source": "ElevenLabs sound generation"
+ },
+ "clock_tick": {
+  "files": [
+   "clock_tick_0.flac"
+  ],
+  "prompt": "Mechanical clock ticking steadily",
+  "source": "ElevenLabs sound generation"
+ },
+ "coins": {
+  "files": [
+   "coins_0.flac"
+  ],
+  "prompt": "Handful of coins dropping onto a wooden table",
+  "source": "ElevenLabs sound generation"
+ },
+ "confetti": {
+  "files": [
+   "confetti_0.flac"
+  ],
+  "prompt": "Party popper confetti burst with paper pieces falling",
+  "source": "ElevenLabs sound generation"
+ },
+ "door_slam": {
+  "files": [
+   "door_slam_0.flac"
+  ],
+  "prompt": "Heavy wooden door slamming shut in a large marble hall with reverb",
+  "source": "ElevenLabs sound generation"
+ },
+ "dun_dun": {
+  "files": [
+   "dun_dun_0.flac"
+  ],
+  "prompt": "Dramatic sting, two deep orchestral hits, suspense, dun dun",
+  "source": "ElevenLabs sound generation"
+ },
+ "error": {
+  "files": [
+   "error_0.flac"
+  ],
+  "prompt": "Wrong answer buzzer, short game show error sound",
+  "source": "ElevenLabs sound generation"
+ },
+ "fabric": {
+  "files": [
+   "fabric_0.flac"
+  ],
+  "prompt": "Denim jeans fabric rustle, clothing movement",
+  "source": "ElevenLabs sound generation"
+ },
+ "footsteps": {
+  "files": [
+   "footsteps_0.flac"
+  ],
+  "prompt": "Footsteps of leather shoes walking on a marble floor in a big hall",
+  "source": "ElevenLabs sound generation"
+ },
+ "gasp": {
+  "files": [
+   "gasp_0.flac"
+  ],
+  "prompt": "Crowd of people gasping in surprise in a large hall",
+  "source": "ElevenLabs sound generation"
+ },
+ "gavel": {
+  "files": [
+   "gavel_0.flac"
+  ],
+  "prompt": "Wooden judge gavel striking a sound block twice, courtroom",
+  "source": "ElevenLabs sound generation"
+ },
+ "glass": {
+  "files": [
+   "glass_0.flac"
+  ],
+  "prompt": "Glass display case door opening, light glass clink",
+  "source": "ElevenLabs sound generation"
+ },
+ "heartbeat": {
+  "files": [
+   "heartbeat_0.flac"
+  ],
+  "prompt": "Two slow deep heartbeats, tense",
+  "source": "ElevenLabs sound generation"
+ },
+ "hit_punch": {
+  "files": [
+   "hit_punch_0.flac",
+   "hit_punch_1.flac"
+  ],
+  "prompt": "Punchy cinematic hit, short low impact with a crisp snap, trailer style, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "laugh": {
+  "files": [
+   "laugh_0.flac"
+  ],
+  "prompt": "Small audience laughing warmly",
+  "source": "ElevenLabs sound generation"
+ },
+ "murmur": {
+  "files": [
+   "murmur_0.flac"
+  ],
+  "prompt": "Quiet crowd murmur in a large tournament hall, ambience, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "notify": {
+  "files": [
+   "notify_0.flac"
+  ],
+  "prompt": "Smartphone notification ping, clean",
+  "source": "ElevenLabs sound generation"
+ },
+ "page_flip": {
+  "files": [
+   "page_flip_0.flac"
+  ],
+  "prompt": "Single book page flip",
+  "source": "ElevenLabs sound generation"
+ },
+ "paper": {
+  "files": [
+   "paper_0.flac",
+   "paper_1.flac"
+  ],
+  "prompt": "Paper sheet rustle, picking up a single document",
+  "source": "ElevenLabs sound generation"
+ },
+ "pen": {
+  "files": [
+   "pen_0.flac"
+  ],
+  "prompt": "Pen writing quickly on paper, scribbling",
+  "source": "ElevenLabs sound generation"
+ },
+ "piece": {
+  "files": [
+   "piece_0.flac",
+   "piece_1.flac"
+  ],
+  "prompt": "Wooden chess piece placed firmly on a wooden chess board, single clean click",
+  "source": "ElevenLabs sound generation"
+ },
+ "piece_slide": {
+  "files": [
+   "piece_slide_0.flac"
+  ],
+  "prompt": "Wooden chess piece sliding across a wooden board and placed down",
+  "source": "ElevenLabs sound generation"
+ },
+ "record_scratch": {
+  "files": [
+   "record_scratch_0.flac"
+  ],
+  "prompt": "Vinyl record scratch, comedic stop",
+  "source": "ElevenLabs sound generation"
+ },
+ "reveal_bell": {
+  "files": [
+   "reveal_bell_0.flac"
+  ],
+  "prompt": "Bright bell ding with a long shimmering tail, big reveal moment",
+  "source": "ElevenLabs sound generation"
+ },
+ "riser": {
+  "files": [
+   "riser_0.flac"
+  ],
+  "prompt": "Tension riser, rising whoosh building suspense, cinematic, ends abruptly, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "shimmer": {
+  "files": [
+   "shimmer_0.flac",
+   "shimmer_1.flac"
+  ],
+  "prompt": "Magical sparkle shimmer, bright twinkling chimes rising, short",
+  "source": "ElevenLabs sound generation"
+ },
+ "sparkle_pop": {
+  "files": [
+   "sparkle_pop_0.flac"
+  ],
+  "prompt": "Small sparkly pop, glitter burst",
+  "source": "ElevenLabs sound generation"
+ },
+ "stamp": {
+  "files": [
+   "stamp_0.flac",
+   "stamp_1.flac"
+  ],
+  "prompt": "Rubber stamp slammed hard onto paper on a wooden desk",
+  "source": "ElevenLabs sound generation"
+ },
+ "success": {
+  "files": [
+   "success_0.flac"
+  ],
+  "prompt": "Positive success chime, two ascending clean notes, user interface sound",
+  "source": "ElevenLabs sound generation"
+ },
+ "swipe_card": {
+  "files": [
+   "swipe_card_0.flac"
+  ],
+  "prompt": "Paper card sliding quickly across a wooden table",
+  "source": "ElevenLabs sound generation"
+ },
+ "thud": {
+  "files": [
+   "thud_0.flac"
+  ],
+  "prompt": "Heavy object dropped onto a wooden floor, dull thud",
+  "source": "ElevenLabs sound generation"
+ },
+ "tvoff": {
+  "files": [
+   "tvoff_0.flac"
+  ],
+  "prompt": "Old CRT television switching off, electric zap and fade",
+  "source": "ElevenLabs sound generation"
+ },
+ "typewriter": {
+  "files": [
+   "typewriter_0.flac"
+  ],
+  "prompt": "Old typewriter typing a few keys then the carriage bell ding",
+  "source": "ElevenLabs sound generation"
+ },
+ "whoosh_deep": {
+  "files": [
+   "whoosh_deep_0.flac"
+  ],
+  "prompt": "Deep heavy cinematic whoosh with low rumble, movie trailer transition, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "whoosh_fast": {
+  "files": [
+   "whoosh_fast_0.flac",
+   "whoosh_fast_1.flac"
+  ],
+  "prompt": "Fast cinematic whoosh, air swish passing close to the camera, clean, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "whoosh_soft": {
+  "files": [
+   "whoosh_soft_0.flac"
+  ],
+  "prompt": "Soft airy swoosh transition, gentle and smooth, clean, no music",
+  "source": "ElevenLabs sound generation"
+ }
+}
