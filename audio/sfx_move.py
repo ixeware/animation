@@ -45,17 +45,17 @@ def move(seed, capture=False):
     for f, a, d in [(1760, 1.0, 0.030), (2680, 0.55, 0.022), (3950, 0.32, 0.015), (430, 0.55, 0.060)]:
         knock += a * np.sin(2 * np.pi * f * det * th) * np.exp(-np.maximum(th, 0) / d) * after
     # 3. sub thump: a sine falling 120 -> 46 Hz (38 Hz for a capture), soft-clipped, ~0.4 s
-    f0, f1 = (130, 38) if capture else (120, 46)
+    f0, f1 = (170, 44) if capture else (160, 52)   # starts high enough that a phone speaker hears its attack
     ph = 2 * np.pi * np.cumsum(np.where(after, f1 + (f0 - f1) * np.exp(-np.maximum(th, 0) / 0.045), 0)) / SR
     env = (1 - np.exp(-np.maximum(th, 0) / 0.002)) * np.exp(-np.maximum(th, 0) / (0.2 if capture else 0.15)) * after
-    thump = np.tanh(1.2 * np.sin(ph) * env) / np.tanh(1.2)
+    thump = np.tanh(2.2 * np.sin(ph) * env) / np.tanh(2.2)          # driven: odd harmonics carry it on small speakers
     # the wooden texture of the knock: a short burst of band-passed noise under the partials
     tap = bp(r.standard_normal(n), 700, 4500) * np.exp(-np.maximum(th, 0) / 0.008) * after
     # 4. sparkle: a little high air after the hit (the "holographic" glint)
     air = hp(r.standard_normal(n), 8500) * np.exp(-np.maximum(th, 0) / 0.07) * after
     glint = sum(np.sin(2 * np.pi * f * th + r.uniform(0, 6)) for f in (5200 * det, 7300 * det)) * np.exp(-np.maximum(th, 0) / 0.12) * after
 
-    mono = 0.5 * click + 0.3 * knock + 0.35 * tap + 0.95 * thump + 0.05 * air + 0.015 * glint
+    mono = 0.6 * click + 0.45 * knock + 0.5 * tap + 0.7 * thump + 0.06 * air + 0.015 * glint
     if capture:  # a crunchier, heavier hit: a burst of mid noise and a second, lower knock
         crunch = bp(r.standard_normal(n), 500, 3200) * np.exp(-np.maximum(th, 0) / 0.05) * after
         mono += 0.35 * crunch + 0.3 * np.sin(2 * np.pi * 310 * th) * np.exp(-np.maximum(th, 0) / 0.08) * after
