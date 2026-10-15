@@ -1,6 +1,7 @@
 // On-screen graphics: name titles, place/date stamps, counters, scoreboard, health bar, badges, stamps.
 import { W, H, C, rgba, clamp, ease, inv, lerp, qaRect } from './core.js';
 import { glowText, outlinedText } from './draw.js';
+import { LOOK } from './look.js';
 
 const serif = (s, w = 700) => `${w} ${s}px Cinzel`;
 const mono = (s, w = 700) => `${w} ${s}px "JetBrains Mono"`;
@@ -52,9 +53,10 @@ export function counter(ctx, value, label, { x = W / 2, y = 330, size = 150, col
   hard(ctx, size * 0.06); ctx.fillStyle = color === '#EAF7F3' ? C.cream : color; ctx.fillText(value, x, y); unhard(ctx);
   { const vw = ctx.measureText(value).width; qaRect(ctx, x - vw / 2, y - size * 0.7, vw, size * 0.72, 'text', value); }
   if (label) {
-    ctx.font = sans(24, 800); ctx.letterSpacing = '5px'; const w = ctx.measureText(label).width + 30;
-    ctx.fillStyle = labelColor; hard(ctx, 4); ctx.fillRect(x - w / 2, y + 26, w, 40); unhard(ctx); qaRect(ctx, x - w / 2, y + 26, w, 40, 'text', label);
-    ctx.fillStyle = lum(labelColor) > 0.55 ? C.ink : C.cream; ctx.textBaseline = 'middle'; ctx.fillText(label, x + 2, y + 47);
+    const fs = LOOK.v2 ? 32 : 24, th = LOOK.v2 ? 52 : 40;  // LOOK v2: the tag is read on a phone, a size up
+    ctx.font = sans(fs, 800); ctx.letterSpacing = '5px'; const w = ctx.measureText(label).width + 30;
+    ctx.fillStyle = labelColor; hard(ctx, 4); ctx.fillRect(x - w / 2, y + 26, w, th); unhard(ctx); qaRect(ctx, x - w / 2, y + 26, w, th, 'text', label);
+    ctx.fillStyle = lum(labelColor) > 0.55 ? C.ink : C.cream; ctx.textBaseline = 'middle'; ctx.fillText(label, x + 2, y + 26 + th / 2 + 1);
   }
   ctx.restore();
 }

@@ -51,21 +51,23 @@ export function seated(g, b, who, e, t, { x = 4, z = 9.3, k = 1.0, lift = 3.1, a
   const hands = () => {
     if (!showHands) return;
     for (const sd of [-1, 1]) {
+      const reaching = reach && sd === side && reach.u > 0;
+      if (LOOK.v2 && !reaching) continue;  // LOOK v2: no resting fists (alone at the table corners they read as balls)
       if (b.toCam(x + sd * hx, 0.25, z + face * 0.75)[2] < 0.6) continue;
       const hr = LOOK.v2 ? 0.27 : 0.33;
-      let p = b.project(x + sd * hx * -face, 0.25, z + face * 0.75), r = hr * p.s;
-      if (reach && sd === side && reach.u > 0) {
+      let p = b.project(x + sd * hx * -face, 0.25, z + face * 0.75), r = hr * p.s, ha = 1;
+      if (reaching) {
         const [sx, sz] = reach.sq ? sqXZ(reach.sq) : [reach.x, reach.z], q = b.project(sx, reach.y ?? 0.9, sz), u = reach.hold ? clamp(reach.u) : Math.sin(Math.PI * clamp(reach.u));
-        const rest = p, ka = reach.hold ? clamp(reach.u * 4) : clamp(Math.sin(Math.PI * clamp(reach.u)) * 3);  // out-and-back reaches end at rest again
-        if (LOOK.v2) {  // the reach starts at the table edge in front of the shoulder, not at the fist's resting spot out at the side
-          const nb = b.project(x + sd * 1.3 * -face, 0.4, z + face * 1.3);
-          p = { x: lerp(p.x, nb.x, ka), y: lerp(p.y, nb.y, ka), s: lerp(p.s, nb.s, ka) };
+        const rest = p;
+        if (LOOK.v2) {  // the hand rises from the table edge in front of the shoulder, fading in (and out again on the way back)
+          p = b.project(x + sd * 1.3 * -face, 0.4, z + face * 1.3);
+          ha = reach.hold ? clamp(reach.u * 5) : clamp(Math.sin(Math.PI * clamp(reach.u)) * 4);
         }
         p = { x: lerp(p.x, q.x, u), y: lerp(p.y, q.y, u) - Math.sin(Math.PI * u) * 40, s: lerp(p.s, q.s, u) };
         r = hr * p.s;
-        if (LOOK.v2) arm(g, b, who, { x, lift, z, k }, rest, p, r, ka * alpha);
+        if (LOOK.v2) arm(g, b, who, { x, lift, z, k }, rest, p, r, ha * alpha);
       }
-      g.save(); g.globalAlpha *= alpha; hand(g, p.x, p.y, r); g.restore();
+      g.save(); g.globalAlpha *= alpha * ha; hand(g, p.x, p.y, r); g.restore();
     }
   };
   if (!back) return hands;
