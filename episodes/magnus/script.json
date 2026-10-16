@@ -60,13 +60,33 @@
   },
   {
    "id": "kid2",
-   "text": "At thirteen, he was a grandmaster, and he drew Garry Kasparov, the world number one.",
-   "say": "At thirteen, he was a grandmaster... and he drew Garry Kasparov. The world number one.",
-   "pause": 0.25,
+   "text": "At thirteen, he was a grandmaster, and he faced Garry Kasparov, the world number one.",
+   "say": "At thirteen, he was a grandmaster... and he faced Garry Kasparov. The world number one.",
+   "pause": 0.15,
    "colors": {
     "thirteen,": "gold",
     "grandmaster,": "gold",
     "Kasparov,": "red"
+   }
+  },
+  {
+   "id": "bored",
+   "text": "Mid-game, while Kasparov was thinking, Magnus just stood up and wandered off, like he was bored.",
+   "say": "Mid-game, while Kasparov was thinking... Magnus just stood up, and wandered off. [amused] Like he was bored.",
+   "pause": 0.15,
+   "colors": {
+    "stood": "gold",
+    "wandered": "gold",
+    "bored.": "lime"
+   }
+  },
+  {
+   "id": "draw",
+   "text": "The game ended in a draw.",
+   "say": "The game ended in a draw.",
+   "pause": 0.25,
+   "colors": {
+    "draw.": "gold"
    }
   },
   {
@@ -139,24 +159,23 @@
    }
   },
   {
+   "id": "streak",
+   "text": "From 2018 to 2020, he didn't lose a single classical game. 125 in a row.",
+   "say": "From twenty eighteen to twenty twenty, he didn't lose a single classical game. [impressed] A hundred twenty-five in a row.",
+   "pause": 0.25,
+   "colors": {
+    "single": "red",
+    "125": "gold",
+    "row.": "gold"
+   }
+  },
+  {
    "id": "iq",
    "text": "His IQ? He's never said.",
    "say": "His IQ? [whispers] He's never said.",
    "pause": 0.2,
    "colors": {
     "never": "red"
-   }
-  },
-  {
-   "id": "fpl",
-   "text": "Oh, and in 2019 he was number one in the world at Fantasy Premier League. Out of seven million players.",
-   "say": "Oh, and in twenty nineteen, he was number one in the world... at Fantasy Premier League. [amused] Out of seven million players.",
-   "pause": 0.25,
-   "colors": {
-    "one": "gold",
-    "Fantasy": "lime",
-    "seven": "gold",
-    "million": "gold"
    }
   },
   {
