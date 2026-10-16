@@ -14,6 +14,8 @@ import { LOOK } from './look.js';
 export const MOVE_COL = { w: '#3FE0C5', b: '#E9B654', x: '#FF5A4F' };
 export const SLIDE = 0.24;                       // the slide, seconds
 export const MOVE_HIT = 0.085;                   // where the hit sits in the move sample
+// the boom samples (audio/sfx_boom.py) swell into their hit: cue them this much before the landing
+export const BOOM_HIT = 0.06;
 export const SLIDE_OPTS = { arc: 0.12, e: ease.out, trail: false };
 export const slide = (lt, dur = SLIDE) => clamp(lt / dur);
 
@@ -21,9 +23,10 @@ export const slide = (lt, dur = SLIDE) => clamp(lt / dur);
 export function moveOf(plies, k) {
   const p = plies[k], prev = plies[k - 1], mover = p.pieces.find(q => q.sq === p.to);
   const side = mover ? mover.c : (k % 2 ? 'w' : 'b');
-  return { from: p.from, to: p.to, side, capture: prev.pieces.length > p.pieces.length, label: `${Math.ceil(k / 2)}${side === 'w' ? '.' : '...'}${p.san}` };
+  return { from: p.from, to: p.to, side, capture: prev.pieces.length > p.pieces.length, brill: /!!$/.test(p.san || ''), label: `${Math.ceil(k / 2)}${side === 'w' ? '.' : '...'}${p.san}` };
 }
-const colOf = m => m.capture ? MOVE_COL.x : MOVE_COL[m.side];
+// a brilliant move (SAN ending in !!) flashes in the brilliant teal
+const colOf = m => m.brill ? '#1EB6A0' : m.capture ? MOVE_COL.x : MOVE_COL[m.side];
 
 // board-plane layer: start and target squares, the dot grid and the dropping frame (draw before the pieces)
 export function moveUnder(ctx, B, m, lt, { dur = SLIDE, hold = 1.3 } = {}) {
@@ -111,4 +114,17 @@ export function playRun(plies, k0, at, t, piecesAt) {
     active.push({ m: moveOf(plies, k0 + j + 1), lt: t - at[j], last, hold, label: last });
   }
   return { pieces, active, k };
+}
+
+// the square of a brilliant move glows: a teal fill with a bright edge and a soft bloom around it (under the pieces)
+export function brilliantSquare(ctx, B, sq, a = 1, t = 0) {
+  if (a <= 0) return;
+  const [x, z] = sqXZ(sq), c = B.project(x, 0.02, z), pulse = 0.85 + 0.15 * Math.sin(t * 5);
+  ctx.save(); ctx.globalCompositeOperation = 'screen';
+  const r = c.s * 1.5, gr = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, r);
+  gr.addColorStop(0, rgba('#1EB6A0', 0.45 * a * pulse)); gr.addColorStop(1, rgba('#1EB6A0', 0));
+  ctx.fillStyle = gr; ctx.beginPath(); ctx.ellipse(c.x, c.y, r, r * 0.55, 0, 0, 7); ctx.fill(); ctx.restore();
+  B.highlight(ctx, sq, '#1EB6A0', 0.62 * a * pulse);
+  ctx.save(); B.quad(ctx, x - 0.47, z - 0.47, x + 0.47, z + 0.47, 0.01);
+  ctx.strokeStyle = rgba('#9FF3E3', 0.85 * a); ctx.lineWidth = Math.max(2, c.s * 0.04); ctx.stroke(); ctx.restore();
 }

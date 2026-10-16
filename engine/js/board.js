@@ -1,6 +1,7 @@
 // Perspective chessboard: orbit camera, squares, overlays, billboard pieces with depth of field.
 import { W, H, C, rgba, clamp, lerp, smooth, ease } from './core.js';
 import { drawPiece } from './pieces.js';
+import { LOOK } from './look.js';
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -129,7 +130,9 @@ export class Board {
     for (const p of list) {
       if (p.alpha === 0 || p.pr.z < 0.6) continue;
       const h = p.pr.s * scale * (p.scale || 1);
-      const blur = clamp(Math.abs(p.pr.z - fz) * dof, 0, maxBlur) * (p.sharp ? 0 : 1);
+      // LOOK v2: the middle of the board stays sharp; only pieces right in front of the lens go soft (as in the reference)
+      const dz = p.pr.z - fz, defocus = LOOK.v2 ? (dz < 0 ? -dz - 1.2 : (dz - 2.5) * 0.35) : Math.abs(dz);
+      const blur = clamp(defocus * dof, 0, maxBlur) * (p.sharp ? 0 : 1);
       if (p.trail) this.trail(ctx, p.trail, p, h);
       // contact shadow
       const g = this.project(p.x, 0, p.z);
@@ -142,6 +145,7 @@ export class Board {
       }
       drawPiece(ctx, p.t, p.c, p.pr.x, p.pr.y, h, { blur, alpha: p.alpha ?? 1, glow: p.glow, rot: p.rot || 0, sx: p.sx || 1, sy: p.sy || 1 });
       if (p.bow) drawBow(ctx, p.pr.x, p.pr.y - h * 0.62, h * 0.32, p.bow);
+      if (p.brill) brilliantIcon(ctx, p.pr.x - h * 0.34, p.pr.y - h * 1.04, Math.max(32, h * 0.3), p.brill);  // left: the move label sits on the right
     }
     return list;
   }
@@ -156,6 +160,21 @@ export class Board {
 }
 
 // gift bow on top of a piece
+// the "brilliant move" mark over a sacrificed piece: a teal disc with a white "!!", popping in (a = 0..1)
+export const BRILL = '#1EB6A0';
+export function brilliantIcon(ctx, x, y, r, a = 1) {
+  if (a <= 0) return;
+  const k = ease.back(clamp(a * 1.6)), al = clamp(a * 3);
+  ctx.save(); ctx.globalAlpha *= al; ctx.translate(x, y); ctx.scale(k, k);
+  ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.arc(r * 0.08, r * 0.14, r * 1.04, 0, 7); ctx.fill();
+  ctx.fillStyle = '#0E7F70'; ctx.beginPath(); ctx.arc(0, 0, r * 1.06, 0, 7); ctx.fill();
+  const gr = ctx.createLinearGradient(0, -r, 0, r); gr.addColorStop(0, '#37D1B9'); gr.addColorStop(1, BRILL);
+  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(0, 0, r * 0.92, 0, 7); ctx.fill();
+  ctx.fillStyle = '#FFFFFF'; ctx.font = `900 ${Math.round(r * 1.25)}px Rubik, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('!!', 0, r * 0.06);
+  ctx.restore();
+}
+
 export function drawBow(ctx, x, y, s, a = 1) {
   if (a <= 0) return;
   ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y); ctx.scale(s / 40, s / 40);

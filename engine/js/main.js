@@ -5,6 +5,7 @@ import { grain, vignette, lightLeak, flash, tvOff } from './draw.js';
 import { screenShatter } from './fx.js';
 import { buildChunks, drawCaptions } from './captions.js';
 import { finish } from './post.js';
+import { CAM } from './stage.js';
 
 const q = new URLSearchParams(location.search);
 QA.on = q.has('qa');
@@ -58,7 +59,8 @@ function drawShot(s, t, g) {
 }
 
 // screen shake driven by impact sounds (boom, hit, stamp, glass); decays in ~0.15 s
-const SHAKE = { boom: 14, hit: 11, stamp: 12, glass: 16, thud: 6, clack: 2.5, buzz: 5, boom_cine: 12, hit_punch: 9, gavel: 7, door_slam: 9 };
+const SHAKE = { boom: 14, hit: 11, stamp: 12, glass: 16, thud: 6, clack: 2.5, buzz: 5, boom_cine: 12, hit_punch: 9, gavel: 7, door_slam: 9,
+  boom_move: 7, boom_big: 13 };
 const shakeCues = (film.cues || []).filter(c => SHAKE[c.id]).map(c => ({ t: c.t, a: SHAKE[c.id] * (c.gain ?? 1) }));
 function shakeAmp(t) {
   let a = 0;
@@ -92,10 +94,33 @@ function dustOut(g, src, p, seed, dir) {
   g.restore();
 }
 
+// motion blur for fast camera moves (fly-arounds, dives): when the image moves more than MB_PX per frame, the shot is
+// drawn again at sub-frame times over the shutter and the samples are averaged
+const MB_PX = 12, SHUTTER = 0.8 / FPS;
+const acc = makeCanvas(), actx = acc.getContext('2d'), subf = makeCanvas(), sctx = subf.getContext('2d');
+function motionBlur(s, t) {
+  const px = CAM.px;
+  if (!(px > MB_PX)) return false;
+  if (QA.on) return true;
+  const n = Math.min(12, Math.ceil(px * 0.8 / 9) + 1);
+  actx.globalAlpha = 1; actx.drawImage(layer, 0, 0);
+  for (let k = 1; k < n; k++) {
+    drawShot(s, t - SHUTTER * k / (n - 1), sctx);
+    actx.globalAlpha = 1 / (k + 1); actx.drawImage(subf, 0, 0);
+  }
+  actx.globalAlpha = 1;
+  lctx.save(); lctx.setTransform(1, 0, 0, 1, 0, 0); lctx.globalAlpha = 1; lctx.filter = 'none'; lctx.drawImage(acc, 0, 0); lctx.restore();
+  return true;
+}
+
 function compose(t, frame) {
   const s = shots.find(s => t >= s.a && t < s.b) || shots[shots.length - 1];
   QA.items = []; QA.M = null; QA.skip = false; QA.shot = s.i; QA.allow = s.qaAllow || [];
+  CAM.px = 0;
   drawShot(s, t, lctx);
+  const items = QA.items;
+  if (motionBlur(s, t)) QA.skip = true;  // a frame in a fly-around is a smear: layout is judged on the frames around it
+  QA.items = items;
   ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.filter = 'none';
   const lt = t - s.a, tr = s.trans || 'cut';
   if (tr === 'fade' && lt < (s.transDur || 0.35)) {

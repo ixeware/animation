@@ -302,5 +302,23 @@
   ],
   "prompt": "own layered design: swish into a wooden knock, a sub thump, a high glint, heavier with a crunch (capture)",
   "source": "synthesized by audio/sfx_move.py"
+ },
+ "boom_move": {
+  "files": [
+   "boom_move_0.flac",
+   "boom_move_1.flac",
+   "boom_move_2.flac",
+   "boom_move_3.flac"
+  ],
+  "prompt": "own design: falling sub boom with a swell, driven 2nd harmonic, low thump, hall tail (shown moves, fly-arounds, stamps)",
+  "source": "synthesized by audio/sfx_boom.py"
+ },
+ "boom_big": {
+  "files": [
+   "boom_big_0.flac",
+   "boom_big_1.flac"
+  ],
+  "prompt": "own design: falling sub boom with a swell, driven 2nd harmonic, low thump, hall tail (long, for mate and the biggest reveals)",
+  "source": "synthesized by audio/sfx_boom.py"
  }
 }

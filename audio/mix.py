@@ -88,7 +88,8 @@ def mix_v2(b, meta, vv, n, dur, cfg):
     m = music.render(meta['music'], dur)[:n]
     m = np.pad(m, ((0, n - len(m)), (0, 0)))
     m = m * (1 - cfg.get('duck', 0.45) * np.clip(envelope(vv[:, 0], 0.25) * 2.2, 0, 1))[:, None]
-    m = ffilter(m, 'highshelf=f=5000:g=4,equalizer=f=250:t=q:w=1:g=-2.5')[:n]
+    # music EQ: 'music_air' dB of highs above 5 kHz (default +4), optional 'music_lp' low-pass to tame ringing tops
+    m = ffilter(m, f"highshelf=f=5000:g={cfg.get('music_air', 4)},equalizer=f=250:t=q:w=1:g=-2.5" + (f",lowpass=f={cfg['music_lp']}" if cfg.get('music_lp') else ''))[:n]
     lm = meter.integrated_loudness(m)
     m *= 10 ** ((lv - cfg.get('music_gap', 8) - lm) / 20)
     # SFX from the sample library (variants in turn), synth bank as the fallback

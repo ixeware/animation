@@ -17,11 +17,13 @@
  },
  "mix": {
   "engine": "v2",
-  "music_gap": 8,
-  "sfx_gap": 0.5,
-  "reverb": 0.45,
+  "music_gap": 11,
+  "music_air": -1,
+  "music_lp": 7500,
+  "sfx_gap": 2.0,
+  "reverb": 0.4,
   "reverb_sec": 2.3,
-  "duck": 0.45
+  "duck": 0.5
  },
  "phrases": [
   {
@@ -185,11 +187,11 @@
   },
   {
    "id": "cta",
-   "text": "Would you have taken the knight? Follow for more.",
-   "say": "Would you have taken the knight? Follow for more.",
+   "text": "Could you beat Bill Gates? Follow for more.",
+   "say": "Could you beat Bill Gates? Follow for more.",
    "pause": 0.0,
    "colors": {
-    "knight?": "gold",
+    "Gates?": "gold",
     "Follow": "lime"
    }
   }

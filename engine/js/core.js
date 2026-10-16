@@ -12,6 +12,8 @@ export const ease = {
   back: t => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); },
   elastic: t => (t === 0 || t === 1 ? t : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * (2 * Math.PI) / 3) + 1),
   expo: t => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+  // quintic in-out: nearly all the travel happens in the middle third (camera fly-arounds, whips)
+  whip: t => (t < 0.5 ? 16 * t ** 5 : 1 - Math.pow(-2 * t + 2, 5) / 2),
 };
 // progress of t through [a, b] with easing (default smooth)
 export const seg = (t, a, b, e = smooth) => e(inv(a, b, t));
@@ -54,12 +56,13 @@ export function mix(h1, h2, t) {
 }
 
 // keyframe track: [[t, value], ...] -> value at t (numbers or arrays), eased between keys
+// keys: [[t, value, ease?], ...]; a key's own ease (3rd element) shapes the segment that ends at it
 export function track(keys, t, e = smooth) {
   if (t <= keys[0][0]) return keys[0][1];
   for (let i = 0; i < keys.length - 1; i++) {
-    const [t0, v0] = keys[i], [t1, v1] = keys[i + 1];
+    const [t0, v0] = keys[i], [t1, v1, e1] = keys[i + 1];
     if (t <= t1) {
-      const u = e(inv(t0, t1, t));
+      const u = (e1 || e)(inv(t0, t1, t));
       return Array.isArray(v0) ? v0.map((x, j) => lerp(x, v1[j], u)) : lerp(v0, v1, u);
     }
   }

@@ -1,25 +1,52 @@
 // Staging helpers: camera rig, seated characters with reaching hands, and the move animator that
 // turns each chess move into a small event (lift, arc, landing squash, shockwave, sparks, shards).
-import { W, H, C, clamp, lerp, ease, track, noise1, inv } from './core.js';
+import { W, H, C, FPS, clamp, lerp, ease, track, noise1, inv } from './core.js';
 import { sqXZ, piecesAt } from './board.js';
 import { drawChar, hand, EXPR, CAST } from './characters.js';
 import { sprite, spriteBox } from './pieces.js';
 import { burst, shockwave, glint, shatterImage, dust } from './fx.js';
 import { LOOK } from './look.js';
 
-// keyframed orbit camera: keys = [[t, {yaw, pitch, dist, fov, cy, target:[x,y,z]}], ...] (local time)
+// how fast the image moves this frame (px per frame around the camera target), measured by rig(); main.js renders
+// sub-frames and averages them (motion blur) while it is high, as in the reference's fly-arounds
+export const CAM = { px: 0 };
+const PROBES = [[0, 0, 0], [2.5, 0, 0], [-2.5, 0, 0], [0, 0, 2.5], [0, 0, -2.5], [0, 2, 0]];
+
+// keyframed orbit camera: keys = [[t, {yaw, pitch, dist, fov, cx, cy, target:[x,y,z]}, ease?], ...] (local time);
+// a key's own ease shapes the move into it (ease.whip for a fly-around)
 export function rig(b, lt, keys, { t = lt, shake = 1, e = ease.inOut, bump = 0 } = {}) {
   const DEF = { yaw: 0, pitch: 0.7, dist: 12, fov: 1500, cx: W / 2, cy: H * 0.52, target: [4, 0, 4] };  // cx/cy: lens shift
   const first = { ...DEF, ...keys[0][1] };
-  const val = k => track(keys.map(([tt, o]) => [tt, o[k] ?? first[k]]), lt, e);
-  const tgt = track(keys.map(([tt, o]) => [tt, o.target ?? first.target]), lt, e);
+  const at = u => {
+    const val = k => track(keys.map(([tt, o, ee]) => [tt, o[k] ?? first[k], ee]), u, e);
+    return { yaw: val('yaw'), pitch: val('pitch'), dist: val('dist'), fov: val('fov'), cx: val('cx'), cy: val('cy'),
+      target: track(keys.map(([tt, o, ee]) => [tt, o.target ?? first.target, ee]), u, e) };
+  };
+  const P = at(lt), P0 = at(lt - 1 / FPS);
+  const probe = c => { b.setCam(c); return PROBES.map(([x, y, z]) => b.project(P.target[0] + x, P.target[1] + y, P.target[2] + z)); };
+  const q0 = probe(P0), q1 = probe(P);
+  CAM.px = q1.reduce((a, q, i) => a + Math.hypot(q.x - q0[i].x, q.y - q0[i].y), 0) / q1.length;
   const hh = shake * 0.012, bb = bump * 0.02;
-  b.setCam({
-    yaw: val('yaw') + noise1(t * 0.55, 1) * hh + Math.sin(t * 61) * bb,
-    pitch: val('pitch') + noise1(t * 0.45, 2) * hh * 0.7 + Math.cos(t * 53) * bb,
-    dist: val('dist'), fov: val('fov'), cx: val('cx'), cy: val('cy'), target: tgt,
+  b.setCam({ ...P,
+    yaw: P.yaw + noise1(t * 0.55, 1) * hh + Math.sin(t * 61) * bb,
+    pitch: P.pitch + noise1(t * 0.45, 2) * hh * 0.7 + Math.cos(t * 53) * bb,
   });
   return b;
+}
+
+// the camera dives into the pieces (end of a shot) or rises out of them (start of the next), to hide a cut inside
+// the motion blur: steeper, much closer, aimed at the board surface. keys: rig keys of the shot; end: its local end
+export function dive(p, k = 1) {
+  const tg = p.target || [4, 0, 4];
+  return { ...p, pitch: (p.pitch ?? 0.7) + 0.5 * k, dist: (p.dist ?? 12) * (1 - 0.62 * k), target: [tg[0], lerp(tg[1], 0.4, k), tg[2]] };
+}
+export function diveOut(keys, end, d = 0.24) {
+  const last = { ...keys[0][1], ...keys[keys.length - 1][1] };
+  return [...keys.filter(([tt]) => tt < end - d), [end - d, last], [end, dive(last), ease.in]];
+}
+export function riseIn(keys, d = 0.3) {
+  const first = keys[0][1];  // later keys inherit the shot's own first pose, not the dive pose that now leads
+  return [[0, dive(first)], [d, first, ease.out], ...keys.slice(1).filter(([tt]) => tt > d).map(([tt, o, ee]) => [tt, { ...first, ...o }, ee])];
 }
 
 // The cartoon heads are billboards; to sell the 3D orbit, the face turns by the angle between the

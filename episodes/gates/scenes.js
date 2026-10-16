@@ -6,14 +6,15 @@ import { W, H, C, clamp, lerp, ease, seg, rgba, rng, makeCanvas, qaRect } from '
 import { Board, piecesAt, sqXZ } from '../../engine/js/board.js';
 import { EXPR, exprAt, drawChar } from '../../engine/js/characters.js';
 import { counter, badge, placeStamp, nameTitle, sans, mono, serif } from '../../engine/js/hud.js';
-import { rig, seated } from '../../engine/js/stage.js';
+import { rig, seated, diveOut, riseIn } from '../../engine/js/stage.js';
 import { box, pool } from '../../engine/js/env.js';
 import { useLookV2, SLATE } from '../../engine/js/look.js';
 import { spotCone, bokeh, lowKey } from '../../engine/js/light.js';
-import { moveUnder, moveOver, playRun, SLIDE, MOVE_HIT } from '../../engine/js/movefx.js';
+import { moveUnder, moveOver, playRun, brilliantSquare, SLIDE, MOVE_HIT, BOOM_HIT } from '../../engine/js/movefx.js';
 
 useLookV2();
 const G = await fetch('../engine/data/gates_carlsen_2014.json').then(r => r.json());
+G[14].san = 'Ne5!!';  // the bait: Magnus leaves the knight to be taken (shown as a brilliant move, as in the reference)
 const PHOTO = await new Promise(res => { const im = new Image(); im.onload = () => res(im); im.src = '../episodes/gates/photos/bill_gates_2013.jpg'; });
 const B = new Board();
 const depth = (x, y, z) => B.toCam(x, y, z)[2];
@@ -206,20 +207,23 @@ export async function build(T) {
   const shot = (a, draw, o = {}) => shots.push({ a, draw, grade: 'slate', ...o });
   const len = sh => sh.b - sh.a + 0.35;
   const pop = (t, t0, d = 0.25) => lerp(1.5, 1, seg(t, t0, t0 + d, ease.back));
-  const moveCue = (tm, k, gain = 0.85) => { const cap = G[k - 1].pieces.length > G[k].pieces.length; cue(tm + SLIDE - MOVE_HIT, cap ? 'move_capture' : 'move', gain); cue(tm + SLIDE + 0.12, 'clock_press', 0.35); };
+  const moveCue = (tm, k, gain = 0.85) => { const cap = G[k - 1].pieces.length > G[k].pieces.length; cue(tm + SLIDE - MOVE_HIT, cap ? 'move_capture' : 'move', gain); };
 
   // ======================= HOOK =======================
   const magT = w('hook1', 'Magnus'), secT = w('hook2', 'seconds');
-  shot(0, (g, lt, t) => closeUp(g, lt, t, 'gates', { ...EXPR.happy, look: [0, 0.35] }, { yaw: 0.16 }), { noJump: true });
-  shot(magT - 0.08, (g, lt, t) => closeUp(g, lt, t, 'magnus14', { ...EXPR.smug, look: [0, 0.3], curve: 0.8 }, { yaw: -0.14 }), { trans: 'cut' });
+  // one shot: Gates's close-up, then the camera whips round the board to Magnus as his name lands (fly-around)
+  const flyA = magT - 0.36, flyB = magT + 0.1;
+  const CU = (gates, yaw, push = 0) => ({ yaw: (gates ? Math.PI : 2 * Math.PI) + yaw, pitch: 0.3, dist: 7.4 - push, fov: 1500, cy: H * 0.46, target: [4, 2.9, gates ? -1.2 : 9.2] });
+  shot(0, (g, lt, t, sh) => boardScene(g, lt, t, [[0, CU(true, 0.16)], [flyA, CU(true, 0.1, 0.25)], [flyB, CU(false, -0.14), ease.whip], [len(sh), CU(false, -0.06, 0.4)]],
+    { pieces: at(0), gE: { ...EXPR.happy, look: [0, 0.35] }, mE: { ...EXPR.smug, look: [0, 0.3], curve: 0.8 }, dof: 1.6, spot: [4, lerp(-1.2, 9.2, seg(t, flyA, flyB, ease.whip))] }), { noJump: true });
   shot(s('hook2') - 0.05, (g, lt, t) => {  // Magnus's half of the clock runs 0:30 -> 0:18 as he says it
     backdropInsert(g, t);
     const used = clamp((t - s('hook2')) / 1.3) * 12;
     bigClock(g, t, '2:00', fmt(30 - used), { hotR: 1, y: 900 });
   }, { trans: 'whip', info: true, hud: (g, lt, t) => counter(g, '12 SECONDS', null, { y: 400, size: 130, color: C.cream, a: seg(t, secT - 0.1, secT) }) });
-  cue(0.02, 'boom_cine', 0.8); cue(0.05, 'murmur', 0.3); cue(magT - 0.08, 'whoosh_fast', 0.5);
-  for (let i = 0; i < 6; i++) cue(s('hook2') + i * 0.22, 'clock_tick', 0.45);
-  cue(secT, 'stamp', 0.8);
+  cue(0.02, 'boom_cine', 0.6); cue(flyA - 0.04, 'whoosh_fast', 0.7); cue(flyB - BOOM_HIT, 'boom_move', 0.9);
+  for (let i = 0; i < 4; i++) cue(s('hook2') + i * 0.3, 'clock_tick', 0.3);
+  cue(secT - BOOM_HIT, 'boom_move', 0.8);
 
   // ======================= LONDON 2014: THE NEW WORLD CHAMPION =======================
   const champT = w('s1', 'champion');
@@ -228,8 +232,8 @@ export async function build(T) {
       const hd = headAt(9.4), drop = ease.out(seg(t, champT - 0.35, champT + 0.05)), y = hd.y - 168 * hd.s - (1 - drop) * 380;
       crown(g, hd.x, y, hd.s * 0.72, seg(t, champT - 0.35, champT - 0.2));
     } });
-  }, { trans: 'dust', hud: (g, lt, t) => placeStamp(g, lt, 'London', 'January 2014', { y: 200, a: 1 - seg(t, champT - 0.6, champT - 0.4) }) });
-  cue(s('s1') - 0.1, 'whoosh_deep', 0.6); cue(champT, 'reveal_bell', 0.8); cue(champT + 0.02, 'shimmer', 0.6);
+  }, { trans: 'whip', hud: (g, lt, t) => placeStamp(g, lt, 'London', 'January 2014', { y: 200, a: 1 - seg(t, champT - 0.6, champT - 0.4) }) });
+  cue(champT - 0.3, 'whoosh_soft', 0.45);  // the crown drops
 
   // ======================= GATES: THE RICHEST MAN =======================
   const richT = w('s2', 'one');
@@ -237,7 +241,7 @@ export async function build(T) {
     closeUp(g, lt, t, 'gates', { ...EXPR.happy, look: [0, 0.3] }, { yaw: -0.12 });
   }, { trans: 'cut', hud: (g, lt) => nameTitle(g, lt, 'Bill Gates', 'FOUNDER OF MICROSOFT', { y: 230, size: 76 }) });
   shot(richT - 0.12, (g, lt, t) => { backdropInsert(g, t); richCard(g, lt, t); }, { trans: 'whip', info: true });
-  cue(richT - 0.12, 'swipe_card', 0.6); cue(richT, 'cash', 0.7); cue(richT + 0.05, 'coins', 0.5);
+  cue(richT, 'cash', 0.45);
 
   // ======================= THE TALK SHOW =======================
   const blitzT = w('s3', 'blitz');
@@ -246,8 +250,8 @@ export async function build(T) {
       { pieces: at(0), mE: { ...EXPR.happy, look: [-0.8, 0.2] }, gE: { ...EXPR.happy, look: [0.8, 0.2] }, dof: 0.6, clock: ['2:00', '0:30'] });
     for (const [x, z] of [[-6, -6], [14, 12]]) spotCone(g, B, { top: [x, 20, z], base: [4, 0, 4], r0: 0.5, r1: 3.5, a: 0.08, t, dust: 20, seed: 5 + x });
     audience(g, t, { y: H - 330, n: 6 });
-  }, { trans: 'dust', noJump: true, hud: (g, lt) => placeStamp(g, lt, 'Skavlan', 'TV talk show', { y: 200 }) });
-  cue(s('s3'), 'applause', 0.6); cue(s('s3') + 0.2, 'murmur', 0.4); cue(blitzT, 'clock_press', 0.6);
+  }, { trans: 'zoom', noJump: true, hud: (g, lt) => placeStamp(g, lt, 'Skavlan', 'TV talk show', { y: 200 }) });
+  cue(s('s3'), 'applause', 0.45); cue(blitzT, 'clock_press', 0.5);
 
   // ======================= TWO MINUTES vs THIRTY SECONDS =======================
   const twoT = w('s4', 'two'), thirtyT = w('s4', 'thirty');
@@ -257,7 +261,7 @@ export async function build(T) {
     const hl = (x, t0, col) => { const a = seg(t, t0, t0 + 0.12); if (a <= 0) return; g.save(); g.globalAlpha = a; g.strokeStyle = col; g.lineWidth = 8; g.beginPath(); g.roundRect(W / 2 + x - 190, 900 - 110, 380, 230, 26); g.stroke(); g.restore(); };
     hl(-210, twoT, '#8FB8E0'); hl(210, thirtyT, RED);
   }, { trans: 'whip', info: true });
-  cue(twoT, 'clock_press', 0.7); cue(thirtyT, 'clock_press', 0.7); cue(thirtyT + 0.05, 'heartbeat', 0.6);
+  cue(twoT, 'clock_press', 0.55); cue(thirtyT, 'clock_press', 0.55);
 
   // ======================= 1.e4 ... the pawn knocked over =======================
   const e4T = w('s5', 'e4'), pawnT = w('s6', 'pawn'), goneT = w('s6', 'gone');
@@ -266,70 +270,85 @@ export async function build(T) {
     const R = playRun(G, 0, openMoves.slice(0, 3), t, piecesAt);
     boardScene(g, lt, t, [[0, { yaw: 0.35, pitch: 0.62, dist: 12.5, fov: 1500, cy: H * 0.5, target: [4, 1, 4.8] }], [len(sh), { yaw: 0.25, dist: 11.4 }]],
       { run: R, mE: 'focus', gE: 'focus', gHands: false, clock: [fmt(120 - 1.5 * clamp(t - e4T, 0, 9)), '0:30'] });
-  }, { trans: 'dust' });
+  }, { trans: 'whip' });
   shot(s('s6') - 0.05, (g, lt, t, sh) => {  // close on d5: Magnus's hand is too fast, the pawn goes over
     const R = playRun(G, 0, openMoves, t, piecesAt);
     // Magnus's fast hand knocks the d5 pawn over as it lands; it lies there, then he sets it up again
     const tip = seg(t, openMoves[3] + 0.22, openMoves[3] + 0.42, ease.out) * (1 - seg(t, goneT + 0.2, goneT + 0.5, ease.inOut));
     if (tip > 0) for (const p of R.pieces) if (p.sq === 'd5' && p.t === 'p') { p.rot = -1.45 * tip; p.y = 0.12 * tip; }
-    boardScene(g, lt, t, [[0, { yaw: 0.2, pitch: 0.42, dist: 7.6, fov: 1500, cy: H * 0.52, target: [3.6, 1.4, 5.6] }], [len(sh), { yaw: 0.12, dist: 7.0 }]],
+    boardScene(g, lt, t, diveOut([[0, { yaw: 0.2, pitch: 0.42, dist: 7.6, fov: 1500, cy: H * 0.52, target: [3.6, 1.4, 5.6] }], [len(sh), { yaw: 0.12, dist: 7.0 }]], (s('s7') - 0.1) - (s('s6') - 0.05)),
       { run: R, mE: exprAt([[0, 'focus'], [pawnT - (t - lt), { ...EXPR.happy, nod: 1 }]], lt), gE: 'focus', gHands: false, dof: 1.8,
         mReach: { sq: 'd5', u: seg(t, openMoves[3] - 0.1, openMoves[3] + 0.5) }, clock: [fmt(120 - 1.5 * clamp(t - e4T, 0, 9)), fmt(30 - 2 * (t > openMoves[3] + 0.3 ? 1 : 0)), t > openMoves[3] + 0.3 ? 'r' : null] });
   }, { trans: 'cut', hud: (g, lt, t) => { if (t > pawnT) { const a = seg(t, pawnT, pawnT + 0.1) * (1 - seg(t, goneT + 0.6, goneT + 0.8)); badge(g, '−2 SECONDS', W / 2, 1500, { color: RED, size: 46, a, scale: pop(t, pawnT) }); } } });
   openMoves.forEach((tm, i) => moveCue(tm, i + 1));
-  cue(openMoves[3] + 0.3, 'piece', 0.9); cue(openMoves[3] + 0.35, 'thud', 0.5); cue(goneT - 0.1, 'laugh', 0.35);
+  cue(openMoves[3] + 0.3, 'piece', 0.7);
 
   // ======================= Gates plays well: 3.Bd3 ... 6.O-O =======================
   const wellT = w('s7', 'own'), castT = w('s7', 'castles');
   const midMoves = [s('s7') - 0.05, s('s7') + 0.3, s('s7') + 0.65, s('s7') + 1.0, wellT, wellT + 0.32, castT - 0.1];  // 3.Bd3 Nf6 4.exd5 Qxd5 5.Nc3 Qh5 6.O-O
   shot(s('s7') - 0.1, (g, lt, t, sh) => {
     const R = playRun(G, 4, midMoves, t, piecesAt);
-    boardScene(g, lt, t, [[0, { yaw: Math.PI - 0.3, pitch: 0.55, dist: 11, fov: 1500, cy: H * 0.5, target: [4.4, 1.2, 2.6] }], [len(sh), { yaw: Math.PI - 0.15, dist: 10 }]],
+    boardScene(g, lt, t, riseIn([[0, { yaw: Math.PI - 0.3, pitch: 0.55, dist: 11, fov: 1500, cy: H * 0.5, target: [4.4, 1.2, 2.6] }], [len(sh), { yaw: Math.PI - 0.15, dist: 10 }]]),
       { run: R, gE: exprAt([[0, 'focus'], [castT - (t - lt), { ...EXPR.happy, look: [0, 0.4] }]], lt), mE: 'focus', mHands: false });
   }, { trans: 'cut' });
   midMoves.forEach((tm, i) => moveCue(tm, 5 + i, 0.75));
+  cue(s('s7') - 0.1 - 0.26, 'whoosh_fast', 0.6);  // the dive between the two shots
 
   // ======================= the free knight: 6...Bg4 7.h3 Ne5 =======================
   const neverT = w('s8', 'never'), knightT = w('s8', 'knight'), freeT = w('s8', 'free');
   const trapMoves = [s('s8') + 0.1, s('s8') + 0.5, knightT - 0.2];  // 6...Bg4 7.h3 Ne5
+  const brT = trapMoves[2] + SLIDE;  // 7...Ne5!! lands: brilliant mark, glowing square, the boom
+  // s8 swings round the board into s9: half the fly-around ends one shot, half starts the next, cut at the side view
+  const end8 = s('s9') - s('s8'), A8 = { yaw: 0.25, pitch: 0.62, dist: 10.6, fov: 1500, cy: H * 0.56, target: [4.6, 1.4, 5.4] };
+  const A9 = { yaw: Math.PI - 0.35, pitch: 0.6, dist: 10.5, fov: 1500, cy: H * 0.52, target: [5.4, 1, 3.4] };
+  const MID = { yaw: 1.45, pitch: 0.62, dist: 10.4, fov: 1500, cy: H * 0.54, target: [5.0, 1.25, 4.2] };
   shot(s('s8') - 0.1, (g, lt, t, sh) => {
     const R = playRun(G, 11, trapMoves, t, piecesAt);
-    for (const p of R.pieces) if (p.sq === 'e5' && p.t === 'n' && t > knightT + 0.1) { p.bow = seg(t, freeT - 0.15, freeT + 0.1); p.halo = GOLD; p.haloA = seg(t, freeT - 0.2, freeT + 0.1); }
-    boardScene(g, lt, t, [[0, { yaw: 0.25, pitch: 0.62, dist: 10.6, fov: 1500, cy: H * 0.56, target: [4.6, 1.4, 5.4] }], [len(sh), { yaw: 0.12, dist: 9.4, target: [4.6, 1.1, 5.0] }]],
-      { run: R, mE: exprAt([[0, 'focus'], [neverT - (t - lt), { ...EXPR.smug, curve: 0.9 }]], lt), gE: 'focus', gHands: false, focus: null });
-  }, { trans: 'dust' });
+    for (const p of R.pieces) if (p.sq === 'e5' && p.t === 'n' && p.c === 'b' && t > brT) p.brill = seg(t, brT, brT + 0.35);
+    boardScene(g, lt, t, [[0, A8], [end8 - 0.3, { ...A8, yaw: 0.12, dist: 9.4, target: [4.6, 1.1, 5.0] }], [end8, MID, ease.in]],
+      { run: R, mE: exprAt([[0, 'focus'], [neverT - (t - lt), { ...EXPR.smug, curve: 0.9 }]], lt), gE: 'focus', gHands: false, focus: null,
+        extraUnder: () => brilliantSquare(g, B, 'e5', seg(t, brT, brT + 0.2), t) });
+  }, { trans: 'cut' });
   trapMoves.forEach((tm, i) => moveCue(tm, 12 + i, 0.8));
-  cue(freeT - 0.1, 'sparkle_pop', 0.7); cue(neverT, 'dun_dun', 0.5);
+  cue(trapMoves[2] + SLIDE - BOOM_HIT, 'boom_move', 1.0);  // the bait lands: brilliant move
+  cue(s('s9') - 0.1 - 0.32, 'whoosh_deep', 0.7);  // the swing round the board
 
   // ======================= 8.hxg4: the engine says Gates is winning =======================
   const insteadT = w('s9', 'instead'), winT = w('s9', 'winning');
   const takeMoves = [w('s9', 'takes') - 0.1, insteadT + 0.3];  // 8.hxg4 Nfxg4
   shot(s('s9') - 0.1, (g, lt, t, sh) => {
     const R = playRun(G, 14, takeMoves, t, piecesAt);
-    for (const p of R.pieces) if (p.sq === 'e5' && p.t === 'n') { p.bow = 1; p.halo = GOLD; p.haloA = 0.6; }
-    boardScene(g, lt, t, [[0, { yaw: Math.PI - 0.35, pitch: 0.6, dist: 10.5, fov: 1500, cy: H * 0.52, target: [5.4, 1, 3.4] }], [len(sh), { yaw: Math.PI - 0.22, dist: 9.6 }]],
-      { run: R, gE: exprAt([[0, 'focus'], [winT - (t - lt), { ...EXPR.happy, look: [0, 0.3] }]], lt), mE: 'focus', mHands: false });
+    for (const p of R.pieces) if (p.sq === 'e5' && p.t === 'n' && p.c === 'b') p.brill = 1;
+    boardScene(g, lt, t, [[0, MID], [0.3, A9, ease.out], [len(sh), { ...A9, yaw: Math.PI - 0.22, dist: 9.6 }]],
+      { run: R, gE: exprAt([[0, 'focus'], [winT - (t - lt), { ...EXPR.happy, look: [0, 0.3] }]], lt), mE: 'focus', mHands: false,
+        extraUnder: () => { if (R.pieces.some(p => p.sq === 'e5' && p.c === 'b')) brilliantSquare(g, B, 'e5', 1, t); } });
   }, { trans: 'cut', hud: (g, lt, t) => { const v = t < takeMoves[1] + 0.3 ? 3.1 : 3.2; evalBar(g, v, '+' + v.toFixed(1), seg(t, winT - 0.5, winT - 0.3)); } });
   takeMoves.forEach((tm, i) => moveCue(tm, 15 + i, 0.8));
-  cue(winT, 'notify', 0.6);
 
   // ======================= 9.Nxe5?? Qh2# =======================
   const takeT = w('s10', 'takes'), queenT = w('s11', 'Queen'), mateT = w('s11', 'Checkmate');
   const endMoves = [takeT + 0.05, queenT - 0.05];
+  // after the queen lands, a fast orbit to the mated corner: king g1 and queen h2 above the captions, Magnus behind
+  const A10 = { yaw: 0.75, pitch: 0.6, dist: 12, fov: 1500, cy: H * 0.5, target: [5.4, 1.2, 4.8] };
+  const M10 = { yaw: 0.35, pitch: 0.4, dist: 9.3, fov: 1500, cy: H * 0.52, target: [6.5, 1, 1.5] };
+  const orbA = endMoves[1] + SLIDE + 0.09, orbB = orbA + 0.5, t10 = s('s10') - 0.1;
   shot(s('s10') - 0.1, (g, lt, t, sh) => {
     const R = playRun(G, 16, endMoves, t, piecesAt);
-    for (const p of R.pieces) if (p.t === 'n' && p.sq === 'e5' && p.c === 'b') { p.bow = 1 - seg(t, endMoves[0] + 0.1, endMoves[0] + 0.25); }
+    const bait = 1 - seg(t, endMoves[0] + 0.1, endMoves[0] + 0.25);  // the mark stays on the bait until Gates takes it
+    for (const p of R.pieces) if (p.t === 'n' && p.sq === 'e5' && p.c === 'b') p.brill = bait;
     const mated = t > endMoves[1] + SLIDE;
     if (mated) for (const p of R.pieces) if (p.t === 'k' && p.c === 'w') { const u = seg(t, mateT + 0.1, mateT + 0.45, ease.in); p.rot = 1.45 * u; p.y = 0.08 * u; }
-    boardScene(g, lt, t, [[0, { yaw: 0.55, pitch: 0.58, dist: 12, fov: 1500, cy: H * 0.56, target: [5.2, 1.6, 4.2] }], [len(sh), { yaw: 0.45, dist: 9.8, target: [5.9, 1.4, 3.2] }]],
+    boardScene(g, lt, t, [[0, A10], [orbA - t10, { ...A10, yaw: 0.7, dist: 11.3 }], [orbB - t10, M10, ease.whip], [len(sh), { ...M10, yaw: 0.3, dist: 8.8 }]],
       { run: R, labels: t < endMoves[1], mE: exprAt([[0, 'focus'], [queenT - (t - lt), { ...EXPR.smug, curve: 1 }]], lt), gE: exprAt([[0, 'happy'], [mateT - (t - lt), 'shock']], lt), gHands: false, mHands: false,
-        extraUnder: () => { if (mated) { const a = seg(t, mateT - 0.2, mateT); B.highlight(g, 'h2', RED, 0.55 * a); B.highlight(g, 'g1', RED, 0.55 * a); } },
+        extraUnder: () => { brilliantSquare(g, B, 'e5', bait, t); if (mated) { const a = seg(t, mateT - 0.2, mateT); B.highlight(g, 'h2', RED, 0.55 * a); B.highlight(g, 'g1', RED, 0.55 * a); } },
         extraOver: () => { if (mated) { const a = seg(t, mateT - 0.2, mateT); B.laser(g, 'h2', 'g1', RED, a, 0.5); } } });
     if (mated) { const a = seg(t, mateT, mateT + 0.12); g.save(); g.fillStyle = rgba('#5A0E0E', 0.28 * a); g.fillRect(0, 0, W, H); g.restore(); }
-  }, { trans: 'dust', hud: (g, lt, t) => { if (t > endMoves[1] + SLIDE) { const a = seg(t, mateT, mateT + 0.12);
-      g.save(); g.globalAlpha = a; g.font = mono(64, 800); g.textAlign = 'center'; g.fillStyle = '#F07A6A'; g.letterSpacing = '6px'; g.fillText('CHECKMATE', W / 2, 300); qaRect(g, W / 2 - 260, 240, 520, 80, 'text', 'checkmate'); g.restore(); } } });
+  }, { trans: 'whip', hud: (g, lt, t) => { if (t > endMoves[1] + SLIDE) { const a = seg(t, mateT, mateT + 0.12);
+      g.save(); g.globalAlpha = a; g.font = mono(64, 800); g.textAlign = 'center'; g.fillStyle = '#F07A6A'; g.letterSpacing = '6px'; g.fillText('CHECKMATE', W / 2, 250); qaRect(g, W / 2 - 260, 190, 520, 80, 'text', 'checkmate'); g.restore(); } } });
   endMoves.forEach((tm, i) => moveCue(tm, 17 + i, 0.95));
-  cue(mateT, 'hit_punch', 0.9); cue(mateT + 0.02, 'gasp', 0.6); cue(mateT + 0.35, 'thud', 0.6);
+  cue(endMoves[0] + SLIDE - BOOM_HIT, 'boom_move', 0.6); cue(endMoves[1] + SLIDE - BOOM_HIT, 'boom_move', 0.9);  // 9.Nxe5 and Qh2
+  cue(orbA - 0.04, 'whoosh_fast', 0.55);
+  cue(mateT - 0.09, 'boom_big', 1.0); cue(mateT + 0.02, 'gasp', 0.4);
   shot(mateT + 0.75, (g, lt, t) => closeUp(g, lt, t, 'gates', { ...EXPR.shock, look: [0, 0.4] }, { pieces: at(18), yaw: 0.1, push: 0.9 }), { trans: 'cut' });
 
   // ======================= nine moves, twelve seconds =======================
@@ -341,33 +360,29 @@ export async function build(T) {
     counter(g, '12 SECONDS', 'OF HIS 30', { y: 400, size: 120, a: seg(t, twelveT - 0.05, twelveT + 0.05) * (1 - seg(t, minT - 0.3, minT - 0.15)) });
     if (t > minT - 0.15) { const a = seg(t, minT - 0.15, minT); g.save(); g.globalAlpha = a; g.strokeStyle = '#8FB8E0'; g.lineWidth = 8; g.beginPath(); g.roundRect(W / 2 - 400, 790, 380, 230, 26); g.stroke(); g.restore();
       counter(g, '1:10 LEFT', 'GATES', { y: 400, size: 120, a, labelColor: '#8FB8E0' }); }
-  }, { trans: 'dust', info: true });
-  cue(nineT, 'stamp', 0.7); cue(twelveT, 'clock_press', 0.7); cue(minT, 'clock_tick', 0.6);
+  }, { trans: 'whip', info: true });
+  cue(nineT, 'stamp', 0.55); cue(twelveT, 'clock_press', 0.5);
 
   // ======================= the quote =======================
   shot(s('s14') - 0.1, (g, lt, t) => { backdropInsert(g, t, 0.55); clipping(g, lt); }, { trans: 'whip', info: true });
-  cue(s('s14') - 0.1, 'paper', 0.8); cue(w('s14', 'cheap'), 'pen', 0.4);
+  cue(s('s14') - 0.1, 'paper', 0.6);
 
   // ======================= CTA =======================
-  const takeQT = w('cta', 'knight'), folT = w('cta', 'Follow');
-  shot(s('cta') - 0.1, (g, lt, t, sh) => {  // back to the bait: the knight on e5 before 9.Nxe5, Gates's hand hovering over it
-    const P = at(16);
-    for (const p of P) if (p.sq === 'e5' && p.t === 'n') { p.bow = 1; p.halo = GOLD; p.haloA = 1; }
-    boardScene(g, lt, t, [[0, { yaw: Math.PI + 0.55, pitch: 0.3, dist: 8.6, fov: 1500, cx: W / 2 - 60, cy: H * 0.46, target: [4.4, 1.7, 2.6] }], [len(sh), { yaw: Math.PI + 0.45, dist: 8.3 }]],
-      { pieces: P, gE: { ...EXPR.focus, look: [0, 0.6] }, mHide: true, dof: 1.2,
-        gReach: { sq: 'e5', y: 1.75, u: seg(t, s('cta') + 0.1, takeQT, ease.inOut), hold: true, side: -1 } });
-  }, { trans: 'dust', noJump: true, hud: (g, lt, t) => {
-    badge(g, 'YES — TAKE IT', W / 2 - 200, 290, { color: '#8A8F98', size: 40, a: seg(t, takeQT, takeQT + 0.1), scale: pop(t, takeQT) });
-    badge(g, 'NO — IT’S A TRAP', W / 2 + 190, 290, { color: GOLD, size: 40, a: seg(t, takeQT + 0.12, takeQT + 0.22), scale: pop(t, takeQT + 0.12) });
+  const gatesQT = w('cta', 'Gates?'), folT = w('cta', 'Follow');
+  shot(s('cta') - 0.1, (g, lt, t, sh) => {  // the viewer takes Magnus's seat: Gates across the board, a new game about to start
+    boardScene(g, lt, t, [[0, { yaw: Math.PI + 0.14, pitch: 0.3, dist: 7.6, fov: 1500, cy: H * 0.47, target: [4, 2.9, -1.2] }], [len(sh), { yaw: Math.PI + 0.05, dist: 6.9 }]],
+      { pieces: at(0), gE: { ...EXPR.smug, look: [0, 0.15], curve: 0.6 }, mHide: true, dof: 1.6, spot: [4, -1.2] });
+  }, { trans: 'whip', noJump: true, hud: (g, lt, t) => {
+    badge(g, 'YES', W / 2 - 130, 290, { color: GOLD, size: 46, a: seg(t, gatesQT, gatesQT + 0.1), scale: pop(t, gatesQT) });
+    badge(g, 'NO', W / 2 + 130, 290, { color: '#8A8F98', size: 46, a: seg(t, gatesQT + 0.12, gatesQT + 0.22), scale: pop(t, gatesQT + 0.12) });
     badge(g, 'FOLLOW FOR MORE', W / 2, 1520, { color: GOLD, size: 48, sub: 'THE 64 FILES', a: seg(t, folT, folT + 0.1), scale: pop(t, folT) });
   } });
-  cue(takeQT, 'sparkle_pop', 0.5); cue(takeQT + 0.12, 'sparkle_pop', 0.5); cue(folT, 'success', 0.8);
 
   const tvOff = T.duration - 0.55;
-  cue(tvOff, 'tvoff', 0.7);
-  const music = [
-    { t: 0, m: 'hook' }, { t: s('s1') - 0.1, m: 'build' }, { t: s('s5') - 0.1, m: 'clockwork' }, { t: s('s8') - 0.1, m: 'tension' },
-    { t: mateT, m: 'hit' }, { t: s('s12') - 0.1, m: 'digital' }, { t: s('cta') - 0.1, m: 'finale' }, { t: T.duration, m: 'end' },
+  cue(tvOff, 'tvoff', 0.6);
+  const music = [  // no music box or bells (they rang over the voice): strings and pizzicato, a calm piano after the mate
+    { t: 0, m: 'hook' }, { t: s('s1') - 0.1, m: 'build' }, { t: s('s5') - 0.1, m: 'tension' },
+    { t: mateT, m: 'hit' }, { t: s('s12') - 0.1, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   shots.sort((a, b) => a.a - b.a);
   return { shots, cues, music, tvOff, duration: T.duration, jumpCut: { every: 1.6, zooms: [1, 1.12, 1.05], shift: 40 } };
