@@ -170,8 +170,14 @@ export function brilliantIcon(ctx, x, y, r, a = 1) {
   ctx.fillStyle = '#0E7F70'; ctx.beginPath(); ctx.arc(0, 0, r * 1.06, 0, 7); ctx.fill();
   const gr = ctx.createLinearGradient(0, -r, 0, r); gr.addColorStop(0, '#37D1B9'); gr.addColorStop(1, BRILL);
   ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(0, 0, r * 0.92, 0, 7); ctx.fill();
-  ctx.fillStyle = '#FFFFFF'; ctx.font = `900 ${Math.round(r * 1.25)}px Rubik, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('!!', 0, r * 0.06);
+  // the two marks drawn by hand: tapered bars and round dots with a clear gap (a font's "!!" reads as "II" when small)
+  ctx.fillStyle = '#FFFFFF'; ctx.strokeStyle = '#FFFFFF'; ctx.lineJoin = 'round'; ctx.lineWidth = r * 0.07;
+  for (const dx of [-0.25, 0.25]) {
+    const x = dx * r;
+    ctx.beginPath(); ctx.moveTo(x - r * 0.12, -r * 0.54); ctx.lineTo(x + r * 0.12, -r * 0.54); ctx.lineTo(x + r * 0.06, r * 0.15); ctx.lineTo(x - r * 0.06, r * 0.15); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x, r * 0.42, r * 0.11, 0, 7); ctx.fill();
+  }
   ctx.restore();
 }
 

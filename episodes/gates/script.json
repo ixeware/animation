@@ -20,7 +20,7 @@
   "music_gap": 11,
   "music_air": -1,
   "music_lp": 7500,
-  "sfx_gap": 2.0,
+  "sfx_gap": 5.0,
   "reverb": 0.4,
   "reverb_sec": 2.3,
   "duck": 0.5
