@@ -390,7 +390,7 @@ export async function build(T) {
   const wideT = tenT - 0.12, LITT = SIM.map((_, i) => tenT + 0.05 + i * 0.09);
   shot(wideT, (g, lt, t) => simul(g, lt, t, [[0, WIDE(0.0, 0.95, 21)], [0.5, WIDE(0.05, 0.62, 17), ease.whip], [2, WIDE(0.1, 0.55, 16)]], { litT: LITT }),
     { noJump: true, grade: 'stream', hud: (g, lt, t) => { const n = SIM.filter((_, i) => t >= LITT[i]).length; counter(g, String(n), 'OPPONENTS', { y: 330, size: 170, color: '#FFFFFF', labelColor: '#FF4FD8', a: seg(t, tenT, tenT + 0.08) }); } });
-  LITT.forEach((tt, i) => i % 3 === 0 && cue(tt, 'piece', 0.25)); boom(LITT[9] + 0.05, 0.75);
+  LITT.forEach((tt, i) => i % 5 === 0 && cue(tt, 'piece', 0.25)); boom(LITT[9] + 0.05, 0.75);
   shot(w('hook1', 'with') - 0.1, (g, lt, t, sh) => simul(g, lt, t, flyAt(CLOSE(-0.85, 6.4, 2.4), CLOSE(0.55, 6.0, 2.4), backT - sh.a + 0.05, len(sh), 0.32), { close: true }),
     { grade: 'stream', hud: (g, lt, t) => placeStamp(g, lt, 'CBS · 60 Minutes', '2012', { y: 200, t0: 0.15 }) });
   cue(backT - 0.12, 'whoosh_fast', 0.4); boom(boardT, 0.9);
@@ -404,7 +404,7 @@ export async function build(T) {
   shot(mapT, (g, lt, t) => world(g, lt, t, mapT + 0.1, flagT - 0.1), { trans: 'whip', info: true, grade: 'neutral', hud: (g, lt, t) => {
     counter(g, 'AGE 5', 'EVERY COUNTRY ON EARTH', { y: 330, size: 150, color: '#FFFFFF', labelColor: '#5EE06B', a: seg(t, fiveT - 0.05, fiveT + 0.05) });
   } });
-  cue(mapT - 0.1, 'whoosh_fast', 0.35); cue(fiveT, 'sparkle_pop', 0.4);
+  cue(mapT - 0.1, 'whoosh_fast', 0.35);
   const wallT = flagT - 0.08;
   shot(wallT, (g, lt, t) => flagWall(g, lt, t, wallT, { checks: [['FLAG', flagT], ['CAPITAL', capT], ['POPULATION', popT]] }), { trans: 'cut', info: true, grade: 'neutral',
     hud: (g, lt, t) => tag(g, 'ACCORDING TO HIS FIRST COACH', 560, seg(t, popT + 0.12, popT + 0.24), { size: 24 }) });
@@ -418,7 +418,7 @@ export async function build(T) {
   const kT = w('kid2', 'and') - 0.08;
   shot(kT, (g, lt, t, sh) => twoShot(g, lt, t, 'kasparov', 'magnus14', 'focus', 'focus', { back: 'warm', pieces: at(30), keys: flyAt(OTS(-0.7, 12.5), OTS(0.32, 11.2), 0.14, len(sh), 0.3) }),
     { trans: 'cut', hud: (g, lt, t) => plate(g, seg(t, drewT, drewT + 0.12), 'REYKJAVIK · MARCH 2004 · RAPID', 'CARLSEN  ½–½  KASPAROV') });
-  cue(kT, 'whoosh_fast', 0.3); boom(drewT, 0.8);
+  boom(drewT, 0.8);
   shot(no1T - 0.1, (g, lt, t, sh) => {
     rig(B, lt, [[0, { yaw: Math.PI - 0.25, pitch: 0.3, dist: 6.9, fov: 1500, cy: H * 0.46, target: [4, 2.9, -1.2] }], [len(sh), { yaw: Math.PI - 0.15, pitch: 0.3, dist: 6.4, fov: 1500, cy: H * 0.46, target: [4, 2.9, -1.2] }]], { t });
     backdrop(g, t, 'warm'); const hp = B.project(4, 3.3, -1.4); rim(g, hp.x, hp.y, hp.s * 4.2, '#FFC060', 0.45);
@@ -453,11 +453,10 @@ export async function build(T) {
     counter(g, 'MOVE ' + mv, 'COMPUTER: 0.00 · DRAW', { y: 330, size: 130, color: '#FFFFFF', labelColor: BLUE });
     evalBar(g, 60, 520, 640, 0, { label: '0.00' });
   } });
-  for (let i = 0; i < 8; i++) cue(ffT + 0.1 + i * 0.16, 'clock_tick', 0.25);
+  for (let i = 0; i < 4; i++) cue(ffT + 0.1 + i * 0.32, 'clock_tick', 0.25);
   shot(pushT, (g, lt, t, sh) => twoShot(g, lt, t, 'magnus', 'nepo', 'focus', { ...EXPR.tired, sweat: 1 }, { back: 'dubai', pieces: at(259), keys: flyAt(OTS(0.75, 12.5), OTS(-0.3, 11.2), 0.14, len(sh), 0.3) }),
     { trans: 'cut', hud: (g, lt, t) => counter(g, '7 HOURS +', 'AT THE BOARD', { y: 330, size: 110, color: '#FFFFFF', labelColor: GOLD }) });
-  cue(pushT, 'whoosh_fast', 0.3);
-  const wT = wonT - 0.08, errT = wT + 0.1, HOLD = 0.6, endK = 271, finT = n136T + 0.55, wDt = (finT - (errT + HOLD)) / (endK - 261);
+    const wT = wonT - 0.08, errT = wT + 0.1, HOLD = 0.6, endK = 271, finT = n136T + 0.55, wDt = (finT - (errT + HOLD)) / (endK - 261);
   shot(wT, (g, lt, t) => {
     const R = t < errT + HOLD ? stepPieces(259, 260, errT, 0.3, t) : stepPieces(260, endK, errT + HOLD, wDt, t);
     rig(B, lt, [[0, { yaw: -0.25, pitch: 0.75, dist: 9.5, fov: 1500, cy: H * 0.52, target: [5.5, 0, 4.5] }], [finT - wT - 0.1, { yaw: 0.15, pitch: 0.7, dist: 8.2, fov: 1500, cy: H * 0.52, target: [5.8, 0, 5.5] }], [finT - wT + 0.18, { yaw: 0.75, pitch: 0.55, dist: 7.0, fov: 1500, cy: H * 0.52, target: [6, 0.5, 6] }, ease.whip], [3, { yaw: 0.85, pitch: 0.5, dist: 6.6, fov: 1500, cy: H * 0.52, target: [6, 0.5, 6] }]], { t });
@@ -494,7 +493,7 @@ export async function build(T) {
     const n = Math.round(lerp(0, 14, ease.out(seg(t, f14 - 0.9, f14, lin))));
     vsScore(g, lt, t, { v: n, k: t >= f14 ? lerp(1.35, 1, seg(t, f14, f14 + 0.25, ease.back)) : 1 }, { v: 0, k: 1 }, { lE: t >= f14 ? { ...EXPR.smug, curve: 0.9 } : 'smug' });
   }, { trans: 'whip', info: true });
-  cue(vsT - 0.1, 'whoosh_fast', 0.3); for (let i = 0; i < 6; i++) cue(f14 - 0.85 + i * 0.14, 'clock_tick', 0.22); boom(f14, 0.9);
+  cue(vsT - 0.1, 'whoosh_fast', 0.3); for (let i = 0; i < 3; i++) cue(f14 - 0.85 + i * 0.28, 'clock_tick', 0.22); boom(f14, 0.9);
   shot(hk2T - 0.08, (g, lt, t, sh) => portrait(g, lt, t, 'hikaru', exprAt([[0, 'neutral'], [onceT - (t - lt), { ...EXPR.sad, curve: 0.1 }]], lt), { back: 'stage', keys: flyAt(FRONT(0.3, 0.6), FRONT(-0.35, 0.95), onceT - sh.a, len(sh)) }),
     { trans: 'cut', hud: (g, lt, t) => { counter(g, t >= onceT ? '1' : '0', 'HIKARU’S CLASSICAL WINS VS MAGNUS', { y: 300, size: 180, color: '#9FC8FF', labelColor: BLUE }); } });
   cue(onceT, 'thud', 0.5);
@@ -527,7 +526,7 @@ export async function build(T) {
   const cT = s('cta') - 0.08, movesT = w('cta', 'moves'), comT = w('cta', 'Comment');
   shot(cT, (g, lt, t, sh) => portrait(g, lt, t, 'magnus', { ...EXPR.smug, curve: 0.8 }, { back: 'stage', keys: flyAt(FRONT(-0.8, 0.0), FRONT(-0.06, 0.6), 0.14, 3) }),
     { trans: 'cut', noJump: true, hud: (g, lt, t) => { if (t >= movesT) badge(g, 'HOW MANY MOVES WOULD YOU LAST?', W / 2, 210, { color: '#FFD43B', size: 42, scale: pop(t, movesT) }); } });
-  cue(cT - 0.04, 'whoosh_fast', 0.3); boom(movesT, 0.6);
+  boom(movesT, 0.6);
   shot(comT - 0.1, (g, lt, t, sh) => portrait(g, lt, t, 'magnus', { ...EXPR.smug, curve: 0.95 }, { back: 'stage', keys: [[0, FRONT(-0.06, 0.35)], [3, FRONT(-0.02, 0.5)]] }),
     { trans: 'cut', noJump: true, hud: (g, lt, t) => {
       badge(g, 'HOW MANY MOVES WOULD YOU LAST?', W / 2, 210, { color: '#FFD43B', size: 42 });
