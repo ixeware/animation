@@ -18,6 +18,7 @@ import { shockwave, embers } from '../../engine/js/fx.js';
 import { confetti } from '../../engine/js/draw.js';
 
 useLookV2();
+const CHANNEL = 'HAPPYCHESS';  // whose channel the video is made for: the follow line names it (THE 64 FILES / HAPPYCHESS)
 CAST.magnusCPU = { ...CAST.magnus, iris: '#3FE0C5' };  // "like a computer": engine-teal eyes
 CAST.magnus5 = { ...CAST.magnus14, face: [1.0, 0.95, 0.98], hairC: '#B98E5A', brow: '#9A7448', suit: '#3E7CC8', suitD: '#2C5E9E', shirt: 'tee', bodyScale: 0.62, blushAlways: 0.35 };
 const B = new Board();
@@ -531,7 +532,7 @@ export async function build(T) {
     { trans: 'cut', noJump: true, hud: (g, lt, t) => {
       badge(g, 'HOW MANY MOVES WOULD YOU LAST?', W / 2, 210, { color: '#FFD43B', size: 42 });
       badge(g, 'COMMENT A NUMBER', W / 2, 320, { color: '#5EE06B', size: 48, scale: pop(t, comT) });
-      badge(g, 'FOLLOW FOR MORE', W / 2, 425, { color: '#8A8F98', size: 32, sub: 'THE 64 FILES', a: seg(t, comT + 0.5, comT + 0.6) });
+      badge(g, 'FOLLOW ' + CHANNEL, W / 2, 418, { color: '#FFFFFF', size: 38, a: seg(t, comT + 0.5, comT + 0.6) });
     } });
   cue(comT, 'notify', 0.35);
 
