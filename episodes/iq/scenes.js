@@ -126,8 +126,10 @@ function iqScale(g, v, { a = 1, y = 1660, unknown = false, ghost = false, einste
   qaRect(g, 120, y - 60, W - 240, 140, 'text', 'iq scale');  // the strip with the ticks (the number above it sits on the same plate by design)
   g.restore();
 }
-// the number above the scale: counts up from 70 to v, landing at tl
+// the number above the scale: '???' (and no marker) until the count, then 70 -> v, landing at tl
 const iqAt = (t, tl, v, d = 0.55) => Math.round(lerp(70, v, ease.out(seg(t, tl - d, tl))));
+const iqHidden = (t, tl, d = 0.55) => t < tl - d;
+const iqText = (t, tl, v, d = 0.55) => iqHidden(t, tl, d) ? '???' : String(iqAt(t, tl, v, d));
 function iqNumber(g, text, { a = 1, y = 1540, color = C.cream, label = 'IQ', labelColor = GOLD, scale = 1 } = {}) {
   if (a <= 0) return;
   g.save(); g.translate(W / 2, y); g.scale(scale, scale); g.translate(-W / 2, -y);
@@ -273,7 +275,7 @@ export async function build(T) {
   shot(0, (g, lt, t) => portrait(g, lt, t, 'bobby72', 'neutral', { dark: 1, keys: [[0, FRONT(-0.35, -0.4)], [6.4, FRONT(-0.1, 0.5)]] }),
     { noJump: true, hud: (g, lt, t) => {
       const v = lerp(70, 182, ease.inOut(seg(t, sixtyT - 0.9, sixtyT)));
-      iqScale(g, v, { einstein: seg(t, einT, einT + 0.2) + (v > 160 ? 1 : 0) });
+      iqScale(g, v, { einstein: seg(t, einT, einT + 0.2) + (v > 160 ? 1 : 0), unknown: t < sixtyT - 0.9 });
       iqNumber(g, '???', { label: 'NUMBER ONE' });  // the marker runs, the number stays hidden
     } });
   cue(sixtyT - 0.9, 'whoosh_soft', 0.4); cue(sixtyT - BOOM_HIT, 'boom_move', 0.9);
@@ -285,7 +287,7 @@ export async function build(T) {
       rank(g, lt, 5, 'Hikaru Nakamura', '5× U.S. CHAMPION');
       streamOverlay(g, t, chatT - 0.4);
       const a = seg(t, s('h5c') - 0.2, s('h5c'));
-      iqScale(g, iqAt(t, h102, 102), { a }); iqNumber(g, String(iqAt(t, h102, 102)), { a, label: 'ONLINE TEST · ON STREAM' });
+      iqScale(g, iqAt(t, h102, 102), { a, unknown: iqHidden(t, h102) }); iqNumber(g, iqText(t, h102, 102), { a, label: 'ONLINE TEST · ON STREAM' });
     } });
   cue(h102 - 0.05, 'thud', 0.45);
 
@@ -301,7 +303,7 @@ export async function build(T) {
     { keys: diveOut([[0, FRONT(0.05, 0.6)], [len(sh), FRONT(-0.02, 0.9)]], end4) }),
     { trans: 'cut', hud: (g, lt, t) => {
       rank(g, lt + 1, 4, 'Garry Kasparov', 'WORLD CHAMPION 1985–2000', 1 - seg(t, k135 - 0.6, k135 - 0.4));
-      iqScale(g, iqAt(t, k135, 135), {}); iqNumber(g, String(iqAt(t, k135, 135)), { label: 'TESTED · DER SPIEGEL 1987' });
+      iqScale(g, iqAt(t, k135, 135, 0.6), { unknown: iqHidden(t, k135, 0.6) }); iqNumber(g, iqText(t, k135, 135, 0.6), { label: 'TESTED · DER SPIEGEL 1987' });  // already counting on the cut
       if (t > belowT) badge(g, 'SPATIAL SKILLS: BELOW AVERAGE', W / 2, 1150, { color: RED, size: 34, a: seg(t, belowT, belowT + 0.1), scale: lerp(1.4, 1, seg(t, belowT, belowT + 0.25, ease.back)) });
     } });
   cue(k135 - BOOM_HIT, 'boom_move', 0.85); cue(backT + end4 - 0.26, 'whoosh_fast', 0.55);
@@ -313,8 +315,8 @@ export async function build(T) {
     { trans: 'cut', qaAllow: ['texts overlap'], hud: (g, lt, t) => {  // the NO SCORE stamp crosses the number on purpose
       rank(g, lt, 3, 'Magnus Carlsen', 'WORLD CHAMPION 2013–2023');
       const a = seg(t, s('m3b') - 0.1, s('m3b') + 0.1), gone = seg(t, neverT, neverT + 0.15);
-      iqScale(g, iqAt(t, m190, 190), { a, ghost: true, unknown: gone > 0.5 });
-      iqNumber(g, gone > 0.5 ? '?' : String(iqAt(t, m190, 190)), { a, color: '#B8BEC4', label: gone > 0.5 ? 'NEVER RELEASED' : 'THE INTERNET SAYS', labelColor: gone > 0.5 ? RED : '#AEB8C0' });
+      iqScale(g, iqAt(t, m190, 190), { a, ghost: true, unknown: gone > 0.5 || iqHidden(t, m190) });
+      iqNumber(g, gone > 0.5 ? '?' : iqText(t, m190, 190), { a, color: '#B8BEC4', label: gone > 0.5 ? 'NEVER RELEASED' : 'THE INTERNET SAYS', labelColor: gone > 0.5 ? RED : '#AEB8C0' });
       noScore(g, gone, lerp(1.5, 1, seg(t, neverT, neverT + 0.2, ease.back)));
     } });
   cue(neverT, 'stamp', 0.6);
@@ -325,7 +327,7 @@ export async function build(T) {
     { trans: 'whip', hud: (g, lt, t) => {
       rank(g, lt, 2, 'Judit Polgar', 'STRONGEST WOMAN IN CHESS HISTORY');
       const a = seg(t, s('p2b') - 0.15, s('p2b') + 0.05) * (1 - seg(t, beatT - 0.1, beatT + 0.1)), v = iqAt(t, p170, 170);
-      iqScale(g, v, { a, einstein: v > 160 ? 1 : 0 }); iqNumber(g, String(v), { a, label: 'REPORTED' });
+      iqScale(g, v, { a, einstein: v > 160 ? 1 : 0, unknown: iqHidden(t, p170) }); iqNumber(g, iqText(t, p170, 170), { a, label: 'REPORTED' });
       const sb = seg(t, beatT, beatT + 0.15);
       resultPlate(g, sb);
     } });
@@ -343,8 +345,8 @@ export async function build(T) {
     rank(g, t - revT, 1, 'Bobby Fischer', 'WORLD CHAMPION 1972', 1 - seg(t, champT - 0.6, champT - 0.4));
     photoCard(g, FISCHER, W - 190, 760, 210, 0.08, 'BOBBY FISCHER, 1972 · ANEFO · CC0', seg(t, revT + 0.3, revT + 0.5) * (1 - seg(t, sixteenT - 0.3, sixteenT - 0.1)), [60, 40, 840, 1000]);
     const a = seg(t, s('f1c') - 0.1, s('f1c') + 0.1), v = iqAt(t, f180, 182, 0.9);
-    iqScale(g, v, { a, einstein: v > 160 ? 1 : 0 });
-    iqNumber(g, t > f180 ? '180s' : t < f180 - 0.9 ? '???' : String(v), { a, label: 'REPORTED · SCHOOL OFFICIAL' });
+    iqScale(g, v, { a, einstein: v > 160 ? 1 : 0, unknown: iqHidden(t, f180, 0.9) });
+    iqNumber(g, t > f180 ? '180s' : iqText(t, f180, 182, 0.9), { a, label: 'REPORTED · SCHOOL OFFICIAL' });
     if (t > sixteenT) tag(g, 'AGE 16 · LEFT SCHOOL', 1160, seg(t, sixteenT, sixteenT + 0.12) * (1 - seg(t, champT - 0.3, champT - 0.1)));
   } });
   cue(fT, 'riser', 0.45); cue(revT - BOOM_HIT - 0.03, 'boom_big', 1.0); cue(revT - 0.45, 'whoosh_fast', 0.5);
