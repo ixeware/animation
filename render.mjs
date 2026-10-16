@@ -1,6 +1,7 @@
 // Render an episode with headless Chromium.
 //   node render.mjs fischer --stills 0.5,12,30      -> build/stills/t*.jpg (+ contact sheet)
 //   node render.mjs fischer [--workers 4] [--from 0 --to 10]  -> build/video.mp4 (silent) + cues.json
+//   node render.mjs fischer --cues                       -> build/cues.json only (sound edits: then audio/mix.py)
 //   node render.mjs fischer --qa [--step 0.1]       -> build/qa.json: text over faces / captions, text off frame, faces cut
 import { chromium } from 'playwright';
 import http from 'node:http';
@@ -106,6 +107,10 @@ try {
       path.join(dir, 'sheet.jpg')]);
     }
     console.log('stills ->', dir);
+  } else if (args.includes('--cues')) {  // cues.json only: re-mix after a sound edit without re-rendering the video
+    const page = await openPage(browser);
+    fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC})'), null, 1));
+    console.log('cues ->', path.join(BUILD, 'cues.json'));
   } else {
     const page0 = await openPage(browser);
     const dur = await page0.evaluate('window.DURATION');
