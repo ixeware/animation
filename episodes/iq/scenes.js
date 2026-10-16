@@ -13,7 +13,7 @@ import { spotCone, bokeh, lowKey } from '../../engine/js/light.js';
 import { BOOM_HIT } from '../../engine/js/movefx.js';
 
 useLookV2();
-CAST.judit02 = { ...CAST.judit, suit: '#2B3140', suitD: '#1E2330', shirt: 'open', scrunchie: null };  // Judit Polgar in 2002 (26), dark jacket
+CAST.judit02 = { ...CAST.judit, suit: '#2B3140', suitD: '#1E2330', scrunchie: null };  // Judit Polgar in 2002 (26), dark top (an open collar showed only its white tip under the hair)
 const B = new Board();
 const depth = (x, y, z) => B.toCam(x, y, z)[2];
 const RED = '#E0503F', GOLD = '#E9B654';
@@ -274,7 +274,7 @@ export async function build(T) {
     { noJump: true, hud: (g, lt, t) => {
       const v = lerp(70, 182, ease.inOut(seg(t, sixtyT - 0.9, sixtyT)));
       iqScale(g, v, { einstein: seg(t, einT, einT + 0.2) + (v > 160 ? 1 : 0) });
-      iqNumber(g, t < sixtyT - 0.9 ? '???' : t < sixtyT ? String(Math.round(v)) : '???', { label: 'NUMBER ONE' });
+      iqNumber(g, '???', { label: 'NUMBER ONE' });  // the marker runs, the number stays hidden
     } });
   cue(sixtyT - 0.9, 'whoosh_soft', 0.4); cue(sixtyT - BOOM_HIT, 'boom_move', 0.9);
 
