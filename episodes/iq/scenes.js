@@ -270,6 +270,12 @@ function crown(g, x, y, s, a = 1) {
 
 // ---------- v2 cut: countdown cards, the hook lineup, real photos, inserts ----------
 const lin = x => x;
+// a sharp fly-around: hold A (drifting in), whip to B in d seconds centred on `at` (local time), then drift on
+const nudge = (P, k) => ({ ...P, dist: P.dist - k });
+const flyAt = (A, B, at, L, d = 0.28) => {
+  const a0 = Math.max(0, at - d / 2), end = Math.max(L, a0 + d + 0.1);
+  return a0 < 0.02 ? [[0, A], [d, B, ease.whip], [end, nudge(B, 0.3)]] : [[0, A], [a0, nudge(A, 0.15)], [a0 + d, B, ease.whip], [end, nudge(B, 0.3)]];
+};
 // the rank numeral alone (top left), for the later shots of a player
 function rankTag(g, n, a = 1) {
   if (a <= 0) return;
@@ -582,11 +588,11 @@ export async function build(T) {
   shot(testT, (g, lt, t) => streamTest(g, lt, t, testT), { trans: 'cut', info: true });
   cue(testT + 0.8, 'clock_press', 0.3);
   shot(liveT - 0.04, (g, lt, t, sh) => portrait(g, lt, t, 'hikaru', exprAt([[0, 'focus'], [0.5, { ...EXPR.happy, look: [-0.6, 0.2] }]], lt),
-    { back: 'stream', keys: [[0, FRONT(-0.6, 0.1)], [0.4, FRONT(-0.16, 0.45), ease.whip], [len(sh), FRONT(-0.08, 0.7)]] }),
+    { back: 'stream', keys: flyAt(FRONT(-0.85, 0.0), FRONT(-0.14, 0.5), 0.14, len(sh)) }),
     { trans: 'cut', hud: (g, lt, t) => { rankTag(g, 5); streamOverlay(g, t, liveT); } });
   cue(liveT - 0.04, 'whoosh_fast', 0.3);
   shot(s('h5c') - 0.05, (g, lt, t, sh) => portrait(g, lt, t, 'hikaru', exprAt([[0, 'happy'], [h102 + 0.1 - (t - lt), { ...EXPR.happy, nod: 1 }]], lt),
-    { back: 'stream', keys: [[0, FRONT(0.32, 0.7)], [len(sh), FRONT(0.24, 1.0)]] }),
+    { back: 'stream', keys: flyAt(FRONT(0.32, 0.7), FRONT(-0.32, 1.0), h102 - sh.a, len(sh)) }),
     { trans: 'cut', hud: (g, lt, t) => {
       rankTag(g, 5);
       iqScale(g, iqAt(t, h102, 102), { unknown: iqHidden(t, h102) }); iqNumber(g, iqText(t, h102, 102), { label: 'ONLINE TEST · ON STREAM' });
@@ -599,12 +605,12 @@ export async function build(T) {
   slam(kT, 4, w('k4a', 'four:'), 'kasparov');
   photo(garryT - 0.06, PH.kasparov_1985a, { from: { x: 0.5, y: 0.5, zoom: 1.0, focus: 0.5 }, to: { x: 0.5, y: 0.42, zoom: 1.15, dolly: 0.12 } },
     ['Garry Kasparov', 'WORLD CHAMPION 1985–2000', 'GARRY KASPAROV, 1985 · ROB BOGAERTS / ANEFO · CC0'], { grade: 'bw' });
-  shot(s('k4b') - 0.04, (g, lt, t, sh) => portrait(g, lt, t, 'kasparov', 'focus', { keys: [[0, FRONT(0.45, 0.2)], [len(sh), FRONT(0.32, 0.55)]] }),
+  shot(s('k4b') - 0.04, (g, lt, t, sh) => portrait(g, lt, t, 'kasparov', 'focus', { keys: flyAt(FRONT(0.95, -0.1), FRONT(0.32, 0.45), 0.14, len(sh)) }),
     { trans: 'cut', hud: (g, lt, t) => { rankTag(g, 4); counter(g, '1987', 'DER SPIEGEL · IQ TEST', { y: 400, size: 150, a: seg(t, y1987, y1987 + 0.1) }); } });
-  cue(y1987, 'stamp', 0.35);
+  cue(y1987, 'stamp', 0.35); cue(s('k4b') - 0.04, 'whoosh_fast', 0.25);
   shot(sheetT, (g, lt, t) => { deskInsert(g, t); const u = ease.out(clamp(lt / 0.3)); g.save(); g.globalAlpha *= u; g.translate(0, -(1 - u) * 260); testSheet(g, lt); g.restore(); }, { trans: 'cut', info: true });
   cue(sheetT, 'paper', 0.5); cue(w('k4b', 'test') - 0.1, 'pen', 0.3);
-  shot(backT, (g, lt, t, sh) => portrait(g, lt, t, 'kasparov', 'focus', { keys: [[0, FRONT(0.05, 0.6)], [len(sh), FRONT(-0.02, 0.9)]] }),
+  shot(backT, (g, lt, t, sh) => portrait(g, lt, t, 'kasparov', 'focus', { keys: flyAt(FRONT(0.08, 0.6), FRONT(-0.45, 0.95), k135 - sh.a, len(sh)) }),
     { trans: 'cut', hud: (g, lt, t) => {
       rankTag(g, 4);
       iqScale(g, iqAt(t, k135, 135, 0.6), { unknown: iqHidden(t, k135, 0.6) }); iqNumber(g, iqText(t, k135, 135, 0.6), { label: 'TESTED · DER SPIEGEL 1987' });
@@ -613,22 +619,22 @@ export async function build(T) {
   shot(rotT, (g, lt, t) => rotationTest(g, lt, t), { trans: 'cut', info: true });
   cue(rotT, 'whoosh_soft', 0.3);
   shot(belowT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'kasparov', exprAt([[0, 'focus'], [0.15, 'sad']], lt),
-    { keys: diveOut([[0, FRONT(-0.2, 0.8)], [len(sh), FRONT(-0.14, 1.0)]], end4 - (belowT - 0.06)) }),
+    { keys: diveOut(flyAt(FRONT(0.45, 0.4), FRONT(-0.2, 0.85), 0.14, len(sh)), end4 - (belowT - 0.06)) }),
     { trans: 'cut', hud: (g, lt, t) => { rankTag(g, 4); badge(g, 'SPATIAL SKILLS: BELOW AVERAGE', W / 2, 1150, { color: RED, size: 34, a: seg(t, belowT, belowT + 0.1), scale: pop(t, belowT) }); } });
-  cue(belowT, 'error', 0.3);
+  cue(belowT, 'error', 0.3); cue(belowT - 0.06, 'whoosh_fast', 0.25);
 
   // ======================= #3 MAGNUS: the internet's 190 =======================
   const magT = w('m3a', 'Magnus'), baitT = s('m3b') - 0.04, m190 = w('m3b', '190.') + 0.25, mag2T = w('m3b', 'Magnus'), neverT = w('m3b', 'never');
   slam(end4, 3, w('m3a', 'three:'), 'magnus');
-  shot(magT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'magnus', 'smug', { keys: [[0, FRONT(0.75, -0.2)], [0.42, FRONT(0.14, 0.4), ease.whip], [len(sh), FRONT(0.08, 0.6)]] }),
-    { trans: 'zoom', hud: (g, lt) => rank(g, lt, 3, 'Magnus Carlsen', 'WORLD CHAMPION 2013–2023') });
+  shot(magT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'magnus', 'smug', { keys: flyAt(FRONT(0.85, -0.2), FRONT(0.12, 0.45), 0.14, len(sh)) }),
+    { trans: 'cut', hud: (g, lt) => rank(g, lt, 3, 'Magnus Carlsen', 'WORLD CHAMPION 2013–2023') });
   cue(magT, 'whoosh_fast', 0.3);
   shot(baitT, (g, lt, t) => clickbait(g, lt, t, baitT + 0.08), { trans: 'cut', info: true, hud: (g, lt, t) => {
     iqScale(g, iqAt(t, m190, 190), { ghost: true, unknown: iqHidden(t, m190) });
     iqNumber(g, iqText(t, m190, 190), { color: '#B8BEC4', label: 'THE INTERNET SAYS', labelColor: '#AEB8C0' });
   } });
   [0, 1, 2, 3].forEach(i => cue(baitT + 0.08 + i * 0.3, 'notify', 0.18));
-  shot(mag2T - 0.08, (g, lt, t, sh) => portrait(g, lt, t, 'magnus', exprAt([[0, 'smug'], [neverT - (t - lt), { ...EXPR.smug, curve: 1 }]], lt), { keys: [[0, FRONT(-0.25, 0.6)], [len(sh), FRONT(-0.15, 0.9)]] }),
+  shot(mag2T - 0.08, (g, lt, t, sh) => portrait(g, lt, t, 'magnus', exprAt([[0, 'smug'], [neverT - (t - lt), { ...EXPR.smug, curve: 1 }]], lt), { keys: flyAt(FRONT(-0.25, 0.6), FRONT(0.38, 0.95), neverT - sh.a, len(sh)) }),
     { trans: 'cut', qaAllow: ['texts overlap'], hud: (g, lt, t) => {  // the NO SCORE stamp crosses the number on purpose
       rankTag(g, 3);
       const gone = seg(t, neverT, neverT + 0.15);
@@ -642,13 +648,14 @@ export async function build(T) {
   const pT = s('p2a') - 0.08, juditT = w('p2a', 'Judit'), boardT = w('p2a', 'the') - 0.06, strongT = w('p2a', 'strongest');
   const p170 = w('p2b', '170.') + 0.35, andT = w('p2b', 'And'), fallT = w('p2b', 'beat') + 0.1, hitK = fallT + 0.32, kasT = w('p2b', 'Kasparov.');
   slam(pT, 2, w('p2a', 'two:'), 'judit02');
-  shot(juditT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'judit02', 'happy', { keys: [[0, FRONT(-0.35, 0.2)], [len(sh), FRONT(-0.22, 0.5)]] }),
-    { trans: 'zoom', hud: (g, lt) => rank(g, lt, 2, 'Judit Polgar', 'GRANDMASTER AT 15 · 1991') });
+  shot(juditT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'judit02', 'happy', { keys: flyAt(FRONT(0.6, -0.1), FRONT(-0.22, 0.45), 0.14, len(sh)) }),
+    { trans: 'cut', hud: (g, lt) => rank(g, lt, 2, 'Judit Polgar', 'GRANDMASTER AT 15 · 1991') });
+  cue(juditT - 0.06, 'whoosh_fast', 0.25);
   shot(boardT, (g, lt, t, sh) => portrait(g, lt, t, 'judit02', { ...EXPR.focus, look: [0, 0.9] },
-    { keys: [[0, BOARDV(-1.0, 0.62, 9.5)], [0.45, BOARDV(-0.3, 0.5, 8.2), ease.whip], [len(sh), BOARDV(-0.18, 0.48, 7.8)]] }),
+    { keys: flyAt(BOARDV(-1.05, 0.62, 9.5), BOARDV(-0.3, 0.5, 8.2), 0.15, len(sh), 0.3) }),
     { trans: 'cut', hud: (g, lt, t) => { rankTag(g, 2); badge(g, 'ONLY WOMAN EVER IN THE WORLD TOP 10', W / 2, 1120, { color: GOLD, size: 38, sub: 'PEAK: WORLD NO. 8 · 2004', a: seg(t, strongT, strongT + 0.1), scale: pop(t, strongT) }); } });
   cue(boardT, 'whoosh_fast', 0.35);
-  shot(s('p2b') - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'judit02', 'happy', { keys: [[0, FRONT(0.3, 0.75)], [len(sh), FRONT(0.22, 1.0)]] }),
+  shot(s('p2b') - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'judit02', 'happy', { keys: flyAt(FRONT(0.3, 0.75), FRONT(-0.38, 1.0), p170 - sh.a, len(sh)) }),
     { trans: 'cut', hud: (g, lt, t) => {
       rankTag(g, 2);
       const v = iqAt(t, p170, 170);
@@ -658,8 +665,9 @@ export async function build(T) {
   // Moscow 2002: Kasparov's king goes down (symbolic: his king falls; the plate gives the real result)
   shot(andT - 0.08, (g, lt, t, sh) => {
     const rot = -1.42 * ease.in(seg(t, fallT, hitK, lin)) + (t > hitK ? 0.07 * Math.sin((t - hitK) * 24) * Math.exp(-(t - hitK) * 7) : 0);
-    portrait(g, lt, t, 'kasparov', exprAt([[0, 'sad'], [0.3, { ...EXPR.sad, look: [0, 0.8] }]], lt), { keys: [[0, KINGV(0.35, 7.2)], [len(sh), KINGV(0.24, 6.6)]],
-      pieces: [{ t: 'k', c: 'b', x: 4.5, z: 7.5, rot }, { t: 'p', c: 'b', x: 5.5, z: 6.5 }, { t: 'p', c: 'b', x: 6.5, z: 6.5 }, { t: 'q', c: 'w', x: 3.5, z: 5.5 }, { t: 'r', c: 'w', x: 1.5, z: 4.5 }] });
+    portrait(g, lt, t, 'kasparov', exprAt([[0, 'sad'], [0.3, { ...EXPR.sad, look: [0, 0.8] }]], lt), { keys: flyAt(KINGV(0.35, 7.2), KINGV(-0.4, 6.6), hitK - sh.a, len(sh), 0.3),
+      pieces: [{ t: 'k', c: 'b', x: 4.5, z: 7.5, rot }, { t: 'q', c: 'w', x: 6.5, z: 7.5 },  // nothing between the lens and the king, whichever side the camera swings to
+        ...[1.5, 2.5, 6.5, 7.5].map(x => ({ t: 'p', c: 'b', x, z: 6.5 }))] });
   }, { trans: 'cut', hud: (g, lt, t) => resultPlate(g, seg(t, kasT, kasT + 0.15)) });
   cue(hitK - BOOM_HIT, 'boom_move', 0.85); cue(hitK, 'piece', 0.45);
 
@@ -672,14 +680,14 @@ export async function build(T) {
   shot(lgT, (g, lt, t) => {
     const dark = 1 - seg(t, revT - 0.02, revT + 0.12);
     portrait(g, lt, t, 'bobby72', exprAt([[0, 'neutral'], [revT - (t - lt), { ...EXPR.happy, look: [0, 0.2] }]], lt), {
-      dark, keys: [[0, FRONT(-0.6, -0.3)], [revT - 0.42 - lgT, FRONT(-0.48, 0)], [revT + 0.08 - lgT, FRONT(0.12, 0.2), ease.whip], [3, FRONT(0.06, 0.6)]] });
+      dark, keys: [[0, FRONT(-0.6, -0.3)], [revT - 0.2 - lgT, FRONT(-0.5, 0)], [revT + 0.1 - lgT, FRONT(0.2, 0.25), ease.whip], [3, FRONT(0.08, 0.65)]] });
   }, { trans: 'cut', noJump: true, hud: (g, lt, t) => { if (t >= revT) rank(g, t - revT, 1, 'Bobby Fischer', 'WORLD CHAMPION 1972'); } });
   cue(revT - BOOM_HIT - 0.03, 'boom_big', 1.0); cue(revT - 0.45, 'whoosh_fast', 0.5);
   photo(photoT, PH.fischer_1972, { from: { x: 0.62, y: 0.5, zoom: 1.0, focus: 0.55 }, to: { x: 0.62, y: 0.42, zoom: 1.15, dolly: 0.12 } },
     ['Bobby Fischer', 'WORLD CHAMPION 1972', 'BOBBY FISCHER, 1972 · ANEFO / NATIONAAL ARCHIEF · CC0'], { grade: 'bw', instant: true });
   shot(fileT, (g, lt, t) => schoolFile(g, lt, t, iqT), { trans: 'cut', info: true });
   cue(fileT, 'paper', 0.45); cue(fileT + 0.32, 'page_flip', 0.35);
-  shot(n180T, (g, lt, t, sh) => portrait(g, lt, t, 'bobby72', 'happy', { keys: [[0, FRONT(0.32, 0.5)], [len(sh), FRONT(0.25, 0.8)]] }),
+  shot(n180T, (g, lt, t, sh) => portrait(g, lt, t, 'bobby72', 'happy', { keys: flyAt(FRONT(0.32, 0.5), FRONT(-0.3, 0.85), f180 - sh.a, len(sh)) }),
     { trans: 'cut', hud: (g, lt, t) => {
       rankTag(g, 1);
       const v = iqAt(t, f180, 182, 0.45);
@@ -687,11 +695,11 @@ export async function build(T) {
       iqNumber(g, t > f180 ? '180s' : iqText(t, f180, 182, 0.45), { label: 'REPORTED · SCHOOL OFFICIAL' });
     } });
   cue(f180 - BOOM_HIT, 'boom_move', 0.9);
-  shot(ageT, (g, lt, t, sh) => portrait(g, lt, t, 'bobby13', 'neutral', { keys: [[0, FRONT(-0.4, 0.3)], [len(sh), FRONT(-0.3, 0.6)]] }),
-    { trans: 'whip', hud: (g, lt, t) => { rankTag(g, 1); counter(g, 'AGE 16', 'LEFT SCHOOL · 1959', { y: 400, size: 130, a: seg(t, sixteenT - 0.05, sixteenT + 0.05) }); } });
-  cue(ageT - 0.1, 'whoosh_soft', 0.3); cue(sixteenT, 'thud', 0.4);
+  shot(ageT, (g, lt, t, sh) => portrait(g, lt, t, 'bobby13', 'neutral', { keys: flyAt(FRONT(0.55, 0.0), FRONT(-0.3, 0.45), 0.14, len(sh)) }),
+    { trans: 'cut', hud: (g, lt, t) => { rankTag(g, 1); counter(g, 'AGE 16', 'LEFT SCHOOL · 1959', { y: 400, size: 130, a: seg(t, sixteenT - 0.05, sixteenT + 0.05) }); } });
+  cue(ageT - 0.04, 'whoosh_fast', 0.3); cue(sixteenT, 'thud', 0.4);
   shot(crT, (g, lt, t, sh) => portrait(g, lt, t, 'bobby72', { ...EXPR.happy, look: [0, -0.3] }, {
-    keys: [[0, FRONT(-0.5, 0.0)], [0.4, FRONT(-0.12, 0.4), ease.whip], [len(sh), FRONT(-0.06, 0.6)]],
+    keys: flyAt(FRONT(-0.7, 0.0), FRONT(-0.1, 0.45), 0.14, len(sh)),
     extra: () => { if (t > champT - 0.4) { const hd = headAt(), u = ease.out(seg(t, champT - 0.35, champT + 0.05)); crown(g, hd.x, hd.y - 168 * hd.s - (1 - u) * 380, hd.s * 0.72, seg(t, champT - 0.35, champT - 0.2)); } } }),
     { trans: 'cut', hud: (g, lt, t) => {
       rankTag(g, 1);
@@ -703,16 +711,16 @@ export async function build(T) {
   // ======================= CTA: could you beat 135? =======================
   const cT = s('cta') - 0.08, comT = w('cta', 'Comment');
   const ctaHud = (g, t) => { iqScale(g, 135, { you: { v: 118 + 22 * Math.sin(t * 1.3), t } }); iqNumber(g, '135', { label: 'KASPAROV · TESTED' }); };
-  shot(cT, (g, lt, t) => portrait(g, lt, t, 'kasparov', { ...EXPR.smug, curve: 0.7 }, { keys: [[0, FRONT(0.5, 0.2)], [0.4, FRONT(0.1, 0.55), ease.whip], [3, FRONT(0.06, 0.65)]] }),
-    { trans: 'whip', noJump: true, hud: (g, lt, t) => ctaHud(g, t) });
-  cue(cT - 0.1, 'whoosh_soft', 0.3);
-  shot(comT - 0.1, (g, lt, t) => portrait(g, lt, t, 'kasparov', { ...EXPR.smug, curve: 0.9 }, { keys: [[0, FRONT(-0.12, 0.6)], [3, FRONT(-0.08, 0.75)]] }),
+  shot(cT, (g, lt, t) => portrait(g, lt, t, 'kasparov', { ...EXPR.smug, curve: 0.7 }, { keys: flyAt(FRONT(0.7, 0.1), FRONT(0.1, 0.55), 0.14, 2.6) }),
+    { trans: 'cut', noJump: true, hud: (g, lt, t) => ctaHud(g, t) });
+  cue(cT - 0.08, 'whoosh_fast', 0.3);
+  shot(comT - 0.1, (g, lt, t) => portrait(g, lt, t, 'kasparov', { ...EXPR.smug, curve: 0.9 }, { keys: flyAt(FRONT(-0.6, 0.4), FRONT(-0.1, 0.72), 0.14, 3) }),
     { trans: 'cut', noJump: true, hud: (g, lt, t) => {
       ctaHud(g, t);
       badge(g, 'COMMENT YOUR IQ', W / 2, 230, { color: GOLD, size: 48, a: seg(t, comT, comT + 0.1), scale: lerp(1.5, 1, seg(t, comT, comT + 0.25, ease.back)) });
       badge(g, 'FOLLOW FOR MORE', W / 2, 330, { color: '#8A8F98', size: 34, sub: 'THE 64 FILES', a: seg(t, comT + 0.5, comT + 0.6) });
     } });
-  cue(comT, 'notify', 0.35);
+  cue(comT, 'notify', 0.35); cue(comT - 0.1, 'whoosh_fast', 0.22);
 
   const tvOff = T.duration - 0.55;
   cue(tvOff, 'tvoff', 0.6);
