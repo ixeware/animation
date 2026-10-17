@@ -18,7 +18,7 @@ import { shockwave, embers } from '../../engine/js/fx.js';
 import { confetti } from '../../engine/js/draw.js';
 
 useLookV2();
-const CHANNEL = 'HAPPYCHESS';  // whose channel the video is made for: the follow line names it (THE 64 FILES / HAPPYCHESS)
+const CHANNEL = 'THE 64 FILES';  // whose channel the video is made for: the follow line names it (THE 64 FILES / HAPPYCHESS)
 CAST.magnusCPU = { ...CAST.magnus, iris: '#3FE0C5' };  // "like a computer": engine-teal eyes
 CAST.magnus5 = { ...CAST.magnus14, face: [1.0, 0.95, 0.98], hairC: '#B98E5A', brow: '#9A7448', suit: '#3E7CC8', suitD: '#2C5E9E', shirt: 'tee', bodyScale: 0.62, blushAlways: 0.35 };
 const B = new Board();
