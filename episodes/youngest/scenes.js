@@ -2,7 +2,9 @@
 // Ponomariov and Bu; Karjakin's (2002) stood 19 years; Gukesh missed it by 17 days (2019) and became world champion at
 // 18; Mishra set it in Budapest (2021, 12y 4m 25d); Oro fell two months short (2026); Roman Shogdzhiev, 11, has two
 // norms. Sources: SOURCES.md. A gold plaque on a pedestal holds the record and shatters each time it falls. Navy and
-// warm gold, colourful from the first frame without neon (rule 28), brilliant-episode pace with fly-arounds (rule 27).
+// warm gold, colourful from the first frame without neon (rule 28), brilliant-episode pace (rule 27). v2: half the
+// fly-arounds (7) and a different kind of shot for each beat — film leader, magazine cover, maps, a split screen, a pile
+// of record cards, a dust time-lapse, a podium, over-the-shoulder and high/low angles — so no two scenes look alike.
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect } from '../../engine/js/core.js';
 import { Board, sqXZ } from '../../engine/js/board.js';
 import { EXPR, exprAt, CAST, drawChar } from '../../engine/js/characters.js';
@@ -15,6 +17,8 @@ import { BOOM_HIT } from '../../engine/js/movefx.js';
 import { shockwave, embers, shatterImage, burst, glint } from '../../engine/js/fx.js';
 import { confetti } from '../../engine/js/draw.js';
 import { loadPhoto3d, photo3d } from '../../engine/js/photo3d.js';
+import { DotMap, CITY } from '../../engine/js/map.js';
+import { webcam, trophy } from '../../engine/js/witty.js';
 
 useLookV2();
 const CHANNEL = 'THE 64 FILES';  // whose channel the video is made for: the follow line names it (THE 64 FILES / HAPPYCHESS)
@@ -41,7 +45,9 @@ const lin = x => x;
 const xz = sq => { const [x, z] = sqXZ(sq); return { x, z }; };
 const at = k => G6[k].pieces.map(p => ({ ...p, ...xz(p.sq) }));
 const PH = {};
-for (const k of ['fischer1956', 'judit1990']) PH[k] = await loadPhoto3d(`../episodes/youngest/photos/${k}`);
+for (const k of ['fischer1956', 'fischer1972', 'judit1990']) PH[k] = await loadPhoto3d(`../episodes/youngest/photos/${k}`);
+const MAP = await new DotMap().init();
+CITY['New Delhi'] = [77.2, 28.6]; CITY['New Jersey'] = [-74.4, 40.2];
 
 // ---------- painted colour sets (blurred once): the navy hall of records, warm tungsten for the old days, one per country ----------
 const STYLE = {
@@ -205,7 +211,7 @@ const blankTex = () => {
 const HV = (yaw = 0, dist = 9, pitch = 0.08, y = 4.7) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.46, target: [0, y, 0] });
 const SLAM = 0.5;  // the new plaque lands this long after the old one breaks
 // rec: the plaque on the pedestal; with breakT, `prev` cracks, shatters at breakT and `rec` slams in from the lens
-function hall(g, lt, t, keys, { rec = 'fischer', prev = null, breakT = null, crack = 0, shadow = 0, empty = false } = {}) {
+function hall(g, lt, t, keys, { rec = 'fischer', prev = null, breakT = null, crack = 0, shadow = 0, empty = false, dust = 0 } = {}) {
   rig(B, lt, keys, { t });
   backdrop(g, t, 'hall');
   quad(g, [[-60, 0, -40], [60, 0, -40], [60, 0, 80], [-60, 0, 80]], '#0A0F1E');
@@ -218,7 +224,7 @@ function hall(g, lt, t, keys, { rec = 'fischer', prev = null, breakT = null, cra
   box(g, B, [-1.4, 0, -1.0], [1.4, 3.25, 1.0], { top: '#2C3456', side: '#141A32', front: '#1C2444' });
   box(g, B, [-2.05, 3.25, -0.4], [2.05, 3.45, 0.4], { top: '#D4A64A', side: '#6A4A18', front: '#9A7028' });
   const landT = breakT === null ? null : breakT + SLAM;
-  if (breakT === null) { if (!empty) plaque(g, rec); cracks(g, crack); }
+  if (breakT === null) { if (!empty) plaque(g, rec); cracks(g, crack); dustOver(g, dust); }
   else if (t < breakT) { if (prev) { plaque(g, prev); cracks(g, seg(t, breakT - 0.3, breakT)); } }
   else {
     if (prev) { const [x, y, w, h] = plaqueRect(); shatterImage(g, plaqueTex(prev), x, y, w, h, t - breakT, { cols: 6, rows: 4, seed: 9, power: 1000, gravity: 2600, spin: 8, life: 1.0, oy: 0.46, ox: 0.56 }); }
@@ -476,6 +482,169 @@ function lineup(g, lt, t, keys, { youLit = null } = {}) {
   });
 }
 
+// ---------- time-lapse: dust and cobwebs settle on the plaque while the years run ----------
+function dustOver(g, u, seed = 7) {
+  if (u <= 0) return;
+  const [x, y, w, h] = plaqueRect(), r = rng(seed);
+  g.save(); g.fillStyle = `rgba(150,140,120,${(0.38 * u).toFixed(3)})`; g.fillRect(x, y, w, h);
+  for (let i = 0; i < 180 * u; i++) { g.fillStyle = `rgba(225,218,204,${(0.55 * r()).toFixed(3)})`; g.beginPath(); g.arc(x + r() * w, y + r() * h, 1 + r() * 2.5, 0, 7); g.fill(); }
+  g.strokeStyle = `rgba(238,238,232,${(0.6 * u).toFixed(3)})`; g.lineWidth = 1.6;
+  for (const [cx, cy, sx] of [[x, y, 1], [x + w, y, -1]]) {  // cobwebs in the top corners
+    const R = 150 * u;
+    for (let k = 0; k < 6; k++) { const a = (k / 5) * Math.PI / 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + sx * Math.cos(a) * R, cy + Math.sin(a) * R); g.stroke(); }
+    for (let ring = 1; ring <= 4; ring++) {
+      g.beginPath();
+      for (let k = 0; k <= 5; k++) { const a = (k / 5) * Math.PI / 2, rr = R * ring / 4 * (0.86 + 0.14 * Math.sin(k * 2.3 + ring)); const px = cx + sx * Math.cos(a) * rr, py = cy + Math.sin(a) * rr; k ? g.lineTo(px, py) : g.moveTo(px, py); }
+      g.stroke();
+    }
+  }
+  g.restore();
+}
+
+// ---------- 1958: a sepia film leader (grain, flicker, scratches, a sweeping hand); the year lands on the beat ----------
+const GRAIN = (() => {
+  const c = makeCanvas(540, 960), g = c.getContext('2d'), d = g.createImageData(540, 960), r = rng(91);
+  for (let i = 0; i < d.data.length; i += 4) { const v = 120 + r() * 135; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+  g.putImageData(d, 0, 0); return c;
+})();
+function filmYear(g, lt, t, year, hitT, sub) {
+  const fr = Math.floor(t * 30), r = rng(fr * 13 + 7), fl = 0.9 + 0.1 * r();
+  const bg = g.createRadialGradient(W / 2, H * 0.46, 60, W / 2, H * 0.46, H * 0.78);
+  bg.addColorStop(0, `rgb(${Math.round(218 * fl)},${Math.round(180 * fl)},${Math.round(124 * fl)})`); bg.addColorStop(1, '#2A1A0C');
+  g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  const cx = W / 2, cy = 880;
+  g.save(); g.strokeStyle = 'rgba(46,28,10,0.6)'; g.lineWidth = 7;
+  for (const R of [360, 300]) { g.beginPath(); g.arc(cx, cy, R, 0, 7); g.stroke(); }
+  g.beginPath(); g.moveTo(0, cy); g.lineTo(W, cy); g.moveTo(cx, cy - 560); g.lineTo(cx, cy + 560); g.stroke();
+  const sw = (((t - hitT) % 0.8 + 0.8) % 0.8) / 0.8 * Math.PI * 2;  // the leader's hand keeps sweeping
+  g.fillStyle = 'rgba(46,28,10,0.2)'; g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, 360, -Math.PI / 2, -Math.PI / 2 + sw); g.closePath(); g.fill();
+  g.restore();
+  if (t > hitT - 0.12) {
+    const u = seg(t, hitT - 0.12, hitT, lin), k = lerp(2.2, 1, ease.in(u));
+    g.save(); g.translate(cx, cy); g.scale(k, k); g.globalAlpha = clamp(u * 2.5);
+    g.font = serif(250, 700); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = 'rgba(38,22,6,0.92)'; g.fillText(year, 0, 12);
+    g.restore();
+    if (t >= hitT) qaRect(g, cx - 330, cy - 120, 660, 240, 'text', year);
+  }
+  g.save(); g.globalCompositeOperation = 'multiply'; g.globalAlpha = 0.5; g.drawImage(GRAIN, -(fr % 7) * 30, -(fr % 5) * 40, W + 240, H + 240); g.restore();
+  g.save(); g.strokeStyle = 'rgba(255,248,230,0.45)'; g.lineWidth = 2;
+  for (let i = 0; i < 3; i++) { const x = r() * W; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + (r() - 0.5) * 24, H); g.stroke(); }
+  g.restore();
+  if (sub) tag(g, sub, 1120, seg(t, hitT + 0.12, hitT + 0.25), { color: '#FFE9B0', size: 30 });
+}
+
+// ---------- the cascade: collectible record cards slam onto a pile, one per name ----------
+const CARDS = new Map();
+function cardImg(c) {
+  if (CARDS.has(c.id)) return CARDS.get(c.id);
+  const [name, , year] = REC[c.id], w = 600, h = 820, cv = makeCanvas(w, h), g = cv.getContext('2d');
+  g.fillStyle = '#F4EEE2'; g.beginPath(); g.roundRect(0, 0, w, h, 30); g.fill();
+  g.save(); g.beginPath(); g.roundRect(24, 96, w - 48, 540, 18); g.clip();
+  const gr = g.createRadialGradient(w / 2, 330, 40, w / 2, 360, 420); gr.addColorStop(0, c.glow); gr.addColorStop(1, mix(c.glow, '#000000', 0.65));
+  g.fillStyle = gr; g.fillRect(24, 96, w - 48, 540);
+  drawChar(g, c.who, { x: w / 2, y: 400, s: 1.15, e: EXPR.focus, t: 0 });
+  g.restore();
+  g.textAlign = 'center'; g.fillStyle = '#2A1A0E';
+  g.font = serif(48, 700); const k = Math.min(1, (w - 70) / g.measureText(name).width); g.font = serif(Math.floor(48 * k), 700); g.fillText(name, w / 2, 70);
+  g.font = sans(86, 900); g.fillText(c.age, w / 2, 742);
+  g.font = sans(26, 900); g.letterSpacing = '5px'; g.fillStyle = '#7A5A30'; g.fillText(`${year} · ${c.flag}`, w / 2, 792);
+  CARDS.set(c.id, cv); return cv;
+}
+function cardStack(g, lt, t, list) {
+  darkCard(g, '#16192C', '#05070C');
+  bokeh(g, t, { n: 12, seed: 61, y0: 0.05, y1: 0.9, a: 0.12, colors: ['#FFD9A0', '#CFE2FF'] });
+  const on = list.filter(c => t >= c.hit - 0.1), S = 0.92;
+  on.forEach((c, i) => {
+    const r = rng(i * 17 + 5), rot = (r() - 0.5) * 0.16, ox = (r() - 0.5) * 120, oy = (r() - 0.5) * 40, cy = 730;
+    const u = seg(t, c.hit - 0.1, c.hit, ease.in), k = lerp(1.7, 1, u) * S;
+    g.save(); g.translate(W / 2 + ox, cy + oy); g.rotate(rot); g.scale(k, k); g.globalAlpha *= clamp(u * 3);
+    g.shadowColor = 'rgba(0,0,0,0.55)'; g.shadowBlur = 40; g.shadowOffsetY = 18;
+    g.drawImage(cardImg(c), -300, -410); g.shadowColor = 'transparent';
+    if (i < on.length - 1) { g.fillStyle = 'rgba(5,7,12,0.5)'; g.beginPath(); g.roundRect(-300, -410, 600, 820, 30); g.fill(); }
+    g.restore();
+    if (t >= c.hit) shockwave(g, W / 2 + ox, cy + oy + 300, t, c.hit, { r0: 80, r1: 620, life: 0.45, color: GOLD, lw: 10, squash: 0.3 });
+  });
+  if (on.length) qaRect(g, W / 2 - 330, 330, 660, 840, 'text', 'cards');
+}
+
+// ---------- 2002: a magazine cover — the year huge behind the boy's head ----------
+function cover(g, lt, t, who, year, hitT, style) {
+  const z = 1 + 0.05 * clamp(lt / 2.4), im = BACKS[style];
+  g.save(); g.translate(W / 2, H / 2); g.scale(z, z); g.translate(-W / 2, -H / 2);
+  g.drawImage(im, -360, -120, W + 720, (W + 720) * im.height / im.width);
+  bokeh(g, t, { n: 12, seed: 23, y0: 0.04, y1: 0.6, a: 0.2, size: [30, 90], colors: STYLE[style].dots });
+  const u = seg(t, hitT - 0.14, hitT, ease.out);
+  if (u > 0) {
+    g.save(); g.globalAlpha *= u; g.translate(W / 2 + (1 - u) * 300, 560); g.font = serif(330, 700); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillText(year, 12, 20);
+    const gr = g.createLinearGradient(0, -170, 0, 170); gr.addColorStop(0, '#FFF2C8'); gr.addColorStop(1, '#C8902E'); g.fillStyle = gr; g.fillText(year, 0, 0); g.restore();
+  }
+  rim(g, W / 2, 800, 560, STYLE[style].beams[0], 0.5);
+  drawChar(g, who, { x: W / 2, y: 880, s: 2.0, e: EXPR.neutral, t });
+  const fl = g.createLinearGradient(0, 1180, 0, 1520); fl.addColorStop(0, 'rgba(5,7,12,0)'); fl.addColorStop(1, '#05070C');  // the bust fades into the dark
+  g.fillStyle = fl; g.fillRect(0, 1180, W, H - 1180); g.fillStyle = '#05070C'; g.fillRect(0, 1519, W, H);
+  g.restore();
+}
+
+// ---------- maps: India for 2019; New Jersey to Budapest for 2021 ----------
+function mapIndia(g, lt, t, t0, pinT) {
+  darkCard(g, '#2A1406', '#0A0503');
+  bokeh(g, t, { n: 10, seed: 70, y0: 0.05, y1: 0.9, a: 0.12, colors: ['#FFB347', '#9FF0D8'] });
+  const u = ease.inOut(seg(t, t0, pinT, lin));
+  MAP.view({ lon: lerp(60, 79, u), lat: lerp(30, 23, u), zoom: lerp(5, 17, u), cy: H * 0.5 });
+  MAP.draw(g, { spacing: 13, base: '#5A3A22', color: id => id === 356 ? '#FFB347' : null });
+  MAP.pin(g, 'New Delhi', { color: '#FFFFFF', a: seg(t, pinT, pinT + 0.1), pulse: t > pinT ? ((t - pinT) / 0.7) % 1 : 0 });
+}
+function mapRoute(g, lt, t, t0, t1) {
+  darkCard(g, '#0A1430', '#04070F');
+  bokeh(g, t, { n: 10, seed: 71, y0: 0.05, y1: 0.9, a: 0.12, colors: ['#FFE2B0', '#9FC0FF'] });
+  MAP.view({ lon: lerp(-30, -25, clamp(lt / 2)), lat: 45, zoom: 8.6, cy: H * 0.52 });
+  MAP.draw(g, { spacing: 12, base: '#344A78', color: id => id === 840 ? '#7A9AD8' : id === 348 ? GOLD : null });
+  MAP.pin(g, 'New Jersey', { color: '#BFD4FF', a: seg(t, t0, t0 + 0.1), below: true });
+  MAP.route(g, 'New Jersey', 'Budapest', seg(t, t0 + 0.1, t1, ease.inOut), { color: GOLD, bend: 0.3 });
+  MAP.pin(g, 'Budapest', { color: GOLD, a: seg(t, t1, t1 + 0.1), pulse: t > t1 ? ((t - t1) / 0.7) % 1 : 0 });
+}
+
+// ---------- the old record next to the new one: a split screen ----------
+function vsAges(g, lt, t, monthT) {
+  darkCard(g, '#3A1E10', '#0A0503');
+  embers(g, t, { n: 30, seed: 29, a: 0.35, color: '#FFC870' });
+  cardTitle(g, 'AGE AT GRANDMASTER', 'THE OLD RECORD VS THE NEW ONE');
+  webcam(g, 60, 420, 450, 540, 'bobby13', 'neutral', t, { bg: ['#C88A3A', '#5A3410'], name: 'FISCHER · 1958', zoom: 0.95, cy: 0.5 });
+  webcam(g, 570, 420, 450, 540, 'judit', t >= monthT ? 'happy' : 'neutral', t, { bg: ['#B8608A', '#4A1A3A'], name: 'POLGÁR · 1991', zoom: 0.95, cy: 0.5 });
+  ymd(g, 285, 1070, [[15, 'Y'], [6, 'M'], [1, 'D']], { size: 66, color: '#FFFFFF' });
+  ymd(g, 795, 1070, [[15, 'Y'], [4, 'M'], [28, 'D']], { size: 66, color: GOLD });
+  if (t >= monthT) badge(g, 'A MONTH YOUNGER', W / 2, 1150, { color: RED, size: 44, scale: pop(t, monthT) });
+}
+
+// ---------- two players: over the near player's shoulder (a dark back view) onto the far one ----------
+const OTS = (yaw = 0.3, dist = 11.5, pitch = 0.3) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.45, target: [4, 2.5, 7] });
+function twoShot(g, lt, t, far, near, eF, eN, { keys, back = 'hall', pieces = at(0), kid = false } = {}) {
+  rig(B, lt, keys, { t });
+  backdrop(g, t, back);
+  const lift = kid ? 2.95 : 3.1, hp = B.project(4, lift + 0.2, 9.4); rim(g, hp.x, hp.y, hp.s * 4.2, STYLE[back].beams[0], 0.45);
+  const hf = seated(g, B, far, eF, t, { z: 9.4, lift, k: kid ? 0.93 : 1 }), hn = seated(g, B, near, eN, t, { z: -1.4, face: 1 });
+  gameTable(g); B.drawSlab(g, COM); B.drawPieces(g, pieces, { focus: B.dist, dof: 1.4 }); hf(); hn();
+  spotCone(g, B, { top: [4, 18, 4], base: [4, 0, 4], r0: 0.7, r1: 5.5, a: 0.14, t, color: '#FFF4E0' });
+  lowKey(g, { cy: H * 0.42, a: 0.28 });
+}
+
+// ---------- 2024: the champion behind a podium, the trophy beside him ----------
+const PODV = (yaw = 0.1, dist = 7.4, pitch = 0.02) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.47, target: [0, 3.1, 0.5] });
+function podium(g, lt, t, keys, who, e) {
+  rig(B, lt, keys, { t });
+  backdrop(g, t, 'saffron');
+  quad(g, [[-60, 0, -40], [60, 0, -40], [60, 0, 80], [-60, 0, 80]], '#1A0E06');
+  pool(g, B, 0, 0.02, 0.5, 4, '#FFE2A8', 0.35);
+  spotCone(g, B, { top: [0, 18, 0.5], base: [0, 0, 0.5], r0: 0.5, r1: 3.4, a: 0.22, t, color: '#FFF0D0' });
+  const hp = B.project(0, 3.5, 0.8); rim(g, hp.x, hp.y, hp.s * 4, '#FFB347', 0.5);
+  actor(g, B, who, { x: 0, y: 3.55, z: 0.8, e, t, face: -1 });
+  box(g, B, [-2.4, 0, -1.4], [2.4, 1.55, 0.2], { top: '#6A3E1A', side: '#2A160A', front: '#4A2A10' });  // the podium hides where the bust ends
+  quad(g, [[-2.4, 1.33, -1.41], [2.4, 1.33, -1.41], [2.4, 1.21, -1.41], [-2.4, 1.21, -1.41]], GOLD);
+  const tp = B.project(2.0, 1.55, -0.9); if (tp.z > 0.6) trophy(g, tp.x, tp.y, tp.s / 100 * 0.8);
+  lowKey(g, { cy: H * 0.42, a: 0.28 });
+}
+
 // a real photograph in 2.5D, dropped below a dark band that carries the title (names sit at the top, above the head)
 const DROP = 330;
 function photoShot(g, lt, ph, { from, to, dur }) {
@@ -495,167 +664,171 @@ export async function build(T) {
   const cues = [];
   const cue = (t, id, gain = 1) => cues.push({ t: +t.toFixed(3), id, gain });
   const shots = [];
-  const shot = (a, draw, o = {}) => shots.push({ a, draw, grade: 'neutral', ...o });
+  const shot = (a, draw, o = {}) => shots.push({ a, draw, grade: 'neutral', trans: 'cut', ...o });
   const len = sh => sh.b - sh.a + 0.35;
   const boom = (t, g = 0.85) => cue(t - BOOM_HIT, 'boom_move', g);
-  const photo = (a, ph, view, title, o = {}) => shot(a, (g, lt, t, sh) => photoShot(g, lt, ph, { ...view, dur: len(sh) }), { trans: 'cut', noJump: true, grade: 'warm', hud: (g, lt) => photoTitle(g, lt, ...title), ...o });
+  const fly = t => cue(t - 0.12, 'whoosh_fast', 0.3);  // the seven fly-arounds, nothing else whooshes
+  const photo = (a, ph, view, title, o = {}) => shot(a, (g, lt, t, sh) => photoShot(g, lt, ph, { ...view, dur: len(sh) }), { trans: 'zoom', noJump: true, grade: 'warm', hud: (g, lt) => photoTitle(g, lt, ...title), ...o });
   // a plaque break: the old record cracks and shatters on the word, the new one slams onto the pedestal
   const breakShot = (a, prev, rec, breakT, keys, o = {}) => {
-    shot(a, (g, lt, t, sh) => hall(g, lt, t, typeof keys === 'function' ? keys(sh) : keys, { rec, prev, breakT }), { trans: 'cut', noJump: true, ...o });
+    shot(a, (g, lt, t, sh) => hall(g, lt, t, typeof keys === 'function' ? keys(sh) : keys, { rec, prev, breakT }), { noJump: true, ...o });
     if (prev) cue(breakT, 'glass', 0.28); boom(breakT + SLAM, 0.95);
   };
 
   // ======================= HOOK: 33 years untouched; it falls; an 11-year-old is coming for it =======================
-  const yrsT = w('hook1', 'years,'), noT = w('hook1', 'no'), bobT = w('hook1', 'Bobby'), fallT = w('hook2', 'fall.'), andT = w('hook2', 'And'), elT = w('hook2', 'eleven-year-old'), comT = w('hook2', 'is');
+  const noT = w('hook1', 'no'), bobT = w('hook1', 'Bobby'), fallT = w('hook2', 'fall.'), andT = w('hook2', 'And'), elT = w('hook2', 'eleven-year-old'), comT = w('hook2', 'is');
   shot(0, (g, lt, t) => hall(g, lt, t, [[0, HV(-0.42, 6.4, -0.02, 5.0)], [noT, HV(-0.3, 5.6, -0.02, 4.9)]], { rec: 'fischer' }),
     { noJump: true, hud: (g, lt, t) => {
       bigText(g, 'THE YOUNGEST', 'GRANDMASTERS', 250, { a: 1 - seg(t, 0.85, 1.0) });
       counter(g, '33 YEARS', 'UNBROKEN', { y: 330, size: 150, color: GOLD, labelColor: '#FFFFFF', a: seg(t, 1.0, 1.08) });
     } });
   cue(1.0 - BOOM_HIT, 'boom_move', 0.6);
-  const Y0 = noT, Y1 = bobT - 0.15;
-  shot(noT, (g, lt, t, sh) => hall(g, lt, t, flyAt(HV(1.05, 12.5, 0.2, 4.2), HV(0.55, 11, 0.14, 4.4), 0.14, len(sh)), { rec: 'fischer' }),
-    { trans: 'cut', hud: (g, lt, t) => counter(g, String(Math.round(lerp(1958, 1991, ease.inOut(seg(t, Y0 + 0.05, Y1, lin))))), 'NO ONE COULD TOUCH IT', { y: 330, size: 160, color: '#FFFFFF', labelColor: GOLD }) });
-  cue(noT - 0.08, 'whoosh_fast', 0.35); for (let i = 0; i < 2; i++) cue(Y0 + 0.15 + i * 0.3, 'clock_tick', 0.18);
-  shot(bobT - 0.04, (g, lt, t, sh) => portrait(g, lt, t, 'bobby13', 'focus', { back: 'retro', pieces: at(12), kid: false, keys: flyAt(FRONT(0.85, -0.1), FRONT(0.12, 0.45), 0.14, len(sh)) }),
-    { trans: 'cut', grade: 'warm', hud: (g, lt) => placeStamp(g, lt, "Bobby Fischer's record", '1958', { y: 200, t0: 0.1 }) });
-  cue(bobT - 0.1, 'whoosh_fast', 0.3);
-  shot(s('hook2') - 0.03, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(0.08, 8.6)], [len(sh), HV(0.02, 7.6)]], { rec: null, prev: 'fischer', breakT: fallT }),
-    { trans: 'cut', noJump: true });
+  const Y0 = noT, Y1 = bobT - 0.15;  // a slow crane down onto the pedestal while the years run
+  shot(noT, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(0.25, 17, 0.8, 3.4)], [len(sh), HV(0.12, 12, 0.32, 4.3)]], { rec: 'fischer' }),
+    { hud: (g, lt, t) => counter(g, String(Math.round(lerp(1958, 1991, ease.inOut(seg(t, Y0 + 0.05, Y1, lin))))), 'NO ONE COULD TOUCH IT', { y: 330, size: 160, color: '#FFFFFF', labelColor: GOLD }) });
+  for (let i = 0; i < 2; i++) cue(Y0 + 0.15 + i * 0.3, 'clock_tick', 0.18);
+  photo(bobT - 0.04, PH.fischer1972, { from: { x: 0.62, y: 0.5, zoom: 1.0, focus: 0.55 }, to: { x: 0.62, y: 0.44, zoom: 1.12, dolly: 0.12 } },
+    ['Bobby Fischer', 'THE RECORD · 1958', 'BOBBY FISCHER, 1972 · BERT VERHOEFF / ANEFO · CC0']);
+  shot(s('hook2') - 0.03, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(0.08, 8.6)], [len(sh), HV(0.02, 7.6)]], { rec: null, prev: 'fischer', breakT: fallT }), { noJump: true });
   cue(fallT, 'glass', 0.32); boom(fallT + 0.04, 0.9);
   shot(andT - 0.05, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', 'focus', { back: 'night', pieces: at(22), dark: 1 - seg(t, elT - 0.1, elT + 0.15),
     keys: flyAt(FRONT(-0.75, -0.3), FRONT(-0.08, 0.6), elT - sh.a, len(sh), 0.3) }),
-    { trans: 'cut', hud: (g, lt, t) => counter(g, 'AGE 11', 'RIGHT NOW', { y: 300, size: 150, color: '#FFFFFF', labelColor: GOLD, a: seg(t, elT, elT + 0.08) }) });
-  cue(elT - 0.12, 'whoosh_fast', 0.35); boom(elT + 0.02, 0.85);
+    { hud: (g, lt, t) => counter(g, 'AGE 11', 'RIGHT NOW', { y: 300, size: 150, color: '#FFFFFF', labelColor: GOLD, a: seg(t, elT, elT + 0.08) }) });
+  fly(elT); boom(elT + 0.02, 0.85);  // fly-around 1
   const coming = comT - 0.06;
-  shot(coming, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(-0.1, 8.4)], [len(sh), HV(-0.02, 7.0)]], { rec: 'mishra', shadow: seg(t, coming + 0.1, s('fis') - 0.2, lin) }),
-    { trans: 'cut', noJump: true });
+  shot(coming, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(-0.1, 8.4)], [len(sh), HV(-0.02, 7.0)]], { rec: 'mishra', shadow: seg(t, coming + 0.1, s('fis') - 0.2, lin) }), { noJump: true });
   cue(coming + 0.1, 'whoosh_deep', 0.35);
 
   // ======================= 1958: FISCHER, 15 =======================
   const f58 = s('fis'), fisT = w('fis', 'Fischer'), gmT = w('fis', 'grandmaster'), f15 = w('fis', 'fifteen,'), youT = w('fis', 'youngest');
-  shot(f58 - 0.06, (g, lt, t) => yearSlam(g, lt, t, '1958', f58 + 0.04, 'THE RECORD IS SET'), { trans: 'whip', info: true, grade: 'warm' });
+  shot(f58 - 0.06, (g, lt, t) => filmYear(g, lt, t, '1958', f58 + 0.04, 'THE RECORD IS SET'), { trans: 'leak', info: true, grade: 'warm' });
   boom(f58 + 0.04, 0.9);
   photo(fisT - 0.5, PH.fischer1956, { from: { x: 0.62, y: 0.38, zoom: 1.0, focus: 0.55 }, to: { x: 0.63, y: 0.34, zoom: 1.16, dolly: 0.12, sx: 0.02 } },
-    ['Bobby Fischer', 'BROOKLYN · AGE 13', 'BOBBY FISCHER, 1956 · UNITED PRESS · PUBLIC DOMAIN']);
-  shot(gmT - 0.08, (g, lt, t, sh) => portrait(g, lt, t, 'bobby13', exprAt([[0, 'focus'], [f15 - (t - lt), { ...EXPR.happy, nod: 0.6 }]], lt), { back: 'retro', pieces: at(12), kid: false,
-    keys: flyAt(FRONT(-0.85, -0.1), FRONT(-0.12, 0.45), 0.14, len(sh)) }),
-    { trans: 'cut', grade: 'warm', hud: (g, lt, t) => {
+    ['Bobby Fischer', 'BROOKLYN · AGE 13', 'BOBBY FISCHER, 1956 · UNITED PRESS · PUBLIC DOMAIN'], { trans: 'cut' });
+  shot(gmT - 0.08, (g, lt, t, sh) => twoShot(g, lt, t, 'bobby13', 'ivan', exprAt([[0, 'focus'], [f15 - (t - lt) + 0.1, { ...EXPR.happy, nod: 0.6 }]], lt), 'focus',
+    { back: 'retro', pieces: at(12), keys: flyAt(OTS(-0.3, 12.2), FRONT(0.1, 0.3), f15 - sh.a, len(sh), 0.3) }),
+    { grade: 'warm', hud: (g, lt, t) => {
       badge(g, 'GRANDMASTER', W / 2, 380, { color: GOLD, size: 52, sub: 'PORTOROŽ · 1958', a: seg(t, gmT, gmT + 0.1), scale: pop(t, gmT) });
-      counter(g, 'AGE 15', null, { y: 250, size: 140, color: '#FFFFFF', a: seg(t, f15, f15 + 0.08) });
+      counter(g, 'AGE 15', null, { y: 250, size: 140, color: '#FFFFFF', a: seg(t, f15 + 0.1, f15 + 0.18) });
     } });
-  cue(gmT - 0.12, 'whoosh_fast', 0.3); boom(f15, 0.8);
-  const setT = youT - 0.35;
-  shot(setT, (g, lt, t, sh) => hall(g, lt, t, flyAt(HV(-0.55, 10.5, 0.12), HV(0.05, 8.4, 0.06), youT - sh.a - 0.3, len(sh), 0.3), { rec: 'fischer', breakT: youT - SLAM + 0.05 }),
-    { trans: 'cut', noJump: true });
+  fly(f15); boom(f15 + 0.1, 0.8);  // fly-around 2
+  const setT = youT - 0.35;  // the first plaque lands, seen from below
+  shot(setT, (g, lt, t) => hall(g, lt, t, [[0, HV(0.0, 8.8, -0.12, 4.5)], [2, HV(0.0, 8.0, -0.1, 4.6)]], { rec: 'fischer', breakT: youT - SLAM + 0.05 }), { noJump: true });
   boom(youT + 0.05, 0.95);
 
   // ======================= 1991: POLGÁR BREAKS IT =======================
   const p91 = s('pol'), judT = w('pol', 'Judit'), brkT = w('pol', 'breaks'), p15 = w('pol', 'fifteen'), p4 = w('pol', 'four');
-  shot(p91 - 0.06, (g, lt, t) => yearSlam(g, lt, t, '1991', p91 + 0.04, 'THE RECORD FALLS', { tint: '#3A1E10' }), { trans: 'whip', info: true, grade: 'warm' });
-  boom(p91 + 0.04, 0.9);
-  photo(judT - 0.5, PH.judit1990, { from: { x: 0.42, y: 0.4, zoom: 1.0, focus: 0.5 }, to: { x: 0.43, y: 0.36, zoom: 1.14, dolly: 0.12, sx: -0.02 } },
-    ['Judit Polgár', 'HUNGARY · AGE 13', 'JUDIT POLGÁR, 1990 · FOTOBURO DE BOER / NOORD-HOLLANDS ARCHIEF · CC0']);
-  breakShot(brkT - 0.25, 'fischer', 'polgar', brkT, [[0, HV(0.1, 8.8)], [1.6, HV(0.03, 8.0)]]);
-  shot(p15 - 0.1, (g, lt, t, sh) => portrait(g, lt, t, 'judit', exprAt([[0, 'focus'], [p4 - (t - lt), { ...EXPR.happy, curve: 0.6 }]], lt), { back: 'retro', pieces: at(20), kid: false,
-    keys: flyAt(FRONT(0.85, -0.1), FRONT(0.1, 0.45), 0.14, len(sh)) }),
-    { trans: 'cut', grade: 'warm', hud: (g, lt, t) => {
-      counter(g, 'AGE 15', null, { y: 250, size: 140, color: '#FFFFFF', a: seg(t, p15, p15 + 0.08) });
-      badge(g, 'A MONTH YOUNGER THAN FISCHER', W / 2, 370, { color: GOLD, size: 40, sub: 'DECEMBER 1991', a: seg(t, p4, p4 + 0.1), scale: pop(t, p4) });
+  const yearOn = (g, lt, t, year, hitT, offT) => {  // the year slams into the title band of a photo, then makes way for the name
+    const u = seg(t, hitT - 0.12, hitT, lin), a = clamp(u * 2.5) * (1 - seg(t, offT - 0.15, offT));
+    if (a <= 0) return;
+    g.save(); g.globalAlpha *= a; g.translate(W / 2, 205); const k = lerp(2.2, 1, ease.in(u)); g.scale(k, k);
+    g.font = serif(190, 700); g.textAlign = 'center'; g.textBaseline = 'middle';
+    const gr = g.createLinearGradient(0, -90, 0, 90); gr.addColorStop(0, '#FFF2C8'); gr.addColorStop(1, '#C8902E'); g.fillStyle = gr; g.fillText(year, 0, 0);
+    g.restore(); if (u >= 1) qaRect(g, W / 2 - 300, 120, 600, 170, 'text', year);
+  };
+  shot(p91 - 0.06, (g, lt, t, sh) => photoShot(g, lt, PH.judit1990, { from: { x: 0.42, y: 0.42, zoom: 1.0, focus: 0.5 }, to: { x: 0.43, y: 0.36, zoom: 1.18, dolly: 0.12, sx: -0.02 }, dur: len(sh) }),
+    { trans: 'zoom', noJump: true, grade: 'warm', hud: (g, lt, t) => {
+      yearOn(g, lt, t, '1991', p91 + 0.04, judT);
+      if (t >= judT - 0.05) photoTitle(g, t - judT + 0.05, 'Judit Polgár', 'HUNGARY · AGE 13', 'JUDIT POLGÁR, 1990 · FOTOBURO DE BOER / NOORD-HOLLANDS ARCHIEF · CC0');
     } });
-  cue(p15 - 0.14, 'whoosh_fast', 0.3); boom(p4, 0.7);
+  boom(p91 + 0.04, 0.9);
+  breakShot(brkT - 0.25, 'fischer', 'polgar', brkT, [[0, HV(0.1, 8.8)], [1.6, HV(0.03, 8.0)]]);
+  shot(p15 - 0.1, (g, lt, t) => vsAges(g, lt, t, p4), { info: true });
+  boom(p4, 0.7);
 
-  // ======================= THE CASCADE: LEKO, BACROT, PONOMARIOV, BU =======================
+  // ======================= THE CASCADE: LEKO, BACROT, PONOMARIOV, BU — record cards on a pile =======================
   const lekT = w('cas', 'Leko.'), ponT = w('cas', 'Ponomariov.'), buT = w('cas', 'Bu'), evT = w('cas', 'Every'), ygT = w('cas', 'younger.');
   const bacT = (lekT + ponT) / 2 + 0.05;
-  const CASC = [['leko14', 'leko', 'HUNGARY', 'AGE 14', lekT, '#2E2238', '#E0604A'], ['bacrot14', 'bacrot', 'FRANCE', 'AGE 14', bacT, '#16244A', '#5A8AF0'],
-    ['pono14', 'pono', 'UKRAINE', 'AGE 14', ponT, '#1E2A40', '#F2C84A'], ['bu13', 'bu', 'CHINA', 'AGE 13', buT, '#3A1416', '#F0503C']];
-  CASC.forEach(([who, id, flag, age, hit, tint, glow], i) => {
-    shot(hit - 0.12, (g, lt, t) => recCard(g, lt, t, who, id, flag, age, hit, tint, glow), { trans: i ? 'cut' : 'whip', info: true });  // hard cuts inside the cascade: each card is on screen ~0.5 s
-    boom(hit, i === 3 ? 0.9 : 0.75);
-  });
+  const CASC = [{ who: 'leko14', id: 'leko', flag: 'HUNGARY', age: 'AGE 14', hit: lekT, glow: '#E0604A' }, { who: 'bacrot14', id: 'bacrot', flag: 'FRANCE', age: 'AGE 14', hit: bacT, glow: '#5A8AF0' },
+    { who: 'pono14', id: 'pono', flag: 'UKRAINE', age: 'AGE 14', hit: ponT, glow: '#F2C84A' }, { who: 'bu13', id: 'bu', flag: 'CHINA', age: 'AGE 13', hit: buT, glow: '#F0503C' }];
+  shot(lekT - 0.14, (g, lt, t) => cardStack(g, lt, t, CASC), { info: true });
+  CASC.forEach((c, i) => { cue(c.hit - 0.08, 'swipe_card', 0.22); boom(c.hit, i === 3 ? 0.9 : 0.72); });
   shot(evT - 0.06, (g, lt, t) => ageChart(g, lt, t, lerp(1955, 2000, ease.inOut(seg(t, evT, ygT - 0.1, lin))), { l1: 'YOUNGEST GRANDMASTER EVER', l2: 'THE RECORD, YEAR BY YEAR', younger: seg(t, ygT, ygT + 0.15) }),
-    { trans: 'whip', info: true });
+    { info: true });
   boom(ygT, 0.7);
 
-  // ======================= 2002: KARJAKIN, 12; THE RECORD STANDS 19 YEARS =======================
+  // ======================= 2002: KARJAKIN, 12 (a magazine cover); THE RECORD GATHERS DUST FOR 19 YEARS =======================
   const k02 = s('kar'), sergT = w('kar', 'Sergey'), k12 = w('kar', 'twelve'), thatT = w('kar', 'That'), n19 = w('kar', 'nineteen');
-  shot(k02 - 0.06, (g, lt, t) => yearSlam(g, lt, t, '2002', k02 + 0.06, 'A 12-YEAR-OLD', { tint: '#14263E', ember: '#BFD8FF' }), { trans: 'whip', info: true, grade: 'cold' });
+  shot(k02 - 0.06, (g, lt, t) => cover(g, lt, t, 'karjakin12', '2002', k02 + 0.06, 'cold'),
+    { noJump: true, grade: 'cold', hud: (g, lt, t) => nameTitle(g, lt, 'Sergey Karjakin', 'UKRAINE · AGE 12', { y: 220, t0: sergT - (t - lt) }) });
   boom(k02 + 0.06, 0.9);
-  shot(sergT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'karjakin12', 'focus', { back: 'cold', pieces: at(16), keys: flyAt(FRONT(-0.85, -0.1), FRONT(-0.1, 0.5), 0.14, len(sh)) }),
-    { trans: 'cut', grade: 'cold', hud: (g, lt) => nameTitle(g, lt, 'Sergey Karjakin', 'UKRAINE · 2002', { y: 220, t0: 0.1 }) });
-  cue(sergT - 0.1, 'whoosh_fast', 0.3);
-  breakShot(k12 - 0.3, 'bu', 'karjakin', k12 - 0.05, [[0, HV(-0.1, 8.8)], [2, HV(-0.03, 7.9)]]);
-  shot(thatT - 0.08, (g, lt, t) => {
-    const pen = t < thatT + 0.1 ? 2002.7 : lerp(2002.7, 2021.45, ease.inOut(seg(t, thatT + 0.1, n19 + 0.05, lin)));
-    ageChart(g, lt, t, pen, { l1: 'THE RECORD STANDS', l2: 'SERGEY KARJAKIN · 2002', span: seg(t, thatT + 0.1, thatT + 0.25), years: Math.max(0, Math.round(pen - 2002.61)) });
-  }, { trans: 'whip', info: true });
-  boom(n19 + 0.05, 0.8);
+  breakShot(k12 - 0.3, 'bu', 'karjakin', k12 - 0.05, [[0, HV(-0.3, 9.0, 0.1)], [2, HV(-0.24, 8.3, 0.1)]]);
+  shot(thatT - 0.08, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(0.0, 7.4, 0.06)], [len(sh), HV(0.0, 6.8, 0.06)]], { rec: 'karjakin', dust: seg(t, thatT, n19 + 0.4, lin) }),
+    { noJump: true, hud: (g, lt, t) => {
+      const yr = Math.round(lerp(2002, 2021, ease.inOut(seg(t, thatT + 0.05, n19, lin))));
+      counter(g, t >= n19 ? '19 YEARS' : String(yr), t >= n19 ? 'UNBROKEN · 2002–2021' : 'THE RECORD STANDS', { y: 330, size: 150, color: t >= n19 ? GOLD : '#FFFFFF', labelColor: t >= n19 ? '#FFFFFF' : GOLD });
+    }, post: (g, lt, t) => {  // time-lapse light: day and night run over the plaque
+      const d = 0.5 + 0.5 * Math.sin(t * 16), a = 0.16 * seg(t, thatT, thatT + 0.3) * (1 - seg(t, n19 + 0.3, n19 + 0.6));
+      if (a > 0) { g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = `rgba(${Math.round(lerp(40, 255, d))},${Math.round(lerp(60, 200, d))},${Math.round(lerp(140, 150, d))},${a.toFixed(3)})`; g.fillRect(0, 0, W, H); g.restore(); }
+    } });
+  for (let i = 0; i < 3; i++) cue(thatT + 0.2 + i * 0.28, 'clock_tick', 0.18); boom(n19, 0.8);
 
-  // ======================= 2019: GUKESH MISSES BY 17 DAYS; WORLD CHAMPION AT 18 =======================
-  const g19 = s('guk'), boyT = w('guk', 'boy'), mssT = w('guk', 'missed'), d17 = w('guk', 'seventeen'), daysT = w('guk', 'days.'), hisT = w('guk', 'His'), gukT = w('guk', 'Gukesh.');
+  // ======================= 2019: INDIA; GUKESH MISSES BY 17 DAYS; WORLD CHAMPION AT 18 =======================
+  const g19 = s('guk'), y19 = w('guk', '2019,'), indT = w('guk', 'Indian'), mssT = w('guk', 'missed'), d17 = w('guk', 'seventeen'), daysT = w('guk', 'days.'), hisT = w('guk', 'His'), gukT = w('guk', 'Gukesh.');
   const g18 = w('guk', 'eighteen,'), chT = w('guk', 'champion.');
-  shot(g19 - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'gukesh12', 'focus', { back: 'saffron', pieces: at(24), keys: flyAt(FRONT(0.85, -0.1), FRONT(0.12, 0.5), boyT - sh.a, len(sh)) }),
-    { trans: 'whip', hud: (g, lt) => placeStamp(g, lt, 'New Delhi, India', '2019', { y: 200, t0: 0.15 }) });
-  cue(boyT - 0.14, 'whoosh_fast', 0.3);
-  shot(mssT - 0.08, (g, lt, t) => missCard(g, lt, t, mssT - 0.08, d17 + 0.3, daysT + 0.05), { trans: 'cut', info: true });
+  shot(g19 - 0.06, (g, lt, t) => mapIndia(g, lt, t, g19, indT), { trans: 'zoom', info: true,
+    hud: (g, lt, t) => counter(g, '2019', 'NEW DELHI, INDIA', { y: 330, size: 150, color: '#FFFFFF', labelColor: '#FFB347', a: seg(t, y19, y19 + 0.1) }) });
+  cue(g19, 'whoosh_soft', 0.25); boom(indT, 0.7);
+  shot(mssT - 0.08, (g, lt, t) => missCard(g, lt, t, mssT - 0.08, d17 + 0.3, daysT + 0.05), { info: true });
   for (let i = 0; i < 3; i++) cue(mssT + 0.3 + i * 0.25, 'clock_tick', 0.18); cue(daysT + 0.05, 'stamp', 0.45);
-  shot(hisT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'gukesh12', exprAt([[0, 'neutral'], [0.5, 'focus']], lt), { back: 'saffron', pieces: at(24), keys: [[0, FRONT(-0.3, 0.6)], [len(sh), FRONT(-0.15, 1.05)]] }),
-    { trans: 'cut', hud: (g, lt, t) => nameTitle(g, lt, 'Gukesh D', 'CHENNAI, INDIA', { y: 220, t0: gukT - (t - lt) }) });
-  shot(g18 - 0.18, (g, lt, t, sh) => portrait(g, lt, t, 'gukesh18', exprAt([[0, 'focus'], [chT - (t - lt), { ...EXPR.happy, curve: 0.9 }]], lt), { back: 'saffron', pieces: at(40), kid: false,
-    keys: flyAt(FRONT(0.85, -0.3), FRONT(0.08, 0.2), 0.14, len(sh)) }),
-    { trans: 'cut', hud: (g, lt, t) => {
+  shot(hisT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'gukesh12', exprAt([[0, 'neutral'], [0.5, 'focus']], lt), { back: 'saffron', pieces: at(24),
+    keys: [[0, { yaw: -0.2, pitch: 0.04, dist: 6.6, fov: 1500, cy: H * 0.5, target: [4, 3.0, 9.2] }], [len(sh), { yaw: -0.14, pitch: 0.04, dist: 6.0, fov: 1500, cy: H * 0.5, target: [4, 3.0, 9.2] }]] }),
+    { hud: (g, lt, t) => nameTitle(g, lt, 'Gukesh D', 'CHENNAI, INDIA', { y: 220, t0: gukT - (t - lt) }) });
+  shot(g18 - 0.18, (g, lt, t, sh) => podium(g, lt, t, flyAt(PODV(-0.7, 9.2), PODV(0.08, 7.2), chT - sh.a, len(sh), 0.3), 'gukesh18', exprAt([[0, 'focus'], [chT - (t - lt), { ...EXPR.happy, curve: 0.9 }]], lt)),
+    { hud: (g, lt, t) => {
       counter(g, 'AGE 18', null, { y: 235, size: 140, color: '#FFFFFF', a: seg(t, g18, g18 + 0.08) });
       badge(g, 'WORLD CHAMPION', W / 2, 355, { color: GOLD, size: 54, sub: 'SINGAPORE · DECEMBER 2024', a: seg(t, chT, chT + 0.1), scale: pop(t, chT) });
     }, post: (g, lt, t) => confetti(g, t, chT - 0.75, { n: 90, seed: 7 }) });
-  cue(g18 - 0.22, 'whoosh_fast', 0.3); boom(chT, 0.95); cue(chT + 0.05, 'confetti', 0.3);
+  fly(chT); boom(chT, 0.95); cue(chT + 0.05, 'confetti', 0.3);  // fly-around 3
 
-  // ======================= 2021, BUDAPEST: MISHRA, THE YOUNGEST EVER =======================
-  const m21 = s('mis'), abhT = w('mis', 'Abhimanyu'), kidT = w('mis', 'kid'), m12 = w('mis', 'Twelve'), m4 = w('mis', 'four'), m25 = w('mis', 'twenty-five'), mDays = w('mis', 'days.');
+  // ======================= 2021: NEW JERSEY TO BUDAPEST; MISHRA, THE YOUNGEST EVER =======================
+  const m21 = s('mis'), budT = w('mis', 'Budapest.'), abhT = w('mis', 'Abhimanyu'), kidT = w('mis', 'kid'), m12 = w('mis', 'Twelve'), m4 = w('mis', 'four'), m25 = w('mis', 'twenty-five'), mDays = w('mis', 'days.');
   const theT = w('mis', 'The'), everT = w('mis', 'ever.');
-  shot(m21 - 0.06, (g, lt, t) => yearSlam(g, lt, t, '2021', m21 + 0.06, 'BUDAPEST, HUNGARY', { tint: '#1A2448', ember: '#FFE2B0' }), { trans: 'whip', info: true });
-  boom(m21 + 0.06, 0.9);
-  shot(abhT - 0.08, (g, lt, t, sh) => portrait(g, lt, t, 'mishra12', exprAt([[0, 'focus'], [0.9, { ...EXPR.happy, curve: 0.5 }]], lt), { back: 'usa', pieces: at(30), keys: flyAt(FRONT(-0.85, -0.1), FRONT(-0.1, 0.5), kidT - sh.a, len(sh)) }),
-    { trans: 'cut', hud: (g, lt) => nameTitle(g, lt, 'Abhimanyu Mishra', 'NEW JERSEY, USA', { y: 220, t0: 0.12 }) });
-  cue(kidT - 0.14, 'whoosh_fast', 0.3);
-  shot(m12 - 0.1, (g, lt, t) => ageClock(g, lt, t, m12, m4, m25, mDays), { trans: 'cut', info: true });
+  shot(m21 - 0.06, (g, lt, t) => mapRoute(g, lt, t, m21, budT + 0.05), { trans: 'zoom', info: true,
+    hud: (g, lt, t) => counter(g, '2021', 'BUDAPEST, HUNGARY', { y: 330, size: 150, color: '#FFFFFF', labelColor: GOLD, a: seg(t, m21, m21 + 0.1) }) });
+  cue(m21 + 0.1, 'whoosh_soft', 0.25); boom(budT + 0.05, 0.8);
+  shot(abhT - 0.08, (g, lt, t, sh) => twoShot(g, lt, t, 'mishra12', 'goran', exprAt([[0, 'focus'], [kidT - (t - lt) + 0.2, { ...EXPR.happy, curve: 0.5 }]], lt), 'focus',
+    { back: 'usa', pieces: at(30), kid: true, keys: flyAt(OTS(0.35, 12.0), FRONT(-0.1, 0.5), kidT - sh.a, len(sh), 0.3) }),
+    { hud: (g, lt) => nameTitle(g, lt, 'Abhimanyu Mishra', 'NEW JERSEY, USA', { y: 220, t0: 0.12 }) });
+  fly(kidT);  // fly-around 4
+  shot(m12 - 0.1, (g, lt, t) => ageClock(g, lt, t, m12, m4, m25, mDays), { info: true });
   boom(mDays, 0.8);
   breakShot(theT - 0.12, 'karjakin', 'mishra', theT, sh => flyAt(HV(0.06, 8.6), HV(0.62, 7.2, 0.14), everT - sh.a, len(sh), 0.3), { post: (g, lt, t) => confetti(g, t, everT - 0.75, { n: 110, seed: 11 }) });
-  cue(everT - 0.12, 'whoosh_fast', 0.3); cue(everT, 'confetti', 0.35);
+  fly(everT); cue(everT, 'confetti', 0.35);  // fly-around 5
 
-  // ======================= 2026: ORO, TWO MONTHS SHORT =======================
+  // ======================= 2026: ORO, TWO MONTHS SHORT (seen from above) =======================
   const oroS = s('oro'), fauT = w('oro', 'Faustino'), fellT = w('oro', 'fell'), twoT = w('oro', 'two');
-  shot(oroS - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'oro12', 'focus', { back: 'arg', pieces: at(18), keys: flyAt(FRONT(0.85, -0.1), FRONT(0.1, 0.5), fauT - sh.a, len(sh)) }),
-    { trans: 'whip', hud: (g, lt, t) => nameTitle(g, lt, 'Faustino Oro', 'ARGENTINA · 2026', { y: 220, t0: fauT - (t - lt) }) });
-  cue(fauT - 0.14, 'whoosh_fast', 0.3);
-  shot(fellT - 0.08, (g, lt, t) => oroCard(g, lt, t, fellT, twoT), { trans: 'cut', info: true });
+  shot(oroS - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'oro12', 'focus', { back: 'arg', pieces: at(18),
+    keys: [[0, { yaw: 0.3, pitch: 0.78, dist: 9.4, fov: 1500, cy: H * 0.44, target: [4, 1.9, 8.4] }], [len(sh), { yaw: 0.22, pitch: 0.74, dist: 8.4, fov: 1500, cy: H * 0.44, target: [4, 2.0, 8.6] }]] }),
+    { hud: (g, lt, t) => nameTitle(g, lt, 'Faustino Oro', 'ARGENTINA · 2026', { y: 220, t0: fauT - (t - lt) }) });
+  shot(fellT - 0.08, (g, lt, t) => oroCard(g, lt, t, fellT, twoT), { info: true });
   boom(twoT, 0.8);
 
   // ======================= NOW: ROMAN, 11, TWO NORMS; BEFORE FEBRUARY =======================
   const rS = s('rom'), romT = w('rom', 'Roman'), r11 = w('rom', 'eleven,'), alrT = w('rom', 'already'), twoN = w('rom', 'two'), normsT = w('rom', 'norms.');
   const ifT = w('rom', 'If'), febT = w('rom', 'February,'), firstT = w('rom', 'first'), u12 = w('rom', 'twelve.'), recT = w('rom', 'record'), fallAgain = w('rom', 'fall');
-  shot(rS - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', 'focus', { back: 'night', pieces: at(22), keys: flyAt(FRONT(-0.85, -0.1), FRONT(-0.1, 0.55), r11 - sh.a, len(sh)) }),
-    { trans: 'whip', hud: (g, lt, t) => { nameTitle(g, lt, 'Roman Shogdzhiev', 'AGE 11 · 2026', { y: 220, t0: romT - (t - lt) }); } });
-  cue(r11 - 0.14, 'whoosh_fast', 0.3); boom(r11, 0.7);
-  shot(alrT - 0.08, (g, lt, t) => normsCard(g, lt, t, twoN, twoN + 0.22, normsT), { trans: 'cut', info: true });
+  shot(rS - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', { ...EXPR.focus, look: [-0.25, 0.85] }, { back: 'night', pieces: at(22),
+    keys: [[0, { yaw: 0.62, pitch: 0.22, dist: 6.4, fov: 1500, cy: H * 0.47, target: [4, 2.7, 9.2] }], [len(sh), { yaw: 0.56, pitch: 0.22, dist: 5.8, fov: 1500, cy: H * 0.47, target: [4, 2.7, 9.2] }]] }),
+    { hud: (g, lt, t) => nameTitle(g, lt, 'Roman Shogdzhiev', 'AGE 11 · 2026', { y: 220, t0: romT - (t - lt) }) });
+  boom(r11, 0.6);
+  shot(alrT - 0.08, (g, lt, t) => normsCard(g, lt, t, twoN, twoN + 0.22, normsT), { info: true });
   cue(twoN, 'sparkle_pop', 0.35); cue(twoN + 0.22, 'sparkle_pop', 0.35);
-  shot(ifT - 0.08, (g, lt, t) => deadline(g, lt, t, ifT + 0.1, febT), { trans: 'cut', info: true });
+  shot(ifT - 0.08, (g, lt, t) => deadline(g, lt, t, ifT + 0.1, febT), { info: true });
   for (let i = 0; i < 2; i++) cue(ifT + 0.25 + i * 0.4, 'page_flip', 0.22); boom(febT, 0.8);
   shot(firstT - 0.3, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', exprAt([[0, 'focus'], [0.6, { ...EXPR.smug, curve: 0.5 }]], lt), { back: 'night', pieces: at(22),
     keys: flyAt(FRONT(0.85, 0.0), FRONT(0.08, 0.7), 0.14, len(sh)) }),
-    { trans: 'cut', hud: (g, lt, t) => badge(g, 'FIRST GM UNDER 12', W / 2, 300, { color: GOLD, size: 58, sub: 'NO ONE HAS EVER DONE IT', a: seg(t, firstT, firstT + 0.1), scale: pop(t, firstT) }) });
-  cue(firstT - 0.34, 'whoosh_fast', 0.3); boom(u12, 0.85);
-  shot(recT - 0.1, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(0.05, 9.4)], [len(sh), HV(0.0, 6.6)]], { rec: 'mishra', crack: seg(t, fallAgain - 0.05, fallAgain + 0.6, ease.out) }),
-    { trans: 'cut', noJump: true });
+    { hud: (g, lt, t) => badge(g, 'FIRST GM UNDER 12', W / 2, 300, { color: GOLD, size: 58, sub: 'NO ONE HAS EVER DONE IT', a: seg(t, firstT, firstT + 0.1), scale: pop(t, firstT) }) });
+  fly(firstT - 0.3 + 0.14); boom(u12, 0.85);  // fly-around 6
+  shot(recT - 0.1, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(0.05, 9.4)], [len(sh), HV(0.0, 6.6)]], { rec: 'mishra', crack: seg(t, fallAgain - 0.05, fallAgain + 0.6, ease.out) }), { noJump: true });
   cue(fallAgain, 'glass', 0.22); cue(fallAgain + 0.02, 'thud', 0.3);
 
   // ======================= CTA: how old were you? =======================
   const ctaT = s('cta') - 0.06, oldT = w('cta', 'old'), youT2 = w('cta', 'you'), comT2 = w('cta', 'Comment');
   shot(ctaT, (g, lt, t, sh) => lineup(g, lt, t, flyAt(LPOSE(LX(1), 14), LPOSE(LX(7), 8.2), youT2 - sh.a, len(sh), 0.34), { youLit: youT2 + 0.1 }),
-    { trans: 'cut', noJump: true, qaAllow: ['face cut by frame'], hud: (g, lt, t) => badge(g, 'HOW OLD WERE YOU?', W / 2, 220, { color: '#FFD43B', size: 54, sub: 'WHEN YOU LEARNED CHESS', a: seg(t, oldT, oldT + 0.1), scale: pop(t, oldT) }) });
-  cue(youT2 - 0.1, 'whoosh_fast', 0.35); boom(youT2 + 0.12, 0.7);
+    { noJump: true, qaAllow: ['face cut by frame'], hud: (g, lt, t) => badge(g, 'HOW OLD WERE YOU?', W / 2, 220, { color: '#FFD43B', size: 54, sub: 'WHEN YOU LEARNED CHESS', a: seg(t, oldT, oldT + 0.1), scale: pop(t, oldT) }) });  // the row runs on past the frame edges
+  fly(youT2); boom(youT2 + 0.12, 0.7);  // fly-around 7
   shot(comT2 - 0.1, (g, lt, t, sh) => lineup(g, lt, t, [[0, LPOSE(LX(7), 7.6)], [3, LPOSE(LX(7), 7.0)]], { youLit: 0 }),
-    { trans: 'cut', noJump: true, hud: (g, lt, t) => {
+    { noJump: true, hud: (g, lt, t) => {
       badge(g, 'HOW OLD WERE YOU?', W / 2, 220, { color: '#FFD43B', size: 54, sub: 'WHEN YOU LEARNED CHESS' });
       badge(g, 'COMMENT YOUR AGE', W / 2, 360, { color: GREEN, size: 48, scale: pop(t, comT2) });
       badge(g, 'FOLLOW ' + CHANNEL, W / 2, 460, { color: '#FFFFFF', size: 38, a: seg(t, comT2 + 0.5, comT2 + 0.6) });
