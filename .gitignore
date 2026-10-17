@@ -2,3 +2,8 @@ build/
 __pycache__/
 node_modules/
 episodes/_lab/
+# Obsidian: the vault is this repo; window layout and installed plugins stay on each device
+.obsidian/workspace*.json
+.obsidian/plugins/
+.obsidian/community-plugins.json
+.trash/
