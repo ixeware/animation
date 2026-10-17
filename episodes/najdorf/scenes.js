@@ -301,7 +301,7 @@ function blindRoom(g, lt, t, keys, { hours = 0, e = 'focus' } = {}) {
   rig(B, lt, keys, { t });
   room(g, B, BACKROOM, { t, blur: 3 });
   const hp = B.project(4, 3.3, 9.4); rim(g, hp.x, hp.y, hp.s * 3.4, '#FFF1D6', 0.3);
-  wallClock(g, hp.x + hp.s * 2.9, hp.y - hp.s * 2.4, hp.s * 0.95, hours);  // on the wall behind him
+  wallClock(g, hp.x + hp.s * 2.15, hp.y - hp.s * 2.1, hp.s * 0.85, hours);  // on the wall behind him
   seated(g, B, 'naj47b', e, t, { z: 9.4, hands: false });
   box(g, B, [0.6, FLOOR_Y, 6.6], [7.4, 0, 8.6], { top: '#3A2A1C', side: '#1A120A', front: '#22180E' });
   const mb = B.project(4.6, 0.02, 7.4), mt = B.project(4.6, 1.5, 7.6);  // a 1940s desk microphone
@@ -438,13 +438,13 @@ function paperIcon(g, x, y, k = 1) {
 }
 function mapVoyage(g, lt, t, t0, t1, { from = 'Warsaw', to = 'Buenos Aires', icon = 'ship' } = {}) {
   darkCard(g, SLATEBG[0], SLATEBG[1]);
-  MAP.view({ lon: -19 + 2 * clamp(lt / 3), lat: 9, zoom: 8.2, cy: H * 0.43 });
+  MAP.view({ lon: -19 + 2 * clamp(lt / 3), lat: 9, zoom: 8.2, cy: H * 0.4 });
   MAP.draw(g, { spacing: 13, base: '#34506A', color: id => id === 616 ? GOLD : id === 32 ? '#7AC0E8' : null });
   const go = from === 'Warsaw', u = seg(t, t0 + 0.1, t1, ease.inOut);
-  MAP.pin(g, from, { color: go ? GOLD : '#BFE0F4', a: seg(t, t0, t0 + 0.1), below: !go });
+  MAP.pin(g, from, { color: go ? GOLD : '#BFE0F4', a: seg(t, t0, t0 + 0.1) });
   const head = MAP.route(g, from, to, u, { color: go ? '#BFE0F4' : GOLD, bend: 0.22 });
-  MAP.pin(g, to, { color: go ? '#BFE0F4' : GOLD, a: seg(t, t1, t1 + 0.1), below: go, pulse: t > t1 ? ((t - t1) / 0.7) % 1 : 0 });
-  if (u > 0.02 && u < 1) (icon === 'ship' ? shipIcon : paperIcon)(g, head[0], head[1] - 30, 1.5);
+  MAP.pin(g, to, { color: go ? '#BFE0F4' : GOLD, a: seg(t, t1, t1 + 0.1), pulse: t > t1 ? ((t - t1) / 0.7) % 1 : 0 });
+  if (u > (go ? 0.14 : 0.02) && u < 1) (icon === 'ship' ? shipIcon : paperIcon)(g, head[0], head[1] - 30, 1.5);  // the liner from the coast on
 }
 
 export async function build(T) {
@@ -461,7 +461,7 @@ export async function build(T) {
   shot(0, (g, lt, t, sh) => hall(g, lt, t, [[0, HALLR(0.04, 17, 0.34)], [len(sh), HALLR(0.01, 14.5, 0.32)]], { who: 'naj47b', e: 'focus', face: 1 }),
     { noJump: true, hud: (g, lt, t) => counter(g, '45', 'GAMES AT ONCE', { y: 330, size: 190, labelColor: TEAL, a: 1 }) });
   boom(fortyT, 0.55);
-  shot(blindT - 0.06, (g, lt, t, sh) => hall(g, lt, t, [[0, HALLV(-0.3, 7.6, 0.1, 3.7)], [len(sh), HALLV(-0.26, 7.0, 0.1, 3.7)]], { who: 'naj47b', e: { ...EXPR.focus, turn: 0.2 } }),
+  shot(blindT - 0.06, (g, lt, t, sh) => hall(g, lt, t, [[0, HALLV(-0.3, 8.4, 0.1, 2.2)], [len(sh), HALLV(-0.26, 7.8, 0.1, 2.2)]], { who: 'naj47b', e: { ...EXPR.focus, turn: 0.2 } }),
     { noJump: true, hud: (g, lt, t) => badge(g, 'BLINDFOLDED', W / 2, 330, { color: RED, size: 54, scale: pop(t, blindT) }) });
   cue(blindT, 'whoosh_soft', 0.2);
   shot(andT - 0.06, (g, lt, t, sh) => hall(g, lt, t, [[0, { yaw: 0.5, pitch: 0.62, dist: 15, fov: 1500, cy: H * 0.5, target: [4, 0, 4] }], [len(sh), { yaw: 0.36, pitch: 0.66, dist: 13.4, fov: 1500, cy: H * 0.5, target: [4, 0, 4] }]], {}),
@@ -485,7 +485,7 @@ export async function build(T) {
   const CAP = [27, 33, 41, 43];
   shot(immT - 0.08, (g, lt, t, sh) => {
     const P = board(PI, t, RUN, 24), hl = BIG.t1 - sh.a;
-    const A = { yaw: Math.PI + 0.3, pitch: 0.68, dist: 11.4, fov: 1500, cy: H * 0.58, target: [5.6, 0.6, 3.2] }, D = { ...A, yaw: Math.PI + 0.24, pitch: 0.7, dist: 10.0, cy: H * 0.55, target: [6.3, 0.6, 3.6] };
+    const A = { yaw: Math.PI + 0.3, pitch: 0.68, dist: 11.4, fov: 1500, cy: H * 0.58, target: [5.6, 0.6, 3.2] }, D = { ...A, yaw: Math.PI + 0.22, pitch: 0.7, dist: 10.6, cy: H * 0.56, target: [5.9, 0.6, 3.4] };
     game(g, lt, t, [[0, A], [hl - 0.06, { ...A, yaw: Math.PI + 0.22 }], [hl + 0.05, D, ease.whip], [hl + 0.6, { ...D, dist: 9.9 }, ease.out], [Math.max(len(sh), hl + 0.7), { ...D, dist: 10.1 }]], P, {
       wE: exprAt([[0, 'focus'], [BIG.t1 + 0.1 - (t - lt), { ...EXPR.shock, sweat: 1 }]], lt), wHands: seg(t, BIG.t1 + 0.15, BIG.t1 + 0.3), dof: 1.1,
       under: () => {
@@ -503,15 +503,15 @@ export async function build(T) {
   }, { noJump: true, roll: lt => 0.04 * Math.sin(Math.min(1, lt / 2) * 1.2), hud: (g, lt, t) => {
       heading(g, 'THE POLISH IMMORTAL', 200, seg(lt, 0.1, 0.3), { size: 40 });
       // the tally: both bishops and both knights given up, then the pawn that mates
-      const icons = [['b', bishT], ['b', bishT + 0.12], ['n', kniT], ['n', kniT + 0.12], ['p', BIG.t1]], x0 = W / 2 - 2 * 120;
+      const icons = [['b', bishT], ['b', bishT + 0.12], ['n', kniT], ['n', kniT + 0.12], ['p', BIG.t1]], x0 = W / 2 - 2 * 108 - 40;
       icons.forEach(([tp, tt], i) => {
-        const x = x0 + i * 120, y = 330, on = t >= tt, bx = spriteBox(92);
+        const x = x0 + i * 108, y = 330, on = t >= tt, bx = spriteBox(92);
         g.save(); g.globalAlpha *= seg(lt, 0.2, 0.4) * (i === 4 && !on ? 0.35 : 1);
         if (i === 4 && on) { g.shadowColor = HI.good; g.shadowBlur = 30; }
         g.drawImage(sprite(tp, 'b'), x - bx.w / 2, y - 46 + bx.top + 92, bx.w, bx.h); g.restore();
         if (i < 4 && on) { const u = seg(t, tt, tt + 0.12); g.save(); g.strokeStyle = RED; g.lineWidth = 9; g.lineCap = 'round'; g.beginPath(); g.moveTo(x - 34, 300); g.lineTo(x - 34 + 68 * u, 300 + 68 * u); g.stroke(); g.restore(); }
       });
-      qaRect(g, x0 - 60, 250, 4 * 120 + 120, 130, 'text', 'tally');
+      qaRect(g, x0 - 54, 250, 4 * 108 + 108, 130, 'text', 'tally');
     },
     post: (g, lt, t) => { if (t >= BIG.t1) { flashTint(g, HI.good, 1 - seg(t, BIG.t1, BIG.t1 + 0.45)); const [x, z] = sqXZ('h5'), p = B.project(x, 0.7, z); speedLines(g, p.x, p.y, t, BIG.t1, { life: 0.7, seed: 23 }); } } });
   RUN.slice(0, -1).forEach((m, i) => { if (CAP.includes(m.k)) cue(m.t1, 'glass', 0.14); else if (i % 3 === 0) cue(m.t1, 'piece', 0.14); });
@@ -520,7 +520,7 @@ export async function build(T) {
   // ======================= 1939: to Buenos Aires; Genia and Lusia at home =======================
   const sailT = s('sail'), olyT = w('sail', 'Olympiad.'), atT = w('sail', 'At'), genT = w('sail', 'Genia'), lusT = w('sail', 'Lusia');
   shot(sailT - 0.08, (g, lt, t, sh) => mapVoyage(g, lt, t, sailT + 0.2, olyT, {}),
-    { info: true, hud: (g, lt, t) => placeStamp(g, lt, 'Buenos Aires', '1939', { y: 330, t0: olyT - (t - lt) }) });
+    { info: true, hud: (g, lt, t) => placeStamp(g, lt, 'Buenos Aires', '1939', { y: 200, t0: olyT - (t - lt) }) });
   cue(sailT + 0.2, 'whoosh_soft', 0.18);
   shot(atT - 0.06, (g, lt, t, sh) => familyFrame(g, lt, t, { names: [seg(t, genT, genT + 0.2), seg(t, lusT, lusT + 0.2)] }), { noJump: true });
 
@@ -570,7 +570,7 @@ export async function build(T) {
   for (let i = 0; i < 6; i++) cue(h23T + i * 0.2, 'clock_tick', 0.12);
   shot(heT - 0.06, (g, lt, t, sh) => scoreGrid(g, lt, t, heT), { info: true });
   cue(w('r45', 'thirty-nine.'), 'shimmer', 0.3);
-  const PAPERS = [['NOTÍCIAS', 'RECORDE MUNDIAL', 'NAJDORF: 45 PARTIDAS ÀS CEGAS', -0.1, -200, 640], ['NOTICIAS', 'RÉCORD MUNDIAL', 'NAJDORF: 45 PARTIDAS A CIEGAS', 0.08, 210, 700],
+  const PAPERS = [['NOTÍCIAS', 'RECORDE MUNDIAL', 'NAJDORF: 45 PARTIDAS ÀS CEGAS', -0.1, -175, 640], ['NOTICIAS', 'RÉCORD MUNDIAL', 'NAJDORF: 45 PARTIDAS A CIEGAS', 0.08, 210, 700],
     ['NOUVELLES', 'RECORD DU MONDE', "NAJDORF : 45 PARTIES À L'AVEUGLE", 0.05, -130, 900], ['WORLD NEWS', 'WORLD RECORD', 'NAJDORF PLAYS 45 BLINDFOLD', -0.03, 60, 840]];
   shot(newsT - 0.06, (g, lt, t, sh) => {
     darkCard(g, '#1A1612', '#070605'); rim(g, W / 2, 760, 900, '#FFE2B0', 0.16 * (1 - seg(t, s('wrote') - 0.6, s('wrote'))));
@@ -596,7 +596,7 @@ export async function build(T) {
   cue(agS, 'camera', 0.2);
   const NRUN = [...ff(1, 9, lineT + 0.1, (najT - 0.45 - lineT - 0.1) / 9, 0.75), { k: 10, t0: najT - 0.3, t1: najT, e: ease.in }];
   shot(lineT - 0.06, (g, lt, t, sh) => {
-    const P = board(NS, t, NRUN, 0), A = { yaw: 0.3, pitch: 0.86, dist: 11.4, fov: 1500, cy: H * 0.54, target: [3.6, 0.4, 4.6] };
+    const P = board(NS, t, NRUN, 0), A = { yaw: 0.3, pitch: 0.8, dist: 11.4, fov: 1500, cy: H * 0.62, target: [3.6, 0.4, 5.0] };
     game(g, lt, t, [[0, A], [len(sh), { ...A, yaw: 0.2, dist: 10.4 }]], P, { wWho: 'gluck', bWho: 'naj47', env: STUDY, dof: 1.2,
       under: () => { ledGlow(g, B, 'a6', GOLD, t, najT, { reach: 3, speed: 14 }); if (t >= najT) B.highlight(g, 'a6', GOLD, 0.85, true); spread(g, B, 'a6', t, najT, GOLD); },
       over: () => { ticks(g, B, 'a6', t, najT, { seed: 3 }); label(NS, 10, t, najT, GOLD); } });

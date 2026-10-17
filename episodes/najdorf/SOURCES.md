@@ -23,10 +23,10 @@
 | File | Where | Author | Licence | Source |
 |---|---|---|---|---|
 | `photos/najdorf1950.jpg` | "he starts again" | Carel L. de Vogel / Anefo, Nationaal Archief (Najdorf with his wife at the closing banquet, Amsterdam, 10 December 1950) | CC0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Miguel_Najdorf_1950.jpg) |
-| `photos/simul1955.jpg` | the simul, labelled with its real place and year | Roberto Dimarco (Najdorf giving a simul at the Círculo Italiano, Junín, Argentina, 1955) | Public domain | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Jun%C3%ADn_Najdorf_Simult%C3%A1neas_en_C%C3%ADrculo_Italiano_1955_HJ87.jpg) |
+| `photos/simul1955.jpg` | spare (not in the video) | Roberto Dimarco (Najdorf giving a simul at the Círculo Italiano, Junín, Argentina, 1955) | Public domain | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Jun%C3%ADn_Najdorf_Simult%C3%A1neas_en_C%C3%ADrculo_Italiano_1955_HJ87.jpg) |
 | `photos/amsterdam1950.jpg` | spare | Joop van Bilsen / Anefo (arrival in Amsterdam, 4 November 1950) | CC0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Aankomst_schaker_Najdorf_Argentinie_op_Centraal_Station,_Bestanddeelnr_904-2763.jpg) |
 
-Line for the post description: `Photos: Carel L. de Vogel / Anefo (CC0); Roberto Dimarco (public domain)`
+Line for the post description: `Photo: Carel L. de Vogel / Anefo, Nationaal Archief (CC0)`
 
-The family appears only as silhouettes; Najdorf, Fischer and Kasparov appear as our stylized cartoons. None of the people
-or their heirs are involved with or endorse the video.
+The family appears only as silhouettes and as candles with the four names we know; Najdorf, Fischer and Kasparov
+appear as our stylized cartoons. None of the people or their heirs are involved with or endorse the video.
