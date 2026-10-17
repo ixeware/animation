@@ -571,7 +571,7 @@ export async function build(T) {
   const CASC = [['leko14', 'leko', 'HUNGARY', 'AGE 14', lekT, '#2E2238', '#E0604A'], ['bacrot14', 'bacrot', 'FRANCE', 'AGE 14', bacT, '#16244A', '#5A8AF0'],
     ['pono14', 'pono', 'UKRAINE', 'AGE 14', ponT, '#1E2A40', '#F2C84A'], ['bu13', 'bu', 'CHINA', 'AGE 13', buT, '#3A1416', '#F0503C']];
   CASC.forEach(([who, id, flag, age, hit, tint, glow], i) => {
-    shot(hit - 0.12, (g, lt, t) => recCard(g, lt, t, who, id, flag, age, hit, tint, glow), { trans: 'whip', whipDir: i % 2 ? 1 : -1, info: true });
+    shot(hit - 0.12, (g, lt, t) => recCard(g, lt, t, who, id, flag, age, hit, tint, glow), { trans: i ? 'cut' : 'whip', info: true });  // hard cuts inside the cascade: each card is on screen ~0.5 s
     boom(hit, i === 3 ? 0.9 : 0.75);
   });
   shot(evT - 0.06, (g, lt, t) => ageChart(g, lt, t, lerp(1955, 2000, ease.inOut(seg(t, evT, ygT - 0.1, lin))), { l1: 'YOUNGEST GRANDMASTER EVER', l2: 'THE RECORD, YEAR BY YEAR', younger: seg(t, ygT, ygT + 0.15) }),
