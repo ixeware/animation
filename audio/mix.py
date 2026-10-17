@@ -79,6 +79,25 @@ def short_term(x, meter, win=0.4):
     return np.array(out)
 
 
+def music_fx(m, fxs, n):
+    """Cut the music out before a big hit ('mute') or muffle a passage ('lp', low-pass at f Hz), with short ramps."""
+    if not fxs:
+        return m
+    t = np.arange(n) / SR
+    def ramp(t0, t1, r):  # 0..1 over [t0, t1] with r-second ramps
+        return np.clip(np.minimum((t - t0) / r + 1, (t1 - t) / r + 1), 0, 1) * ((t > t0 - r) & (t < t1 + r))
+    gain, blend, f_lp = np.ones(n), np.zeros(n), 900
+    for fx in fxs:
+        if fx['kind'] == 'mute':
+            gain = np.minimum(gain, 1 - ramp(fx['t0'], fx['t1'], 0.015))
+        elif fx['kind'] == 'lp':
+            blend = np.maximum(blend, ramp(fx['t0'], fx['t1'], 0.12)); f_lp = fx.get('f', f_lp)
+    if blend.any():
+        muf = ffilter(m, f'lowpass=f={f_lp},lowpass=f={f_lp}')[:n]
+        m = m * (1 - blend[:, None]) + muf * blend[:, None]
+    return m * gain[:, None]
+
+
 def mix_v2(b, meta, vv, n, dur, cfg):
     import pyloudnorm as pyln
     from scipy.signal import fftconvolve
@@ -92,6 +111,7 @@ def mix_v2(b, meta, vv, n, dur, cfg):
     m = ffilter(m, f"highshelf=f=5000:g={cfg.get('music_air', 4)},equalizer=f=250:t=q:w=1:g=-2.5" + (f",lowpass=f={cfg['music_lp']}" if cfg.get('music_lp') else ''))[:n]
     lm = meter.integrated_loudness(m)
     m *= 10 ** ((lv - cfg.get('music_gap', 8) - lm) / 20)
+    m = music_fx(m, meta.get('musicFx', []), n)
     # SFX from the sample library (variants in turn), synth bank as the fallback
     bank, synth = load_samples(), sfx.render_all()
     fx = np.zeros((n, 2)); used = {}; r = np.random.default_rng(3)

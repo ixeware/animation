@@ -1,0 +1,124 @@
+{
+ "title": "13-year-old Magnus vs Kasparov (move FX test)",
+ "channel": "THE 64 FILES",
+ "post": "A 13-year-old vs the world No. 1 ♟️ #chess #magnuscarlsen #kasparov #chesstok",
+ "lead_in": 0.05,
+ "tail": 1.4,
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\""
+ },
+ "voice_fx": {
+  "tempo": 1.3,
+  "max_gap": 0.13
+ },
+ "mix": {
+  "engine": "v2",
+  "music_gap": 11,
+  "music_air": -1,
+  "music_lp": 7500,
+  "sfx_gap": 5.0,
+  "reverb": 0.4,
+  "reverb_sec": 2.3,
+  "duck": 0.5
+ },
+ "phrases": [
+  {
+   "id": "hook",
+   "text": "A thirteen-year-old against the world number one.",
+   "say": "[excited] A thirteen-year-old... against the world number one.",
+   "pause": 0.15,
+   "colors": {
+    "thirteen-year-old": "blue",
+    "one.": "red"
+   }
+  },
+  {
+   "id": "who",
+   "text": "Magnus Carlsen. Garry Kasparov. Reykjavik, 2004.",
+   "say": "Magnus Carlsen. Garry Kasparov. Reykjavik, two thousand four.",
+   "pause": 0.2,
+   "colors": {
+    "Magnus": "blue",
+    "Carlsen.": "blue",
+    "Garry": "red",
+    "Kasparov.": "red"
+   }
+  },
+  {
+   "id": "a1",
+   "text": "Kasparov strikes first. Bishop. Check.",
+   "say": "Kasparov strikes first. Bishop... Check.",
+   "pause": 0.2,
+   "colors": {
+    "Kasparov": "red",
+    "Check.": "red"
+   }
+  },
+  {
+   "id": "a2",
+   "text": "Magnus steps aside, then takes the bishop.",
+   "say": "Magnus steps aside... then takes the bishop.",
+   "pause": 0.15,
+   "colors": {
+    "Magnus": "blue",
+    "takes": "lime"
+   }
+  },
+  {
+   "id": "a3",
+   "text": "Discovered check!",
+   "say": "[serious] Discovered check!",
+   "pause": 0.3,
+   "colors": {
+    "Discovered": "red",
+    "check!": "red"
+   }
+  },
+  {
+   "id": "a4",
+   "text": "But Magnus blocks it, and hits the queen.",
+   "say": "But Magnus blocks it... and hits the queen.",
+   "pause": 0.2,
+   "colors": {
+    "Magnus": "blue",
+    "blocks": "lime",
+    "queen.": "lime"
+   }
+  },
+  {
+   "id": "a5",
+   "text": "Five moves later, the kid wins a pawn.",
+   "say": "Five moves later, the kid wins a pawn.",
+   "pause": 0.2,
+   "colors": {
+    "kid": "blue",
+    "pawn.": "lime"
+   }
+  },
+  {
+   "id": "end",
+   "text": "Fifty-two moves. A draw with the world number one.",
+   "say": "Fifty-two moves. A draw... with the world number one.",
+   "pause": 0.15,
+   "colors": {
+    "draw": "gold",
+    "one.": "gold"
+   }
+  },
+  {
+   "id": "cta",
+   "text": "Could you draw against Kasparov?",
+   "say": "Could you draw against Kasparov?",
+   "pause": 0.1,
+   "colors": {
+    "you": "gold",
+    "Kasparov?": "red"
+   }
+  }
+ ]
+}

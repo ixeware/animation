@@ -109,12 +109,12 @@ try {
     console.log('stills ->', dir);
   } else if (args.includes('--cues')) {  // cues.json only: re-mix after a sound edit without re-rendering the video
     const page = await openPage(browser);
-    fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC})'), null, 1));
+    fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC, musicFx: window.MUSICFX})'), null, 1));
     console.log('cues ->', path.join(BUILD, 'cues.json'));
   } else {
     const page0 = await openPage(browser);
     const dur = await page0.evaluate('window.DURATION');
-    fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page0.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC})'), null, 1));
+    fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page0.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC, musicFx: window.MUSICFX})'), null, 1));
     await page0.close();
     const from = +(opt('from') || 0), to = +(opt('to') || dur);
     const f0 = Math.round(from * FPS), f1 = Math.round(to * FPS);

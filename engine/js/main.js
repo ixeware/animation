@@ -144,7 +144,8 @@ function compose(t, frame) {
     // dense editing: long shots get hard punch-in jump cuts every `every` seconds (film.jumpCut)
     const J = film.jumpCut, [jz, jx, jy] = J && !s.noJump && !s.info ? jumpAt(J, lt, s.b - s.a, s.i) : [1, 0, 0];
     const z = (1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + a * 0.0015) * jz;
-    ctx.translate(W / 2 + sx + jx, H / 2 + sy + jy); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
+    ctx.translate(W / 2 + sx + jx, H / 2 + sy + jy); if (s.roll) ctx.rotate(typeof s.roll === 'function' ? s.roll(lt, t) : s.roll);  // a dutch angle
+    ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
     { const m = ctx.getTransform(); QA.M = [m.a, m.b, m.c, m.d, m.e, m.f]; }
     ctx.drawImage(layer, 0, 0);
   }
@@ -189,5 +190,6 @@ const autoCues = shots.slice(1).flatMap(s => s.trans === 'shatter' ? [{ t: s.a, 
   : ['leak', 'whip', 'zoom', 'flash', 'dust'].includes(s.trans) ? [{ t: Math.max(0, s.a - 0.12), id: 'whoosh', gain: 0.45 }] : []);
 window.CUES = [...(film.cues || []), ...(film.autoWhoosh === false ? [] : autoCues)];
 window.MUSIC = film.music || [];
+window.MUSICFX = film.musicFx || [];  // music cut-outs before a big hit and muffled passages: [{t0, t1, kind: 'mute' | 'lp', f}]
 window.READY = true;
 if (q.has('t')) renderFrame(+q.get('t'));

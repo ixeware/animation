@@ -442,10 +442,23 @@ def chomp():  # teeth on a shield rim
     return norm(out)
 
 
+def revswell():  # a short reverse swell of air into a big hit (cue it so it ends on the hit)
+    d = 0.32
+    t = t_(d)
+    x = hp(noise(d), 2500) * (t / d) ** 3 + bp(noise(d), 400, 2000) * (t / d) ** 4 * 0.4
+    return norm(x, 0.8)
+
+
+def airwash():  # the airy wash after a big hit: bright noise, fast attack, a second-long decay
+    d = 1.6
+    x = hp(noise(d), 3000, 4) * env_exp(d, 0.42, 0.004) + bp(noise(d), 6000, 12000) * env_exp(d, 0.25, 0.003) * 0.5
+    return norm(x, 0.8)
+
+
 BANK = {name: fn for name, fn in globals().items()
         if callable(fn) and name in ('boom hit clack whoosh ting static shield tick alarm pluck riser shimmer thud buzz '
                                      'whirr shutter stamp clock lamp cheer confetti poof heartbeat sting spit splat tvoff glass sparkle '
-                                     'creak fire scatter ratchet typewriter flatline beep kaching drawer gavel waves wind scribble coins honk chomp').split()}
+                                     'creak fire scatter ratchet typewriter flatline beep kaching drawer gavel waves wind scribble coins honk chomp revswell airwash').split()}
 
 
 def render_all():

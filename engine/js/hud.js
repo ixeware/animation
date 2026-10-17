@@ -18,16 +18,16 @@ const unhard = ctx => { ctx.shadowColor = 'transparent'; ctx.shadowOffsetY = 0; 
 const lum = hex => { const n = parseInt(hex.replace('#', '').slice(0, 6), 16); return ((n >> 16) * 0.299 + ((n >> 8) & 255) * 0.587 + (n & 255) * 0.114) / 255; };
 
 // "NEW YORK · 1956": small caps on a thin rule, year in the accent colour
-export function placeStamp(ctx, lt, place, year, { y = 150, a = 1, t0 = 0 } = {}) {
+export function placeStamp(ctx, lt, place, year, { y = 150, a = 1, t0 = 0, x = W / 2 } = {}) {
   const u = ease.out(clamp((lt - t0) / 0.35)) * a;
   if (u <= 0) return;
   ctx.save(); ctx.globalAlpha *= u; ctx.font = sans(30, 800); ctx.letterSpacing = '6px';
   const s1 = place.toUpperCase(), w1 = ctx.measureText(s1).width, w2 = ctx.measureText(year).width, gap = 46;
-  const x0 = W / 2 - (w1 + gap + w2) / 2, yy = y + (1 - u) * 14;
+  const x0 = x - (w1 + gap + w2) / 2, yy = y + (1 - u) * 14;
   ctx.textAlign = 'left'; hard(ctx, 3);
   ctx.fillStyle = C.cream; ctx.fillText(s1, x0, yy); qaRect(ctx, x0, yy - 26, w1 + gap + w2, 46, 'text', place);
   ctx.fillStyle = C.gold; ctx.fillRect(x0 + w1 + gap / 2 - 3, yy - 22, 6, 6); ctx.fillText(year, x0 + w1 + gap, yy);
-  unhard(ctx); ctx.fillStyle = rgba(C.cream, 0.5); ctx.fillRect(W / 2 - (w1 + gap + w2) / 2 * u, yy + 16, (w1 + gap + w2) * u, 2);
+  unhard(ctx); ctx.fillStyle = rgba(C.cream, 0.5); ctx.fillRect(x - (w1 + gap + w2) / 2 * u, yy + 16, (w1 + gap + w2) * u, 2);
   ctx.restore();
 }
 
