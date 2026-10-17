@@ -5,16 +5,19 @@
 // warm gold, colourful from the first frame without neon (rule 28), brilliant-episode pace (rule 27). v2: half the
 // fly-arounds (7) and a different kind of shot for each beat — film leader, magazine cover, maps, a split screen, a pile
 // of record cards, a dust time-lapse, a podium, over-the-shoulder and high/low angles — so no two scenes look alike.
+// v3: no disco. The board scenes sit in calm rooms like the brilliant episode (a wood study, a green chess club, a grey
+// hall with windows, a back room under a lamp), the records stand in a museum room, the cards are plain slate; the
+// painted light beams are kept for one celebration only (Gukesh on the podium).
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect } from '../../engine/js/core.js';
 import { Board, sqXZ } from '../../engine/js/board.js';
 import { EXPR, exprAt, CAST, drawChar } from '../../engine/js/characters.js';
-import { counter, badge, nameTitle, placeStamp, stamp, sans, serif } from '../../engine/js/hud.js';
+import { counter, badge, nameTitle, stamp, sans, serif } from '../../engine/js/hud.js';
 import { rig, seated, actor } from '../../engine/js/stage.js';
-import { box, pool, picture } from '../../engine/js/env.js';
+import { box, pool, picture, room, table, ENV, FLOOR_Y } from '../../engine/js/env.js';
 import { useLookV2 } from '../../engine/js/look.js';
 import { spotCone, bokeh, lowKey } from '../../engine/js/light.js';
 import { BOOM_HIT } from '../../engine/js/movefx.js';
-import { shockwave, embers, shatterImage, burst, glint } from '../../engine/js/fx.js';
+import { shockwave, shatterImage, burst, glint } from '../../engine/js/fx.js';
 import { confetti } from '../../engine/js/draw.js';
 import { loadPhoto3d, photo3d } from '../../engine/js/photo3d.js';
 import { DotMap, CITY } from '../../engine/js/map.js';
@@ -49,16 +52,14 @@ for (const k of ['fischer1956', 'fischer1972', 'judit1990']) PH[k] = await loadP
 const MAP = await new DotMap().init();
 CITY['New Delhi'] = [77.2, 28.6]; CITY['New Jersey'] = [-74.4, 40.2];
 
-// ---------- painted colour sets (blurred once): the navy hall of records, warm tungsten for the old days, one per country ----------
-const STYLE = {
-  hall: { g: ['#0A1328', '#1B2B50', '#060B18'], beams: ['#FFD58A', '#A8C8FF', '#FFD58A', '#A8C8FF', '#FFD58A'], dots: ['#FFE2A8', '#A8CCFF'], ba: 0.34 },
-  retro: { g: ['#2E1A0E', '#6A3E1E', '#1E1008'], beams: ['#FFC870', '#FFE2B0', '#FFC870', '#FFE2B0'], dots: ['#FFE0A0', '#FFB870'], ba: 0.4 },
-  cold: { g: ['#0A1A2C', '#1E3C5E', '#06101C'], beams: ['#BFD8FF', '#FFE6B8', '#BFD8FF', '#FFE6B8'], dots: ['#CFE2FF', '#FFE9C8'], ba: 0.36 },
-  saffron: { g: ['#2A1406', '#7A3E10', '#1A0A04'], beams: ['#FFB347', '#FFE0A0', '#5ED1B0', '#FFB347'], dots: ['#FFD08A', '#9FF0D8'], ba: 0.36 },
-  usa: { g: ['#0A1430', '#24305E', '#070E24'], beams: ['#FFF4E0', '#FF8A80', '#FFF4E0', '#9FC0FF'], dots: ['#FFFFFF', '#FFB0A8', '#B0CCFF'], ba: 0.3 },
-  arg: { g: ['#0A2036', '#2A5A82', '#07182A'], beams: ['#BFE3FF', '#FFF6E0', '#FFD86A', '#BFE3FF'], dots: ['#DDF0FF', '#FFE9A0'], ba: 0.34 },
-  night: { g: ['#0B1530', '#1A2D55', '#08101F'], beams: ['#FFE2B0', '#8FC4FF', '#FFE2B0', '#8FC4FF', '#FFE2B0'], dots: ['#FFE9C8', '#9FD0FF'], ba: 0.36 },
-};
+// ---------- rooms behind the green board (as in the brilliant episode); painted light beams only for the podium ----------
+const STUDY = { base: '#0A0806', wall: ['#3E3426', '#372E22'], seam: '#241C14', rail: '#5A4630', floor: ['#2A2018', '#241B14'], light: '#FFD9A0', lightA: 0.32, frames: true, sconces: true, table: ['#5A3E26', '#2E1E10', '#22160C'] };
+const CLUB = { base: '#060A08', wall: ['#24382C', '#1F3126'], seam: '#14201A', rail: '#4A3A26', floor: ['#2A2018', '#241B14'], light: '#FFE2B0', lightA: 0.3, frames: true, sconces: true, table: ['#5A3E26', '#2E1E10', '#22160C'] };
+const GREY = { ...ENV.cold, table: ['#4A3A2A', '#2A2016', '#1E160E'] };  // a tournament hall with tall windows
+const BACKROOM = { ...ENV.backroom, table: ['#3A2A1C', '#22180E', '#180F08'] };  // dark, one lamp over the board
+const STAGE = { base: '#05070A', wall: ['#141A22', '#11161D'], seam: '#0A0E13', floor: ['#0E1217', '#0B0F13'], light: '#BFD8FF', lightA: 0.16 };
+const MUSEUM = { base: '#06080C', wall: ['#1E2430', '#1A1F2A'], seam: '#0E1218', rail: '#5A4A2A', floor: ['#17191F', '#131519'], light: '#FFE2B0', lightA: 0.24, frames: true };
+const STYLE = { saffron: { g: ['#2A1406', '#7A3E10', '#1A0A04'], beams: ['#FFB347', '#FFE0A0', '#5ED1B0', '#FFB347'], dots: ['#FFD08A', '#9FF0D8'], ba: 0.36 } };
 const paintBack = style => {
   const S = STYLE[style], w = 1800, h = 1500, c = makeCanvas(w, h), g = c.getContext('2d'), r = rng(style.length * 7 + 3);
   const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, S.g[0]); bg.addColorStop(0.55, S.g[1]); bg.addColorStop(1, S.g[2]);
@@ -75,15 +76,10 @@ const paintBack = style => {
   const out = makeCanvas(w, h), o = out.getContext('2d'); o.filter = 'blur(10px)'; o.drawImage(c, 0, 0); return out;
 };
 const BACKS = Object.fromEntries(Object.keys(STYLE).map(k => [k, paintBack(k)]));
-function backdrop(g, t, style = 'hall') {
+function backdrop(g, t, style = 'saffron') {
   const ox = -Math.sin(B.yaw) * 700, oy = (B.pitch - 0.3) * 520, im = BACKS[style];
   g.drawImage(im, -360 + ox, -120 + oy, W + 720, (W + 720) * im.height / im.width);
   bokeh(g, t, { n: 12, seed: style.length, y0: 0.04, y1: 0.45, a: 0.2, size: [30, 90], colors: STYLE[style].dots });
-}
-function gameTable(g) {
-  box(g, B, [3.3, -3.2, 3.3], [4.7, -1.6, 4.7], { top: '#3A1F14', side: '#24130C', front: '#2E180F' });
-  box(g, B, [-1.4, -1.6, -1.4], [9.4, -0.35, 9.4], { top: '#8A4A2E', side: '#4A2618', front: '#5E3220' });
-  pool(g, B, 4, -0.33, 4, 7, '#FFF0D8', 0.24);
 }
 function rim(g, x, y, r, col, a = 0.5) {
   const gr = g.createRadialGradient(x, y, r * 0.2, x, y, r); gr.addColorStop(0, rgba(col, a)); gr.addColorStop(1, rgba(col, 0));
@@ -99,18 +95,16 @@ const flyAt = (A, Bp, at, L, d = 0.28) => {
   const a0 = Math.max(0, at - d / 2), end = Math.max(L, a0 + d + 0.1);
   return a0 < 0.02 ? [[0, A], [d, Bp, ease.whip], [end, nudge(Bp, 0.3)]] : [[0, A], [a0, nudge(A, 0.15)], [a0 + d, Bp, ease.whip], [end, nudge(Bp, 0.3)]];
 };
-function portrait(g, lt, t, who, e, { keys, back = 'hall', pieces = at(0), kid = true, dark = 0, extra = null } = {}) {
+function portrait(g, lt, t, who, e, { keys, env = STUDY, pieces = at(0), kid = true, dark = 0, blur = 3 } = {}) {
   rig(B, lt, keys, { t });
-  backdrop(g, t, back);
+  const E = room(g, B, env, { t, blur });
   const lift = kid ? 2.95 : 3.1, k = kid ? 0.93 : 1, hp = B.project(4, lift + 0.2, 9.4);
-  rim(g, hp.x, hp.y, hp.s * 4.2, STYLE[back].beams[0], 0.45 * (1 - dark * 0.5));
+  rim(g, hp.x, hp.y, hp.s * 3.6, E.light, 0.22 * (1 - dark * 0.5));
   seated(g, B, who, e, t, { z: 9.4, lift, k });
-  if (dark > 0) seated(g, B, who, e, t, { z: 9.4, lift, k, alpha: dark, silhouette: true, shade: 'brightness(0.05)' });  // backlit until the light finds him
-  gameTable(g); B.drawSlab(g, COM);
+  if (dark > 0) seated(g, B, who, e, t, { z: 9.4, lift, k, alpha: dark, silhouette: true, shade: 'brightness(0.05)' });  // in shadow until the light finds him
+  table(g, B, E); B.drawSlab(g, COM);
   B.drawPieces(g, pieces, { focus: B.dist, dof: 1.6 });
-  if (extra) extra();
-  spotCone(g, B, { top: [4, 18, 9.2], base: [4, 0, 9.2], r0: 0.6, r1: 4.5, a: 0.16 * (1 - dark * 0.6), t, color: '#FFF4E0' });
-  lowKey(g, { cy: H * 0.4, a: 0.28 + dark * 0.3 });
+  lowKey(g, { cy: H * 0.4, a: 0.22 + dark * 0.35 });
 }
 
 // two-line headline for the cover frame: white over yellow, heavy outline (rule 28)
@@ -138,6 +132,7 @@ function cardTitle(g, l1, l2, { y = 300, c2 = GOLD } = {}) {
   if (l2) { g.font = sans(26, 800); g.letterSpacing = '5px'; g.fillStyle = c2; g.fillText(l2, W / 2, y + 52); }
   g.restore(); qaRect(g, 70, y - 46, W - 140, l2 ? 110 : 60, 'text', l1);
 }
+const SLATE = ['#16202A', '#07090C'];  // the info cards: plain slate, as in the brilliant episode
 const darkCard = (g, top, bottom) => { const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, top); bg.addColorStop(1, bottom); g.fillStyle = bg; g.fillRect(0, 0, W, H); };
 
 // ---------- SET: the hall of records — the gold plaque on a marble pedestal under a spotlight, older pedestals in the dark ----------
@@ -172,10 +167,11 @@ function plaqueTex(id) {
   eng(year, 640, 86, s => serif(s, 700), 8);
   TEX.set(id, c); return c;
 }
-const PL = { x0: -1.8, x1: 1.8, y0: 3.45, y1: 5.95, cy: 4.7 };
-const plq = (u, v, k = 1, dz = 0) => [lerp(PL.x0, PL.x1, u) * k, PL.cy + (lerp(PL.y1, PL.y0, v) - PL.cy) * k, dz];  // (u, v) on the plaque, v down
+const PX = 4, PZ = 4, FY = FLOOR_Y;  // the pedestal stands in the middle of the museum room, on its floor
+const PL = { x0: -1.8, x1: 1.8, y0: 0.25, y1: 2.75, cy: 1.5 };
+const plq = (u, v, k = 1, dz = 0) => [PX + lerp(PL.x0, PL.x1, u) * k, PL.cy + (lerp(PL.y1, PL.y0, v) - PL.cy) * k, PZ + dz];  // (u, v) on the plaque, v down
 function plaque(g, id, { k = 1, dz = 0, a = 1 } = {}) {
-  if (k === 1 && dz === 0) box(g, B, [PL.x0, PL.y0, 0.01], [PL.x1, PL.y1, 0.16], { top: '#8A6424', side: '#5A3E12', front: '#6A4A18' });
+  if (k === 1 && dz === 0) box(g, B, [PX + PL.x0, PL.y0, PZ + 0.01], [PX + PL.x1, PL.y1, PZ + 0.16], { top: '#8A6424', side: '#5A3E12', front: '#6A4A18' });
   picture(g, B, plaqueTex(id), plq(0, 0, k, dz), plq(1, 0, k, dz), plq(0, 1, k, dz), { tone: 'color', fx: 0.5, fy: 0.5, zoom: 1, border: '#4A3210', pad: 0.06, a });
 }
 const plaqueRect = () => {
@@ -197,7 +193,7 @@ function cracks(g, amt, seed = 4) {
   }
   g.restore();
 }
-const PED = [[-6, 8], [6, 8], [-7, 15], [7, 15], [-8, 22], [8, 22]];
+const PED = [[-1.6, 10.2], [9.6, 10.2], [-6.4, 9.2], [14.4, 9.2]];  // the older records, along the back wall
 let BLANK = null;  // the older plaques in the dark: gold, a frame, no words
 const blankTex = () => {
   if (BLANK) return BLANK;
@@ -208,21 +204,20 @@ const blankTex = () => {
   g.fillStyle = 'rgba(74,46,6,0.45)'; for (const [y, ww] of [[110, 300], [180, 380], [240, 220], [300, 160]]) g.fillRect(w / 2 - ww / 2, y, ww, 14);
   return BLANK = c;
 };
-const HV = (yaw = 0, dist = 9, pitch = 0.08, y = 4.7) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.46, target: [0, y, 0] });
+const HV = (yaw = 0, dist = 9, pitch = 0.08, y = PL.cy) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.46, target: [PX, y, PZ] });
 const SLAM = 0.5;  // the new plaque lands this long after the old one breaks
 // rec: the plaque on the pedestal; with breakT, `prev` cracks, shatters at breakT and `rec` slams in from the lens
 function hall(g, lt, t, keys, { rec = 'fischer', prev = null, breakT = null, crack = 0, shadow = 0, empty = false, dust = 0 } = {}) {
   rig(B, lt, keys, { t });
-  backdrop(g, t, 'hall');
-  quad(g, [[-60, 0, -40], [60, 0, -40], [60, 0, 80], [-60, 0, 80]], '#0A0F1E');
-  for (const [x, z] of [...PED].sort((p, q) => q[1] - p[1])) {  // the older records, far to near
-    pool(g, B, x, 0.02, z, 2.4, '#FFE2A8', 0.2);
-    box(g, B, [x - 1.0, 0, z - 0.7], [x + 1.0, 2.6, z + 0.7], { top: '#252C4C', side: '#10142C', front: '#182040' });
-    picture(g, B, blankTex(), [x - 1.2, 4.3, z], [x + 1.2, 4.3, z], [x - 1.2, 2.64, z], { tone: 'color', fx: 0.5, fy: 0.5, zoom: 1, border: '#3A2608', pad: 0.04, a: 0.7 });
+  room(g, B, MUSEUM, { t, blur: 2 });
+  for (const [x, z] of PED) {  // the older records: dim pedestals along the back wall
+    pool(g, B, x, FY + 0.02, z, 2.4, '#FFE2A8', 0.18);
+    box(g, B, [x - 1.0, FY, z - 0.7], [x + 1.0, FY + 2.6, z + 0.7], { top: '#2A3048', side: '#12162A', front: '#1A2038' });
+    picture(g, B, blankTex(), [x - 1.2, FY + 4.3, z], [x + 1.2, FY + 4.3, z], [x - 1.2, FY + 2.64, z], { tone: 'color', fx: 0.5, fy: 0.5, zoom: 1, border: '#3A2608', pad: 0.04, a: 0.75 });
   }
-  pool(g, B, 0, 0.02, 0, 3.4, '#FFE2A8', 0.32);
-  box(g, B, [-1.4, 0, -1.0], [1.4, 3.25, 1.0], { top: '#2C3456', side: '#141A32', front: '#1C2444' });
-  box(g, B, [-2.05, 3.25, -0.4], [2.05, 3.45, 0.4], { top: '#D4A64A', side: '#6A4A18', front: '#9A7028' });
+  pool(g, B, PX, FY + 0.02, PZ, 3.4, '#FFE2A8', 0.32);
+  box(g, B, [PX - 1.4, FY, PZ - 1.0], [PX + 1.4, 0.05, PZ + 1.0], { top: '#2C3456', side: '#141A32', front: '#1C2444' });  // marble pedestal
+  box(g, B, [PX - 2.05, 0.05, PZ - 0.4], [PX + 2.05, 0.25, PZ + 0.4], { top: '#D4A64A', side: '#6A4A18', front: '#9A7028' });  // bronze plinth
   const landT = breakT === null ? null : breakT + SLAM;
   if (breakT === null) { if (!empty) plaque(g, rec); cracks(g, crack); dustOver(g, dust); }
   else if (t < breakT) { if (prev) { plaque(g, prev); cracks(g, seg(t, breakT - 0.3, breakT)); } }
@@ -233,7 +228,7 @@ function hall(g, lt, t, keys, { rec = 'fischer', prev = null, breakT = null, cra
       plaque(g, rec, u < 1 ? { k: lerp(1.9, 1, u), dz: -lerp(4.5, 0, u), a: clamp(u * 3) } : {});
     }
     if (rec && t >= landT) {
-      const c = B.project(0, PL.cy, 0), base = B.project(0, 3.35, 0);
+      const c = B.project(PX, PL.cy, PZ), base = B.project(PX, 0.15, PZ);
       glint(g, c.x + 120, c.y - 80, t, landT + 0.05, { r: 260, life: 0.45, color: '#FFF4D0' });
       shockwave(g, base.x, base.y, t, landT, { r0: 60, r1: 620, life: 0.5, color: GOLD, lw: 12, squash: 0.3 });
       burst(g, c.x, c.y, t, landT, { n: 26, color: '#FFE2A0', speed: 900, life: 0.7, size: 5, seed: 3 });
@@ -244,48 +239,8 @@ function hall(g, lt, t, keys, { rec = 'fischer', prev = null, breakT = null, cra
     drawChar(g, 'roman11', { x: lerp(W * 0.66, W * 0.5, ease.out(shadow)), y: lerp(H * 1.08, H * 0.74, ease.out(shadow)), s: lerp(2.6, 3.2, shadow), e: EXPR.neutral, t, silhouette: true, shade: 'brightness(0)' });
     g.restore();
   }
-  spotCone(g, B, { top: [0, 18, -1], base: [0, 0, 0], r0: 0.5, r1: 3.8, a: 0.2, t, color: '#FFE9C0' });
+  spotCone(g, B, { top: [PX, 13.5, PZ - 1], base: [PX, FY, PZ], r0: 0.5, r1: 3.8, a: 0.12, t, color: '#FFE9C0' });
   lowKey(g, { cy: H * 0.44, a: 0.3 });
-}
-
-// ---------- a year punches in from the lens (gold Cinzel numerals) ----------
-function yearSlam(g, lt, t, year, hitT, sub, { tint = '#3A220E', ember = '#FFC870' } = {}) {
-  const bg = g.createRadialGradient(W / 2, H * 0.44, 40, W / 2, H * 0.46, H * 0.8); bg.addColorStop(0, tint); bg.addColorStop(1, '#05070C');
-  g.fillStyle = bg; g.fillRect(0, 0, W, H);
-  bokeh(g, t, { n: 12, seed: +year % 50, y0: 0.05, y1: 0.9, a: 0.14, colors: [ember, '#FFE9C8'] });
-  embers(g, t, { n: 36, seed: +year % 13, a: 0.45, color: ember });
-  const u = seg(t, hitT - 0.16, hitT, lin), land = t >= hitT;
-  if (t > hitT - 0.16) {
-    const k = lerp(3.0, 1, ease.in(u)) * (land ? 1 + 0.05 * Math.exp(-(t - hitT) * 10) + 0.04 * (t - hitT) : 1);
-    g.save(); g.translate(W / 2, 880); g.scale(k, k); g.globalAlpha = clamp(u * 2.5);
-    g.font = serif(300, 700); g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = 'rgba(0,0,0,0.5)'; g.fillText(year, 10, 20);
-    const gr = g.createLinearGradient(0, -150, 0, 150); gr.addColorStop(0, '#FFF2C8'); gr.addColorStop(1, '#C8902E'); g.fillStyle = gr; g.fillText(year, 0, 0);
-    g.restore();
-    if (land) qaRect(g, W / 2 - 400, 750, 800, 260, 'text', year);
-  }
-  if (land) shockwave(g, W / 2, 880, t, hitT, { r0: 80, r1: 720, life: 0.5, color: GOLD, lw: 12, squash: 1 });
-  if (sub) tag(g, sub, 1120, seg(t, hitT + 0.12, hitT + 0.25), { color: '#FFE9B0', size: 30 });
-}
-
-// ---------- the cascade: a card per record holder, the bust lit from behind, the age punching in on the name ----------
-function recCard(g, lt, t, who, id, flag, ageTxt, hitT, tint, glow) {
-  const [name, , year] = REC[id];
-  const bg = g.createRadialGradient(W / 2, H * 0.38, 40, W / 2, H * 0.42, H * 0.85); bg.addColorStop(0, tint); bg.addColorStop(1, '#05070C');
-  g.fillStyle = bg; g.fillRect(0, 0, W, H);
-  bokeh(g, t, { n: 10, seed: name.length, y0: 0.03, y1: 0.9, a: 0.12, colors: ['#FFD9A0', '#CFE2FF'] });
-  const halo = g.createRadialGradient(W / 2, 720, 0, W / 2, 720, 640); halo.addColorStop(0, rgba(glow, 0.5)); halo.addColorStop(1, rgba(glow, 0));
-  g.fillStyle = halo; g.fillRect(0, 0, W, H);
-  drawChar(g, who, { x: W / 2, y: 790 - ease.out(clamp(lt / 0.6)) * 26, s: 1.5, e: EXPR.focus, t });
-  const fl = g.createLinearGradient(0, 960, 0, H); fl.addColorStop(0, 'rgba(5,7,12,0)'); fl.addColorStop(0.3, 'rgba(5,7,12,0.94)'); fl.addColorStop(1, '#05070C');
-  g.fillStyle = fl; g.fillRect(0, 960, W, H - 960);
-  const k = lerp(1.3, 1, seg(t, hitT, hitT + 0.16, ease.out)), a = seg(t, hitT - 0.04, hitT + 0.04);
-  g.save(); g.globalAlpha *= a; g.translate(W / 2, 310); g.scale(k, k); g.textAlign = 'center'; g.font = serif(76, 700);
-  const s = Math.min(1, 940 / g.measureText(name).width); g.scale(s, s);
-  g.lineJoin = 'round'; g.lineWidth = 12; g.strokeStyle = 'rgba(8,6,4,0.7)'; g.strokeText(name, 0, 0); g.fillStyle = '#FFFFFF'; g.fillText(name, 0, 0);
-  g.restore(); qaRect(g, 70, 240, W - 140, 90, 'text', name);
-  counter(g, ageTxt, `${year} · ${flag}`, { y: 1090, size: 120, color: GOLD, labelColor: '#FFFFFF', a });
-  if (t >= hitT) shockwave(g, W / 2, 1050, t, hitT, { r0: 60, r1: 560, life: 0.45, color: GOLD, lw: 10, squash: 0.35 });
 }
 
 // ---------- the record, year by year: a falling staircase of ages ----------
@@ -293,8 +248,7 @@ const YR0 = 1955, YR1 = 2030, AG0 = 12, AG1 = 16;
 const CX = yr => 150 + (yr - YR0) / (YR1 - YR0) * 820, CY = a => 500 + (AG1 - a) / (AG1 - AG0) * 600;
 const STEPS = [[1958.7, 15.503], [1991.95, 15.41], [1994.08, 14.393], [1997.22, 14.167], [1997.82, 14.047], [1999.81, 13.869], [2002.61, 12.583], [2021.5, 12.402]];
 function ageChart(g, lt, t, pen, { l1, l2, younger = 0, span = 0, years = null } = {}) {
-  darkCard(g, '#0E1A36', '#05070C');
-  bokeh(g, t, { n: 10, seed: 21, y0: 0.05, y1: 0.9, a: 0.1, colors: ['#FFD9A0', '#A8CCFF'] });
+  darkCard(g, SLATE[0], SLATE[1]);
   cardTitle(g, l1, l2);
   g.save(); g.font = sans(34, 900); g.textAlign = 'right'; g.textBaseline = 'middle';
   for (let a = AG0; a <= AG1; a++) {
@@ -352,8 +306,7 @@ const rowLabel = (g, text, y, color = '#FFFFFF') => { g.save(); g.font = sans(30
 
 // Gukesh, January 2019: the days run past Karjakin's record
 function missCard(g, lt, t, a, d17, missT) {
-  darkCard(g, '#3A1C08', '#0A0503');
-  embers(g, t, { n: 30, seed: 19, a: 0.35, color: '#FFB347' });
+  darkCard(g, SLATE[0], SLATE[1]);
   cardTitle(g, 'AGE AT GRANDMASTER', 'THE RECORD VS THE BOY FROM CHENNAI');
   rowLabel(g, 'KARJAKIN · THE RECORD', 540, GOLD);
   ymd(g, W / 2, 680, [[12, 'Y'], [7, 'M'], [0, 'D']], { size: 120, color: GOLD });
@@ -364,8 +317,7 @@ function missCard(g, lt, t, a, d17, missT) {
 }
 // the age on the day, tile by tile (Mishra)
 function ageClock(g, lt, t, yT, mT, d0, d1) {
-  darkCard(g, '#0E1838', '#05070C');
-  bokeh(g, t, { n: 10, seed: 33, y0: 0.05, y1: 0.9, a: 0.12, colors: ['#FFFFFF', '#FFB0A8', '#B0CCFF'] });
+  darkCard(g, SLATE[0], SLATE[1]);
   cardTitle(g, 'AGE ON THE DAY', 'BUDAPEST · JUNE 30, 2021');
   const tiles = [['YEARS', 12, yT, null], ['MONTHS', 4, mT, null], ['DAYS', 25, d0, d1]];
   tiles.forEach(([lab, v, t0, t1], i) => {
@@ -381,8 +333,7 @@ function ageClock(g, lt, t, yT, mT, d0, d1) {
 }
 // Mishra vs Oro: age at the title, the gap between the bars
 function oroCard(g, lt, t, t0, gapT) {
-  darkCard(g, '#0E2A44', '#05101C');
-  bokeh(g, t, { n: 12, seed: 8, y0: 0.05, y1: 0.9, a: 0.14, colors: ['#DDF0FF', '#FFE9A0'] });
+  darkCard(g, SLATE[0], SLATE[1]);
   cardTitle(g, 'AGE AT GRANDMASTER', 'THE TWO YOUNGEST EVER');
   const lo = 12.0, hi = 12.75, x0 = 90, wmax = 900;
   const rows = [['ABHIMANYU MISHRA · 2021', 12.402, GOLD, [[12, 'Y'], [4, 'M'], [25, 'D']], t0], ['FAUSTINO ORO · 2026', 12.571, SKY, [[12, 'Y'], [6, 'M'], [26, 'D']], t0 + 0.3]];
@@ -408,8 +359,7 @@ function check(g, x, y, s, col = '#1E8E3E') {
   g.beginPath(); g.moveTo(x - 50 * s, y); g.lineTo(x - 14 * s, y + 36 * s); g.lineTo(x + 56 * s, y - 44 * s); g.stroke(); g.restore();
 }
 function normsCard(g, lt, t, c1, c2, q3) {
-  darkCard(g, '#0B1530', '#05070C');
-  bokeh(g, t, { n: 10, seed: 44, y0: 0.05, y1: 0.9, a: 0.12, colors: ['#FFE9C8', '#9FD0FF'] });
+  darkCard(g, SLATE[0], SLATE[1]);
   cardTitle(g, 'THE GRANDMASTER TITLE', '3 NORMS + A 2500 RATING');
   const slots = [['NORM 1', 'JUNE 2026', 'MONGOLIA', c1], ['NORM 2', 'OCT 2026', 'SERBIA', c2], ['NORM 3', '???', '', q3]];
   slots.forEach(([lab, l2, l3, tt], i) => {
@@ -428,8 +378,7 @@ function normsCard(g, lt, t, c1, c2, q3) {
 // the deadline: calendar pages flip to February 4, 2027 (his 12th birthday)
 const MONTHS = ['OCTOBER 2026', 'NOVEMBER 2026', 'DECEMBER 2026', 'JANUARY 2027', 'FEBRUARY 2027'];
 function deadline(g, lt, t, t0, febT) {
-  darkCard(g, '#0B1530', '#05070C');
-  bokeh(g, t, { n: 10, seed: 51, y0: 0.05, y1: 0.9, a: 0.12, colors: ['#FFE9C8', '#9FD0FF'] });
+  darkCard(g, SLATE[0], SLATE[1]);
   cardTitle(g, 'BEFORE HE TURNS 12', 'TO BE THE FIRST GM UNDER 12');
   const dt = (febT - t0) / (MONTHS.length - 1), f = clamp((t - t0) / dt, 0, MONTHS.length - 1), i0 = Math.floor(f);
   const flip = i0 < MONTHS.length - 1 ? clamp((f - i0 - 0.6) / 0.4) : 0, i = flip > 0.5 ? i0 + 1 : i0, sy = Math.max(0.03, Math.abs(Math.cos(flip * Math.PI)));
@@ -452,12 +401,11 @@ function deadline(g, lt, t, t0, febT) {
 // ---------- the CTA: the prodigies in a row with their ages, the last spot is the viewer's ----------
 const LINE = [['bobby13', '15', 'FISCHER'], ['judit', '15', 'POLGÁR'], ['karjakin12', '12', 'KARJAKIN'], ['gukesh12', '12', 'GUKESH'],
   ['mishra12', '12', 'MISHRA'], ['oro12', '12', 'ORO'], ['roman11', '11?', 'ROMAN'], ['rival', '?', 'YOU']];
-const LX = i => -10.5 + i * 3 + (i === 7 ? 1.5 : 0);  // the viewer's spot stands a little apart
+const LX = i => -7.5 + i * 3 + (i === 7 ? 1.5 : 0);  // the viewer's spot stands a little apart
 const LPOSE = (x, dist = 12, yaw = 0) => ({ yaw, pitch: 0.12, dist, fov: 1500, cy: H * 0.5, target: [x, 3.2, 9.4] });
 function lineup(g, lt, t, keys, { youLit = null } = {}) {
   rig(B, lt, keys, { t });
-  backdrop(g, t, 'hall');
-  quad(g, [[-60, 0, -40], [60, 0, -40], [60, 0, 80], [-60, 0, 80]], '#0A0F1E');
+  room(g, B, STAGE, { t, blur: 2 });
   LINE.forEach(([who], i) => {
     const you = who === 'rival', lit = you ? (youLit !== null && t >= youLit ? 1 : 0.35) : 1;
     spotCone(g, B, { top: [LX(i), 15, 9.4], base: [LX(i), 0, 9.4], r0: 0.35, r1: 1.7, a: (you ? 0.3 : 0.14) * lit, t, dust: 8, seed: 5 + i, color: you ? '#FFE0B0' : '#E2ECF6' });
@@ -466,8 +414,8 @@ function lineup(g, lt, t, keys, { youLit = null } = {}) {
     actor(g, B, who, { x: LX(i), y: who === 'judit' || who === 'bobby13' ? 3.1 : 2.95, z: 9.4, k: who === 'judit' || who === 'bobby13' ? 1 : 0.93, e: you ? 'neutral' : 'happy', t, face: -1,
       ...(you ? { silhouette: true, shade: 'brightness(0.08)' } : {}) });
   });
-  box(g, B, [-16, -4, 7.6], [16, 1.3, 8.4], { top: '#2C3456', side: '#141A32', front: '#1C2444' });  // the long desk (down through the stage) hides where the busts end
-  quad(g, [[-16, 1.3, 7.59], [16, 1.3, 7.59], [16, 1.22, 7.59], [-16, 1.22, 7.59]], '#D4A64A');
+  box(g, B, [-8.9, FY, 7.6], [16.9, 1.3, 8.4], { top: '#2C3456', side: '#141A32', front: '#1C2444' });  // the long desk hides where the busts end
+  quad(g, [[-8.9, 1.3, 7.59], [16.9, 1.3, 7.59], [16.9, 1.22, 7.59], [-8.9, 1.22, 7.59]], '#D4A64A');
   lowKey(g, { cy: H * 0.45, a: 0.3 });
   LINE.forEach(([who, age, name], i) => {  // the age and the name over each head; the viewer's spot gets a big ? on the face
     const you = who === 'rival', p = B.project(LX(i), 6.0, 9.4), q = B.project(LX(i), 5.25, 9.4), f = B.project(LX(i), 2.95, 9.4);
@@ -551,8 +499,7 @@ function cardImg(c) {
   CARDS.set(c.id, cv); return cv;
 }
 function cardStack(g, lt, t, list) {
-  darkCard(g, '#16192C', '#05070C');
-  bokeh(g, t, { n: 12, seed: 61, y0: 0.05, y1: 0.9, a: 0.12, colors: ['#FFD9A0', '#CFE2FF'] });
+  darkCard(g, SLATE[0], SLATE[1]);
   const on = list.filter(c => t >= c.hit - 0.1), S = 0.92;
   on.forEach((c, i) => {
     const r = rng(i * 17 + 5), rot = (r() - 0.5) * 0.16, ox = (r() - 0.5) * 120, oy = (r() - 0.5) * 40, cy = 730;
@@ -569,17 +516,17 @@ function cardStack(g, lt, t, list) {
 
 // ---------- 2002: a magazine cover — the year huge behind the boy's head ----------
 function cover(g, lt, t, who, year, hitT, style) {
-  const z = 1 + 0.05 * clamp(lt / 2.4), im = BACKS[style];
+  const z = 1 + 0.05 * clamp(lt / 2.4);
   g.save(); g.translate(W / 2, H / 2); g.scale(z, z); g.translate(-W / 2, -H / 2);
-  g.drawImage(im, -360, -120, W + 720, (W + 720) * im.height / im.width);
-  bokeh(g, t, { n: 12, seed: 23, y0: 0.04, y1: 0.6, a: 0.2, size: [30, 90], colors: STYLE[style].dots });
+  const bg = g.createRadialGradient(W / 2, 760, 60, W / 2, 820, 1000); bg.addColorStop(0, style[0]); bg.addColorStop(1, style[1]);  // a photo-studio sweep
+  g.fillStyle = bg; g.fillRect(-60, -60, W + 120, H + 120);
   const u = seg(t, hitT - 0.14, hitT, ease.out);
   if (u > 0) {
     g.save(); g.globalAlpha *= u; g.translate(W / 2 + (1 - u) * 300, 560); g.font = serif(330, 700); g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillText(year, 12, 20);
     const gr = g.createLinearGradient(0, -170, 0, 170); gr.addColorStop(0, '#FFF2C8'); gr.addColorStop(1, '#C8902E'); g.fillStyle = gr; g.fillText(year, 0, 0); g.restore();
   }
-  rim(g, W / 2, 800, 560, STYLE[style].beams[0], 0.5);
+  rim(g, W / 2, 800, 560, '#DCEBFF', 0.25);
   drawChar(g, who, { x: W / 2, y: 880, s: 2.0, e: EXPR.neutral, t });
   const fl = g.createLinearGradient(0, 1180, 0, 1520); fl.addColorStop(0, 'rgba(5,7,12,0)'); fl.addColorStop(1, '#05070C');  // the bust fades into the dark
   g.fillStyle = fl; g.fillRect(0, 1180, W, H - 1180); g.fillStyle = '#05070C'; g.fillRect(0, 1519, W, H);
@@ -588,16 +535,14 @@ function cover(g, lt, t, who, year, hitT, style) {
 
 // ---------- maps: India for 2019; New Jersey to Budapest for 2021 ----------
 function mapIndia(g, lt, t, t0, pinT) {
-  darkCard(g, '#2A1406', '#0A0503');
-  bokeh(g, t, { n: 10, seed: 70, y0: 0.05, y1: 0.9, a: 0.12, colors: ['#FFB347', '#9FF0D8'] });
+  darkCard(g, SLATE[0], SLATE[1]);
   const u = ease.inOut(seg(t, t0, pinT, lin));
   MAP.view({ lon: lerp(60, 79, u), lat: lerp(30, 23, u), zoom: lerp(5, 17, u), cy: H * 0.5 });
   MAP.draw(g, { spacing: 13, base: '#5A3A22', color: id => id === 356 ? '#FFB347' : null });
   MAP.pin(g, 'New Delhi', { color: '#FFFFFF', a: seg(t, pinT, pinT + 0.1), pulse: t > pinT ? ((t - pinT) / 0.7) % 1 : 0 });
 }
 function mapRoute(g, lt, t, t0, t1) {
-  darkCard(g, '#0A1430', '#04070F');
-  bokeh(g, t, { n: 10, seed: 71, y0: 0.05, y1: 0.9, a: 0.12, colors: ['#FFE2B0', '#9FC0FF'] });
+  darkCard(g, SLATE[0], SLATE[1]);
   MAP.view({ lon: lerp(-30, -25, clamp(lt / 2)), lat: 45, zoom: 8.6, cy: H * 0.52 });
   MAP.draw(g, { spacing: 12, base: '#344A78', color: id => id === 840 ? '#7A9AD8' : id === 348 ? GOLD : null });
   MAP.pin(g, 'New Jersey', { color: '#BFD4FF', a: seg(t, t0, t0 + 0.1), below: true });
@@ -607,8 +552,7 @@ function mapRoute(g, lt, t, t0, t1) {
 
 // ---------- the old record next to the new one: a split screen ----------
 function vsAges(g, lt, t, monthT) {
-  darkCard(g, '#3A1E10', '#0A0503');
-  embers(g, t, { n: 30, seed: 29, a: 0.35, color: '#FFC870' });
+  darkCard(g, SLATE[0], SLATE[1]);
   cardTitle(g, 'AGE AT GRANDMASTER', 'THE OLD RECORD VS THE NEW ONE');
   webcam(g, 60, 420, 450, 540, 'bobby13', 'neutral', t, { bg: ['#C88A3A', '#5A3410'], name: 'FISCHER · 1958', zoom: 0.95, cy: 0.5 });
   webcam(g, 570, 420, 450, 540, 'judit', t >= monthT ? 'happy' : 'neutral', t, { bg: ['#B8608A', '#4A1A3A'], name: 'POLGÁR · 1991', zoom: 0.95, cy: 0.5 });
@@ -619,14 +563,13 @@ function vsAges(g, lt, t, monthT) {
 
 // ---------- two players: over the near player's shoulder (a dark back view) onto the far one ----------
 const OTS = (yaw = 0.3, dist = 11.5, pitch = 0.3) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.45, target: [4, 2.5, 7] });
-function twoShot(g, lt, t, far, near, eF, eN, { keys, back = 'hall', pieces = at(0), kid = false } = {}) {
+function twoShot(g, lt, t, far, near, eF, eN, { keys, env = STUDY, pieces = at(0), kid = false } = {}) {
   rig(B, lt, keys, { t });
-  backdrop(g, t, back);
-  const lift = kid ? 2.95 : 3.1, hp = B.project(4, lift + 0.2, 9.4); rim(g, hp.x, hp.y, hp.s * 4.2, STYLE[back].beams[0], 0.45);
+  const E = room(g, B, env, { t, blur: 3 });
+  const lift = kid ? 2.95 : 3.1, hp = B.project(4, lift + 0.2, 9.4); rim(g, hp.x, hp.y, hp.s * 3.6, E.light, 0.22);
   const hf = seated(g, B, far, eF, t, { z: 9.4, lift, k: kid ? 0.93 : 1 }), hn = seated(g, B, near, eN, t, { z: -1.4, face: 1 });
-  gameTable(g); B.drawSlab(g, COM); B.drawPieces(g, pieces, { focus: B.dist, dof: 1.4 }); hf(); hn();
-  spotCone(g, B, { top: [4, 18, 4], base: [4, 0, 4], r0: 0.7, r1: 5.5, a: 0.14, t, color: '#FFF4E0' });
-  lowKey(g, { cy: H * 0.42, a: 0.28 });
+  table(g, B, E); B.drawSlab(g, COM); B.drawPieces(g, pieces, { focus: B.dist, dof: 1.4 }); hf(); hn();
+  lowKey(g, { cy: H * 0.42, a: 0.24 });
 }
 
 // ---------- 2024: the champion behind a podium, the trophy beside him ----------
@@ -677,21 +620,21 @@ export async function build(T) {
 
   // ======================= HOOK: 33 years untouched; it falls; an 11-year-old is coming for it =======================
   const noT = w('hook1', 'no'), bobT = w('hook1', 'Bobby'), fallT = w('hook2', 'fall.'), andT = w('hook2', 'And'), elT = w('hook2', 'eleven-year-old'), comT = w('hook2', 'is');
-  shot(0, (g, lt, t) => hall(g, lt, t, [[0, HV(-0.42, 6.4, -0.02, 5.0)], [noT, HV(-0.3, 5.6, -0.02, 4.9)]], { rec: 'fischer' }),
+  shot(0, (g, lt, t) => hall(g, lt, t, [[0, HV(-0.42, 6.4, -0.02, 1.8)], [noT, HV(-0.3, 5.6, -0.02, 1.7)]], { rec: 'fischer' }),
     { noJump: true, hud: (g, lt, t) => {
       bigText(g, 'THE YOUNGEST', 'GRANDMASTERS', 250, { a: 1 - seg(t, 0.85, 1.0) });
       counter(g, '33 YEARS', 'UNBROKEN', { y: 330, size: 150, color: GOLD, labelColor: '#FFFFFF', a: seg(t, 1.0, 1.08) });
     } });
   cue(1.0 - BOOM_HIT, 'boom_move', 0.6);
   const Y0 = noT, Y1 = bobT - 0.15;  // a slow crane down onto the pedestal while the years run
-  shot(noT, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(0.25, 17, 0.8, 3.4)], [len(sh), HV(0.12, 12, 0.32, 4.3)]], { rec: 'fischer' }),
+  shot(noT, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(0.25, 15, 0.72, 0.4)], [len(sh), HV(0.12, 11.5, 0.32, 1.2)]], { rec: 'fischer' }),
     { hud: (g, lt, t) => counter(g, String(Math.round(lerp(1958, 1991, ease.inOut(seg(t, Y0 + 0.05, Y1, lin))))), 'NO ONE COULD TOUCH IT', { y: 330, size: 160, color: '#FFFFFF', labelColor: GOLD }) });
   for (let i = 0; i < 2; i++) cue(Y0 + 0.15 + i * 0.3, 'clock_tick', 0.18);
   photo(bobT - 0.04, PH.fischer1972, { from: { x: 0.62, y: 0.5, zoom: 1.0, focus: 0.55 }, to: { x: 0.62, y: 0.44, zoom: 1.12, dolly: 0.12 } },
     ['Bobby Fischer', 'THE RECORD · 1958', 'BOBBY FISCHER, 1972 · BERT VERHOEFF / ANEFO · CC0']);
   shot(s('hook2') - 0.03, (g, lt, t, sh) => hall(g, lt, t, [[0, HV(0.08, 8.6)], [len(sh), HV(0.02, 7.6)]], { rec: null, prev: 'fischer', breakT: fallT }), { noJump: true });
   cue(fallT, 'glass', 0.32); boom(fallT + 0.04, 0.9);
-  shot(andT - 0.05, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', 'focus', { back: 'night', pieces: at(22), dark: 1 - seg(t, elT - 0.1, elT + 0.15),
+  shot(andT - 0.05, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', 'focus', { env: BACKROOM, pieces: at(22), dark: 1 - seg(t, elT - 0.1, elT + 0.15),
     keys: flyAt(FRONT(-0.75, -0.3), FRONT(-0.08, 0.6), elT - sh.a, len(sh), 0.3) }),
     { hud: (g, lt, t) => counter(g, 'AGE 11', 'RIGHT NOW', { y: 300, size: 150, color: '#FFFFFF', labelColor: GOLD, a: seg(t, elT, elT + 0.08) }) });
   fly(elT); boom(elT + 0.02, 0.85);  // fly-around 1
@@ -706,14 +649,14 @@ export async function build(T) {
   photo(fisT - 0.5, PH.fischer1956, { from: { x: 0.62, y: 0.38, zoom: 1.0, focus: 0.55 }, to: { x: 0.63, y: 0.34, zoom: 1.16, dolly: 0.12, sx: 0.02 } },
     ['Bobby Fischer', 'BROOKLYN · AGE 13', 'BOBBY FISCHER, 1956 · UNITED PRESS · PUBLIC DOMAIN'], { trans: 'cut' });
   shot(gmT - 0.08, (g, lt, t, sh) => twoShot(g, lt, t, 'bobby13', 'ivan', exprAt([[0, 'focus'], [f15 - (t - lt) + 0.1, { ...EXPR.happy, nod: 0.6 }]], lt), 'focus',
-    { back: 'retro', pieces: at(12), keys: flyAt(OTS(-0.3, 12.2), FRONT(0.1, 0.3), f15 - sh.a, len(sh), 0.3) }),
+    { env: STUDY, pieces: at(12), keys: flyAt(OTS(-0.3, 12.2), FRONT(0.1, 0.3), f15 - sh.a, len(sh), 0.3) }),
     { grade: 'warm', hud: (g, lt, t) => {
       badge(g, 'GRANDMASTER', W / 2, 380, { color: GOLD, size: 52, sub: 'PORTOROŽ · 1958', a: seg(t, gmT, gmT + 0.1), scale: pop(t, gmT) });
       counter(g, 'AGE 15', null, { y: 250, size: 140, color: '#FFFFFF', a: seg(t, f15 + 0.1, f15 + 0.18) });
     } });
   fly(f15); boom(f15 + 0.1, 0.8);  // fly-around 2
   const setT = youT - 0.35;  // the first plaque lands, seen from below
-  shot(setT, (g, lt, t) => hall(g, lt, t, [[0, HV(0.0, 8.8, -0.12, 4.5)], [2, HV(0.0, 8.0, -0.1, 4.6)]], { rec: 'fischer', breakT: youT - SLAM + 0.05 }), { noJump: true });
+  shot(setT, (g, lt, t) => hall(g, lt, t, [[0, HV(0.0, 8.8, -0.12, 1.3)], [2, HV(0.0, 8.0, -0.1, 1.4)]], { rec: 'fischer', breakT: youT - SLAM + 0.05 }), { noJump: true });
   boom(youT + 0.05, 0.95);
 
   // ======================= 1991: POLGÁR BREAKS IT =======================
@@ -749,7 +692,7 @@ export async function build(T) {
 
   // ======================= 2002: KARJAKIN, 12 (a magazine cover); THE RECORD GATHERS DUST FOR 19 YEARS =======================
   const k02 = s('kar'), sergT = w('kar', 'Sergey'), k12 = w('kar', 'twelve'), thatT = w('kar', 'That'), n19 = w('kar', 'nineteen');
-  shot(k02 - 0.06, (g, lt, t) => cover(g, lt, t, 'karjakin12', '2002', k02 + 0.06, 'cold'),
+  shot(k02 - 0.06, (g, lt, t) => cover(g, lt, t, 'karjakin12', '2002', k02 + 0.06, ['#4A6A88', '#0C1420']),
     { noJump: true, grade: 'cold', hud: (g, lt, t) => nameTitle(g, lt, 'Sergey Karjakin', 'UKRAINE · AGE 12', { y: 220, t0: sergT - (t - lt) }) });
   boom(k02 + 0.06, 0.9);
   breakShot(k12 - 0.3, 'bu', 'karjakin', k12 - 0.05, [[0, HV(-0.3, 9.0, 0.1)], [2, HV(-0.24, 8.3, 0.1)]]);
@@ -771,7 +714,7 @@ export async function build(T) {
   cue(g19, 'whoosh_soft', 0.25); boom(indT, 0.7);
   shot(mssT - 0.08, (g, lt, t) => missCard(g, lt, t, mssT - 0.08, d17 + 0.3, daysT + 0.05), { info: true });
   for (let i = 0; i < 3; i++) cue(mssT + 0.3 + i * 0.25, 'clock_tick', 0.18); cue(daysT + 0.05, 'stamp', 0.45);
-  shot(hisT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'gukesh12', exprAt([[0, 'neutral'], [0.5, 'focus']], lt), { back: 'saffron', pieces: at(24),
+  shot(hisT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'gukesh12', exprAt([[0, 'neutral'], [0.5, 'focus']], lt), { env: STUDY, pieces: at(24),
     keys: [[0, { yaw: -0.2, pitch: 0.04, dist: 6.6, fov: 1500, cy: H * 0.5, target: [4, 3.0, 9.2] }], [len(sh), { yaw: -0.14, pitch: 0.04, dist: 6.0, fov: 1500, cy: H * 0.5, target: [4, 3.0, 9.2] }]] }),
     { hud: (g, lt, t) => nameTitle(g, lt, 'Gukesh D', 'CHENNAI, INDIA', { y: 220, t0: gukT - (t - lt) }) });
   shot(g18 - 0.18, (g, lt, t, sh) => podium(g, lt, t, flyAt(PODV(-0.7, 9.2), PODV(0.08, 7.2), chT - sh.a, len(sh), 0.3), 'gukesh18', exprAt([[0, 'focus'], [chT - (t - lt), { ...EXPR.happy, curve: 0.9 }]], lt)),
@@ -788,7 +731,7 @@ export async function build(T) {
     hud: (g, lt, t) => counter(g, '2021', 'BUDAPEST, HUNGARY', { y: 330, size: 150, color: '#FFFFFF', labelColor: GOLD, a: seg(t, m21, m21 + 0.1) }) });
   cue(m21 + 0.1, 'whoosh_soft', 0.25); boom(budT + 0.05, 0.8);
   shot(abhT - 0.08, (g, lt, t, sh) => twoShot(g, lt, t, 'mishra12', 'goran', exprAt([[0, 'focus'], [kidT - (t - lt) + 0.2, { ...EXPR.happy, curve: 0.5 }]], lt), 'focus',
-    { back: 'usa', pieces: at(30), kid: true, keys: flyAt(OTS(0.35, 12.0), FRONT(-0.1, 0.5), kidT - sh.a, len(sh), 0.3) }),
+    { env: GREY, pieces: at(30), kid: true, keys: flyAt(OTS(0.35, 12.0), FRONT(-0.1, 0.5), kidT - sh.a, len(sh), 0.3) }),
     { hud: (g, lt) => nameTitle(g, lt, 'Abhimanyu Mishra', 'NEW JERSEY, USA', { y: 220, t0: 0.12 }) });
   fly(kidT);  // fly-around 4
   shot(m12 - 0.1, (g, lt, t) => ageClock(g, lt, t, m12, m4, m25, mDays), { info: true });
@@ -798,7 +741,7 @@ export async function build(T) {
 
   // ======================= 2026: ORO, TWO MONTHS SHORT (seen from above) =======================
   const oroS = s('oro'), fauT = w('oro', 'Faustino'), fellT = w('oro', 'fell'), twoT = w('oro', 'two');
-  shot(oroS - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'oro12', 'focus', { back: 'arg', pieces: at(18),
+  shot(oroS - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'oro12', 'focus', { env: CLUB, pieces: at(18),
     keys: [[0, { yaw: 0.3, pitch: 0.78, dist: 9.4, fov: 1500, cy: H * 0.44, target: [4, 1.9, 8.4] }], [len(sh), { yaw: 0.22, pitch: 0.74, dist: 8.4, fov: 1500, cy: H * 0.44, target: [4, 2.0, 8.6] }]] }),
     { hud: (g, lt, t) => nameTitle(g, lt, 'Faustino Oro', 'ARGENTINA · 2026', { y: 220, t0: fauT - (t - lt) }) });
   shot(fellT - 0.08, (g, lt, t) => oroCard(g, lt, t, fellT, twoT), { info: true });
@@ -807,7 +750,7 @@ export async function build(T) {
   // ======================= NOW: ROMAN, 11, TWO NORMS; BEFORE FEBRUARY =======================
   const rS = s('rom'), romT = w('rom', 'Roman'), r11 = w('rom', 'eleven,'), alrT = w('rom', 'already'), twoN = w('rom', 'two'), normsT = w('rom', 'norms.');
   const ifT = w('rom', 'If'), febT = w('rom', 'February,'), firstT = w('rom', 'first'), u12 = w('rom', 'twelve.'), recT = w('rom', 'record'), fallAgain = w('rom', 'fall');
-  shot(rS - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', { ...EXPR.focus, look: [-0.25, 0.85] }, { back: 'night', pieces: at(22),
+  shot(rS - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', { ...EXPR.focus, look: [-0.25, 0.85] }, { env: BACKROOM, pieces: at(22),
     keys: [[0, { yaw: 0.62, pitch: 0.22, dist: 6.4, fov: 1500, cy: H * 0.47, target: [4, 2.7, 9.2] }], [len(sh), { yaw: 0.56, pitch: 0.22, dist: 5.8, fov: 1500, cy: H * 0.47, target: [4, 2.7, 9.2] }]] }),
     { hud: (g, lt, t) => nameTitle(g, lt, 'Roman Shogdzhiev', 'AGE 11 · 2026', { y: 220, t0: romT - (t - lt) }) });
   boom(r11, 0.6);
@@ -815,7 +758,7 @@ export async function build(T) {
   cue(twoN, 'sparkle_pop', 0.35); cue(twoN + 0.22, 'sparkle_pop', 0.35);
   shot(ifT - 0.08, (g, lt, t) => deadline(g, lt, t, ifT + 0.1, febT), { info: true });
   for (let i = 0; i < 2; i++) cue(ifT + 0.25 + i * 0.4, 'page_flip', 0.22); boom(febT, 0.8);
-  shot(firstT - 0.3, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', exprAt([[0, 'focus'], [0.6, { ...EXPR.smug, curve: 0.5 }]], lt), { back: 'night', pieces: at(22),
+  shot(firstT - 0.3, (g, lt, t, sh) => portrait(g, lt, t, 'roman11', exprAt([[0, 'focus'], [0.6, { ...EXPR.smug, curve: 0.5 }]], lt), { env: STUDY, pieces: at(22),
     keys: flyAt(FRONT(0.85, 0.0), FRONT(0.08, 0.7), 0.14, len(sh)) }),
     { hud: (g, lt, t) => badge(g, 'FIRST GM UNDER 12', W / 2, 300, { color: GOLD, size: 58, sub: 'NO ONE HAS EVER DONE IT', a: seg(t, firstT, firstT + 0.1), scale: pop(t, firstT) }) });
   fly(firstT - 0.3 + 0.14); boom(u12, 0.85);  // fly-around 6
