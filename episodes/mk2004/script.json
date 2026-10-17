@@ -88,6 +88,10 @@
     "Magnus": "blue",
     "blocks": "lime",
     "queen.": "lime"
+   },
+   "hold": {
+    "after": "it,",
+    "sec": 1.0
    }
   },
   {

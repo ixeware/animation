@@ -14,6 +14,7 @@ API responses are cached in build/tts_cache/, so re-runs cost no credits.
 
 Optional post-processing of every phrase (script.json -> "voice_fx"):
   {"tempo": 1.1}                                   faster delivery, pitch kept (ffmpeg atempo)
+A phrase can hold its breath: "hold": {"after": "it,", "sec": 1.0} puts a second of silence after that word.
   {"sts": {"voice_id": "...", "model": "eleven_multilingual_sts_v2", "stability": 0.5, "similarity_boost": 0.85}}
                                                    ElevenLabs speech-to-speech: our take keeps its timing and
                                                    intonation, the timbre becomes the chosen narrator (env ELEVENLABS_API_KEY)
@@ -363,6 +364,13 @@ def main(ep):
         else:
             print(f"  [{p['id']}] {len(heard)} heard vs {len(caps)} words -> aligned")
             spans = align(caps, heard, dur)
+        if p.get('hold'):  # {"after": word, "sec": s}: a held breath inside the line, for a big move to land in
+            k = caps.index(p['hold']['after']); hs = p['hold']['sec']
+            n0, f = int(((spans[k][1] + spans[k + 1][0]) / 2 if k + 1 < len(spans) else spans[k][1]) * SR), int(0.01 * SR)
+            audio = audio.copy(); audio[max(0, n0 - f):n0] *= np.linspace(1, 0, n0 - max(0, n0 - f)); audio[n0:n0 + f] *= np.linspace(0, 1, len(audio[n0:n0 + f]))
+            audio = np.concatenate([audio[:n0], np.zeros(int(hs * SR)), audio[n0:]])
+            spans = [(s + hs, e + hs) if i > k else (s, e) for i, (s, e) in enumerate(spans)]
+            dur = len(audio) / SR
         words = [{'w': c, 's': round(t + s, 3), 'e': round(t + e, 3), 'c': p.get('colors', {}).get(c, 'lime')}
                  for c, (s, e) in zip(caps, spans)]
         phrases.append({'id': p['id'], 'text': p['text'], 's': round(t, 3), 'e': round(t + dur, 3), 'words': words})

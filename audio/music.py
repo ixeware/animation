@@ -195,6 +195,18 @@ def m_hit(S, a, b):
     S.add(a, strings(CH['D'] + [note('D4')], b - a + 0.8, cut=4680, att=0.05), 0.4, rev=0.5, until=b + 0.4)
 
 
+def m_slam(S, a, b):  # the drop after the big move (the 9th second of the chess.history Kramnik–Topalov short)
+    t = t_(1.8)
+    S.add(a, np.sin(2 * np.pi * (36 + 34 * np.exp(-t * 7)) * t) * np.exp(-t / 0.9), 1.0, rev=0.05, until=b + 0.4)  # a falling sub
+    S.add(a, kick(0.5), 0.9, until=b)
+    S.add(a, pad(CH['Dm'] + [note('D4'), note('A4'), note('D5')], b - a + 0.5, cut=6500, att=0.008, rel=0.5), 0.6, rev=0.5, until=b + 0.4)
+    S.add(a, hp(noise(1.8), 1800) * env_exp(1.8, 0.55, 0.004), 0.3, rev=0.3, until=b + 0.4)  # the airy wash
+    for tt in beats(a + BEAT / 2, b, 2):  # an eighth-note bass pulse under it
+        S.add(tt, bass(note('D2'), 0.24), 0.55, until=b)
+    for tt in beats(a + BEAT, b, 1):
+        S.add(tt, kick(), 0.65, until=b)
+
+
 def m_glory(S, a, b):
     S.add(a, pad(CH['F'] + [note('A3')], b - a + 0.5, cut=3240, att=0.3), 0.45, rev=0.5, until=b + 0.3)
     for i, t in enumerate(beats(a, b, 2)):

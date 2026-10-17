@@ -80,22 +80,26 @@ def short_term(x, meter, win=0.4):
 
 
 def music_fx(m, fxs, n):
-    """Cut the music out before a big hit ('mute') or muffle a passage ('lp', low-pass at f Hz), with short ramps."""
+    """Cut the music out before a big hit ('mute'), muffle a passage ('lp', low-pass at f Hz), or let it play loud for a
+    moment ('boost', db; the drop after a big move, released over 0.35 s after t1), with short ramps."""
     if not fxs:
         return m
     t = np.arange(n) / SR
     def ramp(t0, t1, r):  # 0..1 over [t0, t1] with r-second ramps
         return np.clip(np.minimum((t - t0) / r + 1, (t1 - t) / r + 1), 0, 1) * ((t > t0 - r) & (t < t1 + r))
-    gain, blend, f_lp = np.ones(n), np.zeros(n), 900
+    gain, boost, blend, f_lp = np.ones(n), np.ones(n), np.zeros(n), 900
     for fx in fxs:
         if fx['kind'] == 'mute':
             gain = np.minimum(gain, 1 - ramp(fx['t0'], fx['t1'], 0.015))
+        elif fx['kind'] == 'boost':
+            k = np.clip(np.minimum((t - fx['t0']) / 0.005 + 1, (fx['t1'] - t) / 0.35 + 1), 0, 1) * ((t > fx['t0'] - 0.005) & (t < fx['t1'] + 0.35))
+            boost = np.maximum(boost, 10 ** (fx.get('db', 6) * k / 20))
         elif fx['kind'] == 'lp':
             blend = np.maximum(blend, ramp(fx['t0'], fx['t1'], 0.12)); f_lp = fx.get('f', f_lp)
     if blend.any():
         muf = ffilter(m, f'lowpass=f={f_lp},lowpass=f={f_lp}')[:n]
         m = m * (1 - blend[:, None]) + muf * blend[:, None]
-    return m * gain[:, None]
+    return m * (gain * boost)[:, None]
 
 
 def mix_v2(b, meta, vv, n, dur, cfg):

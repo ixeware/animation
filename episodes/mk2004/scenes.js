@@ -183,8 +183,10 @@ export async function build(T) {
   boom(NXE4.t1, 0.75); cue(NXE4.t1, 'glass', 0.18); cue(dchT, 'hit_punch', 0.55); cue(dchT, 'boom_big', 0.35);
 
   // ======================= THE BIG ONE: 22.Be5 — saves the bishop, blocks the check, hits the queen =======================
-  const butT = w('a4', 'But'), blkT = w('a4', 'blocks'), hitT = w('a4', 'hits'), qT = w('a4', 'queen.');
-  const BE5 = { k: 43, t0: blkT - 0.2, t1: blkT };
+  const butT = w('a4', 'But'), blkT = w('a4', 'blocks'), andT = w('a4', 'and'), hitT = w('a4', 'hits'), qT = w('a4', 'queen.');
+  // as in the reference: the line stops ("…blocks it,"), the music cuts, the bishop slides in the silence and lands on the
+  // hit, then the music plays alone and loud before the voice comes back (the line holds its breath: script.json `hold`)
+  const BE5 = { k: 43, t1: andT - 0.8 }; BE5.t0 = BE5.t1 - 0.28; BE5.e = ease.in;
   // the zoom punch: hold, snap in on the landing (motion blur), ease back out
   const PUNCH = (A, D, hl, L) => [[0, A], [hl - 0.06, A], [hl + 0.05, D, ease.whip], [hl + 0.6, { ...D, dist: D.dist + 0.5 }, ease.out], [Math.max(L, hl + 0.7), { ...D, yaw: D.yaw - 0.04, dist: D.dist + 0.7 }]];
   shot(butT - 0.06, (g, lt, t, sh) => {
@@ -193,6 +195,7 @@ export async function build(T) {
       kE: exprAt([[0, 'smug'], [BE5.t1 + 0.1 - (t - lt), { ...EXPR.worried, sweat: 1 }]], lt), kHands: seg(t, BE5.t1 + 0.15, BE5.t1 + 0.3), dof: 1.2,
       under: () => {
         if (t < BE5.t1) { boardArrow(g, B, 'f6', 'e5', seg(t, butT + 0.1, butT + 0.25) * (1 - seg(t, BE5.t0, BE5.t1))); squareFrame(g, B, 'e5', HI.good, seg(t, butT + 0.1, butT + 0.25)); }
+        if (t >= BE5.t0 && t < BE5.t1 + 0.3) slideStreak(g, B, 'f6', P.find(q => q.id === G[43].pieces.find(z => z.sq === 'e5').id), 1 - seg(t, BE5.t1, BE5.t1 + 0.3));
         if (t < BE5.t1) B.laser(g, 'c7', 'h2', HI.bad, 0.9, 0.6);                      // the check it is about to block
         ledGlow(g, B, 'e5', HI.good, t, BE5.t1, { reach: 8, speed: 18 });
         if (t >= BE5.t0) B.highlight(g, 'f6', HI.good, 0.35); if (t >= BE5.t1) B.highlight(g, 'e5', HI.good, 0.9, true);
@@ -211,7 +214,18 @@ export async function build(T) {
     post: (g, lt, t) => {
       if (t >= BE5.t1) { flashTint(g, HI.good, 1 - seg(t, BE5.t1, BE5.t1 + 0.45)); const [x, z] = sqXZ('e5'), p = B.project(x, 0.7, z); speedLines(g, p.x, p.y, t, BE5.t1, { life: 0.7, seed: 21 }); }
     } });
-  cue(BE5.t1 - 0.32, 'revswell', 0.7); cue(BE5.t1 - 0.004, 'boom', 1.0); cue(BE5.t1, 'hit_punch', 0.6); cue(BE5.t1, 'airwash', 0.55); cue(BE5.t1 - BOOM_HIT, 'boom_big', 0.45);
+  cue(BE5.t1 - 0.32, 'revswell', 0.8); cue(BE5.t0, 'piece_slide', 0.3); cue(BE5.t1 - 0.004, 'boom', 1.0); cue(BE5.t1, 'hit_punch', 0.6); cue(BE5.t1, 'airwash', 0.55); cue(BE5.t1 - BOOM_HIT, 'boom_big', 0.45);
+  // "…and hits the queen": closer on the queen, Kasparov behind it with his hands on his head
+  shot(andT - 0.06, (g, lt, t, sh) => {
+    const C = { yaw: 0.22, pitch: 0.5, dist: 7.2, fov: 1500, cy: H * 0.55, target: [2.9, 1.0, 6.0] };
+    scene(g, lt, t, [[0, C], [len(sh), { ...C, yaw: 0.14, dist: 6.5 }]], pos(43), { kE: { ...EXPR.worried, sweat: 1 }, kHands: 1, dof: 1.2,
+      under: () => { ledGlow(g, B, 'e5', HI.good, t, BE5.t1, { reach: 8, speed: 18 }); B.highlight(g, 'e5', HI.good, 0.9, true); },
+      over: () => {
+        neon(g, B, 'e5', 'c7', HI.good, 1, { y: 0.62, w: t >= hitT ? 1.5 : 1 }); pieceRing(g, B, 'c7', HI.bad, 1, 1);
+        if (t >= hitT) pieceRing(g, B, 'c7', HI.bad, 1 - seg(t, hitT, hitT + 0.5), seg(t, hitT, hitT + 0.3));
+      },
+    });
+  }, { noJump: true, roll: 0.03 });
   cue(hitT, 'boom_move', 0.45);
 
   // ======================= FIVE MOVES LATER: 27.Nxc6 wins a pawn (and hits the rook) =======================
@@ -241,7 +255,7 @@ export async function build(T) {
       else scorePanel(g, 'CARLSEN', 'KASPAROV', '½', '½', { head: 'RESULT · 52 MOVES', a: 1 });
     } });
   cue(endT + 0.1, 'whoosh_soft', 0.22); boom(drawT, 0.7); cue(drawT, 'shimmer', 0.3);
-  shot(wldT - 0.12, (g, lt, t, sh) => scene(g, lt, t, [[0, KV(0.08, 6.8, 0.3)], [len(sh), KV(0.02, 6.0, 0.3)]], pos(103), { kE: { ...EXPR.tired, look: [0.3, 0.6], curve: -0.4 } }),
+  shot(wldT - 0.12, (g, lt, t, sh) => scene(g, lt, t, [[0, { ...KV(0.08, 6.8, 0.3), cy: H * 0.53 }], [len(sh), { ...KV(0.02, 6.2, 0.3), cy: H * 0.53 }]], pos(103), { kE: { ...EXPR.tired, look: [0.3, 0.6], curve: -0.4 } }),
     { hud: (g, lt, t) => scorePanel(g, 'CARLSEN', 'KASPAROV', '½', '½', { head: 'RESULT · 52 MOVES' }) });
 
   // ======================= CTA: could you draw against Kasparov? =======================
@@ -255,8 +269,8 @@ export async function build(T) {
 
   const tvOff = T.duration - 0.5;
   cue(tvOff, 'tvoff', 0.5);
-  const music = [{ t: 0, m: 'tension' }, { t: BE5.t1, m: 'hit' }, { t: fiveT - 0.05, m: 'build' }, { t: ctaT, m: 'hook' }, { t: T.duration, m: 'end' }];
-  const musicFx = [{ t0: s('who') - 0.08, t1: kasT - 0.1, kind: 'lp', f: 700 }, { t0: BE5.t1 - 0.3, t1: BE5.t1 - 0.01, kind: 'mute' }, { t0: ctaT, t1: T.duration, kind: 'lp', f: 900 }];
+  const music = [{ t: 0, m: 'tension' }, { t: BE5.t1, m: 'slam' }, { t: fiveT - 0.05, m: 'build' }, { t: ctaT, m: 'hook' }, { t: T.duration, m: 'end' }];
+  const musicFx = [{ t0: s('who') - 0.08, t1: kasT - 0.1, kind: 'lp', f: 700 }, { t0: BE5.t0, t1: BE5.t1 - 0.01, kind: 'mute' }, { t0: BE5.t1, t1: andT - 0.4, kind: 'boost', db: 10 }, { t0: ctaT, t1: T.duration, kind: 'lp', f: 900 }];
   shots.sort((a, b) => a.a - b.a);
   return { shots, cues, music, musicFx, tvOff, duration: T.duration, autoWhoosh: false, jumpCut: { every: 1.4, zooms: [1, 1.1, 1.04], shift: 30 } };
 }
