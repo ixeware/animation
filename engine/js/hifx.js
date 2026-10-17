@@ -167,13 +167,19 @@ export function keyOver(ctx, B, m, t, pieces, { label = true, lines = true } = {
     pieceRing(ctx, B, m.check, HI.bad, 1, clamp((lt - 0.1) / 0.3));
   }
   ticks(ctx, B, m.to, t, m.land, { seed: m.to.charCodeAt(0) });
-  if (label && m.label) {
-    const [x, z] = sqXZ(m.to), p = B.project(x, 1.75, z), fs = Math.round(clamp(p.s * 0.3, 26, 46));
-    ctx.save(); ctx.globalAlpha *= clamp(lt / 0.12); ctx.font = `800 ${fs}px "JetBrains Mono"`; ctx.textAlign = 'center';
-    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 8; ctx.fillStyle = m.color; ctx.fillText(m.label, p.x, p.y);
-    const tw = ctx.measureText(m.label).width; qaRect(ctx, p.x - tw / 2, p.y - fs, tw, fs * 1.2, 'text', 'move ' + m.label);
-    ctx.restore();
-  }
+  if (label && m.label) { const [x, z] = sqXZ(m.to), p = B.project(x, 1.75, z); moveTag(ctx, m.label, p.x, p.y, m.color, Math.round(clamp(p.s * 0.42, 24, 54)), clamp(lt / 0.12)); }
+}
+
+// ---------- the move label as in `brilliant` (board.js label): mono in a dark rounded box outlined in the mover's colour ----------
+export function moveTag(ctx, text, x, y, color, fs = 40, a = 1) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha *= a; ctx.font = `800 ${fs}px "JetBrains Mono"`; ctx.letterSpacing = '-1px';
+  const tw = ctx.measureText(text).width, bx = x - tw / 2 - 12, by = y - fs * 0.95, bw = tw + 24, bh = fs * 1.3;
+  ctx.fillStyle = 'rgba(6,9,11,0.78)'; ctx.strokeStyle = rgba(color, 0.7); ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 8); ctx.fill(); ctx.stroke();
+  ctx.textAlign = 'center'; ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 8; ctx.fillText(text, x, y);
+  qaRect(ctx, bx, by, bw, bh, 'text', 'move ' + text);
+  ctx.restore();
 }
 
 // ---------- the player's reaction: both hands to the head, as in the reference ----------
@@ -200,26 +206,5 @@ export function handsOnHead(ctx, x, y, s, t, u = 1, skin) {
     ctx.fillStyle = '#F4F1EA'; ctx.beginPath(); ctx.ellipse(x + a.w[0] * s, y + a.w[1] * s + jy, 21 * s, 15 * s, sd * 0.6, 0, 7); ctx.fill();
     hand(ctx, x + a.h[0] * s, y + a.h[1] * s + jy, 34 * s, skin);
   }
-  ctx.restore();
-}
-
-// ---------- the score panel: names in mono, big numbers, a thin gold border ----------
-export function scorePanel(ctx, left, right, l, r, { y = 270, head = null, a = 1, lc = HI.hero, rc = HI.bad } = {}) {
-  if (a <= 0) return;
-  ctx.save(); ctx.globalAlpha *= a;
-  ctx.font = '700 28px "JetBrains Mono"'; ctx.letterSpacing = '4px'; const lw = ctx.measureText(left).width, rw = ctx.measureText(right).width;
-  ctx.font = '900 70px Rubik'; ctx.letterSpacing = '0px'; const nw = ctx.measureText(l).width + ctx.measureText(r).width + 70;
-  const w = lw + rw + nw + 110, h = head ? 120 : 96, x0 = W / 2 - w / 2, y0 = y - h / 2;
-  ctx.fillStyle = 'rgba(8,10,12,0.85)'; ctx.strokeStyle = 'rgba(242,193,78,0.6)'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.roundRect(x0, y0, w, h, 18); ctx.fill(); ctx.stroke();
-  const by = y + (head ? 22 : 24);
-  if (head) { ctx.font = '700 18px "JetBrains Mono"'; ctx.letterSpacing = '4px'; ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(242,232,214,0.7)'; ctx.fillText(head, W / 2, y0 + 30); }
-  let x = x0 + 30; ctx.textAlign = 'left';
-  ctx.font = '700 28px "JetBrains Mono"'; ctx.letterSpacing = '4px'; ctx.fillStyle = lc; ctx.fillText(left, x, by - 4); x += lw + 22;
-  ctx.font = '900 70px Rubik'; ctx.letterSpacing = '0px'; ctx.fillStyle = '#F4EEE2'; ctx.fillText(l, x, by + 10); x += ctx.measureText(l).width + 14;
-  ctx.fillStyle = HI.gold; ctx.fillRect(x, by - 18, 28, 7); x += 42;
-  ctx.fillStyle = '#F4EEE2'; ctx.fillText(r, x, by + 10); x += ctx.measureText(r).width + 22;
-  ctx.font = '700 28px "JetBrains Mono"'; ctx.letterSpacing = '4px'; ctx.fillStyle = rc; ctx.fillText(right, x, by - 4);
-  qaRect(ctx, x0, y0, w, h, 'text', 'score');
   ctx.restore();
 }

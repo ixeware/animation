@@ -3,10 +3,10 @@
 // 19...Bh2+ 20.Kh1 Nd6 21.Kxh2 Nxe4+ (a discovered check from c7 that also hits the bishop on f6) 22.Be5 (saves the
 // bishop, blocks the check, hits the queen), 27.Nxc6 wins a pawn and hits the rook, the draw. Dark slate board on a
 // curtained stage with a few warm lamps, as in the reference; the big move is 22.Be5.
-import { W, H, clamp, lerp, ease, seg, rgba } from '../../engine/js/core.js';
+import { W, H, C, clamp, lerp, ease, seg, rgba } from '../../engine/js/core.js';
 import { piecesAt, sqXZ, Board } from '../../engine/js/board.js';
 import { EXPR, exprAt } from '../../engine/js/characters.js';
-import { badge, placeStamp, sans } from '../../engine/js/hud.js';
+import { badge, placeStamp, sans, score } from '../../engine/js/hud.js';
 import { rig, seated } from '../../engine/js/stage.js';
 import { room, table } from '../../engine/js/env.js';
 import { useLookV2, SLATE } from '../../engine/js/look.js';
@@ -14,7 +14,7 @@ import { bokeh, lowKey } from '../../engine/js/light.js';
 import { BOOM_HIT } from '../../engine/js/movefx.js';
 import { shatterImage, burst } from '../../engine/js/fx.js';
 import { sprite, spriteBox } from '../../engine/js/pieces.js';
-import { HI, ledGlow, neon, pieceRing, spread, flashTint, speedLines, ticks, boardArrow, squareFrame, armsUp, handsOnHead, scorePanel, targets, slideStreak } from '../../engine/js/hifx.js';
+import { HI, ledGlow, neon, pieceRing, spread, flashTint, speedLines, ticks, boardArrow, squareFrame, armsUp, handsOnHead, moveTag, targets, slideStreak } from '../../engine/js/hifx.js';
 
 useLookV2();
 const CHANNEL = 'THE 64 FILES';  // whose channel the video is made for: the follow line names it
@@ -55,14 +55,12 @@ function captured(g, k, t, land) {
   shatterImage(g, sprite(cap.t, cap.c), land0.x - bx.w / 2, land0.y + bx.top, bx.w, bx.h, dt, { cols: 3, rows: 5, seed: k, power: 520 * sc, gravity: 2200 * sc, spin: 8, life: 0.85, oy: 0.55 });
   burst(g, mid.x, mid.y, t, land, { n: 16, color: cap.c === 'w' ? '#FFFFFF' : '#9FB0BA', speed: 900 * sc, size: 7 * sc, kind: 'dot', seed: k + 99 });
 }
-// the move label in the mover's colour, above the landed piece
+// the move label in the mover's colour above the landed piece, in the brilliant box (hifx moveTag)
 function moveLabel(g, k, t, land, color, { y = 1.8, text = null, dx = 0 } = {}) {
   if (t < land) return;
-  const [x, z] = sqXZ(G[k].to), p = B.project(x, y, z), fs = Math.round(clamp(p.s * 0.3, 26, 46));
-  if (p.y > 1180) p.y = 1180;  // above the captions
-  g.save(); g.globalAlpha *= clamp((t - land) / 0.12); g.font = `800 ${fs}px "JetBrains Mono"`; g.textAlign = 'center';
-  const txt = text || label(k), tw = g.measureText(txt).width, x0 = clamp(p.x + dx, 80 + tw / 2, W - 80 - tw / 2);  // inside the frame
-  g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 8; g.fillStyle = color; g.fillText(txt, x0, p.y); g.restore();
+  const [x, z] = sqXZ(G[k].to), p = B.project(x, y, z), fs = Math.round(clamp(p.s * 0.42, 24, 54)), txt = text || label(k);
+  g.save(); g.font = `800 ${fs}px "JetBrains Mono"`; g.letterSpacing = '-1px'; const tw = g.measureText(txt).width; g.restore();
+  moveTag(g, txt, clamp(p.x + dx, 80 + tw / 2, W - 80 - tw / 2), Math.min(p.y, 1200 - fs * 0.35), color, fs, clamp((t - land) / 0.12));  // inside the frame, above the captions
 }
 
 // one board scene: both players, the table, the slate board, effects under and over the pieces
@@ -91,14 +89,15 @@ export async function build(T) {
   const shot = (a, draw, o = {}) => shots.push({ a, draw, grade: 'neutral', trans: 'cut', ...o });
   const len = sh => sh.b - sh.a + 0.35;
   const boom = (t, g = 0.85) => cue(t - BOOM_HIT, 'boom_move', g);
-  const panel = (g, t, a = 1) => scorePanel(g, 'CARLSEN', 'KASPAROV', '13', '40', { head: 'REYKJAVIK RAPID · 2004 · AGE', a });
+  const panel = (g, t, a = 1) => score(g, 'CARLSEN', 'KASPAROV', '13', '40', { label: 'AGE · REYKJAVIK 2004', a });
+  const result = g => score(g, 'CARLSEN', 'KASPAROV', '½', '½', { label: 'DRAW · 52 MOVES' });
 
   // ======================= HOOK: a 13-year-old against the world number one =======================
   const yo = w('hook', 'thirteen-year-old'), agT = w('hook', 'against'), wnT = w('hook', 'world');
   shot(0, (g, lt, t, sh) => scene(g, lt, t, [[0, MV(0.16, 7.4, 0.3)], [len(sh), MV(0.06, 6.6, 0.3)]], pos(0), { mE: { ...EXPR.focus, look: [0, 0.6] } }),
     { noJump: true, hud: (g, lt, t) => panel(g, t) });
   shot(agT - 0.05, (g, lt, t, sh) => scene(g, lt, t, [[0, KV(-0.14, 7.6, 0.3)], [len(sh), KV(-0.05, 6.8, 0.3)]], pos(0), { kE: 'smug' }),
-    { hud: (g, lt, t) => { panel(g, t); badge(g, 'WORLD NO. 1', W / 2, 420, { color: HI.bad, size: 40, a: seg(t, wnT, wnT + 0.08), scale: lerp(1.4, 1, seg(t, wnT, wnT + 0.2, ease.back)) }); } });
+    { hud: (g, lt, t) => { panel(g, t); badge(g, 'WORLD NO. 1', W / 2, 420, { color: C.gold, size: 40, a: seg(t, wnT, wnT + 0.08), scale: lerp(1.4, 1, seg(t, wnT, wnT + 0.2, ease.back)) }); } });
   boom(wnT, 0.6);
 
   // ======================= WHO, WHERE: the opening in fast forward, seen from above =======================
@@ -107,10 +106,9 @@ export async function build(T) {
   shot(s('who') - 0.08, (g, lt, t, sh) => {
     scene(g, lt, t, [[0, { ...TOP(0.55, 15.5, 0.95), cy: H * 0.56 }], [len(sh), { ...TOP(0.2, 13.5, 0.85), cy: H * 0.56 }]], board(t, OPEN, 0), { e: lin, kE: 'focus', mE: 'focus', backs: true,  // Magnus's back carries his tag
       over: () => {  // name tags over the players on their names
-        for (const [x, y, z, name, col, t0] of [[4, 1.5, -1.4, 'CARLSEN', HI.hero, magT], [4, 0.6, 9.4, 'KASPAROV', HI.bad, garT]]) {
+        for (const [x, y, z, name, col, t0] of [[4, 1.5, -1.4, 'CARLSEN', C.accent, magT], [4, 0.6, 9.4, 'KASPAROV', C.red, garT]]) {
           const p = B.project(x, y, z); if (p.z < 0.6 || t < t0) continue;
-          g.save(); g.globalAlpha *= seg(t, t0, t0 + 0.12); g.font = '800 30px "JetBrains Mono"'; g.letterSpacing = '4px'; g.textAlign = 'center';
-          g.shadowColor = 'rgba(0,0,0,0.9)'; g.shadowBlur = 8; g.fillStyle = col; g.fillText(name, p.x, p.y); g.restore();
+          badge(g, name, p.x, p.y, { color: col, size: 30, a: seg(t, t0, t0 + 0.1), scale: lerp(1.4, 1, seg(t, t0, t0 + 0.2, ease.back)) });
         }
       } });
   }, { noJump: true, hud: (g, lt, t) => { panel(g, t); placeStamp(g, lt, 'Reykjavik', '2004', { y: 420, x: 260, t0: rekT - (t - lt) }); } });  // the stamp beside Kasparov, under the panel
@@ -251,19 +249,18 @@ export async function build(T) {
   shot(endT - 0.06, (g, lt, t, sh) => scene(g, lt, t, [[0, { ...TOP(0.45, 14, 1.12), cy: H * 0.64 }], [len(sh), { ...TOP(0.15, 13.0, 1.08), cy: H * 0.64 }]], board(t, LATE, 53), { e: lin,
     under: () => ledGlow(g, B, 'd4', HI.gold, t, drawT, { reach: 8, speed: 14, a: 0.9 }) }),
     { noJump: true, hud: (g, lt, t) => {
-      if (t < drawT) scorePanel(g, 'CARLSEN', 'KASPAROV', '13', '40', { head: 'REYKJAVIK RAPID · 2004 · AGE' });
-      else scorePanel(g, 'CARLSEN', 'KASPAROV', '½', '½', { head: 'RESULT · 52 MOVES', a: 1 });
+      if (t < drawT) panel(g, t); else result(g);
     } });
   cue(endT + 0.1, 'whoosh_soft', 0.22); boom(drawT, 0.7); cue(drawT, 'shimmer', 0.3);
   shot(wldT - 0.12, (g, lt, t, sh) => scene(g, lt, t, [[0, { ...KV(0.08, 6.8, 0.3), cy: H * 0.53 }], [len(sh), { ...KV(0.02, 6.2, 0.3), cy: H * 0.53 }]], pos(103), { kE: { ...EXPR.tired, look: [0.3, 0.6], curve: -0.4 } }),
-    { hud: (g, lt, t) => scorePanel(g, 'CARLSEN', 'KASPAROV', '½', '½', { head: 'RESULT · 52 MOVES' }) });
+    { hud: (g, lt, t) => result(g) });
 
   // ======================= CTA: could you draw against Kasparov? =======================
   const ctaT = s('cta') - 0.06, youT = w('cta', 'you');
   shot(ctaT, (g, lt, t, sh) => scene(g, lt, t, [[0, MV(0.1, 6.8, 0.3)], [len(sh), MV(0.03, 6.0, 0.3)]], pos(103), { mE: { ...EXPR.happy, curve: 0.6 } }),
     { noJump: true, hud: (g, lt, t) => {
-      badge(g, 'COULD YOU DRAW KASPAROV?', W / 2, 250, { color: '#FFD43B', size: 46, a: seg(t, youT, youT + 0.1), scale: lerp(1.5, 1, seg(t, youT, youT + 0.25, ease.back)) });
-      badge(g, 'FOLLOW ' + CHANNEL, W / 2, 360, { color: '#FFFFFF', size: 36, a: seg(t, youT + 0.8, youT + 0.9) });
+      badge(g, 'COULD YOU DRAW KASPAROV?', W / 2, 250, { color: C.accent, size: 46, a: seg(t, youT, youT + 0.1), scale: lerp(1.5, 1, seg(t, youT, youT + 0.25, ease.back)) });
+      badge(g, 'FOLLOW ' + CHANNEL, W / 2, 360, { color: C.cream, size: 36, a: seg(t, youT + 0.8, youT + 0.9) });
     } });
   cue(youT + 0.8, 'notify', 0.3);
 

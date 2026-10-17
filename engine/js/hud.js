@@ -112,6 +112,28 @@ export function healthBar(ctx, name, label, pct, { y = 150, a = 1, x0 = 150, x1 
   ctx.restore();
 }
 
+// the score in the `brilliant` type (its HUMANS 1 | 0 ROBOTS): two names over two big numbers, a thin divider, the label
+// on the accent strip; a game or a match at the top of the frame (STYLE_BIBLE rule 33)
+export function score(ctx, left, right, l, r, { y = 230, a = 1, label = null, lc = C.lime, rc = C.red, labelColor = C.accent, size = 96, dx = 175 } = {}) {
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha *= a; ctx.textAlign = 'center';
+  const ny = y - size * 0.62, vy = y + size * 0.36;
+  ctx.font = sans(30, 900); ctx.letterSpacing = '5px'; ctx.fillStyle = C.cream; hard(ctx, 4);
+  ctx.fillText(left, W / 2 - dx, ny); ctx.fillText(right, W / 2 + dx, ny); unhard(ctx);
+  ctx.font = sans(size, 900); ctx.letterSpacing = '0px'; ctx.lineJoin = 'round'; ctx.lineWidth = size * 0.08; ctx.strokeStyle = 'rgba(10,8,6,0.55)';
+  for (const [v, x, c] of [[l, W / 2 - dx, lc], [r, W / 2 + dx, rc]]) { ctx.strokeText(v, x, vy); hard(ctx, size * 0.06); ctx.fillStyle = c; ctx.fillText(v, x, vy); unhard(ctx); }
+  ctx.fillStyle = rgba(C.cream, 0.5); ctx.fillRect(W / 2 - 1.5, ny - 26, 3, vy - ny + 26);
+  let bottom = vy + 8;
+  if (label) {
+    ctx.font = sans(24, 800); ctx.letterSpacing = '5px'; const w = ctx.measureText(label).width + 30, th = 40, ty = vy + 22;
+    ctx.fillStyle = labelColor; hard(ctx, 4); ctx.fillRect(W / 2 - w / 2, ty, w, th); unhard(ctx);
+    ctx.fillStyle = lum(labelColor) > 0.55 ? C.ink : C.cream; ctx.textBaseline = 'middle'; ctx.fillText(label, W / 2 + 2, ty + th / 2 + 1);
+    bottom = ty + th;
+  }
+  qaRect(ctx, W / 2 - dx - 160, ny - 30, 2 * dx + 320, bottom - ny + 30, 'text', 'score');
+  ctx.restore();
+}
+
 // two-name scoreboard with big score digits
 export function scoreboard(ctx, left, right, sl, sr, { y = 300, a = 1, hiL = false, hiR = false, flashR = 0, flashL = 0, title = null } = {}) {
   if (a <= 0) return;

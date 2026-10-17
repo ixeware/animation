@@ -5,7 +5,8 @@
 //  - close framing: faces fill a third to half of the frame, big defocused pieces in the foreground
 //  - character finish: peach skin, soft side shading, eye sockets, permanent blush, rounded nose tip,
 //    brown irises, hair strands, wrinkles and moles where the person has them, ages of the same person
-//  - quiet text: small caps place/date tag and name title at the top, small mono labels, no neon or glowing text
+//  - text: as in the `brilliant` episode (STYLE_BIBLE rule 33): Rubik heavy, teal accent strips and badges, move labels
+//    in a dark outlined box; no mono panels
 export const LOOK = { v2: false };
 export function useLookV2(on = true) { LOOK.v2 = on; }
 

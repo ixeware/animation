@@ -40,6 +40,7 @@ export const C = {
   // muted film palette for on-screen graphics (no neon)
   lime: '#A8C66C', red: '#E0603F', blue: '#7AA6D6', gold: '#E9B654', amber: '#D9902F',
   teal: '#5FA8A0', cream: '#F2E8D6', white: '#F2F2F2', ink: '#16120E',
+  accent: '#1BADA6',  // the teal of `brilliant`: label strips and key badges (STYLE_BIBLE rule 33)
 };
 // karaoke caption colours stay bright for legibility
 export const capColor = { lime: '#B8E65A', red: '#FF6B4F', blue: '#6CB8FF', gold: '#F5C451' };
