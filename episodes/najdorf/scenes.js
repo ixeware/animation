@@ -633,6 +633,7 @@ export async function build(T) {
   ];
   const musicFx = [
     { t0: BIG.t0, t1: BIG.t1 - 0.01, kind: 'mute' }, { t0: BIG.t1, t1: sailT - 0.3, kind: 'boost', db: 8 },
+    { t0: nothT - 0.05, t1: r45S - 0.06, kind: 'lp', f: 700 },  // "Nothing.": the music goes muffled until 1947
     { t0: s('r45') + 7.6, t1: wroteS - 0.45, kind: 'lp', f: 900 }, { t0: wroteS - 0.45, t1: truS - 0.1, kind: 'mute' },
     { t0: ctaT, t1: T.duration, kind: 'lp', f: 900 },
   ];
