@@ -261,6 +261,7 @@ function hairBack(g, c, fw) {
   if (c.hair === 'curly') { g.beginPath(); g.ellipse(0, -36, 116 * fw, 112, 0, 0, 7); g.fill(); }
   if (c.hair === 'magnus' || c.hair === 'parted') { g.beginPath(); g.ellipse(0, -44, 108 * fw, 100, 0, 0, 7); g.fill(); }
   if (c.hair === 'levy') { g.beginPath(); g.ellipse(0, -52, 104 * fw, 100, 0, 0, 7); g.fill(); }
+  if (c.hair === 'slick') { g.beginPath(); g.ellipse(0, -44, 104 * fw, 96, 0, 0, 7); g.fill(); }
   if (c.hair === 'quiff') { g.beginPath(); g.ellipse(4, -70, 98 * fw, 92, 0, 0, 7); g.fill(); }
   if (c.hair === 'longcurly') {  // long curly hair falling past the shoulders, bumpy outline
     const w = 100 * fw; g.beginPath(); g.moveTo(-w - 30, -40);
@@ -307,6 +308,14 @@ function hairFront(g, c, fw, fh) {
       p.moveTo(-w - 4, 10); p.bezierCurveTo(-w - 6, -60, -w + 6, -90, -70, -100); p.lineTo(-60, -60); p.bezierCurveTo(-80, -40, -w + 8, -10, -w - 4, 10);
       p.moveTo(w + 4, 10); p.bezierCurveTo(w + 6, -60, w - 6, -90, 70, -100); p.lineTo(60, -60); p.bezierCurveTo(80, -40, w - 8, -10, w + 4, 10);
       p.moveTo(-30, -h + 6); p.quadraticCurveTo(0, -h - 10, 30, -h + 6); p.quadraticCurveTo(0, -h + 2, -30, -h + 6); break;
+    case 'slick': {  // combed straight back from a high hairline that recedes at the temples (the 1940s); c.hairline sets its height
+      const hl = c.hairline ?? -90;
+      p.moveTo(-w - 3, -14); p.bezierCurveTo(-w - 10, -h * 0.9, -w * 0.55, -h - 20, 0, -h - 20);
+      p.bezierCurveTo(w * 0.55, -h - 20, w + 10, -h * 0.9, w + 3, -14);
+      p.bezierCurveTo(w - 4, -46, w - 10, hl + 4, w - 26, hl - 4);
+      p.quadraticCurveTo(40, hl - 16, 16, hl - 8); p.quadraticCurveTo(0, hl + 2, -16, hl - 8);  // a slight widow's peak
+      p.quadraticCurveTo(-40, hl - 16, -(w - 26), hl - 4); p.bezierCurveTo(-w + 10, hl + 4, -w + 4, -46, -w - 3, -14); break;
+    }
     case 'wig':  // powdered wig with rolled curls over the ears
     case 'tied':
       p.moveTo(-w - 6, -10); p.bezierCurveTo(-w - 12, -h * 0.95, -40, -h - 20, 0, -h - 18);
@@ -422,6 +431,12 @@ function hairFront(g, c, fw, fh) {
         g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo((x0 + x1) / 2 + 8, Math.min(y0, y1) - 16, x1, y1); g.stroke();
       }
       if (!tuft) { g.strokeStyle = rgba(mix(c.hairC, '#000000', 0.45), 0.7); g.lineWidth = 3; g.beginPath(); g.moveTo(-36, -h - 12); g.quadraticCurveTo(-34, -h + 30, -34, -98); g.stroke(); }
+    } else if (c.hair === 'slick') {  // comb lines running back from the hairline over the crown
+      const hl = c.hairline ?? -90;
+      for (let i = -3; i <= 3; i++) {
+        g.strokeStyle = i % 2 ? rgba('#000000', 0.2) : rgba(hi, 0.42); g.lineWidth = i % 2 ? 3 : 4;
+        g.beginPath(); g.moveTo(i * 24, hl - 10 - Math.abs(i) * 3); g.quadraticCurveTo(i * 30, -h - 4, i * 36, -h - 30); g.stroke();
+      }
     } else if (c.hair === 'curly' || c.hair === 'longcurly' || c.hair === 'wild') {
       g.lineWidth = 4;
       for (let i = 0; i < 22; i++) { const u = Math.sin(i * 91.7) * 0.5 + 0.5, v = Math.sin(i * 37.3 + 1) * 0.5 + 0.5, a0 = i * 1.7;
@@ -644,9 +659,9 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
       for (const sd of [-1, 1]) for (let i = 0; i < 2; i++) { const a = -0.25 - i * 0.3; g.beginPath(); g.moveTo(sd * (38 + 18 * Math.cos(a)), -2 - 24 * Math.sin(-a)); g.lineTo(sd * (38 + 26 * Math.cos(a)), -2 - 34 * Math.sin(-a)); g.stroke(); }
     }
     if (c.blindfold) {  // a cloth band over the eyes, knot tails at the side
-      g.fillStyle = c.blindfold; g.beginPath(); g.moveTo(-104, -40); g.quadraticCurveTo(0, -52, 104, -40); g.lineTo(104, 18); g.quadraticCurveTo(0, 8, -104, 18); g.closePath(); g.fill();
-      g.strokeStyle = 'rgba(0,0,0,0.18)'; g.lineWidth = 3; for (const y of [-26, -6]) { g.beginPath(); g.moveTo(-100, y); g.quadraticCurveTo(0, y - 10, 100, y); g.stroke(); }
-      g.beginPath(); g.moveTo(104, -16); g.quadraticCurveTo(140, -4, 150, 40); g.lineTo(132, 44); g.quadraticCurveTo(126, 10, 104, 0); g.closePath(); g.fill();
+      g.fillStyle = c.blindfold; g.beginPath(); g.moveTo(-104, -30); g.quadraticCurveTo(0, -42, 104, -30); g.lineTo(104, 36); g.quadraticCurveTo(0, 24, -104, 36); g.closePath(); g.fill();  // over the eyes, the brows still show
+      g.strokeStyle = 'rgba(255,255,255,0.08)'; g.lineWidth = 3; for (const y of [-14, 8]) { g.beginPath(); g.moveTo(-100, y); g.quadraticCurveTo(0, y - 10, 100, y); g.stroke(); }
+      g.beginPath(); g.moveTo(104, -2); g.quadraticCurveTo(140, 10, 150, 54); g.lineTo(132, 58); g.quadraticCurveTo(126, 24, 104, 14); g.closePath(); g.fill();
     }
     if (c.glasses === 'round') {  // Franklin's small spectacles, low on the nose
       g.strokeStyle = '#4A3F33'; g.lineWidth = 4;
