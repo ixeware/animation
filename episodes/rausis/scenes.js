@@ -513,86 +513,62 @@ export async function build(T) {
   const len = sh => sh.b - sh.a + 0.35;
   const boom = (t, g = 0.85) => cue(t - BOOM_HIT, 'boom_move', g);
 
-  // ======================= HOOK: 58, and getting better; nobody could explain it... until the bathroom =======================
-  const betT = w('hook', 'better'), chessT = w('hook', 'chess.');
-  shot(0, (g, lt, t, sh) => portrait(g, lt, t, 'rausis', { ...EXPR.focus, brow: 0.25, browY: 3, look: [0, 0.6] }, { keys: [[0, FRONT(0.12, 7.4, 0.3)], [len(sh), FRONT(0.04, 6.4, 0.3)]] }),
-    { noJump: true, hud: (g, lt, t) => {
-      const r = Math.round(lerp(2500, 2686, ease.inOut(seg(t, 0.15, chessT + 0.1))));
-      counter(g, String(r), 'RATING · AGE 58', { y: 330, size: 190, labelColor: TEAL });
-      if (t >= betT) { g.save(); g.globalAlpha = seg(t, betT, betT + 0.15); g.fillStyle = C.lime; g.font = sans(70, 900); g.textAlign = 'center'; g.fillText('▲', W / 2 + 290, 270 - 10 * Math.sin(t * 6)); g.restore(); }
-    } });
-  boom(betT, 0.5);
-  const nobT = s('bath'), untilT = w('bath', 'Until'), bathT = w('bath', 'bathroom.');
+  // ======================= HOOK (rule 42): the photo itself, from the first frame =======================
+  const photo0 = w('hook', 'photo');
+  shot(0, (g, lt, t, sh) => { darkCard(g, '#14100C', '#050403'); pressPhoto(g, lt, t, { y: 900, s: lerp(0.98, 1.07, clamp(lt / 3.8)), flashT: photo0 }); },
+    { noJump: true, hud: (g, lt, t) => { heading(g, 'THE MOST EMBARRASSING', 190, 1, { size: 50, spacing: 4 }); heading(g, 'PHOTO IN CHESS', 262, 1, { size: 50, spacing: 4 }); } });
+  cue(photo0, 'camera', 0.45);
+
+  // ======================= THE MAN ON THAT TOILET: Igors Rausis, 58, top 100 =======================
+  const manS = s('man'), igT = w('man', 'Igors'), andT = w('man', 'And'), t100 = w('man', '100');
+  shot(manS - 0.06, (g, lt, t, sh) => photoShot(g, lt, PH.rausis, { from: { x: 0.55, y: 0.45, zoom: 1.0, dolly: 0 }, to: { x: 0.56, y: 0.47, zoom: 1.08, dolly: 0.05 }, dur: 3.4, drop: 440 }),
+    { noJump: true, hud: (g, lt, t) => { nameTitle(g, lt, 'Igors Rausis', 'GRANDMASTER · AGE 58', { y: 200, size: 66, t0: igT - (t - lt) }); credit(g, seg(lt, 0.4, 0.6) * 0.75); } });
+  cue(manS, 'whoosh_soft', 0.18);
+  shot(andT - 0.06, (g, lt, t, sh) => top100(g, lt, t, t100 + 0.15), { info: true });
+  boom(t100, 0.5);
+
+  // ======================= HIS RATING KEPT CLIMBING; NOBODY COULD EXPLAIN HOW =======================
+  const clS = s('climb'), nobT = w('climb', 'nobody');
+  shot(clS - 0.06, (g, lt, t, sh) => ratingChart(g, lt, t, clS + 0.05, nobT - 0.25, clS + 0.3), { info: true, hud: (g, lt, t) => heading(g, 'HIS RATING', 330, seg(lt, 0, 0.15)) });
   shot(nobT - 0.06, (g, lt, t, sh) => puzzled(g, lt, t), { noJump: true });
-  cue(nobT + 0.1, 'whoosh_soft', 0.18);
-  shot(untilT - 0.06, (g, lt, t, sh) => corridor(g, lt, t, { z0: 1.0, z1: 1.18, dur: 2.6, glow: seg(t, bathT - 0.3, bathT + 0.2) }), { noJump: true });
-  cue(untilT, 'footsteps', 0.25); cue(bathT, 'dun_dun', 0.5);
+  cue(nobT, 'dun_dun', 0.3);
 
-  // ======================= WHO: Igors Rausis, grandmaster since 1992 =======================
-  const whoS = s('who');
-  shot(whoS - 0.08, (g, lt, t, sh) => photoShot(g, lt, PH.rausis, { from: { x: 0.55, y: 0.45, zoom: 1.0, dolly: 0 }, to: { x: 0.56, y: 0.47, zoom: 1.1, dolly: 0.06 }, dur: 4.4, drop: 440 }),
-    { noJump: true, hud: (g, lt, t) => { nameTitle(g, lt, 'Igors Rausis', 'GRANDMASTER · SINCE 1992', { y: 200, size: 66, t0: w('who', 'Igors') - (t - lt) }); credit(g, seg(lt, 0.4, 0.6) * 0.75); } });
-  cue(whoS, 'camera', 0.2);
+  // ======================= PLAYERS HUNDREDS OF POINTS WEAKER; FIDE STARTED WATCHING =======================
+  const wkS = s('weak'), hundT = w('weak', 'hundreds'), fideT = w('weak', 'And'), watchT = w('weak', 'watching.');
+  shot(wkS - 0.06, (g, lt, t, sh) => versus(g, lt, t, hundT), { noJump: true, hud: (g, lt, t) => heading(g, 'HIS OPPONENTS', 300, seg(lt, 0, 0.15)) });
+  shot(fideT - 0.06, (g, lt, t, sh) => fairPlay(g, lt, t, watchT - 0.1), { noJump: true });
+  for (let i = 0; i < 5; i++) cue(watchT - 0.1 + i * 0.12, 'page_flip', 0.1);
 
-  // ======================= CLIMB: from 2500 to 2686 =======================
-  const clS = s('climb'), fromT = w('climb', 'From'), r2686 = w('climb', '2686.');
-  shot(clS - 0.06, (g, lt, t, sh) => ratingChart(g, lt, t, clS + 0.15, r2686, w('climb', '2500')), { info: true, hud: (g, lt, t) => heading(g, 'HIS RATING', 330, seg(lt, 0, 0.15)) });
-  boom(r2686, 0.6);
-
-  // ======================= TOP 100: the oldest =======================
-  const topS = s('top'), oldT = w('top', 'oldest');
-  shot(topS - 0.06, (g, lt, t, sh) => top100(g, lt, t, oldT), { info: true });
-
-  // ======================= WHO HE WAS BEATING =======================
-  const howS = s('how'), whoT = w('how', 'who');
-  shot(howS - 0.06, (g, lt, t, sh) => versus(g, lt, t, whoT), { noJump: true, hud: (g, lt, t) => heading(g, 'HIS OPPONENTS', 300, seg(lt, 0, 0.15)) });
-  cue(whoT, 'dun_dun', 0.3);
-  const wkS = s('weak'), winT = w('weak', 'Win');
-  shot(wkS - 0.06, (g, lt, t, sh) => wins(g, lt, t, winT - 0.5, 0.17), { info: true, hud: (g, lt, t) => heading(g, 'SMALL OPENS', 260, seg(lt, 0, 0.15)) });
-  for (let i = 0; i < 9; i++) cue(winT - 0.5 + i * 0.17, 'stamp', 0.12);
-
-  // ======================= FIDE WATCHED HIM FOR MONTHS =======================
-  const waS = s('watch'), monT = w('watch', 'months.');
-  shot(waS - 0.06, (g, lt, t, sh) => fairPlay(g, lt, t, monT - 0.15), { noJump: true });
-  for (let i = 0; i < 5; i++) cue(monT - 0.15 + i * 0.12, 'page_flip', 0.12);
-  cue(waS, 'clock_tick', 0.15);
-
-  // ======================= STRASBOURG, JULY 2019: HE GETS UP AND WALKS TO THE BATHROOM =======================
-  const stS = s('stras'), midT = w('stras', 'In'), upT = w('stras', 'gets'), walkT = w('stras', 'walks'), bath2 = w('stras', 'bathroom.');
-  shot(stS - 0.06, (g, lt, t, sh) => hall(g, lt, t, [[0, HIGH(-0.5, 15, 0.5)], [len(sh), HIGH(-0.3, 13, 0.52)]], {}),
+  // ======================= JULY 2019, STRASBOURG: MID-GAME, HE GOES TO THE BATHROOM =======================
+  const stS = s('stras'), inT = w('stras', 'In'), goT = w('stras', 'goes'), bathT = w('stras', 'bathroom.');
+  shot(stS - 0.06, (g, lt, t, sh) => hall(g, lt, t, [[0, HIGH(-0.5, 15, 0.5)], [len(sh), HIGH(-0.35, 13.5, 0.52)]], {}),
     { noJump: true, hud: (g, lt, t) => placeStamp(g, lt, 'Strasbourg', '2019', { y: 200, t0: 0.1 }) });
-  shot(midT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'rausis', exprAt([[0, { ...EXPR.focus, look: [0, 0.7] }], [upT - (t - lt), { ...EXPR.neutral, look: [0.9, 0], turn: 0.4 }]], lt),
+  shot(inT - 0.06, (g, lt, t, sh) => portrait(g, lt, t, 'rausis', exprAt([[0, { ...EXPR.focus, brow: 0.25, look: [0, 0.7] }], [goT - 0.6 - (t - lt), { ...EXPR.neutral, look: [0.9, 0], turn: 0.4 }]], lt),
     { keys: [[0, FRONT(-0.15, 6.8, 0.3)], [len(sh), FRONT(-0.05, 6.2, 0.3)]] }), { noJump: true });
-  shot(walkT - 0.06, (g, lt, t, sh) => corridor(g, lt, t, { z0: 1.05, z1: 1.2, dur: 2, glow: 0.4 + 0.6 * seg(t, bath2, bath2 + 0.5) }), { noJump: true });
-  cue(walkT, 'footsteps', 0.3); cue(bath2 + 0.15, 'door_slam', 0.22);
+  shot(goT - 0.06, (g, lt, t, sh) => corridor(g, lt, t, { z0: 1.05, z1: 1.2, dur: 1.6, glow: 0.3 + 0.7 * seg(t, bathT, bathT + 0.4) }), { noJump: true });
+  cue(goT, 'footsteps', 0.3); cue(bathT + 0.25, 'door_slam', 0.2);
 
-  // ======================= THE PHONE =======================
+  // ======================= IN THAT TOILET, THEY FIND A PHONE =======================
   const fdS = s('found'), findT = w('found', 'find'), phT = w('found', 'phone.');
-  shot(fdS - 0.06, (g, lt, t, sh) => stall(g, lt, t, { find: findT, zoom: [1, 1.06], dur: 3 }),
+  shot(fdS - 0.06, (g, lt, t, sh) => stall(g, lt, t, { find: findT, zoom: [1, 1.05], dur: 2.5 }),
     { noJump: true, hud: (g, lt, t) => { if (t >= phT) badge(g, 'PHONE FOUND', W / 2, 330, { color: RED, size: 56, ...pop(t, phT) }); } });
   cue(fdS, 'heartbeat', 0.3); cue(phT - 0.32, 'revswell', 0.9); cue(phT - 0.004, 'boom', 0.9); cue(phT - BOOM_HIT, 'boom_big', 0.45);
 
-  // ======================= THE PHOTO THAT WENT ROUND THE WORLD =======================
-  const poS = s('photo'), photoT = w('photo', 'photo'), worldT = w('photo', 'world:'), lidT = w('photo', 'toilet'), progT = w('photo', 'chess');
-  shot(poS - 0.06, (g, lt, t, sh) => { darkCard(g, '#14100C', '#050403'); pressPhoto(g, lt, t, { flashT: photoT, s: lerp(0.86, 0.9, clamp(lt / 1.5)) }); },
-    { noJump: true, hud: (g, lt, t) => heading(g, 'THE PHOTO', 230, seg(t, photoT, photoT + 0.15)) });
-  cue(photoT, 'camera', 0.4);
-  shot(worldT - 0.2, (g, lt, t, sh) => worldPhotos(g, lt, t, worldT - 0.1), { info: true });
-  shot(lidT - 0.3, (g, lt, t, sh) => { darkCard(g, '#14100C', '#050403'); pressPhoto(g, lt, t, { s: lerp(1.0, 1.08, clamp(lt / 2)), y: 820 }); },
-    { noJump: true, hud: (g, lt, t) => { if (t >= progT) badge(g, 'A CHESS PROGRAM', W / 2, 240, { color: TEAL, size: 50, ...pop(t, progT) }); } });
-  for (let i = 0; i < 8; i++) cue(worldT - 0.1 + i * 0.16, 'paper', 0.08);
-
-  // ======================= AN iPHONE 4. IN 2019. =======================
-  const ipS = s('iphone'), fourT = w('iphone', '4.'), yrT = w('iphone', '2019.');
-  shot(ipS - 0.06, (g, lt, t, sh) => oldPhone(g, lt, t, {}),
+  // ======================= THE PHOTO GOES ROUND THE WORLD: A CHESS PROGRAM, ON AN iPHONE 4, IN 2019 =======================
+  const poS = s('photo'), worldT = w('photo', 'world:'), progT = w('photo', 'chess'), anT = w('photo', 'an'), fourT = w('photo', '4.'), yrT = w('photo', '2019.');
+  shot(poS - 0.06, (g, lt, t, sh) => worldPhotos(g, lt, t, poS + 0.25), { info: true });
+  for (let i = 0; i < 8; i++) cue(poS + 0.25 + i * 0.16, 'paper', 0.08);
+  shot(progT - 0.12, (g, lt, t, sh) => { darkCard(g, '#14100C', '#050403'); pressPhoto(g, lt, t, { s: lerp(1.05, 1.14, clamp(lt / 1.4)), y: 820 }); },
+    { noJump: true, hud: (g, lt, t) => badge(g, 'A CHESS PROGRAM', W / 2, 240, { color: TEAL, size: 50, ...pop(t, progT) }) });
+  shot(anT - 0.06, (g, lt, t, sh) => oldPhone(g, lt, t, {}),
     { noJump: true, hud: (g, lt, t) => {
       if (t >= fourT) badge(g, 'IPHONE 4', W / 2, 250, { color: TEAL, size: 60, sub: 'RELEASED IN 2010', ...pop(t, fourT) });
       if (t >= yrT) badge(g, 'USED IN 2019', W / 2, 1300 - 90, { color: GOLD, size: 50, ...pop(t, yrT) });
     } });
   cue(fourT - 0.05, 'record_scratch', 0.35);
 
-  // ======================= THE STATEMENT; "I SIMPLY LOST MY MIND YESTERDAY" =======================
-  const sgS = s('sign'), signsT = w('sign', 'signs'), qT = w('sign', '"I');
+  // ======================= HE SIGNS; "I SIMPLY LOST MY MIND" =======================
+  const sgS = s('sign'), signsT = w('sign', 'signs:'), qT = w('sign', '"I');
   shot(sgS - 0.06, (g, lt, t, sh) => statement(g, lt, t, signsT), { info: true });
   cue(signsT, 'pen', 0.4);
   shot(qT - 0.06, (g, lt, t, sh) => {
@@ -605,38 +581,37 @@ export async function build(T) {
     table(g, B, E); lowKey(g, { cy: H * 0.42, a: 0.3 });
   }, { noJump: true, hud: (g, lt, t) => heading(g, '“I SIMPLY LOST MY MIND”', 250, seg(lt, 0.05, 0.25), { size: 40, spacing: 3 }) });
 
-  // ======================= BANNED FOR SIX YEARS; THE GM TITLE GOES =======================
-  const bnS = s('ban'), bansT = w('ban', 'bans'), stripT = w('ban', 'strips');
-  shot(bnS - 0.06, (g, lt, t, sh) => namePlate(g, lt, t, bansT, stripT + 0.1), { info: true });
-  cue(bansT, 'gavel', 0.5); cue(bansT + 0.05, 'stamp', 0.4); cue(stripT + 0.45, 'thud', 0.3);
+  // ======================= SIX-YEAR BAN; THE GM TITLE GOES =======================
+  const bnS = s('ban'), sixT = w('ban', 'Six-year'), titleT = w('ban', 'title,');
+  shot(bnS - 0.06, (g, lt, t, sh) => namePlate(g, lt, t, sixT, titleT + 0.05), { info: true });
+  cue(sixT, 'gavel', 0.5); cue(sixT + 0.05, 'stamp', 0.4); cue(titleT + 0.45, 'thud', 0.3);
 
-  // ======================= THE CRAZIEST PART CAME A YEAR LATER =======================
+  // ======================= A YEAR LATER, IT GETS CRAZIER =======================
   const teS = s('tease'), yearT = w('tease', 'year');
   shot(teS - 0.06, (g, lt, t, sh) => yearFlip(g, lt, t, yearT - 0.1), { info: true });
   cue(yearT - 0.1, 'page_flip', 0.4);
 
-  // ======================= LATVIA, 2020: A NEW NAME ON THE LIST =======================
-  const lvS = s('latvia'), listT = T.w('latvia', 5).s, isaT = w('latvia', 'Isa');  // the second "A": "A new name on the list"
+  // ======================= LATVIA: A NEW PLAYER SIGNS UP, ISA KASIMI =======================
+  const lvS = s('latvia'), newT = T.w('latvia', 5).s, isaT = w('latvia', 'Isa');  // the second "A": "A new player"
   shot(lvS - 0.06, (g, lt, t, sh) => mapLatvia(g, lt, t), { info: true, hud: (g, lt, t) => placeStamp(g, lt, 'Latvia', '2020', { y: 200, t0: 0.1 }) });
-  shot(listT - 0.06, (g, lt, t, sh) => entryList(g, lt, t, isaT), { info: true });
+  shot(newT - 0.06, (g, lt, t, sh) => entryList(g, lt, t, isaT), { info: true });
   cue(isaT, 'typewriter', 0.3);
 
-  // ======================= NEW NAME, SAME FACE; HALF THE ROOM KNEW HIM =======================
+  // ======================= NEW NAME, SAME FACE; HALF THE ROOM RECOGNIZED HIM =======================
   const fcS = s('face'), sameT = w('face', 'Same'), halfT = w('face', 'Half');
   shot(fcS - 0.06, (g, lt, t, sh) => twoNames(g, lt, t, sameT), { info: true });
   cue(sameT, 'dun_dun', 0.35);
   shot(halfT - 0.06, (g, lt, t, sh) => roomFaces(g, lt, t, halfT + 0.05), { noJump: true });
   cue(halfT + 0.1, 'murmur', 0.35); cue(halfT + 0.2, 'gasp', 0.25);
 
-  // ======================= "YOU CAN CHANGE YOUR NAME, BUT YOU CANNOT HIDE YOUR FACE" =======================
-  const quS = s('quote'), saidT = w('quote', '"You');
-  shot(quS - 0.06, (g, lt, t, sh) => corridor(g, lt, t, { z0: 1.12, z1: 1.0, dur: 1.4, glow: 0, shut: seg(lt, 0.3, 1.2) }), { noJump: true });
-  cue(quS + 0.1, 'door_slam', 0.18);
-  shot(saidT - 0.3, (g, lt, t, sh) => photoShot(g, lt, PH.rausis, { from: { x: 0.55, y: 0.45, zoom: 1.04, dolly: 0 }, to: { x: 0.56, y: 0.47, zoom: 1.14, dolly: 0.05 }, dur: 4, dim: 0.25, drop: 440 }),
+  // ======================= HIS WORDS: "YOU CAN CHANGE YOUR NAME, BUT YOU CANNOT HIDE YOUR FACE" =======================
+  const quS = s('quote');
+  shot(quS - 0.06, (g, lt, t, sh) => photoShot(g, lt, PH.rausis, { from: { x: 0.55, y: 0.45, zoom: 1.04, dolly: 0 }, to: { x: 0.56, y: 0.47, zoom: 1.14, dolly: 0.05 }, dur: 4.6, dim: 0.25, drop: 440 }),
     { noJump: true, hud: (g, lt, t) => {
       g.save(); g.globalAlpha = seg(lt, 0.15, 0.4); g.font = serif(46, 700); g.textAlign = 'center'; g.fillStyle = CREAM; g.shadowColor = 'rgba(0,0,0,0.7)'; g.shadowBlur = 20;
-      g.fillText('“You can change your name,', W / 2, 190); g.fillText('but you cannot hide your face.”', W / 2, 252); g.restore();
-      qaRect(g, 100, 145, W - 200, 125, 'text', 'quote'); credit(g, seg(lt, 0.4, 0.6) * 0.75, 314);
+      g.fillText('“You can change your name,', W / 2, 170); g.fillText('but you cannot hide your face.”', W / 2, 232);
+      g.font = sans(22, 800); g.letterSpacing = '5px'; g.fillStyle = GOLD; g.fillText('IGORS RAUSIS · 2020', W / 2, 286); g.restore();
+      qaRect(g, 100, 125, W - 200, 175, 'text', 'quote'); credit(g, seg(lt, 0.4, 0.6) * 0.75, 330);
     } });
 
   // ======================= CTA: how many years would you ban him? =======================
@@ -651,13 +626,12 @@ export async function build(T) {
   const tvOff = T.duration - 0.5;
   cue(tvOff, 'tvoff', 0.5);
   const music = [
-    { t: 0, m: 'intrigue' }, { t: s('climb') - 0.06, m: 'build' }, { t: s('how') - 0.06, m: 'clockwork' }, { t: s('watch') - 0.06, m: 'paranoia' },
-    { t: s('stras') - 0.06, m: 'tension' }, { t: phT, m: 'slam' }, { t: s('iphone') - 0.06, m: 'hook' }, { t: s('sign') - 0.06, m: 'court' },
-    { t: s('tease') - 0.06, m: 'void' }, { t: s('latvia') - 0.06, m: 'clockwork' }, { t: s('quote') - 0.06, m: 'finale' }, { t: ctaT, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: 0, m: 'intrigue' }, { t: s('weak') - 0.06, m: 'clockwork' }, { t: s('stras') - 0.06, m: 'tension' }, { t: phT, m: 'slam' },
+    { t: anT - 0.06, m: 'hook' }, { t: s('sign') - 0.06, m: 'court' }, { t: s('tease') - 0.06, m: 'void' }, { t: s('latvia') - 0.06, m: 'clockwork' },
+    { t: s('quote') - 0.06, m: 'finale' }, { t: ctaT, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
-    { t0: bathT - 0.05, t1: whoS - 0.1, kind: 'lp', f: 700 },             // the hook lands on the bathroom: muffled
-    { t0: phT - 0.32, t1: phT - 0.01, kind: 'mute' }, { t0: phT, t1: poS - 0.3, kind: 'boost', db: 6 },
+    { t0: phT - 0.32, t1: phT - 0.01, kind: 'mute' }, { t0: phT, t1: poS - 0.1, kind: 'boost', db: 6 },
     { t0: s('sign') - 0.06, t1: s('ban') - 0.1, kind: 'lp', f: 900 },
     { t0: ctaT, t1: T.duration, kind: 'lp', f: 900 },
   ];

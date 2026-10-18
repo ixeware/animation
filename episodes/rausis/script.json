@@ -1,9 +1,9 @@
 {
  "title": "The grandmaster in the bathroom (Igors Rausis, 2019)",
  "channel": "THE 64 FILES",
- "post": "He was 58 and kept getting better at chess... until someone checked the bathroom 🚽📱♟️ #chess #history #story #cheating",
+ "post": "The most embarrassing photo in chess history 🚽📱♟️ #chess #history #story #cheating",
  "lead_in": 0.05,
- "tail": 1.6,
+ "tail": 1.8,
  "voice": {
   "provider": "elevenlabs",
   "voice_id": "N2lVS1w4EtoT3dr4eOWO",
@@ -35,125 +35,76 @@
  "phrases": [
   {
    "id": "hook",
-   "text": "He was fifty-eight, and he kept getting better at chess.",
-   "say": "[curious] He was fifty-eight... and he kept getting better at chess.",
-   "pause": 0.25,
+   "text": "This is the most embarrassing photo in chess history.",
+   "say": "[mischievously] This is the most embarrassing photo... in chess history.",
+   "pause": 0.45,
    "colors": {
-    "fifty-eight,": "gold",
-    "better": "lime"
+    "embarrassing": "red",
+    "photo": "gold"
    }
   },
   {
-   "id": "bath",
-   "text": "Nobody could explain it. Until someone checked the bathroom.",
-   "say": "Nobody could explain it... [whispers] until someone checked the bathroom.",
-   "pause": 0.5,
-   "colors": {
-    "explain": "lime",
-    "bathroom.": "red"
-   }
-  },
-  {
-   "id": "who",
-   "text": "This is Igors Rausis. A grandmaster since 1992.",
-   "say": "[serious] This is Igors Rausis. A grandmaster since nineteen ninety-two.",
+   "id": "man",
+   "text": "The man on that toilet, Igors Rausis, was 58. And one of the top 100 players in the world.",
+   "say": "The man on that toilet... Igors Rausis... was fifty-eight. And one of the top one hundred players in the world.",
    "pause": 0.3,
    "colors": {
+    "toilet,": "red",
     "Igors": "blue",
-    "Rausis.": "blue",
-    "1992.": "gold"
+    "Rausis,": "blue",
+    "58.": "gold",
+    "100": "gold"
    }
   },
   {
    "id": "climb",
-   "text": "At an age when most players fade, he climbed. From 2500 to 2686.",
-   "say": "At an age when most players fade... he climbed. From twenty-five hundred... to twenty-six eighty-six.",
+   "text": "His rating kept climbing, and nobody could explain how.",
+   "say": "His rating kept climbing... and nobody could explain how.",
    "pause": 0.3,
    "colors": {
-    "fade,": "red",
-    "climbed.": "lime",
-    "2500": "gold",
-    "2686.": "gold"
-   }
-  },
-  {
-   "id": "top",
-   "text": "The oldest player in the world's top 100.",
-   "say": "The oldest player... in the world's top one hundred.",
-   "pause": 0.45,
-   "colors": {
-    "oldest": "gold",
-    "100.": "gold"
-   }
-  },
-  {
-   "id": "how",
-   "text": "But look at who he was beating.",
-   "say": "[mischievously] But look at who he was beating.",
-   "pause": 0.2,
-   "colors": {
-    "who": "red"
+    "climbing,": "lime",
+    "how.": "gold"
    }
   },
   {
    "id": "weak",
-   "text": "Small opens. Opponents hundreds of points weaker. Win after win.",
-   "say": "Small opens. Opponents hundreds of points weaker. Win... after win.",
+   "text": "His wins came against players hundreds of points weaker. And FIDE started watching.",
+   "say": "[mischievously] His wins came against players hundreds of points weaker... and FIDE started watching.",
    "pause": 0.35,
    "colors": {
     "weaker.": "red",
-    "Win": "lime",
-    "win.": "lime"
-   }
-  },
-  {
-   "id": "watch",
-   "text": "FIDE's fair-play team started watching him. Quietly. For months.",
-   "say": "[serious] FIDE's fair-play team started watching him. Quietly. For months.",
-   "pause": 0.5,
-   "colors": {
-    "watching": "red",
-    "months.": "gold"
+    "watching.": "red"
    }
   },
   {
    "id": "stras",
-   "text": "July 2019. Strasbourg, France. In the middle of a game, Rausis gets up and walks to the bathroom.",
-   "say": "July twenty nineteen. Strasbourg, France. In the middle of a game... Rausis gets up... and walks to the bathroom.",
-   "pause": 0.5,
+   "text": "July 2019, Strasbourg. In the middle of a game, he goes to the bathroom.",
+   "say": "July twenty nineteen, Strasbourg. In the middle of a game... he goes to the bathroom.",
+   "pause": 0.35,
    "colors": {
-    "2019.": "gold",
-    "Strasbourg,": "blue",
+    "2019,": "gold",
+    "Strasbourg.": "blue",
     "bathroom.": "red"
    }
   },
   {
    "id": "found",
-   "text": "In the toilet he just used, they find a phone.",
-   "say": "[whispers] In the toilet he just used... they find... a phone.",
-   "pause": 0.35,
+   "text": "In that toilet, they find a phone.",
+   "say": "[whispers] In that toilet... they find... a phone.",
+   "pause": 0.6,
    "colors": {
-    "toilet": "red",
+    "toilet,": "red",
     "phone.": "red"
    }
   },
   {
    "id": "photo",
-   "text": "Then a photo goes around the world: a grandmaster on a toilet lid, a chess program on his phone.",
-   "say": "Then a photo goes around the world. A grandmaster... on a toilet lid... a chess program on his phone.",
-   "pause": 0.3,
+   "text": "And this photo goes around the world: a chess program, on an iPhone 4. In 2019.",
+   "say": "And this photo goes around the world. A chess program... on an iPhone four. [laughs] In twenty nineteen.",
+   "pause": 0.35,
    "colors": {
     "photo": "gold",
-    "toilet": "red",
-    "chess": "lime"
-   }
-  },
-  {
-   "id": "iphone",
-   "text": "His phone? An iPhone 4. In 2019.",
-   "say": "His phone? [laughs] An iPhone four. In twenty nineteen.",
-   "pause": 0.45,
-   "colors": {
+    "chess": "lime",
     "iPhone": "lime",
     "4.": "gold",
     "2019.": "gold"
@@ -161,39 +112,38 @@
   },
   {
    "id": "sign",
-   "text": "He signs a statement: the phone is his. \"I simply lost my mind yesterday.\"",
-   "say": "[serious] He signs a statement. The phone is his. [sighs] 'I simply lost my mind yesterday.'",
-   "pause": 0.4,
+   "text": "He signs: the phone is his. \"I simply lost my mind.\"",
+   "say": "[serious] He signs. The phone is his. [sighs] 'I simply lost my mind.'",
+   "pause": 0.3,
    "colors": {
     "his.": "red",
-    "mind": "gold"
+    "mind.\"": "gold"
    }
   },
   {
    "id": "ban",
-   "text": "FIDE bans him for six years and strips his grandmaster title.",
-   "say": "FIDE bans him for six years... and strips his grandmaster title.",
-   "pause": 0.6,
+   "text": "Six-year ban. Grandmaster title, gone.",
+   "say": "Six-year ban. Grandmaster title... gone.",
+   "pause": 0.7,
    "colors": {
-    "six": "red",
-    "years": "red",
-    "strips": "red"
+    "Six-year": "red",
+    "gone.": "red"
    }
   },
   {
    "id": "tease",
-   "text": "But the craziest part came a year later.",
-   "say": "[mischievously] But the craziest part... came a year later.",
-   "pause": 0.35,
+   "text": "But a year later, it gets crazier.",
+   "say": "[mischievously] But a year later... it gets crazier.",
+   "pause": 0.3,
    "colors": {
-    "craziest": "gold"
+    "crazier.": "gold"
    }
   },
   {
    "id": "latvia",
-   "text": "A tiny tournament in Latvia. A new name on the list: Isa Kasimi.",
-   "say": "A tiny tournament in Latvia. A new name on the list... Isa Kasimi.",
-   "pause": 0.35,
+   "text": "A tiny tournament in Latvia. A new player signs up: Isa Kasimi.",
+   "say": "A tiny tournament in Latvia. A new player signs up... Isa Kasimi.",
+   "pause": 0.3,
    "colors": {
     "Latvia.": "blue",
     "Isa": "blue",
@@ -202,20 +152,20 @@
   },
   {
    "id": "face",
-   "text": "New name. Same face. Half the room knew him.",
-   "say": "[laughs] New name. Same face. Half the room knew him.",
+   "text": "New name. Same face. Half the room recognized him.",
+   "say": "[laughs] New name. Same face. Half the room recognized him.",
    "pause": 0.3,
    "colors": {
     "Same": "red",
     "face.": "red",
-    "knew": "gold"
+    "recognized": "gold"
    }
   },
   {
    "id": "quote",
-   "text": "He left. Later he said: \"You can change your name, but you cannot hide your face.\"",
-   "say": "He left. Later he said... 'You can change your name... but you cannot hide your face.'",
-   "pause": 0.6,
+   "text": "His words: \"You can change your name, but you cannot hide your face.\"",
+   "say": "His words... 'You can change your name... but you cannot hide your face.'",
+   "pause": 0.65,
    "colors": {
     "name,": "lime",
     "face.\"": "gold"
