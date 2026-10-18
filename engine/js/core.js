@@ -5,7 +5,23 @@ export const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 export const lerp = (a, b, t) => a + (b - a) * t;
 export const inv = (a, b, x) => clamp((x - a) / (b - a));
 export const smooth = t => t * t * (3 - 2 * t);
+// a CSS cubic-bezier(x1, y1, x2, y2) as an easing function of progress 0..1 (Newton steps, bisection if they stall)
+export function bezier(x1, y1, x2, y2) {
+  const f = (t, a, b) => ((1 - 3 * b + 3 * a) * t + (3 * b - 6 * a)) * t * t + 3 * a * t;
+  const df = (t, a, b) => 3 * (1 - 3 * b + 3 * a) * t * t + 2 * (3 * b - 6 * a) * t + 3 * a;
+  return x => {
+    if (x <= 0) return 0; if (x >= 1) return 1;
+    let t = x;
+    for (let i = 0; i < 8; i++) { const d = df(t, x1, x2), e = f(t, x1, x2) - x; if (Math.abs(e) < 1e-6) return f(t, y1, y2); if (Math.abs(d) < 1e-6) break; t -= e / d; }
+    let lo = 0, hi = 1; t = x;
+    for (let i = 0; i < 30; i++) { const e = f(t, x1, x2) - x; if (Math.abs(e) < 1e-6) break; if (e > 0) hi = t; else lo = t; t = (lo + hi) / 2; }
+    return f(t, y1, y2);
+  };
+}
 export const ease = {
+  // Emil Kowalski's strong curves (emilkowalski/skills, MIT): ui for anything entering or leaving, move for on-screen travel
+  ui: bezier(0.23, 1, 0.32, 1),
+  move: bezier(0.77, 0, 0.175, 1),
   in: t => t * t * t,
   out: t => 1 - Math.pow(1 - t, 3),
   inOut: t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),

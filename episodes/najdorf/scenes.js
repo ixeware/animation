@@ -7,10 +7,10 @@
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect } from '../../engine/js/core.js';
 import { Board, sqXZ, piecesAt } from '../../engine/js/board.js';
 import { EXPR, exprAt, CAST, drawChar } from '../../engine/js/characters.js';
-import { counter, badge, nameTitle, placeStamp, sans, serif } from '../../engine/js/hud.js';
+import { counter, badge, nameTitle, placeStamp, sans, serif, popIn, enter } from '../../engine/js/hud.js';
 import { rig, seated, actor } from '../../engine/js/stage.js';
 import { box, room, table, ENV, FLOOR_Y, texTri } from '../../engine/js/env.js';
-import { useLookV2, SLATE } from '../../engine/js/look.js';
+import { useLookV2, SLATE, LOOK } from '../../engine/js/look.js';
 import { bokeh, lowKey } from '../../engine/js/light.js';
 import { BOOM_HIT } from '../../engine/js/movefx.js';
 import { shatterImage, burst } from '../../engine/js/fx.js';
@@ -49,17 +49,20 @@ const BACKROOM = { ...ENV.backroom, table: ['#3A2A1C', '#22180E', '#180F08'] };
 const GALLERY = { base: '#0E0B08', wall: ['#5A4A38', '#4C3E2F'], seam: '#2E241A', rail: '#6A5236', floor: ['#2E2318', '#261D14'], light: '#FFE6B8', lightA: 0.3, windows: true };
 const darkCard = (g, top, bottom) => { const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, top); bg.addColorStop(1, bottom); g.fillStyle = bg; g.fillRect(0, 0, W, H); };
 const SLATEBG = ['#16202A', '#07090C'];
-const pop = (t, t0, d = 0.25) => lerp(1.5, 1, seg(t, t0, t0 + d, ease.back));
+const M2 = () => LOOK.motion >= 2;  // the text motion profile (look.js): 1 = pops and plain fades, 2 = rules 41-44
 function rim(g, x, y, r, col, a = 0.5) {
   const gr = g.createRadialGradient(x, y, r * 0.2, x, y, r); gr.addColorStop(0, rgba(col, a)); gr.addColorStop(1, rgba(col, 0));
   g.save(); g.globalCompositeOperation = 'screen'; g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.restore();
 }
 // a heading in the brilliant type: letter-spaced heavy cream with a teal underline
-function heading(g, text, y, a = 1, { size = 44, color = CREAM } = {}) {
+function heading(g, text, y, a = 1, { size = 44, color = CREAM, at = null } = {}) {
+  const u = M2() && at ? enter(at[0], at[1], 0.3) : 1, us = M2() && at ? enter(at[0], at[1] + 0.08) : 1;
+  if (M2() && at) a = u;
   if (a <= 0) return;
   g.save(); g.globalAlpha *= a; g.font = sans(size, 900); g.letterSpacing = '5px'; g.textAlign = 'center'; g.fillStyle = color;
-  g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowOffsetY = 5; g.fillText(text, W / 2, y); g.shadowColor = 'transparent';
-  const tw = g.measureText(text).width; g.fillStyle = TEAL; g.fillRect(W / 2 - 40, y + 18, 80, 5);
+  if (u < 1) g.filter = `blur(${((1 - u) * 5).toFixed(1)}px)`;
+  g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowOffsetY = 5; g.fillText(text, W / 2, y + (1 - u) * 14); g.shadowColor = 'transparent'; g.filter = 'none';
+  const tw = g.measureText(text).width; g.fillStyle = TEAL; g.fillRect(W / 2 - 40 * us, y + 18, 80 * us, 5);
   qaRect(g, W / 2 - tw / 2, y - size * 0.8, tw, size + 30, 'text', text); g.restore();
 }
 
@@ -151,7 +154,7 @@ function label(G, k, t, land, color, { y = 1.8, dx = 0 } = {}) {
   if (t < land) return;
   const [x, z] = sqXZ(G[k].to), p = B.project(x, y, z), fs = Math.round(clamp(p.s * 0.42, 24, 54)), txt = `${Math.ceil(k / 2)}${k % 2 ? '.' : '...'}${G[k].san}`;
   g_measure.font = `800 ${fs}px "JetBrains Mono"`; const tw = g_measure.measureText(txt).width;
-  moveTag(gCur, txt, clamp(p.x + dx, 80 + tw / 2, W - 80 - tw / 2), Math.min(p.y, 1200 - fs * 0.35), color, fs, clamp((t - land) / 0.12));
+  moveTag(gCur, txt, clamp(p.x + dx, 80 + tw / 2, W - 80 - tw / 2), Math.min(p.y, 1200 - fs * 0.35), color, fs, M2() ? 1 : clamp((t - land) / 0.12), { u: M2() ? enter(t, land, 0.22) : null });
 }
 const g_measure = makeCanvas(8, 8).getContext('2d'); let gCur = null;
 function game(g, lt, t, keys, pieces, { wWho = 'gluck', bWho = 'naj39', wE = 'focus', bE = 'focus', env = CAFE, under = null, over = null, dof = 1.3, e = ease.inOut, wHands = 0, slab = SLATE } = {}) {
@@ -320,13 +323,15 @@ const RES = (() => { const a = Array(45).fill('1'), r = rng(1947); for (const v 
 function scoreGrid(g, lt, t, t0) {
   darkCard(g, SLATEBG[0], SLATEBG[1]);
   const n = clamp(Math.floor((t - t0) / 0.018), 0, 45), wins = RES.slice(0, n).filter(v => v === '1').length;
-  counter(g, String(wins), n >= 45 ? 'WINS · 4 DRAWS · 2 LOSSES' : 'WINS', { y: 360, size: 170, labelColor: TEAL });
+  counter(g, String(wins), n >= 45 ? 'WINS · 4 DRAWS · 2 LOSSES' : 'WINS', { y: 360, size: 170, labelColor: TEAL, at: [t, t0 - 0.06] });
   const cols = 9, s = 96, gap = 12, x0 = W / 2 - (cols * s + (cols - 1) * gap) / 2, y0 = 560;
   for (let i = 0; i < 45; i++) {
     const c = i % cols, r = Math.floor(i / cols), x = x0 + c * (s + gap), y = y0 + r * (s + gap), on = i < n, v = RES[i];
-    g.fillStyle = !on ? 'rgba(255,255,255,0.06)' : v === '1' ? C.lime : v === '½' ? '#8A949C' : RED;
-    g.beginPath(); g.roundRect(x, y, s, s, 12); g.fill();
-    if (on) { g.fillStyle = v === '1' ? C.ink : '#FFFFFF'; g.font = sans(46, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(v, x + s / 2, y + s / 2 + 2); g.textBaseline = 'alphabetic'; }
+    g.fillStyle = 'rgba(255,255,255,0.06)'; g.beginPath(); g.roundRect(x, y, s, s, 12); g.fill();
+    const k = M2() ? enter(t, t0 + i * 0.018, 0.16) : on ? 1 : 0;  // motion 2: each result lands from 90%
+    if (k > 0) { g.save(); g.globalAlpha *= k; g.translate(x + s / 2, y + s / 2); g.scale(0.9 + 0.1 * k, 0.9 + 0.1 * k); g.translate(-x - s / 2, -y - s / 2);
+      g.fillStyle = v === '1' ? C.lime : v === '½' ? '#8A949C' : RED; g.beginPath(); g.roundRect(x, y, s, s, 12); g.fill();
+      g.fillStyle = v === '1' ? C.ink : '#FFFFFF'; g.font = sans(46, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(v, x + s / 2, y + s / 2 + 2); g.textBaseline = 'alphabetic'; g.restore(); }
   }
   qaRect(g, x0, y0, cols * (s + gap), 5 * (s + gap), 'text', 'results grid');
 }
@@ -459,16 +464,16 @@ export async function build(T) {
   // ======================= HOOK: forty-five games at once, blindfolded — and the record wasn't the point =======================
   const fortyT = w('hook', 'forty-five'), blindT = w('hook', 'Blindfolded.'), andT = w('hook', 'And'), recT = w('hook', 'record'), wasT = w('hook', "wasn't");
   shot(0, (g, lt, t, sh) => hall(g, lt, t, [[0, HALLR(0.04, 17, 0.34)], [len(sh), HALLR(0.01, 14.5, 0.32)]], { who: 'naj47b', e: 'focus', face: 1 }),
-    { noJump: true, hud: (g, lt, t) => counter(g, '45', 'GAMES AT ONCE', { y: 330, size: 190, labelColor: TEAL, a: 1 }) });
+    { noJump: true, hud: (g, lt, t) => counter(g, '45', 'GAMES AT ONCE', { y: 330, size: 190, labelColor: TEAL, a: 1, at: [t, 0] }) });
   boom(fortyT, 0.55);
   shot(blindT - 0.06, (g, lt, t, sh) => hall(g, lt, t, [[0, HALLV(-0.3, 8.4, 0.1, 2.2)], [len(sh), HALLV(-0.26, 7.8, 0.1, 2.2)]], { who: 'naj47b', e: { ...EXPR.focus, turn: 0.2 } }),
-    { noJump: true, hud: (g, lt, t) => badge(g, 'BLINDFOLDED', W / 2, 330, { color: RED, size: 54, scale: pop(t, blindT) }) });
+    { noJump: true, hud: (g, lt, t) => badge(g, 'BLINDFOLDED', W / 2, 330, { color: RED, size: 54, ...popIn(t, blindT) }) });
   cue(blindT, 'whoosh_soft', 0.2);
   shot(andT - 0.06, (g, lt, t, sh) => hall(g, lt, t, [[0, { yaw: 0.5, pitch: 0.62, dist: 15, fov: 1500, cy: H * 0.5, target: [4, 0, 4] }], [len(sh), { yaw: 0.36, pitch: 0.66, dist: 13.4, fov: 1500, cy: H * 0.5, target: [4, 0, 4] }]], {}),
     { noJump: true, hud: (g, lt, t) => {
       if (t < recT) return;
-      badge(g, 'WORLD RECORD', W / 2, 360, { color: GOLD, size: 60, scale: pop(t, recT) });
-      const u = seg(t, wasT, wasT + 0.18); if (u <= 0) return;  // ...wasn't the point: struck out
+      badge(g, 'WORLD RECORD', W / 2, 360, { color: GOLD, size: 60, ...popIn(t, recT) });
+      const u = M2() ? enter(t, wasT, 0.3) : seg(t, wasT, wasT + 0.18); if (u <= 0) return;  // ...wasn't the point: struck out
       g.save(); g.strokeStyle = RED; g.lineWidth = 12; g.lineCap = 'round'; g.beginPath(); g.moveTo(W / 2 - 250, 380); g.lineTo(W / 2 - 250 + 500 * u, 340); g.stroke(); g.restore();
     } });
   cue(recT, 'stamp', 0.35);
@@ -501,15 +506,16 @@ export async function build(T) {
       },
     });
   }, { noJump: true, roll: lt => 0.04 * Math.sin(Math.min(1, lt / 2) * 1.2), hud: (g, lt, t) => {
-      heading(g, 'THE POLISH IMMORTAL', 200, seg(lt, 0.1, 0.3), { size: 40 });
+      heading(g, 'THE POLISH IMMORTAL', 200, seg(lt, 0.1, 0.3), { size: 40, at: [lt, 0.1] });
       // the tally: both bishops and both knights given up, then the pawn that mates
       const icons = [['b', bishT], ['b', bishT + 0.12], ['n', kniT], ['n', kniT + 0.12], ['p', BIG.t1]], x0 = W / 2 - 2 * 108 - 40;
       icons.forEach(([tp, tt], i) => {
         const x = x0 + i * 108, y = 330, on = t >= tt, bx = spriteBox(92);
-        g.save(); g.globalAlpha *= seg(lt, 0.2, 0.4) * (i === 4 && !on ? 0.35 : 1);
+        const ui = M2() ? enter(lt, 0.2 + i * 0.05) : seg(lt, 0.2, 0.4);  // motion 2: one after another, 50 ms apart
+        g.save(); g.globalAlpha *= ui * (i === 4 && !on ? 0.35 : 1); if (M2()) g.translate(0, (1 - ui) * 12);
         if (i === 4 && on) { g.shadowColor = HI.good; g.shadowBlur = 30; }
         g.drawImage(sprite(tp, 'b'), x - bx.w / 2, y - 46 + bx.top + 92, bx.w, bx.h); g.restore();
-        if (i < 4 && on) { const u = seg(t, tt, tt + 0.12); g.save(); g.strokeStyle = RED; g.lineWidth = 9; g.lineCap = 'round'; g.beginPath(); g.moveTo(x - 34, 300); g.lineTo(x - 34 + 68 * u, 300 + 68 * u); g.stroke(); g.restore(); }
+        if (i < 4 && on) { const u = M2() ? enter(t, tt, 0.22) : seg(t, tt, tt + 0.12); g.save(); g.strokeStyle = RED; g.lineWidth = 9; g.lineCap = 'round'; g.beginPath(); g.moveTo(x - 34, 300); g.lineTo(x - 34 + 68 * u, 300 + 68 * u); g.stroke(); g.restore(); }
       });
       qaRect(g, x0 - 54, 250, 4 * 108 + 108, 130, 'text', 'tally');
     },
@@ -550,7 +556,7 @@ export async function build(T) {
   shot(r40S - 0.06, (g, lt, t, sh) => filmYear(g, lt, t, '1943', y43T + 0.05), { noJump: true });
   boom(y43T + 0.05, 0.5);
   shot(f40T - 0.06, (g, lt, t, sh) => hall(g, lt, t, [[0, HALLV(0.4, 9.4, 0.2, 2.8)], [len(sh), HALLV(0.3, 8.4, 0.2, 2.8)]], { who: 'naj39b', env: CAFE, lit: 0.9 }),
-    { noJump: true, hud: (g, lt, t) => { counter(g, '40', 'BOARDS AT ONCE · BLINDFOLDED', { y: 330, size: 170, labelColor: TEAL }); if (t >= wr40T) badge(g, 'WORLD RECORD', W / 2, 520, { color: GOLD, size: 52, scale: pop(t, wr40T) }); } });
+    { noJump: true, hud: (g, lt, t) => { counter(g, '40', 'BOARDS AT ONCE · BLINDFOLDED', { y: 330, size: 170, labelColor: TEAL, at: [t, f40T - 0.06] }); if (t >= wr40T) badge(g, 'WORLD RECORD', W / 2, 520, { color: GOLD, size: 52, ...popIn(t, wr40T) }); } });
   boom(f40T, 0.5); cue(wr40T, 'shimmer', 0.25);
 
   // ======================= MAYBE THE PAPERS WILL REACH EUROPE... NOTHING =======================
@@ -563,10 +569,10 @@ export async function build(T) {
   // ======================= 1947, SÃO PAULO: FORTY-FIVE BOARDS, 23 HOURS, 39 WINS =======================
   const r45S = s('r45'), f45T = w('r45', 'Forty-five'), h23T = w('r45', 'Twenty-three'), heT = w('r45', 'He'), newsT = w('r45', 'Newspapers');
   shot(r45S - 0.06, (g, lt, t, sh) => hall(g, lt, t, [[0, { yaw: -0.5, pitch: 0.36, dist: 12, fov: 1500, cy: H * 0.5, target: [4, 0.6, 4] }], [len(sh), { yaw: -0.2, pitch: 0.4, dist: 10.2, fov: 1500, cy: H * 0.5, target: [4, 0.6, 4] }]], {}),
-    { noJump: true, hud: (g, lt, t) => { placeStamp(g, lt, 'São Paulo', '1947', { y: 200, t0: 0.1 }); if (t >= f45T) counter(g, '45', 'BOARDS', { y: 400, size: 170, labelColor: TEAL, a: seg(t, f45T, f45T + 0.08) }); } });
+    { noJump: true, hud: (g, lt, t) => { placeStamp(g, lt, 'São Paulo', '1947', { y: 200, t0: 0.1 }); if (t >= f45T) counter(g, '45', 'BOARDS', { y: 400, size: 170, labelColor: TEAL, a: M2() ? 1 : seg(t, f45T, f45T + 0.08), at: [t, f45T] }); } });
   boom(f45T, 0.55);
   shot(h23T - 0.06, (g, lt, t, sh) => blindRoom(g, lt, t, [[0, FRONT(0.3, 7.6, 0.24)], [len(sh), FRONT(0.2, 6.8, 0.24)]], { hours: 9 + 23 * seg(t, h23T, heT - 0.1, lin), e: { ...EXPR.focus, sweat: 1 } }),
-    { noJump: true, hud: (g, lt, t) => counter(g, String(Math.max(1, Math.round(23 * seg(t, h23T, heT - 0.15, lin)))), 'HOURS', { y: 330, size: 170, labelColor: TEAL }) });
+    { noJump: true, hud: (g, lt, t) => counter(g, String(Math.max(1, Math.round(23 * seg(t, h23T, heT - 0.15, lin)))), 'HOURS', { y: 330, size: 170, labelColor: TEAL, at: [t, h23T - 0.06] }) });
   for (let i = 0; i < 6; i++) cue(h23T + i * 0.2, 'clock_tick', 0.12);
   shot(heT - 0.06, (g, lt, t, sh) => scoreGrid(g, lt, t, heT), { info: true });
   cue(w('r45', 'thirty-nine.'), 'shimmer', 0.3);
@@ -600,11 +606,11 @@ export async function build(T) {
     game(g, lt, t, [[0, A], [len(sh), { ...A, yaw: 0.2, dist: 10.4 }]], P, { wWho: 'gluck', bWho: 'naj47', env: STUDY, dof: 1.2,
       under: () => { ledGlow(g, B, 'a6', GOLD, t, najT, { reach: 3, speed: 14 }); if (t >= najT) B.highlight(g, 'a6', GOLD, 0.85, true); spread(g, B, 'a6', t, najT, GOLD); },
       over: () => { ticks(g, B, 'a6', t, najT, { seed: 3 }); label(NS, 10, t, najT, GOLD); } });
-  }, { noJump: true, hud: (g, lt, t) => { if (t >= najT) badge(g, 'THE NAJDORF', W / 2, 260, { color: TEAL, size: 56, scale: pop(t, najT) }); } });
+  }, { noJump: true, hud: (g, lt, t) => { if (t >= najT) badge(g, 'THE NAJDORF', W / 2, 260, { color: TEAL, size: 56, ...popIn(t, najT) }); } });
   NRUN.slice(0, -1).forEach((m, i) => { if (i % 2 === 0) cue(m.t1, 'piece', 0.14); }); boom(najT, 0.7); cue(najT, 'shimmer', 0.22);
   shot(weapT - 0.06, (g, lt, t, sh) => {
     darkCard(g, SLATEBG[0], SLATEBG[1]);
-    heading(g, 'THE WEAPON OF CHAMPIONS', 300, seg(lt, 0, 0.15), { size: 40 });
+    heading(g, 'THE WEAPON OF CHAMPIONS', 300, seg(lt, 0, 0.15), { size: 40, at: [lt, 0] });
     webcam(g, 60, 400, 460, 640, 'bobby72', 'focus', t, { bg: ['#3A5A7A', '#14202E'], name: 'FISCHER', zoom: 0.95, cy: 0.5 });
     webcam(g, 560, 400, 460, 640, 'kasparov', 'focus', t, { bg: ['#6A3A3A', '#2A1214'], name: 'KASPAROV', zoom: 0.95, cy: 0.5 });
   }, { info: true });
@@ -618,9 +624,9 @@ export async function build(T) {
   const ctaT = s('cta') - 0.06, howT = w('cta', 'How'), comT = w('cta', 'Comment');
   shot(ctaT, (g, lt, t, sh) => portrait(g, lt, t, 'naj47', { ...EXPR.happy, curve: 0.6 }, { env: STUDY, pieces: posOf(NS, 10), keys: [[0, FRONT(0.12, 7.0, 0.3)], [len(sh), FRONT(0.04, 6.2, 0.3)]] }),
     { noJump: true, hud: (g, lt, t) => {
-      badge(g, 'HOW MANY BOARDS BLINDFOLDED?', W / 2, 230, { color: TEAL, size: 44, a: seg(t, howT, howT + 0.1), scale: pop(t, howT) });
-      badge(g, 'COMMENT A NUMBER', W / 2, 330, { color: GOLD, size: 40, a: seg(t, comT, comT + 0.1), scale: pop(t, comT) });
-      badge(g, 'FOLLOW ' + CHANNEL, W / 2, 420, { color: CREAM, size: 34, a: seg(t, comT + 0.6, comT + 0.7) });
+      badge(g, 'HOW MANY BOARDS BLINDFOLDED?', W / 2, 230, { color: TEAL, size: 44, a: seg(t, howT, howT + 0.1), ...popIn(t, howT) });
+      badge(g, 'COMMENT A NUMBER', W / 2, 330, { color: GOLD, size: 40, a: seg(t, comT, comT + 0.1), ...popIn(t, comT) });
+      badge(g, 'FOLLOW ' + CHANNEL, W / 2, 420, { color: CREAM, size: 34, a: seg(t, comT + 0.6, comT + 0.7), ...(M2() ? popIn(t, comT + 0.6) : {}) });
     } });
   cue(comT + 0.6, 'notify', 0.3);
 

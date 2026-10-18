@@ -6,6 +6,7 @@
 // the board. The hero's moves are lime, the opponent's red, a result gold. Sound (audio/sfx.py `revswell`, `airwash`):
 // the music cuts out ~0.25 s before the big move, a short reverse swell, then a low boom with an airy wash.
 import { W, H, clamp, lerp, ease, rgba, mix, rng, qaRect } from './core.js';
+import { LOOK } from './look.js';
 import { sqXZ } from './board.js';
 import { hand } from './characters.js';
 
@@ -171,10 +172,14 @@ export function keyOver(ctx, B, m, t, pieces, { label = true, lines = true } = {
 }
 
 // ---------- the move label as in `brilliant` (board.js label): mono in a dark rounded box outlined in the mover's colour ----------
-export function moveTag(ctx, text, x, y, color, fs = 40, a = 1) {
-  if (a <= 0) return;
+export function moveTag(ctx, text, x, y, color, fs = 40, a = 1, { u = null } = {}) {
+  if (a <= 0 || u === 0) return;
   ctx.save(); ctx.globalAlpha *= a; ctx.font = `800 ${fs}px "JetBrains Mono"`; ctx.letterSpacing = '-1px';
   const tw = ctx.measureText(text).width, bx = x - tw / 2 - 12, by = y - fs * 0.95, bw = tw + 24, bh = fs * 1.3;
+  if (u !== null && LOOK.motion >= 2) {  // motion 2: grows out of the square below it (the box's bottom edge is the origin)
+    const k = 0.9 + 0.1 * u, oy = by + bh; ctx.globalAlpha *= u;
+    ctx.translate(x, oy + (1 - u) * 8); ctx.scale(k, k); ctx.translate(-x, -oy); if (u < 0.95) ctx.filter = `blur(${((1 - u) * 4).toFixed(1)}px)`;
+  }
   ctx.fillStyle = 'rgba(6,9,11,0.78)'; ctx.strokeStyle = rgba(color, 0.7); ctx.lineWidth = 2;
   ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 8); ctx.fill(); ctx.stroke();
   ctx.textAlign = 'center'; ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 8; ctx.fillText(text, x, y);

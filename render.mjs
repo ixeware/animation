@@ -3,6 +3,7 @@
 //   node render.mjs fischer [--workers 4] [--from 0 --to 10]  -> build/video.mp4 (silent) + cues.json
 //   node render.mjs fischer --cues                       -> build/cues.json only (sound edits: then audio/mix.py)
 //   node render.mjs fischer --qa [--step 0.1]       -> build/qa.json: text over faces / captions, text off frame, faces cut
+//   any of these with --motion 1|2: the text motion profile (LOOK.motion) for an A/B; --out name.mp4: the video's file name
 import { chromium } from 'playwright';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -29,7 +30,7 @@ async function openPage(browser, extra = '') {
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
   page.on('console', m => { if (m.type() === 'error') console.error('[page]', m.text()); });
   page.on('pageerror', e => console.error('[pageerror]', e.message));
-  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}`);
+  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}${opt('motion') ? '&motion=' + opt('motion') : ''}`);
   await page.waitForFunction('window.READY === true', null, { timeout: 120000 });
   return page;
 }
@@ -139,9 +140,10 @@ try {
     }));
     const list = path.join(BUILD, 'parts.txt');
     fs.writeFileSync(list, parts.filter(Boolean).map(p => `file '${p}'`).join('\n'));
-    execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', path.join(BUILD, 'video.mp4')]);
+    const outFile = path.join(BUILD, opt('out') || 'video.mp4');
+    execFileSync('ffmpeg', ['-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', outFile]);
     parts.filter(Boolean).forEach(p => fs.unlinkSync(p));
-    console.log(`video -> ${path.join(BUILD, 'video.mp4')} in ${((Date.now() - t0) / 1000).toFixed(0)}s`);
+    console.log(`video -> ${outFile} in ${((Date.now() - t0) / 1000).toFixed(0)}s`);
   }
 } finally {
   await browser.close(); server.close();
