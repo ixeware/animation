@@ -189,9 +189,9 @@ function shoe(g, cx, ty, s) {
   g.fillStyle = '#0C0705'; g.beginPath(); g.roundRect(cx - hw * 1.06, top + h * 0.8, hw * 2.12, h * 0.22, h * 0.08); g.fill();
   g.fillStyle = 'rgba(255,228,196,0.16)'; g.beginPath(); g.ellipse(cx - hw * 0.28, top + h * 0.5, hw * 0.34, h * 0.13, -0.1, 0, 7); g.fill();
 }
-function footShadow(g, x, z, r, a = 1) {
-  if (a <= 0.02 || depth(x, FLOOR_Y, z) < 0.6) return;
-  const p = B.project(x, FLOOR_Y, z), w = p.s * r, gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, w);
+function footShadow(g, x, z, r, a = 1, y = FLOOR_Y) {
+  if (a <= 0.02 || depth(x, y, z) < 0.6) return;
+  const p = B.project(x, y, z), w = p.s * r, gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, w);
   gr.addColorStop(0, `rgba(0,0,0,${0.5 * a})`); gr.addColorStop(1, 'rgba(0,0,0,0)');
   g.save(); g.fillStyle = gr; g.translate(p.x, p.y); g.scale(1, 0.32); g.translate(-p.x, -p.y); g.fillRect(p.x - w, p.y - w, w * 2, w * 2); g.restore();
 }
@@ -393,26 +393,50 @@ function bathroom(g, t, { doors = [0, 0, 0], lockRed = 0, sit = null, mid = null
   if (front) front(g);
 }
 
-// ---------- standing and walking people: legs under the bust, in world space; head centre 7.1 above the feet ----------
-function legs(g, x, y, sc, { walk = 0, phase = 0, col = ['#3A3F48', '#22262C'], dark = false } = {}) {
-  const cc = dark ? ['#0E0E12', '#08080A'] : col;
-  for (const sd of Math.sin(phase) > 0 ? [-1, 1] : [1, -1]) {
-    const ang = walk * 0.3 * Math.sin(phase + (sd > 0 ? 0 : Math.PI));
-    g.save(); g.translate(x + sd * 56 * sc, y + 315 * sc); g.rotate(ang); g.scale(sc, sc);
-    const gr = g.createLinearGradient(-52, 0, 52, 0); gr.addColorStop(0, cc[1]); gr.addColorStop(0.45, cc[0]); gr.addColorStop(1, cc[1]);
-    g.fillStyle = gr; g.beginPath(); g.moveTo(-54, 0); g.lineTo(54, 0); g.lineTo(42, 340); g.lineTo(-42, 340); g.closePath(); g.fill();
-    g.fillStyle = dark ? '#060608' : '#2A1E18'; g.beginPath(); g.ellipse(4, 352, 54, 22, 0, 0, 7); g.fill();
-    g.restore();
-  }
+// ---------- standing and walking people. The bust's top is narrowed and cut at the hips, its sides become sleeves
+// that end in hands; trousers as wide as the hips taper to the shoes. Bust units from the head centre; the bust is
+// drawn at HK of the usual size so that the legs get a third of the figure; the soles are 7.1 world units down ----------
+const HK = 0.82, FEET = 7.1 * 100 / 1.05 / HK;
+function jacketClip(g) {
+  g.beginPath(); g.moveTo(-700, -900); g.lineTo(700, -900); g.lineTo(700, 198); g.lineTo(160, 212);
+  g.bezierCurveTo(156, 300, 150, 380, 148, 446); g.quadraticCurveTo(0, 470, -148, 446);
+  g.bezierCurveTo(-150, 380, -156, 300, -160, 212); g.lineTo(-700, 198); g.closePath(); g.clip();
 }
-// a standing (or walking) person; y0 = the floor under the feet. back: seen from behind, a dark silhouette
-function standing(g, who, x, z, { e = 'neutral', t = 0, k = 1, walk = 0, phase = 0, back = false, y0 = FLOOR_Y, col, blur = 0 } = {}) {
+// one trouser leg and its shoe; lift raises the foot (the swinging leg), fwd brings it toward the camera
+function leg(g, sd, { lift = 0, fwd = 0, col }) {
+  const ay = FEET - 34 - lift + fwd * 16, ky = (440 + ay) / 2, k = 1 + fwd * 0.04, sx = sd * 72;
+  shoe(g, sx, ay + 4, 112 * k);
+  const gr = g.createLinearGradient(sd * 150, 0, 0, 0);
+  gr.addColorStop(0, col[1]); gr.addColorStop(0.42, col[0]); gr.addColorStop(1, mix(col[1], '#000000', 0.25));
+  g.fillStyle = gr; g.beginPath(); g.moveTo(sd * 2, 396); g.lineTo(sd * 147, 396);
+  g.bezierCurveTo(sd * 148, 480, sd * (118 + 6 * k), ky, sd * 112 * k, ay);
+  g.lineTo(sd * 32 * k, ay); g.bezierCurveTo(sd * 28, ky + 20, sd * 14, 520, sd * 4, 478); g.closePath(); g.fill();
+  g.strokeStyle = 'rgba(0,0,0,0.22)'; g.lineWidth = 4;  // the crease down the front, a fold at the knee, the hem
+  g.beginPath(); g.moveTo(sd * 74, 470); g.lineTo(sx, ay - 10); g.stroke();
+  g.beginPath(); g.moveTo(sd * 46, ky - 6); g.quadraticCurveTo(sd * 70, ky + 4, sd * 100, ky - 8); g.stroke();
+  g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(sd > 0 ? 32 * k : -112 * k, ay - 8, 80 * k, 8);
+}
+// a standing (or walking) person; y0 = the floor under the feet, col = the trousers
+function standing(g, who, x, z, { e = 'neutral', t = 0, k = 1, walk = 0, phase = 0, y0 = FLOOR_Y, col } = {}) {
   const hy = y0 + 7.1 * k; if (depth(x, hy, z) < 0.8) return null;
-  const p = B.project(x, hy, z), sc = p.s * k / 100 * 1.05, bob = walk ? Math.abs(Math.sin(phase)) * -10 * sc : 0;
-  footShadow(g, x, z, 1.3 * k, 0.8);
-  g.save(); if (blur > 0.5) g.filter = `blur(${blur.toFixed(1)}px)`;
-  legs(g, p.x, p.y + bob, sc, { walk, phase, col, dark: back });
-  drawChar(g, who, { x: p.x, y: p.y + bob, s: sc, e: typeof e === 'string' ? EXPR[e] : e, t, silhouette: back, shade: `${blur > 0.5 ? `blur(${blur.toFixed(1)}px) ` : ''}brightness(0.14) saturate(0.4)` });
+  const c = CAST[who], p = B.project(x, hy, z), sc = p.s * k / 100 * 1.05 * HK, bob = walk ? -Math.abs(Math.cos(phase)) * 12 : 0;
+  footShadow(g, x, z, 1.3 * k, 0.8, y0);
+  g.save(); g.translate(p.x, p.y); g.scale(sc, sc);
+  const steps = [-1, 1].map(sd => { const ph = phase + (sd > 0 ? 0 : Math.PI); return { sd, fwd: walk * Math.sin(ph), lift: walk * Math.max(0, Math.cos(ph)) * 44 }; });
+  const tc = col || [mix(c.suit, '#000000', 0.1), mix(c.suitD, '#000000', 0.35)];
+  for (const L of steps.sort((a, b) => a.fwd - b.fwd)) leg(g, L.sd, { ...L, col: tc });
+  g.translate(0, bob);
+  g.save(); jacketClip(g);
+  drawChar(g, who, { e: typeof e === 'string' ? EXPR[e] : e, t });
+  g.strokeStyle = 'rgba(0,0,0,0.24)'; g.lineWidth = 5;  // the arms along the sides, the hem
+  for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(sd * 114, 236); g.quadraticCurveTo(sd * 120, 340, sd * 112, 444); g.stroke(); }
+  g.fillStyle = 'rgba(0,0,0,0.22)'; g.beginPath(); g.moveTo(-150, 436); g.quadraticCurveTo(0, 460, 150, 436); g.lineTo(150, 480); g.lineTo(-150, 480); g.closePath(); g.fill();
+  g.restore();
+  for (const sd of [-1, 1]) {  // hands out of the sleeves, swinging against the legs when he walks
+    const sw = walk * Math.sin(phase + (sd > 0 ? Math.PI : 0));
+    hand(g, sd * (142 - sw * 4), 470 - sw * 10, 30);
+    g.fillStyle = mix(c.suitD, '#000000', 0.2); g.beginPath(); g.roundRect(sd * 128 - 26, 430, 52, 22, 8); g.fill();  // the cuff
+  }
   g.restore();
   return p;
 }
@@ -810,7 +834,7 @@ CAST.club1 = { face: [0.97, 1.05, 0.88], hair: 'receding', hairC: '#C9C4BA', bro
 CAST.club2 = { face: [0.95, 1.04, 0.88], hair: 'longcurly', hairC: '#6A4A2E', brow: '#4A3420', suit: '#2F5D6A', suitD: '#21444E', shirt: 'tee', ears: 0.9, female: true };
 const CLUBT = [[4, 1.2, ['club1', 'opp3']], [4, 6.0, ['opp1', 'club2']], [4, 10.6, ['gmA', 'opp2']]];
 const BOARDTEX = tex(256, 256, g => { for (let f = 0; f < 8; f++) for (let r = 0; r < 8; r++) { g.fillStyle = (f + r) % 2 ? '#E2C89A' : '#8A5A34'; g.fillRect(f * 32, r * 32, 32, 32); } });
-function clubRoom(g, lt, t, keys, tTurn, { him = true } = {}) {
+function clubRoom(g, lt, t, keys, tTurn) {
   rig(B, lt, keys, { t });
   room(g, B, CLUB, { t, blur: 2 });
   const items = [];
@@ -827,7 +851,6 @@ function clubRoom(g, lt, t, keys, tTurn, { him = true } = {}) {
     });
   });
   items.sort((a, b) => b.d - a.d).forEach(it => it.f());
-  if (him) standing(g, 'rausis', 6.6, -6, { t, back: true, blur: 3 });
   lowKey(g, { cy: H * 0.45, a: 0.3 });
 }
 
@@ -906,7 +929,7 @@ export async function build(T) {
   cue(clS, 'riser', 0.35);
   // ======================= NOBODY COULD EXPLAIN HOW: two grandmasters at the foot of it, looking up =======================
   shot(nobT - 0.06, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.16, -0.1, 18, [4, 16.6, 3])], [len(sh), K(0.08, -0.08, 16.5, [4, 16.9, 3])]], { t });
+    rig(B, lt, [[0, K(0.16, -0.1, 18, [4, 14.8, 3])], [len(sh), K(0.08, -0.08, 16.5, [4, 15.1, 3])]], { t });
     const gm = (who, x, r, sd, d) => ({ d: depth(x, 0, 3.2), f: () => {
       const top = pillar(g, x, 3.2, r), hy = top + 0.25 + 7.1;
       standing(g, who, x, 3.2, { e: { ...EXPR.worried, sweat: 0, look: [sd * 0.3, -1], turn: sd * 0.3 }, t: t + d, y0: top + 0.25 });
