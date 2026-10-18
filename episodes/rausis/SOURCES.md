@@ -18,6 +18,19 @@
 | New name, same face, half the room knew him; he left | "Half of the playing hall knew me"; withdrew after GM Arturs Neikšāns protested | [Chess.com interview](https://www.chess.com/article/view/igors-rausis-isa-kasimi-interview), [Wikipedia](https://en.wikipedia.org/wiki/Isa_Kasimi) |
 | "You can change your name, but you cannot hide your face" | his words, Chess.com interview (October 2020) | [Chess.com interview](https://www.chess.com/article/view/igors-rausis-isa-kasimi-interview) |
 
+On screen, drawn rather than documented (the facts behind each are in the table above):
+- the bathroom, the stalls and the frozen "photo" in the hook are our cartoon of the scene; the real photo is not used;
+- the wall of the world top 100: anonymous frames; only number 50 — him, 2686, age 58 — is a fact (Chess.com: world
+  no. 50 and the oldest in the top 100; ChessBase: 2686). The other ratings follow a smooth curve from 2875 (number 1,
+  Carlsen, July 2019 list) down to about 2650;
+- the rating pillars: 2500 → 2686 is his; the other pillars are decoration;
+- the three opponents' ratings (2240, 2190, 2150) illustrate "opponents rated more than 400 points below him" (ChessBase);
+- the FIDE monitor wall stands for the fair-play team following him "for months thanks to Prof. Regan's excellent
+  statistical insights" (Yuri Garrett, ChessBase);
+- the newspapers carry invented generic mastheads (NEWS, NOUVELLES, NACHRICHTEN, NOTICIAS) — no real paper is
+  imitated; the coverage itself was The Times, The Telegraph, NBC and others;
+- the wall calendar runs to October 2020, the month of the Valka event (Chess.com interview).
+
 Not in the video, on purpose: he said he had finished chemotherapy two days before Strasbourg (his own account,
 Chess.com interview); he died on 28 March 2024, aged 62. The video stays light and factual; no mockery beyond the
 documented events. The famous toilet photo is not used (copyright); the bathroom scene is our cartoon.

@@ -2,14 +2,15 @@
 // until July 2019, when a phone was found in the toilet he had just used at the Strasbourg Open. A photo of him on the
 // toilet lid with a chess program went round the world (an iPhone 4, in his own words); he signed that the phone was
 // his, FIDE banned him for six years and took his GM title; a year later he turned up at a small tournament in Latvia
-// as Isa Kasimi, and half the room knew him. Sources: SOURCES.md. Retention: the hook asks a question (how does a
-// 58-year-old keep getting better?) and points at the bathroom without saying why; the phone lands at half time; a new
-// loop ("the craziest part came a year later") carries the last 20 seconds. Calm rooms (rule 30), brilliant text
-// (rule 33), a closing question answered with a number (rule 39), light tone: he died in 2024, no mockery.
+// as Isa Kasimi, and half the room knew him. Sources: SOURCES.md.
+// v2 (rules 42, 43): 62.5 s; the hook is the photo itself from the first frame; every beat is staged in a 3D set the
+// camera moves through (a tiled bathroom with three stalls, a wall of the top 100, rating pillars, the club table,
+// the FIDE monitor wall, newspapers spinning down on a world map, an iPhone 4 on a turntable, the arbiters' office,
+// the Baltic in dots, a badge on a lanyard, the club in Valka). Light tone: he died in 2024, no mockery.
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect } from '../../engine/js/core.js';
 import { Board } from '../../engine/js/board.js';
 import { EXPR, exprAt, CAST, drawChar, hand } from '../../engine/js/characters.js';
-import { counter, badge, nameTitle, placeStamp, stamp, sans, serif, mono, popIn } from '../../engine/js/hud.js';
+import { badge, nameTitle, placeStamp, stamp, sans, serif, mono, popIn } from '../../engine/js/hud.js';
 import { rig, seated, actor } from '../../engine/js/stage.js';
 import { box, room, table, ENV, FLOOR_Y, texTri, pool } from '../../engine/js/env.js';
 import { useLookV2, SLATE } from '../../engine/js/look.js';
@@ -40,8 +41,6 @@ const CREDIT = 'Photo: Mt7 / Wikimedia Commons, CC BY-SA 3.0';
 // ---------- calm rooms (rule 30) ----------
 const HALL = { base: '#0E0B08', wall: ['#5A4A38', '#4C3E2F'], seam: '#2E241A', rail: '#6A5236', floor: ['#2E2318', '#261D14'], light: '#FFE6B8', lightA: 0.3, windows: true };
 const CLUB = { base: '#0A0806', wall: ['#3E3426', '#372E22'], seam: '#241C14', rail: '#5A4630', floor: ['#2A2018', '#241B14'], light: '#FFD9A0', lightA: 0.32, frames: true, sconces: true, table: ['#5A3E26', '#2E1E10', '#22160C'] };
-const darkCard = (g, top, bottom) => { const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, top); bg.addColorStop(1, bottom); g.fillStyle = bg; g.fillRect(0, 0, W, H); };
-const SLATEBG = ['#16202A', '#07090C'];
 const pop = (t, t0) => popIn(t, t0);
 function rim(g, x, y, r, col, a = 0.5) {
   const gr = g.createRadialGradient(x, y, r * 0.2, x, y, r); gr.addColorStop(0, rgba(col, a)); gr.addColorStop(1, rgba(col, 0));
@@ -55,7 +54,6 @@ function heading(g, text, y, a = 1, { size = 44, color = CREAM, spacing = 5 } = 
   const tw = g.measureText(text).width; g.fillStyle = TEAL; g.fillRect(W / 2 - 40, y + 18, 80, 5);
   qaRect(g, W / 2 - tw / 2, y - size * 0.8, tw, size + 30, 'text', text); g.restore();
 }
-const zoomAt = (g, x, y, z) => { g.translate(x, y); g.scale(z, z); g.translate(-x, -y); };
 
 // ---------- 3D toolkit: clipped lines, tiled planes, shaded convex solids (boxes, turned shapes, cylinders),
 // textured quads. Every set below is built from these, so the camera can move through it ----------
@@ -170,8 +168,6 @@ function texQuad(g, img, tl, tr, bl, { under = true, near = 0.4, a = 1, src = nu
   }
   g.restore();
 }
-// does the quad (tl, tr, bl) show its front (the side the texture reads correctly from) to the camera?
-const showsFront = (tl, tr, bl) => vdot(vcross(vsub(tr, tl), vsub(bl, tl)), vsub(B.E, tl)) > 0;
 const tex = (w, h, draw) => { const c = makeCanvas(w, h), x = c.getContext('2d'); draw(x, w, h); return c; };
 
 // ---------- people in 3D: limbs between world points, shoes, a man seated on a toilet lid, a walker ----------
@@ -216,7 +212,7 @@ const layout = (rows, nb, z0, dz, seed) => {  // a mid-game on every board, a di
   }
   return { rows, items: out, z0: z0 - 0.7, z1: z0 + (nb - 1) * dz + 0.7 };
 };
-const BIG = layout([0.3, 4, 7.7], 15, -3.6, 1.12, 47), SMALL = layout([1.2, 6.8], 4, 1.0, 2.2, 20);
+const BIG = layout([0.3, 4, 7.7], 15, -3.6, 1.12, 47);
 function hallBoards(g, L, { lit = 1, turn = 0, marks = 0, t = 0 } = {}) {
   const items = [...L.items].sort((a, b) => B.toCam(b.xc, 0, b.z)[2] - B.toCam(a.xc, 0, a.z)[2]);
   for (const xc of [...L.rows].sort((a, b) => Math.abs(b - B.E[0]) - Math.abs(a - B.E[0])))
@@ -261,7 +257,6 @@ function hall(g, lt, t, keys, { L = BIG, env = HALL, lit = 1, turn = 0, marks = 
   hallBoards(g, L, { lit, turn, marks, t });
   lowKey(g, { cy: H * 0.44, a: 0.24 });
 }
-const HALLR = (yaw = 0, dist = 17, pitch = 0.34, tz = -4) => ({ yaw: Math.PI + yaw, pitch, dist, fov: 1500, cy: H * 0.5, target: [4, 2.6, tz] });
 const HIGH = (yaw, dist, pitch = 0.62) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.5, target: [4, 0, 4] });
 
 // ---------- a portrait behind a board (him), and a game seen from the side (him against a weaker player) ----------
@@ -506,7 +501,6 @@ function tag3(g, x, y, z, text, col, u) {
   g.strokeStyle = col; g.lineWidth = 4; g.stroke(); g.fillStyle = col; g.textAlign = 'center'; g.fillText(text, 0, fs * 0.38);
   g.restore(); qaRect(g, p.x - tw / 2, p.y - fs * 0.85, tw, fs * 1.4, 'text', text);
 }
-const SIDE = (yaw = -1.2, dist = 12, pitch = 0.24, ty = 1.4) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.5, target: [4, ty, 4] });
 const WCAMS = [[Math.PI + 0.32, 0.3, 10, [4, 2.0, 2.2]], [-0.26, 0.28, 11, [4, 2.8, 6.2]], [Math.PI - 0.32, 0.3, 10, [4, 2.0, 2.2]]];
 function winsSet(g, lt, t, keys, t0, dt, { tags = true } = {}) {
   const i = clamp(Math.floor((t - t0) / dt), 0, OPP.length - 1), k = t - (t0 + i * dt), [opp, rr] = OPP[i];
