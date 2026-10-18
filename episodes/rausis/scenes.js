@@ -389,16 +389,16 @@ function namePlate(g, lt, t, tBan, tStrip) {
   const pg = g.createLinearGradient(0, py - 90, 0, py + 90); pg.addColorStop(0, '#6A4A2A'); pg.addColorStop(1, '#3A2414');
   g.fillStyle = pg; g.beginPath(); g.moveTo(px - 400, py + 110); g.lineTo(px - 360, py - 90); g.lineTo(px + 360, py - 90); g.lineTo(px + 400, py + 110); g.closePath(); g.fill(); g.restore();
   g.fillStyle = '#D8B878'; g.fillRect(px - 330, py - 60, 660, 120);
-  g.fillStyle = '#2A1C10'; g.font = sans(64, 900); g.letterSpacing = '4px'; g.textAlign = 'left'; g.textBaseline = 'middle';
-  const name = 'IGORS RAUSIS', gm = 'GM ', wn = g.measureText(name).width, wg = g.measureText(gm).width, x0 = px - (wg + wn) / 2;
-  g.fillText(name, x0 + wg, py + 4);
-  if (t < tStrip) g.fillText(gm, x0, py + 4);
-  else {  // the two letters fall off and bounce on the desk
-    const dt = t - tStrip;
-    ['G', 'M'].forEach((ch, i) => {
-      const d = Math.max(0, dt - i * 0.08), vy = 900, yy = Math.min(py + 4 + 0.5 * 2600 * d * d, 1060), bounce = yy >= 1060 ? Math.abs(Math.sin((d - 0.5) * 9)) * 30 * Math.exp(-(d - 0.5) * 4) : 0;
-      g.save(); g.translate(x0 + i * wg * 0.45 + 20, yy - bounce); g.rotate(d * (i ? 3 : -2.4)); g.fillStyle = '#2A1C10'; g.fillText(ch, -20, 0); g.restore();
-    });
+  g.font = sans(64, 900); g.letterSpacing = '4px'; g.textAlign = 'left'; g.textBaseline = 'middle';
+  const name = 'IGORS RAUSIS', gm = 'GM', wn = g.measureText(name).width, wg = g.measureText(gm + ' ').width, x0 = px - (wg + wn) / 2;
+  const cut = x0 + wg - 10;  // the brass plate is cut just after "GM"
+  g.fillStyle = '#D8B878'; g.fillRect(cut, py - 60, px + 330 - cut, 120);
+  g.fillStyle = '#2A1C10'; g.fillText(name, x0 + wg, py + 4);
+  const piece = () => { g.fillStyle = '#E2C486'; g.fillRect(-(cut - (px - 330)), -60, cut - (px - 330), 120); g.fillStyle = 'rgba(0,0,0,0.15)'; g.fillRect(-4, -60, 4, 120); g.fillStyle = '#2A1C10'; g.fillText(gm, x0 - cut, 4); };
+  if (t < tStrip) { g.save(); g.translate(cut, py); piece(); g.restore(); }
+  else {  // the "GM" piece breaks off, tumbles and lands on the desk
+    const d = t - tStrip, fall = Math.min(1, d / 0.45), yy = py + lerp(0, 230, fall * fall), rot = lerp(0, -0.9, ease.out(fall)) + (fall >= 1 ? Math.sin((d - 0.45) * 18) * 0.08 * Math.exp(-(d - 0.45) * 6) : 0);
+    g.save(); g.translate(cut - 80 * fall, yy); g.rotate(rot); piece(); g.restore();
   }
   g.textBaseline = 'alphabetic';
   qaRect(g, px - 330, py - 60, 660, 120, 'text', 'name plate');
@@ -480,24 +480,24 @@ function twoNames(g, lt, t, tEq) {
 }
 // a real photograph in 2.5D under a dark band carrying its title
 const DROP = 330, lin = x => x;
-function photoShot(g, lt, ph, { from, to, dur, dim = 0 }) {
+function photoShot(g, lt, ph, { from, to, dur, dim = 0, drop = DROP }) {
   g.fillStyle = '#0B0E11'; g.fillRect(0, 0, W, H);
-  g.save(); g.translate(0, DROP); photo3d(g, ph, lt, { from, to, dur, e: lin }); g.restore();
-  const gr = g.createLinearGradient(0, DROP - 20, 0, DROP + 250); gr.addColorStop(0, '#0B0E11'); gr.addColorStop(1, 'rgba(11,14,17,0)');
-  g.fillStyle = gr; g.fillRect(0, 0, W, DROP + 250);
+  g.save(); g.translate(0, drop); photo3d(g, ph, lt, { from, to, dur, e: lin }); g.restore();
+  const gr = g.createLinearGradient(0, drop - 20, 0, drop + 250); gr.addColorStop(0, '#0B0E11'); gr.addColorStop(1, 'rgba(11,14,17,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, W, drop + 250);
   if (dim > 0) { g.fillStyle = `rgba(0,0,0,${dim.toFixed(3)})`; g.fillRect(0, 0, W, H); }
 }
 function credit(g, a = 0.75, y = 314) { g.save(); g.globalAlpha *= a; g.font = sans(17, 700); g.letterSpacing = '2px'; g.textAlign = 'center'; g.fillStyle = CREAM; g.fillText(CREDIT, W / 2, y); g.restore(); }
 // the photo goes round the world: thumbnails landing on a dotted map
 function worldPhotos(g, lt, t, t0) {
   darkCard(g, SLATEBG[0], SLATEBG[1]);
-  MAP.view({ lon: 10 + 4 * clamp(lt / 4), lat: 30, zoom: 3.2, cy: H * 0.46 });
-  MAP.draw(g, { spacing: 10, base: '#34506A' });
+  MAP.view({ lon: -12 + 6 * clamp(lt / 4), lat: 36, zoom: 4.6, cy: H * 0.46 });
+  MAP.draw(g, { spacing: 11, base: '#34506A' });
   const spots = ['Strasbourg', 'London', 'New York', 'Paris', 'Moscow', 'Tokyo', 'Manila', 'Reykjavik'];
   spots.forEach((c, i) => {
     const ti = t0 + i * 0.16; if (t < ti) return;
     const [x, y] = MAP.proj(...CITY[c]), u = seg(t, ti, ti + 0.25, ease.back);
-    g.save(); g.translate(x, y - 40 * u); g.scale(u, u); g.rotate((i % 2 ? 1 : -1) * 0.06);
+    g.save(); g.translate(x, y - 40 * u); g.scale(1.35 * u, 1.35 * u); g.rotate((i % 2 ? 1 : -1) * 0.06);
     g.fillStyle = '#F2EEE4'; g.shadowColor = 'rgba(0,0,0,0.6)'; g.shadowBlur = 16; g.fillRect(-44, -54, 88, 108); g.shadowColor = 'transparent';
     g.fillStyle = '#76827C'; g.fillRect(-36, -46, 72, 80); g.fillStyle = '#ABA9A3'; g.beginPath(); g.arc(0, -16, 16, 0, 7); g.fill(); g.fillStyle = rgba(PHONE, 0.9); g.fillRect(-6, 4, 12, 18);
     g.restore();
@@ -530,7 +530,7 @@ export async function build(T) {
 
   // ======================= WHO: Igors Rausis, grandmaster since 1992 =======================
   const whoS = s('who');
-  shot(whoS - 0.08, (g, lt, t, sh) => photoShot(g, lt, PH.rausis, { from: { x: 0.52, y: 0.42, zoom: 1.18, dolly: 0 }, to: { x: 0.54, y: 0.44, zoom: 1.32, dolly: 0.06 }, dur: 4.4 }),
+  shot(whoS - 0.08, (g, lt, t, sh) => photoShot(g, lt, PH.rausis, { from: { x: 0.55, y: 0.45, zoom: 1.0, dolly: 0 }, to: { x: 0.56, y: 0.47, zoom: 1.1, dolly: 0.06 }, dur: 4.4, drop: 440 }),
     { noJump: true, hud: (g, lt, t) => { nameTitle(g, lt, 'Igors Rausis', 'GRANDMASTER · SINCE 1992', { y: 200, size: 66, t0: w('who', 'Igors') - (t - lt) }); credit(g, seg(lt, 0.4, 0.6) * 0.75); } });
   cue(whoS, 'camera', 0.2);
 
@@ -632,7 +632,7 @@ export async function build(T) {
   const quS = s('quote'), saidT = w('quote', '"You');
   shot(quS - 0.06, (g, lt, t, sh) => corridor(g, lt, t, { z0: 1.12, z1: 1.0, dur: 1.4, glow: 0, shut: seg(lt, 0.3, 1.2) }), { noJump: true });
   cue(quS + 0.1, 'door_slam', 0.18);
-  shot(saidT - 0.3, (g, lt, t, sh) => photoShot(g, lt, PH.rausis, { from: { x: 0.5, y: 0.45, zoom: 1.1, dolly: 0 }, to: { x: 0.52, y: 0.47, zoom: 1.24, dolly: 0.05 }, dur: 4, dim: 0.25 }),
+  shot(saidT - 0.3, (g, lt, t, sh) => photoShot(g, lt, PH.rausis, { from: { x: 0.55, y: 0.45, zoom: 1.04, dolly: 0 }, to: { x: 0.56, y: 0.47, zoom: 1.14, dolly: 0.05 }, dur: 4, dim: 0.25, drop: 440 }),
     { noJump: true, hud: (g, lt, t) => {
       g.save(); g.globalAlpha = seg(lt, 0.15, 0.4); g.font = serif(46, 700); g.textAlign = 'center'; g.fillStyle = CREAM; g.shadowColor = 'rgba(0,0,0,0.7)'; g.shadowBlur = 20;
       g.fillText('“You can change your name,', W / 2, 190); g.fillText('but you cannot hide your face.”', W / 2, 252); g.restore();
