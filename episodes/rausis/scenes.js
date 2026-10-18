@@ -536,7 +536,16 @@ function winsSet(g, lt, t, keys, t0, dt, { tags = true } = {}) {
   table(g, B, E); B.drawSlab(g, SLATE);
   B.drawPieces(g, POS.map(p => p.id === 'e1' ? { ...p, rot: fall * 1.5, x: p.x + fall * 0.4, y: fall * 0.05 } : p), { focus: B.dist, dof: 1.2 });
   hb(); hw();
-  if (k > 0.55) { const u = clamp((k - 0.55) / 0.5), p = B.project(1.2, 0.8 + u * 1.6, 2.5); g.save(); g.globalAlpha *= 1 - u; g.font = sans(Math.round(p.s * 0.9), 900); g.textAlign = 'center'; g.fillStyle = C.lime; g.fillText('1–0', p.x, p.y); g.restore(); }
+  // the white king falls, so black (him) wins: 0–1; it rises by the board, or beside him when he faces the camera
+  // (from the board it would climb into the captions), and stays inside the frame
+  if (k > 0.55) {
+    const u = clamp((k - 0.55) / 0.5), [ax, ay, az] = i === 1 ? [6.6, 2.4, 8.6] : [1.2, 0.8, 2.5];
+    const p = B.project(ax, ay + u * 1.6, az), fs = Math.round(clamp(p.s * 0.9, 110, 160));
+    g.save(); g.globalAlpha *= 1 - u; g.font = sans(fs, 900); g.textAlign = 'center'; g.fillStyle = C.lime;
+    g.shadowColor = 'rgba(0,0,0,0.75)'; g.shadowBlur = 14;
+    const tw = g.measureText('0–1').width, x = clamp(p.x, tw / 2 + 60, W - tw / 2 - 60);
+    g.fillText('0–1', x, p.y); qaRect(g, x - tw / 2, p.y - fs * 0.75, tw, fs * 0.8, 'text', '0–1'); g.restore();
+  }
   if (tags && i === 1) tag3(g, 4, 5.6, 9.4, '2686', GOLD, clamp(k / 0.2));  // only the face turned to the camera carries its rating
   if (tags && i !== 1) tag3(g, 4, 5.6, -1.4, String(rr), RED, rise);
   lowKey(g, { cy: H * 0.42, a: 0.28 });
@@ -1041,7 +1050,7 @@ export async function build(T) {
 
   // ======================= NEW NAME, SAME FACE; HALF THE ROOM RECOGNIZED HIM =======================
   const fcS = s('face'), nameT = w('face', 'name.'), sameT = w('face', 'Same'), faceT = w('face', 'face.'), halfT = w('face', 'Half');
-  shot(fcS - 0.06, (g, lt, t, sh) => { const t0 = t - lt; badgeSet(g, lt, t, [[0, K(-0.22, 0.04, 8.0, [4, 3.4, 4])], [sameT - t0, K(0.1, 0.04, 7.2, [4, 3.4, 4])], [faceT - t0 + 0.2, K(0.12, 0.03, 4.9, [4, 3.3, 4]), ease.out], [len(sh), K(0.14, 0.03, 4.7, [4, 3.3, 4])]], nameT - 0.3, faceT); },
+  shot(fcS - 0.06, (g, lt, t, sh) => { const t0 = t - lt; badgeSet(g, lt, t, [[0, K(-0.22, 0.04, 8.0, [4, 3.1, 4])], [sameT - t0, K(0.1, 0.04, 7.2, [4, 3.0, 4])], [faceT - t0 + 0.2, K(0.12, 0.03, 4.9, [4, 2.8, 4]), ease.out], [len(sh), K(0.14, 0.03, 4.7, [4, 2.8, 4])]], nameT - 0.3, faceT); },
     { noJump: true });
   cue(nameT - 0.3, 'whoosh_fast', 0.3); cue(faceT, 'dun_dun', 0.35);
   shot(halfT - 0.06, (g, lt, t, sh) => clubRoom(g, lt, t, [[0, K(0, 0.13, 15.5, [4, 2.4, 5])], [len(sh), K(0.06, 0.12, 13.5, [4, 2.6, 5])]], halfT + 0.05), { noJump: true });
