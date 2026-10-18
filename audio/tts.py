@@ -159,6 +159,7 @@ class Kokoro:
         self.ratio = 2 ** (-v.get('pitch_semitones', 0) / 12)  # tape-style deepen
 
     def __call__(self, text, prev, nxt):
+        text = untag(text)  # eleven_v3 audio tags ([serious]...) would be read out loud
         audio, toks, off = [], [], 0.0
         for r in self.pipe(text, voice=self.v['name'], speed=self.v.get('speed', 1.0) * self.ratio):
             a = r.audio.numpy()

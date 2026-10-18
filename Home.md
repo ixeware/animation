@@ -16,6 +16,7 @@
 
 | Папка | О чём | Факты и фото |
 |---|---|---|
+| `rausis` | гроссмейстер, который жульничал из туалета (Раусис, 2019) | [SOURCES](episodes/rausis/SOURCES.md) |
 | `najdorf` | Найдорф: 45 досок вслепую, чтобы семья узнала, что он жив | [SOURCES](episodes/najdorf/SOURCES.md) |
 | `youngest` | самые молодые гроссмейстеры | [SOURCES](episodes/youngest/SOURCES.md) |
 | `magnus` | насколько силён Магнус | [SOURCES](episodes/magnus/SOURCES.md) |
