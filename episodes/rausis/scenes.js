@@ -768,7 +768,7 @@ function calendarSet(g, lt, t, keys, t0, rate) {
     const u = ((t - t0) / rate) % 1, a = ease.in(u) * 2.6, fz = -ease.in(u) * 5;
     const P = (x, yy) => [x, cy + h / 2 - Math.cos(a) * (cy + h / 2 - yy), z - Math.sin(a) * (cy + h / 2 - yy) + fz];
     texQuad(g, CAL[n], P(cx - w / 2, cy + h / 2), P(cx + w / 2, cy + h / 2), P(cx - w / 2, cy - h / 2), { a: 1 - u * 0.3 });
-  } else texQuad(g, CAL[15], C0, C1, C2);
+  } else texQuad(g, CAL[t < t0 ? 0 : 15], C0, C1, C2);   // before the flipping starts the first page, JUL 2019
   ab(g, [cx - w / 2 - 0.1, cy + h / 2, z - 0.1], [cx + w / 2 + 0.1, cy + h / 2 + 0.25, z], '#2A2016', { amb: 0.6 });
   lowKey(g, { cy: H * 0.4, a: 0.3 });
 }

@@ -85,6 +85,7 @@ npm i                      # playwright (браузер берётся сист�
 |---|---|
 | `STYLE_BIBLE.md` | Полный разбор стиля: сторителлинг, палитра, персонажи, HUD доски, шрифты, монтаж, голос, музыка, SFX |
 | `reference/episodes.md` | Покадровые разборы всех 4 роликов аккаунта |
+| `reference/rausis_v2.md` | Эталонный ролик в раскадровке (правило 45): кадры каждой сцены, как сделан переход через экран FIDE |
 | `templates/episode_template.md` | Шаблон нового эпизода |
 | `episodes/<name>/script.json` | Сценарий: фразы, паузы после них, цвета ударных слов в субтитрах |
 | `episodes/<name>/scenes.js` | Планы эпизода, привязанные к словам озвучки, метки SFX и музыкальные разделы |
@@ -92,7 +93,7 @@ npm i                      # playwright (браузер берётся сист�
 | `render.mjs` | Рендер в headless Chromium: стоп-кадры (`--stills 1,2,3`) или видео в несколько потоков; `--motion 1\|2` — движение надписей (правило 41), `--out имя.mp4` — куда писать видео, чтобы сравнить два варианта |
 | `audio/tts.py` | Озвучка: Fish Audio, ElevenLabs или локальный Kokoro; тайминги каждого слова; кэш ответов API в `build/tts_cache/` |
 | `audio/music.py`, `audio/sfx.py`, `audio/mix.py` | Процедурная партитура (ре минор, 120 BPM), 45 синтезированных эффектов, сведение (голос сверху, подложка на 7–8 LU ниже, мастер −16 LUFS) |
-| `tools/` | Анализ TikTok-профиля (`analyze_tiktok.sh`, `analyze_audio.py`), PGN → позиции по ходам (`pgn_to_json.py`), карты глубины для 2.5D (`depth.py`, Depth Anything V2) |
+| `tools/` | Анализ TikTok-профиля (`analyze_tiktok.sh`, `analyze_audio.py`), PGN → позиции по ходам (`pgn_to_json.py`), карты глубины для 2.5D (`depth.py`, Depth Anything V2), контакт-листы кадров из готового видео с подписью времени (`sheet.py`) |
 
 ## Оформление
 
