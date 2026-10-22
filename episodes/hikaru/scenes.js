@@ -258,8 +258,11 @@ function mark(g, ch, x, y, z, u, t, { color = CREAM, size = 1.1 } = {}) {
 function tag3(g, x, y, z, text, col, u) {
   if (u <= 0 || depth(x, y, z) < 0.8) return;
   const p = B.project(x, y, z), k = lerp(1.35, 1, ease.out(clamp(u))), fs = Math.round(clamp(p.s * 0.6, 30, 64));
-  g.save(); g.globalAlpha *= clamp(u * 2); g.translate(p.x, p.y); g.scale(k, k);
   g.font = sans(fs, 900); const tw = g.measureText(text).width + fs * 0.8;
+  if (p.x < -tw / 2 || p.x > W + tw / 2) return;  // the anchor is off screen: no tag
+  p.x = clamp(p.x, tw * k / 2 + 24, W - tw * k / 2 - 24);  // a tag at the edge slides into the frame
+  g.save(); g.globalAlpha *= clamp(u * 2); g.translate(p.x, p.y); g.scale(k, k);
+  g.font = sans(fs, 900);
   g.fillStyle = 'rgba(8,6,4,0.78)'; g.beginPath(); g.roundRect(-tw / 2, -fs * 0.85, tw, fs * 1.4, 10); g.fill();
   g.strokeStyle = col; g.lineWidth = 4; g.stroke(); g.fillStyle = col; g.textAlign = 'center'; g.fillText(text, 0, fs * 0.38);
   g.restore(); qaRect(g, p.x - tw / 2, p.y - fs * 0.85, tw, fs * 1.4, 'text', text);
@@ -995,7 +998,7 @@ export async function build(T) {
     const hu = seg(t, andT, resgT, ease.out) * (1 - seg(t, banT + 0.5, banT + 0.9));
     const pieces = p101.map(p => p.id === 'K1' ? { ...p, rot: -1.35 * tip } : p);
     arena(g, t, { led: 'vs', jb: 0, mid: g2 => tableSet(g2, t, { pieces, hReach: { sq: 'h2', y: lerp(1.45, 0.9, tip), u: hu, hold: true }, hSide: -1 }) });
-  }, { trans: 'whip', hud: (g, lt, t) => stamp(g, 'BANNED', W / 2, 330, t, banT, { sub: 'NO RESIGNING' }) });
+  }, { trans: 'whip', hud: (g, lt, t) => stamp(g, 'BANNED', W * 0.6, 285, t, banT, { sub: 'NO RESIGNING' }) });
   cue(andT - 0.1, 'whoosh_fast', 0.3); cue(resgT + 0.28, 'thud', 0.5); cue(banT, 'stamp', 0.7); cue(banT + 0.02, 'error', 0.35); cue(banT + 0.3, 'piece', 0.6);
 
   // ======================= USA WINS FOUR STRAIGHT: the jumbotron counts up =======================
@@ -1024,7 +1027,7 @@ export async function build(T) {
   const fmS = s('format'), d1T = w('format', 2), fiveT = w('format', 'five'), d2T = w('format', 5), thenT = w('format', 'then'), bulT = w('format', 'bullet');
   const fmtBadge = (text, t0, color = CREAM) => (g, lt, t) => badge(g, text, W / 2, 230, { color, size: 46, a: seg(t, t0, t0 + 0.1), ...pop(t, t0) });
   shot(fmS - 0.06, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI / 2 + 0.3, 0.25, 4.5, [9.9, 0.2, 4])], [len(sh), K(PI / 2 + 0.22, 0.22, 3.9, [9.9, 0.2, 4])]], { t });
+    rig(B, lt, [[0, K(PI / 2 + 0.4, 0.25, 4.6, [9.9, 0.2, 4])], [len(sh), K(PI / 2 + 0.46, 0.22, 4.1, [9.9, 0.2, 4])]], { t });
     arena(g, t, { led: 'live', jb: 4, mid: g2 => tableSet(g2, t, { pieces: board(G, 20), clock: t >= d1T ? { draw: true } : { l: 600 - (t - fmS) * 20, r: 596, run: 1 } }) });
   }, { hud: fmtBadge('10 MIN', fmS) });
   cue(fmS - 0.06, 'clock_press', 0.5); cue(d1T, 'ting', 0.35);
@@ -1150,7 +1153,7 @@ export async function build(T) {
   const planA = w('twist', 'the') - 0.05, winrT = w('twist', 'winner'), supT = w('twist', 'supposed'), tkT = w('twist', 'king');
   const planP = v => [lerp(4, LAND[0], v), lerp(1.4, LAND[1], v) + Math.sin(PI * v) * 9, lerp(4, LAND[2], v)];
   shot(planA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-PI / 2 + 0.25, 0.55, 30, [14, 1.5, 3])], [len(sh), K(-PI / 2 + 0.3, 0.52, 27, [14.5, 2, 3])]], { t });
+    rig(B, lt, [[0, K(-PI / 2 + 0.25, 0.55, 30, [14, 1.5, 6.5], { fov: 1350, cy: H * 0.42 })], [len(sh), K(-PI / 2 + 0.3, 0.52, 27, [14.5, 2, 6.5], { fov: 1350, cy: H * 0.42 })]], { t });
     const u = seg(t, supT, tkT + 0.1, x => x);
     arena(g, t, { led: 'vs', jb: 0, cheer: 0.1, mid: g2 => tableSet(g2, t, { pieces: board(G, 0) }),
       over: g2 => {
@@ -1192,12 +1195,12 @@ export async function build(T) {
   // ======================= THIS TIME GUKESH WINS: 46...Qxf2, Hikaru's king goes over =======================
   const qA = gwT - 0.36, m92 = moveOf(G2, 92);
   shot(thisT - 0.04, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.3, 0.42, 8.5, [5, 0.8, 3.5])], [len(sh), K(0.24, 0.4, 7.6, [5.2, 0.8, 3])]], { t });
+    rig(B, lt, [[0, K(0.3, 0.42, 8.5, [5, 1.15, 3.5])], [len(sh), K(0.24, 0.4, 7.6, [5.2, 1.15, 3])]], { t });
     const top = seg(t, gwT + 0.1, gwT + 0.35, ease.in);
     const pieces = (t < qA ? piecesAt(G2, 91) : piecesAt(G2, 92, slide(t - qA), SLIDE_OPTS)).map(p => p.id === 'K1' ? { ...p, rot: -1.35 * top } : p);
     clubSet(g, t, { pieces, eg: 'focus', eh: t > gwT ? 'sad' : 'worried', gReach: { sq: 'f2', u: seg(t, qA - 0.45, qA + 0.95, x => x) },
       under: g2 => moveUnder(g2, B, m92, t - qA), over: g2 => moveOver(g2, B, m92, t - qA) });
-  }, { hud: (g, lt, t) => { if (t >= gwT) badge(g, 'GUKESH WINS', W / 2, 230, { color: '#FF9933', size: 50, ...pop(t, gwT) }); } });
+  }, { hud: (g, lt, t) => { if (t >= gwT) badge(g, 'GUKESH WINS', W / 2, 195, { color: '#FF9933', size: 50, ...pop(t, gwT) }); } });
   cue(qA + SLIDE - MOVE_HIT, 'move_capture', 0.8); boom(qA + SLIDE, 0.6); cue(gwT + 0.33, 'thud', 0.4);
 
   // ======================= NO THROW: a handshake over the board =======================

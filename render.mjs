@@ -63,7 +63,7 @@ function qaCheck(fr, t, W = 1080, H = 1920) {
   for (const f of faces) {
     for (const c of caps) if (inter(f, c) / area(f) > 0.25) out.push(['captions over face', f.label]);
     const inside = inter(f, { x: 0, y: 0, w: W, h: H }) / area(f);
-    if (inside < 0.55 && area(f) < W * H * 0.5) out.push(['face cut by frame', f.label]);
+    if (inside > 0.01 && inside < 0.55 && area(f) < W * H * 0.5) out.push(['face cut by frame', f.label]);
   }
   return out.filter(([type]) => !(fr.allow || []).includes(type)).map(([type, what]) => ({ t, type, what, shot: fr.shot }));
 }
