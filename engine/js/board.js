@@ -1,5 +1,5 @@
 // Perspective chessboard: orbit camera, squares, overlays, billboard pieces with depth of field.
-import { W, H, C, rgba, clamp, lerp, smooth, ease } from './core.js';
+import { W, H, C, rgba, mix, clamp, lerp, smooth, ease } from './core.js';
 import { drawPiece } from './pieces.js';
 import { LOOK } from './look.js';
 
@@ -9,6 +9,18 @@ const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a
 const norm = a => { const l = Math.hypot(...a); return [a[0] / l, a[1] / l, a[2] / l]; };
 
 export const sqXZ = name => [name.charCodeAt(0) - 97 + 0.5, +name[1] - 1 + 0.5];
+
+// the outline of the slab, -m..8+m with corners rounded to rc: points with their outward normals, the corners'
+// arcs in n steps (with rc = 0 an arc's points coincide and its quads are skipped)
+function slabRing(m, rc, n = 14) {
+  const lo = -m + rc, hi = 8 + m - rc, out = [];
+  for (const [cx, cz, a0] of [[hi, lo, -Math.PI / 2], [hi, hi, 0], [lo, hi, Math.PI / 2], [lo, lo, Math.PI]])
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + i / n * Math.PI / 2, nx = Math.cos(a), nz = Math.sin(a);
+      out.push({ x: cx + nx * rc, z: cz + nz * rc, nx, nz });
+    }
+  return out;
+}
 
 export class Board {
   constructor(cam = {}) { this.setCam(cam); }
@@ -47,22 +59,90 @@ export class Board {
 
   quad(ctx, x0, z0, x1, z1, y = 0) { this.poly(ctx, [[x0, y, z0], [x1, y, z0], [x1, y, z1], [x0, y, z1]]); }
 
-  drawSlab(ctx, { light = C.sq2, dark = C.sq1, frame = '#151A1D', side = '#0B0E10', m = 0.35, th = 0.35, tint = null, tintA = 0 } = {}) {
-    // side faces (front-facing ones drawn last)
-    const faces = [
-      [[-m, 0, -m], [8 + m, 0, -m], [8 + m, -th, -m], [-m, -th, -m]],
-      [[8 + m, 0, -m], [8 + m, 0, 8 + m], [8 + m, -th, 8 + m], [8 + m, -th, -m]],
-      [[8 + m, 0, 8 + m], [-m, 0, 8 + m], [-m, -th, 8 + m], [8 + m, -th, 8 + m]],
-      [[-m, 0, 8 + m], [-m, 0, -m], [-m, -th, -m], [-m, -th, 8 + m]],
-    ].map(f => ({ f, d: this.project(...f.reduce((a, p) => [a[0] + p[0] / 4, a[1] + p[1] / 4, a[2] + p[2] / 4], [0, 0, 0])).z }))
-      .sort((a, b) => b.d - a.d);
-    for (const { f } of faces) { this.poly(ctx, f); ctx.fillStyle = side; ctx.fill(); }
-    this.quad(ctx, -m, -m, 8 + m, 8 + m); ctx.fillStyle = frame; ctx.fill();
+  // the slab as in the reference (STYLE_BIBLE rule 46): rounded corners (rc), a soft light rim along the top edge, dark
+  // sides that catch a little light from the camera's right, a soft shadow round the foot, and the channel's mark
+  // engraved on every side that faces the camera (LOOK.mark; mark: null leaves the sides bare)
+  drawSlab(ctx, { light = C.sq2, dark = C.sq1, frame = '#151A1D', side = '#0B0E10', m = 0.35, th = 0.35, rc = 0.3, rim = 0.45,
+    shadow = 0.4, mark = LOOK.mark, ink = null, tint = null, tintA = 0 } = {}) {
+    const ring = slabRing(m, Math.min(rc, m)), E = this.E;
+    if (shadow > 0) {
+      ctx.save(); this.poly(ctx, ring.map(p => [p.x, -th, p.z]));
+      ctx.shadowColor = `rgba(0,0,0,${shadow})`; ctx.shadowBlur = clamp(this.project(4, -th, 4).s * 0.22, 3, 36);
+      ctx.fillStyle = side; ctx.fill(); ctx.restore();
+    }
+    // the sides: a quad per pair of neighbouring outline points; the slab is convex, so the ones facing the camera
+    // never overlap and need no sorting. Fill and stroke in one colour, so no seams show between the quads
+    const vis = [];
+    ctx.save(); ctx.lineWidth = 1; ctx.lineJoin = 'round';
+    for (let i = 0; i < ring.length; i++) {
+      const a = ring[i], b = ring[(i + 1) % ring.length];
+      if (Math.hypot(b.x - a.x, b.z - a.z) < 1e-6) continue;
+      const nx = (a.nx + b.nx) / 2, nz = (a.nz + b.nz) / 2;
+      if (nx * (E[0] - (a.x + b.x) / 2) + nz * (E[2] - (a.z + b.z) / 2) <= 0) continue;
+      vis.push([a, b]);
+      const lit = 0.04 + 0.12 * Math.max(0, (nx * this.R[0] + nz * this.R[2]) / Math.hypot(nx, nz));
+      if (!this.poly(ctx, [[a.x, 0, a.z], [b.x, 0, b.z], [b.x, -th, b.z], [a.x, -th, a.z]])) continue;
+      ctx.fillStyle = ctx.strokeStyle = mix(side, '#B8C6CC', lit); ctx.fill(); ctx.stroke();
+    }
+    ctx.restore();
+    this.poly(ctx, ring.map(p => [p.x, 0, p.z])); ctx.fillStyle = frame; ctx.fill();
+    // the rim: a thin light line along the visible top edge, as if the edge were rounded and caught the key light
+    if (rim > 0) {
+      ctx.save(); ctx.strokeStyle = rgba(mix(frame, '#FFFFFF', 0.3), rim); ctx.lineCap = 'round';
+      for (const [a, b] of vis) {
+        if (this.toCam(a.x, 0, a.z)[2] < 0.3 || this.toCam(b.x, 0, b.z)[2] < 0.3) continue;
+        const p = this.project(a.x, 0, a.z), q = this.project(b.x, 0, b.z);
+        ctx.lineWidth = clamp((p.s + q.s) * 0.009, 1, 5);
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+      }
+      ctx.restore();
+    }
     for (let f = 0; f < 8; f++) for (let r = 0; r < 8; r++) {
       this.quad(ctx, f, r, f + 1, r + 1);
       ctx.fillStyle = (f + r) % 2 ? light : dark; ctx.fill();
     }
     if (tint && tintA > 0) { this.quad(ctx, 0, 0, 8, 8); ctx.fillStyle = rgba(tint, tintA); ctx.fill(); }
+    if (mark) this.engrave(ctx, mark, { m, th, rc: Math.min(rc, m), ink: ink || mix(side, '#E4ECEE', 0.3) });
+  }
+
+  // a mark engraved on the sides of the slab, in Cinzel caps a little over half the side's height, centred. Glyph by
+  // glyph: each one is mapped onto the side with the perspective of its own spot (the Jacobian of the projection
+  // there), so the line of letters follows the side into the distance. A dark copy above and a faint light one below
+  // cut it in.
+  engrave(ctx, text, { m, th, rc, ink }) {
+    const fs = 100, chars = [...text];
+    ctx.save(); ctx.font = `700 ${fs}px Cinzel`; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.letterSpacing = '0px';
+    const capPx = ctx.measureText('H').actualBoundingBoxAscent, gw = chars.map(ch => ctx.measureText(ch).width), track = fs * 0.1;
+    const span = gw.reduce((a, b) => a + b, 0) + track * (chars.length - 1);
+    const k = Math.min(th * 0.56 / capPx, (8 + 2 * m - 2 * rc - 1.2) / span), cap = capPx * k;  // world units per font px
+    const base = ctx.getTransform(), a0 = ctx.globalAlpha, e = 0.05;
+    for (const [nx, nz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
+      const rx = -nz, rz = nx, cx = 4 + nx * (4 + m), cz = 4 + nz * (4 + m), cy = -th / 2;
+      const v = norm(sub(this.E, [cx, cy, cz])), a = smooth(clamp((nx * v[0] + nz * v[2] - 0.06) / 0.24));
+      if (a <= 0.01) continue;
+      let u = -span * k / 2;
+      const glyphs = [];
+      for (let i = 0; i < chars.length; i++) {
+        const uc = u + gw[i] * k / 2; u += (gw[i] + track) * k;
+        const P = [cx + rx * uc, cy, cz + rz * uc];
+        if (this.toCam(...P)[2] < 0.4) continue;
+        const S = this.project(...P), R0 = this.project(P[0] - rx * e, cy, P[2] - rz * e), R1 = this.project(P[0] + rx * e, cy, P[2] + rz * e);
+        const D0 = this.project(P[0], cy + e, P[2]), D1 = this.project(P[0], cy - e, P[2]);
+        const ju = [(R1.x - R0.x) / (2 * e), (R1.y - R0.y) / (2 * e)], jd = [(D1.x - D0.x) / (2 * e), (D1.y - D0.y) / (2 * e)];
+        const hpx = Math.hypot(...jd) * cap;
+        if (hpx < 3) continue;
+        glyphs.push({ ch: chars[i], m: [ju[0] * k, ju[1] * k, jd[0] * k, jd[1] * k,
+          S.x - ju[0] * gw[i] * k / 2 + jd[0] * cap / 2, S.y - ju[1] * gw[i] * k / 2 + jd[1] * cap / 2], a: a * clamp((hpx - 3) / 5) });
+      }
+      for (const [col, dy, al] of [['#000000', -fs * 0.035, 0.6], ['#FFFFFF', fs * 0.03, 0.07], [ink, 0, 1]]) {
+        ctx.fillStyle = col;
+        for (const gl of glyphs) {
+          ctx.setTransform(base); ctx.transform(...gl.m); ctx.globalAlpha = a0 * gl.a * al;
+          ctx.fillText(gl.ch, 0, dy);
+        }
+      }
+    }
+    ctx.restore();
   }
 
   highlight(ctx, sq, color, a = 0.8, glow = true) {
