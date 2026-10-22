@@ -17,7 +17,12 @@
 | No throw, no celebration: he puts every piece back | the players "shook hands with a smile", and Gukesh followed "his well-known ritual of calmly rearranging the pieces before getting up" (IANS) | [DT Next (IANS)](https://www.dtnext.in/news/sports/champions-showdown-gukesh-takes-calm-revenge-on-nakamura-after-controversial-king-throwing-gesture-851109), [ETV Bharat](https://www.etvbharat.com/en/sports/gukesh-d-revenge-on-hikaru-nakamura-clutch-chess-enn25103104015), [The Logical Indian](https://thelogicalindian.com/d-gukesh-defeats-hikaru-nakamura-at-clutch-chess-showdown-2025-takes-revenge-with-calm-precision/) |
 | The internet called it revenge | headlines: "Gukesh takes calm revenge on Nakamura" (DT Next), "takes classy revenge" (Orissa Post), "Internet reacts to D Gukesh's composed move avenging Hikaru Nakamura's antics" (ETV Bharat) | [DT Next](https://www.dtnext.in/news/sports/champions-showdown-gukesh-takes-calm-revenge-on-nakamura-after-controversial-king-throwing-gesture-851109), [Orissa Post](https://www.orissapost.com/gukesh-dommaraju-silences-nakamura-with-calm-gesture-takes-classy-revenge/amp/), [ETV Bharat](https://www.etvbharat.com/en/sports/gukesh-d-revenge-on-hikaru-nakamura-clutch-chess-enn25103104015) |
 
-Game data: `engine/data/nakamura_gukesh_2025.pgn` (TWIC, round 5, the decisive game) and `engine/data/nakamura_gukesh_2025.json`.
+Game data: `engine/data/nakamura_gukesh_2025.pgn` (TWIC, round 5, the decisive game) and `engine/data/nakamura_gukesh_2025.json`;
+Saint Louis: `engine/data/nakamura_gukesh_stl2025.pgn` and `.json` (Lichess broadcast of Clutch Chess: Champions Showdown,
+round 2, game 1, 27 October 2025, 10+5; Gukesh wins with 46...Qxf2, 0–1).
+
+The eval bar follows our Stockfish run (depth 22, positive numbers favour White): −4.2 after 51.Rc1 (Black is winning),
+0.00 after 51...Qxc1 and through the moves where Black could repeat, mate in one (M1) after 55...Kf8??.
 
 On screen, drawn rather than documented (the facts behind each are in the table above):
 - the arena is our drawing of Esports Stadium Arlington: a stage with one table, LED screens, stands and phone lights;
@@ -29,7 +34,12 @@ On screen, drawn rather than documented (the facts behind each are in the table 
   illustrate the time trouble;
 - the board shows the real final moves (55...Kf8?? 56.Qd8#);
 - the phone post with Sutovsky's words is a plain card, not a copy of the X interface;
-- the club in Saint Louis is drawn, and the reset illustrates the IANS description.
+- the club in Saint Louis is drawn, and the reset illustrates the IANS description; the board in the club shows the
+  real last move 46...Qxf2, the toppled king and the handshake are staged;
+- the hand with the phone, the wall of phones with headline cards and the gold underline on Sutovsky's words are
+  our design; the headlines are quoted from the sources in the table;
+- the VHS rewind and the arc on the stage plan are a way to show "it was planned", not footage of the event;
+- the empty arena with the king on a seat at the end is a drawn callback to the opening, not a real photo.
 
 Not in the video, on purpose: Vladimir Kramnik's criticism of the toss (his feud with Nakamura is tied to the death of
 Daniel Naroditsky; the video stays away from it). The reset is Gukesh's usual ritual (IANS), so the video does not
