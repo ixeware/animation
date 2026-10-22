@@ -91,6 +91,31 @@
 Не подтвердилось: «в кресле Спасского (1972) нашли две дохлые мухи» — в надёжных источниках только «безрезультатный
 обыск зала полицией»; «Иванов не снял ботинки, потому что носки пахнут» (2013) — один рассказ от первого лица.
 
+## Живые звёзды (22.10.2026)
+Автор: «про современных шахматистов больше залетает». Статистика 22.10 это подтверждает: ролики с живыми героями
+набрали 124–623 тыс. просмотров (Witty Alien, обыгравший Магнуса, — 504 тыс., «Why MAGNUS is the GOAT» — 292 тыс.),
+исторические — 19–154 тыс. (Найдорф — 19 тыс., Тал — 70 тыс.).
+1. **Магнус ударил по столу, а через месяц назвал Гукеша слабым.** 1.06.2025, Norway Chess, Ставангер, 6-й тур:
+   Карлсен почти всю партию давил, в цейтноте отдал коня ради проходной (52...Ne2+??), конь Гукеша успел её
+   остановить — первая победа 19-летнего чемпиона мира над Магнусом в классику, «turnaround of the year» (Хауэлл).
+   Магнус сдаётся и бьёт по столу так, что фигуры падают на пол; извиняется, хлопает Гукеша по спине и уходит, не
+   дав интервью. Гукеш: «I have also banged a lot of tables in my career». Поворот: через месяц, перед турниром в
+   Загребе, Магнус: «Gukesh hasn't done anything to indicate that he's going to do well in such a tournament… I will
+   approach it as if I'm playing one of the presumably weaker players». 3.07.2025, рапид: у Гукеша «horrible
+   opening», к 19-му ходу почти проигрыш — и он переворачивает партию (35...e4!), Магнус сдаётся. По столу не бьёт:
+   молча расставляет фигуры и уходит. Гукеш: «It's nice that two losing positions in a row I could win against
+   Magnus!», Каспаров: «Now we can question Magnus' domination». Гукеш выигрывает рапид (14 из 18, пять побед
+   подряд). Кода: в блице он последний, и турнир всё равно выигрывает Магнус. Повод: в конце ноября 2026 Гукеш
+   защищает титул против Синдарова в Женеве — выпустить до матча; продолжение ролика про Хикару (Гукеш — сквозной
+   герой). Ходы с эффектами §8: 52...Ne2+?? и 35...e4!. Вопрос: «So, one to ten: how weak is the world champion?»
+   Источники: [Wikipedia](https://en.wikipedia.org/wiki/Norway_Chess_2025),
+   [Gulf News](https://gulfnews.com/sport/magnus-carlsen-bangs-table-in-frustration-as-gukesh-wins-1.500149197),
+   [Chess.com, Загреб, день 1](https://www.chess.com/news/view/2025-superunited-croatia-rapid-blitz-day-1),
+   [день 2](https://www.chess.com/news/view/2025-superunited-croatia-rapid-blitz-day-2),
+   [FIDE](https://www.fide.com/magnus-carlsen-wins-gct-superunited-rapid-blitz-croatia/),
+   [World Chess, Гукеш — Синдаров](https://worldchess.com/news/fide-quietly-changes-dates-for-gukeshsindarov-world-championship).
+   Слова Гукеша про столы пересказывают по-разному («a lot of» / «many tables»); брать «a lot of» (Chess.com).
+
 ## Ещё из комментариев (не драма, но просят)
 - «Why are jeans banned in the first place?» — топ-комментарий под джинсами (1116♥): короткий ответ-ролик.
 - Witty Alien, часть 2: Alien Gambit (верными цветами), 27 или 51 бриллиант за партию — проверить, был ли реванш.
