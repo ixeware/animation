@@ -30,15 +30,21 @@ On screen, drawn rather than documented (the facts behind each are in the table 
 - the playing halls in Stavanger and Zagreb are our drawings: a dark stage with one table, lights and screens; no event
   logo or sponsor board is copied;
 - how many pieces fell and where they landed is drawn: the sources say "some pieces tumbling to the floor";
-- the clock in Norway shows the real broadcast times around the blunder (under a minute); the Zagreb clock shows the
-  real 0:26 at the end;
+- the slam itself is drawn: the fist, the slow motion and the angles; so is the jump of the pieces;
+- the clocks are drawn to show the time trouble: the broadcast gives Carlsen 0:55 and 0:47 before the blunder in Norway
+  (on screen his clock runs down under a minute) and 0:26 when he resigns in Zagreb (on screen as is); the other
+  readings are ours;
 - the boards show the real moves: 52...Ne2+?? 53.Rxe2+ Kxe2 54.Nxf8 and the knight run to c4 in Norway, 23.b4 and
   35...e4 in Zagreb;
 - the X post and the quotes are plain cards and screens, not copies of the X interface or of a broadcast;
-- Kasparov in a commentary booth is our drawing (reports say he was commentating); the "extra-heavy table" being
-  delivered is a joke on his post, not a real event;
-- Carlsen's "presumably weaker" quote is shown on a phone screen as a headline card; the interview itself is not shown;
-- the empty stage with the table at the end is a drawn callback to the opening.
+- Kasparov in a commentary booth with the result on the wall screen is our drawing (reports say he was commentating);
+  the steel "1000 KG / EXTRA HEAVY" table dropped onto the Zagreb stage is a joke on his post, not a real event;
+- the interview where Carlsen says "presumably weaker" is drawn (a microphone and a backdrop); the words are his;
+- the eval bar before 35...e4 starts from our +0.6; the broadcast gives −1.08 after 35.Rc5 e4, and +5.7 after
+  52...Ne2+?? in Norway, which the bar keeps through the knight run;
+- the Geneva stage with Gukesh at the board and the GUKESH | SINDAROV screen is our drawing: the match starts on
+  24 November 2026;
+- the empty stage at the end, with the pieces still on the floor, is a drawn callback to the opening.
 
 Not in the video, on purpose: Carlsen beat Gukesh in round 1 of Norway Chess 2025 and again in blitz round 4 in Zagreb,
 and he won the Zagreb event (22.5/36, Gukesh third, last in the blitz section); the video keeps to the two games

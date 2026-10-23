@@ -17,6 +17,7 @@
 
 | Папка | О чём | Факты и фото |
 |---|---|---|
+| `tablebang` | Магнус бьёт по столу после проигрыша Гукешу, и тихий реванш Гукеша в Загребе | [SOURCES](episodes/tablebang/SOURCES.md) |
 | `hikaru` | Хикару бросает короля чемпиона мира Гукеша в толпу, и тихий ответ Гукеша | [SOURCES](episodes/hikaru/SOURCES.md) |
 | `rausis` | гроссмейстер, который жульничал из туалета (Раусис, 2019) | [SOURCES](episodes/rausis/SOURCES.md) |
 | `najdorf` | Найдорф: 45 досок вслепую, чтобы семья узнала, что он жив | [SOURCES](episodes/najdorf/SOURCES.md) |

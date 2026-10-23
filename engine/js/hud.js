@@ -37,7 +37,7 @@ export function placeStamp(ctx, lt, place, year, { y = 150, a = 1, t0 = 0, x = W
   const x0 = x - (w1 + gap + w2) / 2, yy = y + (1 - u) * 14;
   ctx.textAlign = 'left'; hard(ctx, 3);
   ctx.fillStyle = C.cream; ctx.fillText(s1, x0, yy); qaRect(ctx, x0, yy - 26, w1 + gap + w2, 46, 'text', place);
-  ctx.fillStyle = C.gold; ctx.fillRect(x0 + w1 + gap / 2 - 3, yy - 22, 6, 6); ctx.fillText(year, x0 + w1 + gap, yy);
+  ctx.fillStyle = C.gold; ctx.fillRect(x0 + w1 + gap / 2 - 3, yy - 14, 6, 6); ctx.fillText(year, x0 + w1 + gap, yy);
   unhard(ctx); ctx.filter = 'none'; ctx.fillStyle = rgba(C.cream, 0.5); ctx.fillRect(x - (w1 + gap + w2) / 2 * ur, yy + 16, (w1 + gap + w2) * ur, 2);
   ctx.restore();
 }
