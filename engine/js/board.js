@@ -85,6 +85,7 @@ export class Board {
       ctx.fillStyle = ctx.strokeStyle = mix(side, '#B8C6CC', lit); ctx.fill(); ctx.stroke();
     }
     ctx.restore();
+    if (E[1] <= 0) return;  // seen from under the board plane: the top faces away
     this.poly(ctx, ring.map(p => [p.x, 0, p.z])); ctx.fillStyle = frame; ctx.fill();
     // the rim: a thin light line along the visible top edge, as if the edge were rounded and caught the key light
     if (rim > 0) {

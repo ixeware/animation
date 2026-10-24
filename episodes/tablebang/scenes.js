@@ -549,36 +549,78 @@ function tableSet(g, t, { pieces = null, loose = [], ew = 'focus', eb = 'focus',
   if (behind) behind(g);
   if (wChair && E[2] > -1.4) chair(g, B, wx, -1.9, { face: 1, color: CHAIR });
   if (bChair && E[2] < 9.3) chair(g, B, bx, 9.8, { face: -1, color: CHAIR });
-  const seatW = () => wPlayer ? seated(g, B, white, ew, t, { x: wx, z: -1.4, face: 1, reach: wReach, side: wSide }) : null;
-  const seatB = () => bPlayer ? seated(g, B, black, eb, t, { x: bx, z: 9.3, face: -1, reach: bReach, side: bSide }) : null;
-  const wFar = E[2] > 4;  // the far player first
-  let hw = null, hb = null;
-  if (wFar) { hw = seatW(); hb = seatB(); } else { hb = seatB(); hw = seatW(); }
+  // the players, the far one first: the busts now; the hands later, and a player seen from behind (hands and all) last
+  const seats = [[wPlayer, white, ew, wx, -1.4, 1, wReach, wSide], [bPlayer, black, eb, bx, 9.3, -1, bReach, bSide]].filter(s => s[0]);
+  if (E[2] <= 4) seats.reverse();
+  const P = seats.map(([, who, e, x, z, face, reach, side]) => ({ who, back: (E[2] - z) * face < 0, arm: armOf(reach, x, z, face, side),
+    f: seated(g, B, who, e, t, { x, z, face, reach, side }) }));
+  const hands = back => P.forEach(p => { if (p.back === back) { useSkin(g, p.who); p.f(); } });
+  // a camera under the table top sees its underside: what stands on the table goes first and the table over it
+  const below = E[1] < (steel ? steelY : 0) - 0.35;
+  // what is nearer to the camera than a reaching arm (of a player seen from the front) is drawn after the arm
+  const AR = below ? [] : P.filter(p => !p.back && p.arm).map(p => p.arm);
+  const late = (x, y, z) => AR.some(A => frontOf(A, x, y, z));
+  const outL = loose.filter(p => zoneOf(p) === 'out' && outLate(p)), side = loose.filter(p => zoneOf(p) === 'side'), dc = depth(9.9, 0.1, 4);
+  const lateP = new Set([...loose.filter(p => zoneOf(p) !== 'out'), ...outL].filter(p => late(p.x, p.y, p.z)));
+  // the clock goes late with anything late behind it, and takes along whatever is in front of it
+  const clockLate = !!clock && AR.length > 0 && (late(9.9, -0.35, 4) || side.some(p => lateP.has(p) && depth(p.x, p.y, p.z) > dc));
+  if (clockLate) side.forEach(p => { if (depth(p.x, p.y, p.z) <= dc) lateP.add(p); });
+  const early = list => list.filter(p => !lateP.has(p));
+  const lateB = pieces && AR.length ? pieces.filter(p => late(p.x, p.y || 0, p.z)) : [];
   drawLoose(g, loose.filter(p => zoneOf(p) === 'out' && !outLate(p)));
-  if (steel) steelTable(g, { dy: steelY }); else table(g, B, { table: TABLE }, { x1: 10.6 });
   const barLate = E[0] < -1.5, sideLate = E[0] > 8.6;
-  if (evalV !== null && !barLate) evalBar(g, evalV, { label: evalLabel, cols: evalCols });
-  const side = loose.filter(p => zoneOf(p) === 'side');
   const sideDraw = () => {  // the captured pieces behind the clock, the clock, those in front of it
-    const dc = depth(9.9, 0.1, 4);
-    drawLoose(g, side.filter(p => depth(p.x, p.y, p.z) > dc));
-    if (clock) lcdClock(g, clock, press);
-    drawLoose(g, side.filter(p => depth(p.x, p.y, p.z) <= dc));
+    const S = early(side);
+    drawLoose(g, S.filter(p => depth(p.x, p.y, p.z) > dc));
+    if (clock && !clockLate) lcdClock(g, clock, press);
+    drawLoose(g, S.filter(p => depth(p.x, p.y, p.z) <= dc));
   };
-  if (!sideLate) sideDraw();
-  if (slab) B.drawSlab(g, SLATE);
-  if (under) under(g);
-  if (pieces) B.drawPieces(g, pieces, { focus: focus ?? B.dist, dof: 1.4 });
-  drawLoose(g, loose.filter(p => zoneOf(p) === 'brd'));
-  if (sideLate) sideDraw();
+  const onTable = () => {
+    if (evalV !== null && !barLate) evalBar(g, evalV, { label: evalLabel, cols: evalCols });
+    if (!sideLate) sideDraw();
+    if (slab) B.drawSlab(g, SLATE);
+    if (under) under(g);
+    if (pieces) B.drawPieces(g, lateB.length ? pieces.filter(p => !lateB.includes(p)) : pieces, { focus: focus ?? B.dist, dof: 1.4 });
+    drawLoose(g, early(loose.filter(p => zoneOf(p) === 'brd')));
+    if (sideLate) sideDraw();
+  };
+  const tbl = () => { if (steel) steelTable(g, { dy: steelY }); else table(g, B, { table: TABLE }, { x1: 10.6 }); };
+  if (below) { onTable(); hands(false); tbl(); } else { tbl(); onTable(); }
   if (over) over(g);
-  drawLoose(g, loose.filter(p => zoneOf(p) === 'out' && outLate(p)));
+  drawLoose(g, early(outL));
   if (evalV !== null && barLate) evalBar(g, evalV, { label: evalLabel, cols: evalCols });
   if (arms) arms(g);
-  for (const [who, f] of wFar ? [[white, hw], [black, hb]] : [[black, hb], [white, hw]]) if (f) { useSkin(g, who); f(); }
+  if (!below) {
+    hands(false);
+    // the late pass, far to near: the pieces and the clock in front of the arms
+    [...lateB.map(p => [depth(p.x, p.y || 0, p.z), () => B.drawPieces(g, [p], { focus: focus ?? B.dist, dof: 1.4 })]),
+      ...[...lateP].map(p => [depth(p.x, p.y, p.z), () => drawLoose(g, [p])]),
+      ...(clockLate ? [[dc, () => lcdClock(g, clock, press)]] : [])].sort((a, b) => b[0] - a[0]).forEach(([, f]) => f());
+  }
+  hands(true);
   if (!wPlayer && wChair && E[2] < -1.4) chair(g, B, wx, -1.9, { face: 1, color: CHAIR });
   if (!bPlayer && bChair && E[2] > 9.3) chair(g, B, bx, 9.8, { face: -1, color: CHAIR });
   if (front) front(g);
+}
+// LOOK v2 arms (stage.js, seated and arm): a reaching arm runs on screen from the shoulder, drawn with the bust at its
+// depth, to the hand, which rises from the table edge in front of the shoulder and goes to the target. Its two ends on
+// screen, with their depths
+function armOf(reach, x, z, face, side) {
+  if (!reach || !(reach.u > 0)) return null;
+  const [tx, tz] = reach.sq ? sqXZ(reach.sq) : [reach.x, reach.z], u = reach.hold ? clamp(reach.u) : Math.sin(Math.PI * clamp(reach.u));
+  const R0 = [x - side * face * 1.3, 0.4, z + face * 1.3], T0 = [tx, reach.y ?? 0.9, tz];
+  const hp = B.project(x, 3.1, z), s = hp.s / 100 * 1.05, rest = B.project(...R0), q = B.project(...T0), sdx = Math.sign(rest.x - hp.x) || 1;
+  return { a: { x: hp.x + sdx * 125 * s, y: hp.y + 255 * s, d: depth(x, 3.1, z) },
+    b: { x: lerp(rest.x, q.x, u), y: lerp(rest.y, q.y, u) - Math.sin(Math.PI * u) * 40, d: lerp(depth(...R0), depth(...T0), u) } };
+}
+// a piece standing at (x, y, z) in front of an arm: nearer to the camera than the arm wherever its foot, middle and top
+// fall along the arm on screen (a piece under the hand stays under it)
+function frontOf({ a, b }, x, y, z) {
+  const dx = b.x - a.x, dy = b.y - a.y, d = depth(x, y + 0.6, z);
+  return [0.15, 0.6, 1.1].every(h => {
+    const q = B.project(x, y + h, z), u = clamp(((q.x - a.x) * dx + (q.y - a.y) * dy) / (dx * dx + dy * dy || 1));
+    return d < lerp(a.d, b.d, u) - 0.1;
+  });
 }
 
 // ---------- people on their feet (the Rausis walker): the bust over trousers and shoes; walk swings the legs and
@@ -898,12 +940,12 @@ export async function build(T) {
   }, { hud: hookHud });
   function hookScene2(g, t) {
     const u = t - IT;
-    rig(B, t - HB, [[0, K(PI / 2 - 0.55, 0.14, 8, [8.2, 1.6, 7.8])], [H3 - HB, K(PI / 2 - 0.62, 0.1, 6.8, [8.5, 1.2, 7.8])]], { t, bump: u > 0 && u < 0.3 ? 1.4 : 0 });
-    hookSet(g, t);
+    rig(B, t - HB, [[0, K(0.3, 0.55, 10.2, [7, 1.9, 8.8], { cy: H * 0.4 })], [H3 - HB, K(0.34, 0.51, 9.3, [7.1, 1.6, 8.8], { cy: H * 0.4 })]], { t, bump: u > 0 && u < 0.3 ? 1.4 : 0 });
+    hookSet(g, t, { loose: simAt(simH(t)).filter(p => !(p.cap && p.c === 'b')) });
     if (u >= 0 && u < 0.4) { flashTint(g, '#FFFFFF', 0.45 * (1 - u / 0.4)); const p = B.project(IMP[0], 0, IMP[1]); speedLines(g, p.x, p.y, t, IT, { life: 0.4 }); }
   }
   shot(HB, (g, lt, t) => hookScene2(g, t), { trans: 'whip', hud: hookHud });
-  const hookFloor = aimKeys(tt => lerp3([18.6, -2.55, 9.8], [18.0, -2.45, 9.4], seg(tt, H3, loopA, lin)), tt => lerp3([13.6, -2.4, 6.3], [14.1, -2.6, 6.5], seg(tt, H3, loopA, lin)), H3, loopA + 0.5);
+  const hookFloor = aimKeys(tt => lerp3([21.0, -2.3, 12.0], [20.4, -2.2, 11.4], seg(tt, H3, loopA, lin)), tt => lerp3([13.8, -2.3, 6.2], [14.2, -2.5, 6.4], seg(tt, H3, loopA, lin)), H3, loopA + 0.5);
   shot(H3, (g, lt, t) => {
     rig(B, lt, hookFloor, { t, e: lin, shake: 0.5 });
     hookSet(g, t);
@@ -1007,14 +1049,14 @@ export async function build(T) {
   // THE SLAM (the main boom, after the silence), then down on the floor with the pieces
   const simM = t => t < M2A ? (t - MT < 0.1 ? t - MT : 0.1 + (t - MT - 0.1) * 0.35) : 0.24 + (t - M2A) * 2.2;
   shot(MT, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI / 2 - 0.35, 0.12, 9, [8.5, 1.4, 7.6])], [len(sh), K(PI / 2 - 0.3, 0.1, 8.2, [8.6, 1.3, 7.6])]], { t, bump: lt < 0.3 ? 1.4 : 0 });
+    rig(B, lt, [[0, K(PI / 2 - 0.35, 0.14, 10.5, [8.4, 1.4, 7.6])], [len(sh), K(PI / 2 - 0.3, 0.12, 9.6, [8.5, 1.3, 7.6])]], { t, bump: lt < 0.3 ? 1.4 : 0 });
     slamSet(g, t, simM(t), { bReach: fist(-0.1) });
     const p = B.project(IMP[0], 0, IMP[1]); speedLines(g, p.x, p.y, t, MT);
   }, { trans: 'flash', hud: (g, lt, t) => badge(g, 'SLAM!', W / 2, 230, { color: HI.bad, size: 64, ...pop(t, MT) }) });
   cue(MT - 0.32, 'revswell', 0.9); cue(MT - 0.004, 'boom', 0.9); cue(MT - BOOM_HIT, 'boom_big', 0.5); cue(MT, 'hit_punch', 0.7); cue(MT, 'scatter', 0.8);
   cue(MT + 0.3, 'gasp', 0.45); cue(MT + 0.5, 'murmur', 0.35);
   shot(M2A, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI / 2 + 0.5, 0.06, 6, [14.2, -2.5, 6.5])], [len(sh), K(PI / 2 + 0.42, 0.08, 5.4, [14.2, -2.6, 6.6])]], { t });
+    rig(B, lt, [[0, K(PI / 2 + 0.75, 0.08, 9, [14.2, -2.4, 6.4])], [len(sh), K(PI / 2 + 0.68, 0.1, 8.3, [14.2, -2.5, 6.5])]], { t });
     slamSet(g, t, simM(t), { bReach: fist(-0.1) });
   }, { trans: 'whip' });
   cue(M2A - 0.06, 'whoosh_fast', 0.3); clacks(th => M2A + (th - 0.24) / 2.2, 0.24, 0.24 + (wkA - M2A) * 2.2);
@@ -1172,7 +1214,7 @@ export async function build(T) {
 
   // ======================= CTA: the Stavanger hall again, empty; the pieces still on the floor =======================
   shot(ctaA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI / 2 + 0.3, 0.02, 5, [14.3, -2.75, 6.5])], [2.4, K(PI / 2 + 0.45, 0.25, 11, [9, -1, 6])], [len(sh), K(PI / 2 + 0.55, 0.42, 19, [6, 0, 5])]], { t });
+    rig(B, lt, [[0, K(PI / 2 + 0.35, 0.06, 8, [14.0, -2.5, 6.2])], [2.4, K(PI / 2 + 0.45, 0.28, 12, [9, -1, 6])], [len(sh), K(PI / 2 + 0.55, 0.42, 19, [6, 0, 5])]], { t });
     hall(g, t, { ...NORc, led: 'cta', cone: 0.05, mid: g2 => tableSet(g2, t, { loose: AFTER, bx: MX, clock: DONE, wPlayer: false, bPlayer: false }) });
   }, { trans: 'whip', hud: (g, lt, t) => {
     badge(g, 'RATE IT: 1 TO 10', W / 2, 230, { color: TEAL, size: 40, a: seg(t, rateT, rateT + 0.1), ...pop(t, rateT) });
