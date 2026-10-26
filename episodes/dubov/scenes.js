@@ -30,8 +30,8 @@ const B = new Board();
 const GOLD = '#F2C14E', RED = HI.bad, TEAL = C.accent, CREAM = C.cream, LIME = HI.good;
 const PHONE = '#9FD8FF', DUB_C = HI.hero, NEP_C = '#E0603F', MAG_C = '#6FB2FF', SV_C = '#E9B654', RAP_C = '#B08AF0';
 // the knight game (Dubov White here, as ChessBase lists it; ply 24 = every piece home), Batumi 2019 (Dubov White; ply 41
-// = 21.Rh7+, 43 = 22.Rxf7, 77 = 39.Qa2#), Airthings 2020 (Carlsen White; ply 75 = 38...Qf4+, 77 = 39...Qxf5#), and the
-// 2021 title match, game 6 (the far boards and Dubai)
+// = 21.Rh7+, 43 = 22.Rxf7, 77 = 39.Qa2#), Airthings 2020 (quarterfinal game 3, Dubov White; ply 75 = 38.Qf4+, 77 =
+// 39.Qxf5#), and the 2021 title match, game 6 (the far boards and Dubai)
 const KN = await fetch('../engine/data/dubov_nepo_blitz2023.json').then(r => r.json());
 const SV = await fetch('../engine/data/dubov_svane_2019.json').then(r => r.json());
 const AM = await fetch('../engine/data/dubov_carlsen_airthings2020.json').then(r => r.json());
@@ -1140,8 +1140,8 @@ export async function build(T) {
   // ======================= A PROTEST: from the table to the organizers' desk =======================
   const DRAWN = { ...SAM_CLK, result: '½ – ½' };
   shot(proA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.3, 0.24, 13, [4, 2.4, 4.5])], [orgT - proA - 0.1, K(0.2, 0.2, 21, [-7.5, 1.2, 14.5]), ease.inOut], [len(sh), K(0.18, 0.19, 19.5, [-8, 1.2, 15])]], { t });
-    samSet(g, t, { pieces: board(KN, 25), clock: DRAWN, ew: 'smug', eb: 'smug' }, { led: 'samD', desk: { e: 'focus', glow: seg(t, orgT, orgT + 0.2, lin) } });
+    rig(B, lt, [[0, K(0.45, 0.34, 15.5, [4, 2.2, 4.5])], [orgT - proA - 0.1, K(0.2, 0.2, 21, [-7.5, 1.2, 14.5]), ease.inOut], [len(sh), K(0.18, 0.19, 19.5, [-8, 1.2, 15])]], { t });
+    samSet(g, t, { pieces: board(KN, 25), clock: DRAWN, ew: 'smug', eb: 'smug' }, { led: 'samD', bg: false, desk: { e: 'focus', glow: seg(t, orgT, orgT + 0.2, lin) } });
   }, { trans: 'whip', hud: (g, lt, t) => {
     if (t >= prT) badge(g, 'PROTEST', W / 2, 230, { color: RED, size: 60, ...pop(t, prT) });
     if (t >= orgT) badge(g, 'AGAINST THE ORGANIZERS', W / 2, 330, { color: CREAM, size: 38, ...pop(t, orgT) });
@@ -1154,7 +1154,7 @@ export async function build(T) {
     samSet(g, t, { pieces: board(KN, 25), clock: DRAWN, ew: 'smug', eb: 'smug' }, { led: 'samD', led2: 'sam0', ledU: seg(t, zT - 0.05, zT + 0.15, lin), desk: { e: t >= zT ? 'angry' : 'focus', qa: true } });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= zT) stamp(g, 'ZERO', W / 2, 300, t, zT, { color: RED, size: 110 }); } });
   shot(bothA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-PI / 2 + 0.06, 0.3, 19.5, [4, 2.8, 4])], [len(sh), K(-PI / 2 + 0.1, 0.28, 18.5, [4, 2.8, 4])]], { t });
+    rig(B, lt, [[0, K(-PI / 2 + 0.06, 0.3, 23, [4, 2.8, 4])], [len(sh), K(-PI / 2 + 0.1, 0.28, 22, [4, 2.8, 4])]], { t });
     const u = seg(t, bothA + 0.1, bothA + 0.35, lin);
     samSet(g, t, { pieces: board(KN, 25), clock: { ...SAM_CLK, result: '0 – 0' }, ew: 'shock', eb: 'shock',
       over: g2 => { tag3(g2, 4, 5.6, -1.4, '0', RED, u); tag3(g2, 4, 5.6, 9.3, '0', RED, u); } }, { led: 'sam0' });
