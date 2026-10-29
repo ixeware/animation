@@ -4,6 +4,144 @@
 (драма — один поворот внутри интересной самой по себе истории). Факты ниже проверены по источникам в конце каждого
 пункта; перед сценарием всё равно собрать `SOURCES.md`.
 
+## Анализ 29.10.2026 и топ новых идей
+Статистика `tools/tiktok.py stats` на 29.10: 8082 подписчика, 361 тыс. лайков, 21 ролик; 1963 комментария под всеми
+роликами (`tools/tiktok.py comments`).
+
+| Ролик | Просмотры | Вышел | Лайки, % | Комм. на 1000 | Репосты на 1000 | Сохр. на 1000 |
+|---|---|---|---|---|---|---|
+| brilliant | 896,5 тыс. | 14.10 | 8,9 | 0,57 | 3,3 | 9,7 |
+| witty | 712,5 тыс. | 13.10 | 9,3 | 0,60 | 5,0 | 12,4 |
+| hikaru | 550,2 тыс. | 22.10 | 6,2 | 0,57 | 2,3 | 6,2 |
+| levy | 326,1 тыс. | 14.10 | 9,8 | 0,60 | 3,4 | 12,0 |
+| tablebang | 314,1 тыс. | 24.10 | 5,2 | 0,30 | 2,0 | 5,4 |
+| magnus | 308,4 тыс. | 17.10 | 7,7 | 0,96 | 5,0 | 8,0 |
+| rausis | 225,4 тыс. | 18.10 | 3,9 | 0,24 | 1,7 | 3,6 |
+| iq | 216,8 тыс. | 16.10 | 5,9 | 1,18 | 3,3 | 7,6 |
+| fischer | 214,9 тыс. | 12.10 | 8,0 | 0,40 | 4,0 | 10,4 |
+| jeans | 176,9 тыс. | 15.10 | 7,9 | 0,30 | 3,1 | 8,3 |
+| lewis | 174,4 тыс. | 13.10 | 5,4 | 0,19 | 3,5 | 6,0 |
+| talbrill | 153,7 тыс. | 25.10 | 6,5 | 1,15 | 3,2 | 6,9 |
+| gates | 140,6 тыс. | 16.10 | 7,9 | 0,23 | 3,2 | 7,7 |
+| dubov | 117,9 тыс. | 26.10 | 5,4 | 0,20 | 2,3 | 6,5 |
+| tal | 82,1 тыс. | 13.10 | 10,3 | 0,57 | 6,9 | 14,0 |
+| turk | 78,2 тыс. | 13.10 | 4,4 | 0,47 | 2,5 | 7,0 |
+| baby | 61,4 тыс. | 14.10 | 4,8 | 0,37 | 2,9 | 6,3 |
+| solve, youngest, najdorf, records | 22–29 тыс. | 14–18.10 | 4,0–5,2 | 0,36–0,80 | 2,5–3,1 | 5,3–6,4 |
+
+**Что видно**
+1. **Ролики ещё растут.** За три дня (26→29.10): hikaru 481→550 тыс., tablebang 215→314 тыс., talbrill 69→154 тыс.
+   Гукеш — герой и hikaru, и tablebang: он сквозной персонаж канала.
+2. **Конфликт приносит просмотры, но не лайки.**
+   - Конфликт (hikaru, tablebang, rausis, dubov): лайков 4–6 %, сохранений 4–6 на 1000.
+   - Герой, который побеждает или выбирается (tal, levy, witty, brilliant, fischer): лайков 8–10 %, сохранений
+     10–14 на 1000.
+   - Лучшее сочетание — живая звезда и смена эмоции внутри одного сюжета.
+3. **Комментарии приносит вопрос, на который отвечают числом или своим примером.**
+   - iq (1,18 на 1000): «102 😭» — 1349♥.
+   - talbrill (1,15 на 1000): зрители присылают свои бриллианты.
+   - У dubov «оцени 1–10» дал всего 0,20 на 1000. Героя подросткам не представили, а спорили не об оценке, а о том,
+     «why zero points?».
+4. **Кого называют в комментариях:** Witty Alien — 117, Магнус — 99, Хикару — 44, Гукеш — 28, Народицкий — 27,
+   Леви — 26, Таль — 22, Фишер — 17, Каспаров — 11. Ханса, Синдарова, Динга и Праггу не называет почти никто.
+5. **Что спрашивают сами зрители:**
+   - «Why are jeans banned in the first place?» — уже 1536♥.
+   - «witty alien has 21k+ no?» — 4634♥ под brilliant.
+   - «what was wrong about the toilet??» — 159♥ под rausis: не поняли, в чём обман. Механику объяснять одной
+     фразой.
+   - «Is Ts real???» под fischer.
+   - «Do napoleon like chess?» под turk.
+
+**Топ новых идей** (по ожидаемому эффекту; формула — живая звезда, поворот, вопрос числом в конце)
+1. **«The world champion is the underdog» (Гукеш — Синдаров, Женева).** Выпустить до 24.11 — в этот день первая
+   партия; 14 партий до 11.12, тай-брейк 12.12.
+   - Хук: «For the first time, the world champion is the underdog.»
+   - Факты:
+     - Обоим по 20 — самый молодой матч за титул в истории; фонд $2,5 млн.
+     - Синдаров стал ГМ в 12, выиграл Кубок мира 2025 и турнир претендентов 2026 без поражений, за тур до конца.
+     - Карлсен: Синдаров — фаворит, «no question».
+     - На Олимпиаде 2026 Гукеш после ничьей с индонезийским IM опустился ниже 2700 в live-рейтинге (проверить по
+       второму источнику, имя и возраст соперника тоже). Индонезия — третья страна среди подписчиков.
+   - Поворот: Гукеш уже был андердогом — выиграл претендентов в 17 лет, а в 18 стал чемпионом.
+   - Вопрос: «Predict the score — comment it like 7.5–5.5.»
+   - Серия: hikaru → tablebang → этот ролик.
+   - Источники:
+     - [World Chess, всё о матче](https://worldchess.com/news/gukesh-vs-sindarov-everything-you-need-to-know-about-the-2026-world-chess-championship);
+     - [World Chess, даты](https://worldchess.com/news/fide-quietly-changes-dates-for-gukeshsindarov-world-championship);
+     - [ChessBase India](https://chessbase.in/news/geneva-world-chess-championship-2026-gukesh-sindarov);
+     - [IANS, претенденты](https://ianslive.in/sindarov-wins-2026-candidates-with-round-to-spare-to-challenge-gukesh--20260414234845);
+     - [DD India, ниже 2700](https://ddindia.co.in/2026/09/chess-olympiad-average-start-for-indian-men-gukesh-dips-below-2700-in-live-ratings/).
+   - Проверить: слова Абдусаттарова «80–20» и сжатый кулак Гукеша после победы над Синдаровым в Варшаве (рапид,
+     6.05.2026).
+2. **Ding: один ход до тай-брейка** (пункт 2 топ-10 ниже) — приквел к первой идее.
+   - Выпустить за 2–4 дня до 24.11 или в день старта.
+   - Хук: «14 games. One move. He gave away the world title.»
+   - Вопрос: «How many seconds did it take you to spot it?»
+3. **Двойной бонгклауд: Магнус и Хикару ходят королём на втором ходу.** Две главные звезды комментариев в одном
+   кадре.
+   - 15.03.2021, Magnus Carlsen Invitational, последний тур отбора: 1.e4 e5 2.Ke2 Ke7. Затем намеренное троекратное
+     повторение; оба уже вышли дальше.
+   - Поворот-кода: за похожую «ничью без игры» Дубов и Непо в 2023-м получили по нулю — ссылка на `dubov`.
+   - Ещё пример: в 2020-м Магнус сыграл против Уэсли Со 1.f3 и 2.Kf2, Со назвал это унизительным (найти первоисточник).
+   - Вопрос: «Rate it 1–10: genius or disrespect?»
+   - Источники: [Wikipedia, Bongcloud](https://en.wikipedia.org/wiki/Bongcloud_Attack),
+     [Chess.com, MCI день 3](https://www.chess.com/news/view/2021-magnus-carlsen-invitational-day-3).
+4. **Уэсли Со: страна перестала ему платить — а он разгромил Магнуса 13,5–2,5.** Для филиппинской аудитории
+   (17,8 % подписчиков).
+   - 2014: ушёл из федерации Филиппин из-за отсутствия поддержки.
+   - 2019: первый чемпион мира FIDE по шахматам Фишера, финал с Карлсеном 13,5–2,5.
+   - Семейный конфликт и спор о гражданстве не брать.
+   - Вопрос: «How many games out of 16 would you take off Magnus?»
+   - Источники:
+     - [Philstar](https://philstar.com/sports/2014/06/11/1333631/so-cites-financial-support-reason-departure);
+     - [FIDE](https://fischerrandom.fide.com/news/wesley-so-first-official-fischer-random-chess-world-champion);
+     - [GMA](https://gmanetwork.com/news/sports/othersports/714007/wesley-so-upsets-no-1-carlsen-claims-world-title/story);
+     - [Wikipedia](https://en.wikipedia.org/wiki/Wesley_So).
+5. **Witty Alien, часть 2.** Самое частое имя в комментариях (117), второй ролик канала.
+   - Повод — топ-комментарий «witty alien has 21k+ no?» (4634♥): обновить счёт бриллиантов. Проверить на его профиле
+     Chess.com в день записи.
+   - Хук: «You said I got his number wrong. You were right.» — зрители любят, когда им отвечают.
+   - Плюс Alien Gambit верными цветами (ошибка из раздела ниже).
+6. **Хоу Ифань сдалась за пять ходов — нарочно.** Протест и героиня — то же устройство, что у Дубова, но с понятной
+   причиной.
+   - Гибралтар, 2017, последний тур, против Лалита Бабу.
+   - Протест: 7 соперниц-женщин в 9 турах. Потом она извинилась.
+   - Поворот: ChessBase посчитал вероятность таких жеребьёвок.
+   - Вопрос: «Rate the protest 1–10.»
+   - Проверить точные ходы партии.
+   - Источники: [chess24](https://chess24.com/en/read/news/tradewise-gibraltar-10-nakamura-hat-trick-hou-yifan-protest),
+     [CS Monitor](https://m.csmonitor.com/World/Europe/2017/0204/Why-the-Queen-of-Chess-abandoned-the-Gibraltar-tournament),
+     [ChessBase](https://en.chessbase.com/newsroom/post/what-were-the-odds-of-hou-yifan-s-pairings-in-2017?page=0).
+7. **Ананд против вулкана (2010).** Герой выбирается — сохранения.
+   - Пепел исландского вулкана, рейсы отменены, 40 часов на машине до Софии.
+   - Матч с Топаловым на его поле; Ананд выигрывает последнюю, 12-ю партию — 6,5–5,5.
+   - Вопрос: «How many hours would you drive for a match?»
+   - Проверить цвет фигур в 12-й партии.
+   - Источники: [TWIC](https://theweekinchess.com/chessnews/events/world-chess-championship-2010/anand-told-to-get-to-sofia-by-wednesday),
+     [Chess.com](https://www.chess.com/news/view/breaking-news-anand-seeks-postponement-6226),
+     [ChessBase India](https://www.chessbase.in/news/Anand-s-Rocky-Road-to-World-Title-Triumph).
+8. **Ниманн — Карлсен** (пункт 2 в «Ещё про Магнуса»). Конфликт: просмотры будут, лайков меньше; Ханса в
+   комментариях не называют.
+   - Иск на $100 млн отклонён в июне 2023-го, мировая — в августе 2023-го.
+   - Источники: [CBS](https://www.cbsnews.com/amp/news/hans-niemann-sues-magnus-carlsen-chess-com-cheating-allegations/),
+     [Wikipedia](https://en.wikipedia.org/wiki/Carlsen%E2%80%93Niemann_controversy).
+9. **Каспаров отпустил фигуру и переходил: Линарес, 1994, против 17-летней Юдит Полгар.** Есть видеозапись; повод —
+   фильм Netflix «Queen of Chess» (февраль 2026).
+   - Вопрос: «Rate it 1–10: cheating or not?»
+   - Источник: [ChessBase](https://en.chessbase.com/post/touch-move-polgar-kasparov-controversy).
+10. **136 ходов: самая длинная партия матчей за титул (Карлсен — Непо, Дубай 2021, 6-я партия).** Продолжение `dubov`.
+    - 7 ч 45 мин; прежний рекорд — 124 хода (Корчной — Карпов, 1978).
+    - Данные партии уже есть: `engine/data/carlsen_nepo_2021_g6.json`.
+    - Источники: [Wikipedia](https://en.wikipedia.org/wiki/Carlsen_versus_Nepomniachtchi),
+      [Chess.com](https://chess.com/news/view/fide-world-chess-championship-2021-game-6).
+
+Отложено:
+- **Фирузджа.** В 16 лет ушёл из иранской федерации, потом играл за Францию. Сначала проверить «самый молодой
+  2800».
+- **Годовщина Народицкого.** 27 упоминаний; «Did NOT know Daniel passed» — 739♥. Только бережно, без догадок о
+  причине смерти.
+- **Ролик-ответ про ИИ-очки** — спорно.
+
 ## Что показали комментарии
 - Драма работает: под brilliant третий по лайкам комментарий про то, как внезапно в конце прозвучала смерть Дани
   (944♥); под Witty Alien лучший — «from herding goats to playing them» (8044♥).
