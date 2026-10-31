@@ -4,6 +4,128 @@
 (драма — один поворот внутри интересной самой по себе истории). Факты ниже проверены по источникам в конце каждого
 пункта; перед сценарием всё равно собрать `SOURCES.md`.
 
+## Анализ 31.10.2026 и ещё топ идей
+Статистика `tools/tiktok.py stats` на 31.10: 8481 подписчик (+399 за два дня), 389,6 тыс. лайков, 22 ролика.
+
+| Ролик | Просмотры | Вышел | Лайки, % | Комм. на 1000 | Репосты на 1000 | Сохр. на 1000 |
+|---|---|---|---|---|---|---|
+| hikaru | 614,8 тыс. | 22.10 | 6,2 | 0,55 | 2,3 | 6,1 |
+| tablebang | 347,5 тыс. | 24.10 | 5,2 | 0,29 | 1,9 | 5,5 |
+| talbrill | 166,4 тыс. | 25.10 | 6,5 | 1,08 | 3,2 | 7,0 |
+| dubov | 129,9 тыс. | 26.10 | 5,5 | 0,18 | 2,4 | 6,5 |
+| bongcloud | 111,0 тыс. | 29.10 | 5,7 | 0,32 | 2,8 | 6,7 |
+
+**Что видно**
+1. `bongcloud` за два дня набрал 111 тыс. — быстрее, чем `dubov` (130 тыс. за пять дней). Лайков меньше, чем у роликов
+   с героем (5,7 %): это снова спор о поведении.
+2. **Каспаров стал мемом-реакцией.** Лучший комментарий под `bongcloud` — просто «Kasparov:» со стикером (865♥).
+   Второй — «the version Magnus plays is called the wrongcloud» (55♥). Секундная реакция Каспарова подойдёт как
+   камео в любой ролик про выходки звёзд.
+3. **Гукеша любят.** Под `tablebang` на расистский комментарий ответили «stfu shitty racist» (1889♥), а «gukesh a chill
+   guy» собрал 630♥.
+4. **Числовой вопрос снова сработал:** «I played 3149 brilliant moves» (242♥) под `talbrill`, у которого больше всех
+   комментариев (1,08 на 1000). Под `dubov` опять спрашивают «why zero points?»: правило надо объяснять одной фразой.
+5. **Просьба зрителя:** «pls make the fools checkmate» (под `bongcloud`) — это идея 6 ниже.
+
+**Ещё топ идей** (формула та же: живая звезда или герой-ровесник, поворот, вопрос числом)
+1. **«Его отец бросил работу хирурга, чтобы сын играл в шахматы» (Гукеш).** Подъём героя даёт лайки и сохранения
+   (`tal`, `levy`, `witty`), а Гукеша зрители любят. Выпустить до 24.11 — это приквел к матчу с Синдаровым (идея 1
+   выше).
+   - Отец, Раджиникант, ЛОР-хирург, около 2018 года оставил работу, чтобы ездить с сыном по турнирам. Мать, Падма,
+     микробиолог, одна кормила семью.
+   - В 2017–2018 денег не хватало, турниры оплачивали друзья родителей. Гукеш: «We were not a very well-off family, so
+     they had to face a lot of financial struggles… They made the most sacrifices.»
+   - Финал: 12.12.2024, Сингапур, 14-я партия, ничейный эндшпиль — 55.Rf2 Дина (эффекты §8). Гукеш в 18 лет — самый
+     молодой чемпион мира, 7,5–6,5; он плачет, закрыв лицо руками.
+   - Вопрос: «How old were you when you started chess? He was 7.»
+   - Источники:
+     - [Onmanorama, слова Гукеша](https://www.onmanorama.com/sports/other-sports/2024/12/12/world-chess-champion-d-gukesh-about-parents-rajnikanth-padma.amp.html);
+     - [The Week (PTI)](https://www.theweek.in/wire-updates/sports/2024/04/22/spd14-spo-chess-gukesh-parents.html);
+     - [Chess.com, 14-я партия](https://chess.com/news/view/fide-world-chess-championship-2024-game-14);
+     - [India TV, слёзы](https://www.indiatvnews.com/sports/other/gukesh-in-tears-after-beating-ding-liren-to-become-2nd-indian-to-become-world-champion-in-chess-watch-2024-12-12-965944);
+     - [Asian Age, начал в 7](https://www.asianage.com/sports/champ-started-moving-chess-pieces-at-seven-1846397).
+2. **Dewa Kipas: Леви поймал читера — и против него поднялась целая страна.** Для Индонезии (5,9 % подписчиков);
+   Леви — герой `levy` (326 тыс.).
+   - 2.03.2021: Леви на стриме проигрывает аккаунту Dewa_Kipas. Аккаунт за 11 дней вырос на 800 с лишним пунктов,
+     точность в победах больше 90 %. Леви жалуется, Chess.com за несколько часов закрывает аккаунт за нарушение
+     fair play.
+   - За аккаунтом — индонезийский любитель Даданг Субур. Сын пишет, что отца забанили несправедливо, пост
+     разлетается. Леви засыпают сообщениями вплоть до угроз смертью, он закрывает соцсети.
+   - Поворот: Дедди Корбузье устраивает в своей студии в Джакарте матч Субура с WGM Ирене Сукандар. 3–0 в пользу
+     Ирене; Chess.com
+     оценивает игру Субура в 1127. Пик — 1,25 млн зрителей одновременно, самый смотрибельный шахматный стрим в
+     истории. За несколько часов регистраций из Индонезии на Chess.com в 40 раз больше обычного.
+   - Осторожно: Субур отрицает жульничество — говорить «Chess.com закрыл аккаунт за нарушение правил», без «он
+     жульничал».
+   - Вопрос: «Guess his real rating — comment a number.»
+   - Источники: [Chess.com](https://www.chess.com/news/view/most-watched-chess-stream-in-history-dewa-kipas),
+     [CNN Indonesia](https://www.cnnindonesia.com/olahraga/20210326125219-178-622411/streaming-irene-vs-dewa-kipas-tembus-rekor-dunia-catur),
+     [Jakarta Post](https://www.thejakartapost.com/paper/2021/04/12/meet-irene-kharisma-sukandar-the-grandmaster-thrust-into-the-spotlight).
+3. **125 партий без поражений — и поляк, который сломал серию дважды.** Магнус и число.
+   - С 31.07.2018 по 10.10.2020 — 125 классических партий без поражений (42 победы, 83 ничьи), рекорд на элитном
+     уровне.
+   - Конец: Norway Chess 2020, 5-й тур, Ян-Кшиштоф Дуда. Дуда: «I didn't expect to win this game at all», «I almost
+     blundered checkmate in one move». Магнус: «It had to happen at some point. But in any case, it's very, very
+     disappointing.»
+   - Поворот: через год, на Кубке мира в Сочи, Дуда выбивает Магнуса в полуфинале (рапид, 1,5–0,5) и выигрывает кубок.
+   - Вопрос: «What's your longest win streak? Comment a number.»
+   - Источники: [Wikipedia, рекорды](https://en.wikipedia.org/wiki/List_of_world_records_in_chess),
+     [Chess.com](https://www.chess.com/news/view/2020-norway-chess-round-5-duda-beats-carlsen),
+     [FIDE](https://www.fide.com/norway-chess-r05-duda-ends-carlsens-unbeaten-streak),
+     [ChessBase, Кубок мира](https://en.chessbase.com/post/world-cup-2021-r8-d2).
+4. **13-летний Фишер отдаёт ферзя: «Партия века».** Герой — ровесник зрителей; жертва ферзя с эффектами §8, как в
+   `brilliant` и `talbrill`. Фишера просят в комментариях, `fischer` — 236 тыс. и 10 сохранений на 1000.
+   - 17.10.1956, Нью-Йорк, Marshall Chess Club, Мемориал Розенвальда: Дональд Бирн — Бобби Фишер (13 лет).
+   - 17...Be6!! — ферзь отдан; финал 41...Rc2#. Название дал Ханс Кмох в Chess Review.
+   - Вопрос: «What was your rating at 13? Comment it.»
+   - Источник: [Wikipedia](https://en.wikipedia.org/wiki/The_Game_of_the_Century_(chess)); ходы — PGN из базы.
+5. **272 хода: 12-летний не сдавался.** Абсурд и герой-ровесник.
+   - Август 2024, Kingston Invitational (Лондон): Билли Феллоуз (12 лет) — Питер Лалич, 272 хода, победили чёрные.
+     Самая длинная результативная партия с рейтингом FIDE.
+   - На 203-м ходу закрылось здание. Партию отложили и доиграли в 8:15 утра, до начала следующего тура. Белые могли
+     сдаться уже после 219-го хода чёрных; ChessBase назвал партию фарсом.
+   - Прежний рекорд — ничья в 269 ходов: Николич — Арсович, Белград, 1989, 20 ч 15 мин.
+   - Мальчик — несовершеннолетний: его не высмеивать, крупно имя не давать. Шутить над самим рекордом.
+   - Вопрос: «How many moves was your longest game?»
+   - Источники: [Spectator Australia](https://www.spectator.com.au/2024/08/marathon),
+     [ChessBase](https://en.chessbase.com/post/a-game-that-outlasted-the-day-7),
+     [Wikipedia, рекорды](https://en.wikipedia.org/wiki/List_of_world_records_in_chess).
+6. **Мат за 2 хода — и мастер, сдавшийся на третьем** (просьба зрителя «fools checkmate»).
+   - Мат дураку: 1.f3 e5 2.g4 Qh4# (или 1.g4 e5 2.f3 Qh4#) — быстрее мата не бывает.
+   - Связка с `bongcloud`: Магнус против Со начал 1.f3 — первым ходом мата дураку («wrongcloud», 55♥).
+   - Поворот: самая короткая результативная партия мастеров — Джорджевич — Ковачевич, Бела-Црква, 1984: 1.d4 Nf6
+     2.Bg5 c6 3.e3?? Qa5+, слон теряется, белые сдаются.
+   - Проверить по базе партий: точные имена и ходы (пока только вторичные источники).
+   - Вопрос: «What's your fastest win? Comment the number of moves.»
+   - Источник: [Wikipedia, рекорды](https://en.wikipedia.org/wiki/List_of_world_records_in_chess).
+7. **AlphaZero: научилась шахматам сама и разгромила Stockfish.** ИИ подросткам интересен; поворот — Магнус и Дубов.
+   - 2017: AlphaZero знала только правила и играла сама с собой. Stockfish она обогнала примерно через 4 часа
+     обучения, матч сыграла после 9 часов.
+   - Матч из 100 партий: 28 побед, 72 ничьи, 0 поражений.
+   - Поворот: в 2019 году Магнус назвал своими «героями» AlphaZero и Дубова, с ними он стал «a very different
+     player» — ссылка на `dubov`.
+   - «Научилась за 4 часа» не говорить: 4 часа — это когда она обогнала Stockfish.
+   - Вопрос: «How many hours a day do you play? Comment a number.»
+   - Источники: [Wikipedia](https://en.wikipedia.org/wiki/AlphaZero),
+     [Chess.com](https://www.chess.com/news/view/google-s-alphazero-destroys-stockfish-in-100-game-match),
+     [chess24, Norway Chess 2019](https://chess24.com/en/read/news/norway-chess-8-magnus-triumphs-again).
+8. **Эухенио Торре: первый гроссмейстер Азии и секундант Фишера.** Для Филиппин (17,8 % подписчиков).
+   - 1974: в 22 года — серебро на первой доске олимпиады в Ницце и звание гроссмейстера, первое в Азии (вне СССР).
+   - 1992: официальный секундант Фишера в матче-реванше со Спасским.
+   - Рекорд — 23 олимпиады за сборную Филиппин (по Залу славы; другие источники дают 22).
+   - Вопрос: «Guess how many Olympiads he played — comment a number.»
+   - Источники: [Wikipedia](https://en.wikipedia.org/wiki/Eugene_Torre),
+     [World Chess Hall of Fame](https://worldchesshof.org/hof-inductee/eugene-torre).
+9. **Морфи: опера, герцог и мат за 17 ходов.** Историческая тема — просмотров меньше, сохранений больше.
+   - 2.11.1858, Парижская опера, ложа герцога: Морфи (21 год) против герцога Брауншвейгского и графа Изуара,
+     советующихся вдвоём. Мат на 17-м ходу (жертва ферзя на b8, Rd8#).
+   - Морфи громит Андерсена 7–2 при двух ничьих. Стаунтон уходит от матча. Вернувшись в Америку в 1859-м, Морфи
+     бросает серьёзные шахматы: «The Pride and Sorrow of Chess».
+   - Не брать миф про туфли вокруг кровати — это искажённая цитата (Wikipedia).
+   - Вопрос: «Guess: in how many moves did he mate them?»
+   - Источники: [Wikipedia, Opera Game](https://en.wikipedia.org/wiki/Opera_Game),
+     [Wikipedia, Morphy](https://en.wikipedia.org/wiki/Paul_Morphy).
+
 ## Анализ 29.10.2026 и топ новых идей
 Статистика `tools/tiktok.py stats` на 29.10: 8082 подписчика, 361 тыс. лайков, 21 ролик; 1963 комментария под всеми
 роликами (`tools/tiktok.py comments`).
