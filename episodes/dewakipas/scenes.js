@@ -1153,7 +1153,7 @@ export async function build(T) {
   const cardFeed = (g, t, o = {}) => { rig(B, 0, [[0, K(0.04, 0.1, 15.5, [4, 4.6, 10])], [1, K(0.04, 0.1, 15.5, [4, 4.6, 10])]], { t }); onlineStage(g, t, cardAt(t, o)); };
   const hookFeed = (g, t) => { rig(B, 0, [[0, K(0, 0.27, 17, [4, 3.4, 6.6])], [1, K(0, 0.27, 17, [4, 3.4, 6.6])]], { t }); onlineStage(g, t, { pieces: board(GC, 80), cams: { lev: { e: 'focus' }, fan: { spin: 7 } } }); };
   shot(nameA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI + 0.52, 0.12, 8.6, [4, 2.9, -1.4])], [len(sh), K(PI + 0.45, 0.1, 7.4, [4, 3.0, -1.4])]], { t });
+    rig(B, lt, [[0, K(PI + 0.56, 0.26, 8.8, [4, 3.0, -1.4])], [len(sh), K(PI + 0.5, 0.24, 7.6, [4, 3.1, -1.4])]], { t });
     levyRoom(g, t, { screen: monitorScreen(feed(g2 => hookFeed(g2, t))), e: 'focus', over: g2 => tag3(g2, 4, 5.6, -1.4, 'LEVY · GOTHAMCHESS', LEVY_C, seg(t, nameA + 0.3, nameA + 0.6, lin)) });
   }, { trans: 'whip', hud: (g, lt, t) => { scrim(g); placeStamp(g, lt, 'On stream', 'MARCH 2, 2021 · 12,000 WATCHING', { y: 200, t0: 0.1 }); } });
   shot(accA, (g, lt, t, sh) => {
@@ -1207,7 +1207,7 @@ export async function build(T) {
     x.font = sans(26, 800); x.letterSpacing = '3px'; x.fillStyle = 'rgba(255,243,224,0.7)'; x.fillText('DEWA_KIPAS', 220, 470);
   };
   shot(repA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.42, 0.2, 10, [4, 2.8, 2])], [len(sh), K(-0.34, 0.17, 8.6, [4, 2.8, 2.2])]], { t, bump: t > repT && t < repT + 0.25 ? 0.8 : 0 });
+    rig(B, lt, [[0, K(-0.8, 0.14, 7.6, [3.6, 2.6, 3.0])], [len(sh), K(-0.7, 0.12, 6.6, [3.6, 2.6, 3.2])]], { t, bump: t > repT && t < repT + 0.25 ? 0.8 : 0 });
     levyRoom(g, t, { screen: monitorScreen(feed(g2 => hookFeed(g2, t)), { left: reportLeft(t >= repT + 0.1) }), e: 'angry' });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= repT + 0.1) badge(g, 'REPORTED', W / 2, 230, { color: LEVY_C, size: 60, ...pop(t, repT + 0.1) }); } });
   shot(hrsA, (g, lt, t, sh) => {
