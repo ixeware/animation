@@ -45,7 +45,7 @@
      - [India TV, слёзы](https://www.indiatvnews.com/sports/other/gukesh-in-tears-after-beating-ding-liren-to-become-2nd-indian-to-become-world-champion-in-chess-watch-2024-12-12-965944);
      - [Asian Age, начал в 7](https://www.asianage.com/sports/champ-started-moving-chess-pieces-at-seven-1846397).
 2. **Dewa Kipas: Леви поймал читера — и против него поднялась целая страна.** Для Индонезии (5,9 % подписчиков);
-   Леви — герой `levy` (326 тыс.).
+   Леви — герой `levy` (326 тыс.). Сделан: `dewakipas` (см. [SOURCES](episodes/dewakipas/SOURCES.md)).
    - 2.03.2021: Леви на стриме проигрывает аккаунту Dewa_Kipas. Аккаунт за 11 дней вырос на 800 с лишним пунктов,
      точность в победах больше 90 %. Леви жалуется, Chess.com за несколько часов закрывает аккаунт за нарушение
      fair play.

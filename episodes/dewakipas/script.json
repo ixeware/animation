@@ -1,0 +1,215 @@
+{
+  "title": "Dewa Kipas: GothamChess vs the Fan God",
+  "channel": "THE 64 FILES",
+  "post": "GothamChess lost to the 'Fan God'… and it became the most-watched chess stream ever 🤯 #chess #indonesia #gothamchess #dewakipas #story",
+  "lead_in": 0.05,
+  "tail": 1.8,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.84,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.3,
+    "max_gap": 0.13
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5.0,
+    "reverb": 0.4,
+    "reverb_sec": 2.3,
+    "duck": 0.5
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "GothamChess lost a game... to the Fan God.",
+      "say": "[mischievously] GothamChess lost a game... to the Fan God.",
+      "pause": 0.25,
+      "colors": {
+        "GothamChess": "blue",
+        "lost": "red",
+        "Fan": "coral",
+        "God.": "coral"
+      }
+    },
+    {
+      "id": "record",
+      "text": "Three weeks later, it led to the most-watched chess stream in history.",
+      "say": "Three weeks later, it led to the most-watched chess stream... in history.",
+      "pause": 0.3,
+      "colors": {
+        "Three": "gold",
+        "weeks": "gold",
+        "most-watched": "gold",
+        "history.": "gold"
+      }
+    },
+    {
+      "id": "name",
+      "text": "March 2021. The account: Dewa Kipas. Indonesian for Fan God.",
+      "say": "March 2021. The account: Dewa Kipas. [amused] Indonesian for... Fan God.",
+      "pause": 0.2,
+      "colors": {
+        "Dewa": "coral",
+        "Kipas.": "coral",
+        "Fan": "coral",
+        "God.": "coral",
+        "Indonesian": "teal"
+      }
+    },
+    {
+      "id": "sus",
+      "text": "Eight hundred points in eleven days. Ten seconds a move, even the obvious ones. Over ninety percent accuracy.",
+      "say": "Eight hundred points in eleven days. Ten seconds a move... even the obvious ones. [suspicious] Over ninety percent accuracy.",
+      "pause": 0.25,
+      "colors": {
+        "Eight": "gold",
+        "hundred": "gold",
+        "eleven": "gold",
+        "Ten": "red",
+        "seconds": "red",
+        "obvious": "red",
+        "ninety": "red",
+        "percent": "red"
+      }
+    },
+    {
+      "id": "report",
+      "text": "Levy reported it. Hours later, Chess.com closed the account for breaking fair-play rules.",
+      "say": "Levy reported it. Hours later... Chess.com closed the account for breaking fair-play rules.",
+      "pause": 0.3,
+      "colors": {
+        "Levy": "blue",
+        "reported": "blue",
+        "closed": "red",
+        "fair-play": "red",
+        "rules.": "red"
+      }
+    },
+    {
+      "id": "who",
+      "text": "Behind it: Dadang Subur, an amateur from Indonesia. He denies cheating.",
+      "say": "Behind it: Dadang Subur, an amateur from Indonesia. He denies cheating.",
+      "pause": 0.2,
+      "colors": {
+        "Dadang": "coral",
+        "Subur,": "coral",
+        "Indonesia.": "teal",
+        "denies": "gold"
+      }
+    },
+    {
+      "id": "son",
+      "text": "His son posted: my dad is strong, the ban is unfair. The post went viral.",
+      "say": "His son posted: my dad is strong... the ban is unfair. [dramatic] The post went viral.",
+      "pause": 0.25,
+      "colors": {
+        "strong,": "gold",
+        "unfair.": "red",
+        "viral.": "coral"
+      }
+    },
+    {
+      "id": "storm",
+      "text": "Messages poured in to Levy. Some were death threats.",
+      "say": "Messages poured in to Levy. [serious] Some were death threats.",
+      "pause": 0.2,
+      "colors": {
+        "Levy.": "blue",
+        "death": "red",
+        "threats.": "red"
+      }
+    },
+    {
+      "id": "lock",
+      "text": "He locked his accounts. Dadang and his son condemned the harassment.",
+      "say": "He locked his accounts. Dadang and his son condemned the harassment.",
+      "pause": 0.35,
+      "colors": {
+        "locked": "red",
+        "condemned": "gold",
+        "harassment.": "red"
+      }
+    },
+    {
+      "id": "twist",
+      "text": "Then TV star Deddy Corbuzier set up a match in Jakarta: the Fan God against International Master Irene Sukandar.",
+      "say": "Then TV star Deddy Corbuzier set up a match in Jakarta: [excited] the Fan God... against International Master Irene Sukandar.",
+      "pause": 0.3,
+      "colors": {
+        "Deddy": "gold",
+        "Corbuzier": "gold",
+        "Jakarta:": "teal",
+        "Fan": "coral",
+        "God": "coral",
+        "Irene": "teal",
+        "Sukandar.": "teal"
+      }
+    },
+    {
+      "id": "match",
+      "text": "Three games. Irene won all three. His performance, by Chess.com: eleven twenty-seven.",
+      "say": "Three games. Irene won all three. [deadpan] His performance, by Chess.com: eleven twenty-seven.",
+      "pause": 0.3,
+      "colors": {
+        "Irene": "teal",
+        "all": "teal",
+        "three.": "teal",
+        "eleven": "red",
+        "twenty-seven.": "red"
+      }
+    },
+    {
+      "id": "peak",
+      "text": "One point two five million watched live. Ten times the old record.",
+      "say": "[excited] One point two five million watched live. Ten times the old record.",
+      "pause": 0.2,
+      "colors": {
+        "One": "gold",
+        "point": "gold",
+        "two": "gold",
+        "five": "gold",
+        "million": "gold",
+        "Ten": "gold",
+        "record.": "gold"
+      }
+    },
+    {
+      "id": "levy",
+      "text": "Levy's verdict: people who play unfairly will be caught.",
+      "say": "Levy's verdict: [firmly] people who play unfairly... will be caught.",
+      "pause": 0.35,
+      "colors": {
+        "Levy's": "blue",
+        "unfairly": "red",
+        "caught.": "blue"
+      }
+    },
+    {
+      "id": "cta",
+      "text": "So what's the Fan God's real rating? Comment a number.",
+      "say": "[curious] So what's the Fan God's real rating? Comment a number.",
+      "pause": 0.0,
+      "colors": {
+        "Fan": "coral",
+        "God's": "coral",
+        "real": "gold",
+        "rating?": "gold",
+        "number.": "gold"
+      }
+    }
+  ]
+}
