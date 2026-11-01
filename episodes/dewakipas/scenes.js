@@ -655,14 +655,14 @@ function gaugeTex(v) {
   const k = Math.round(clamp(v) * 50);
   return once('gauge:' + k, 1024, 640, (x, w, h) => {
     x.fillStyle = '#1E1029'; x.fillRect(0, 0, w, h);
-    const cx = w / 2, cy = 470, R = 330;
+    const cx = w / 2, cy = 420, R = 300;
     x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = sans(40, 900); x.letterSpacing = '10px'; x.fillStyle = 'rgba(255,243,224,0.8)'; x.fillText('ACCURACY', cx, 60);
     for (let i = 0; i < 50; i++) { const a = Math.PI + i / 50 * Math.PI, on = i < k; x.strokeStyle = on ? (i >= 45 ? CORAL : i >= 30 ? GOLD : TEAL) : 'rgba(255,243,224,0.1)'; x.lineWidth = 18; x.beginPath(); x.arc(cx, cy, R, a + 0.01, a + Math.PI / 50 - 0.01); x.stroke(); }
     const a = Math.PI + k / 50 * Math.PI;
     x.strokeStyle = CREAM; x.lineWidth = 12; x.lineCap = 'round'; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + Math.cos(a) * (R - 50), cy + Math.sin(a) * (R - 50)); x.stroke();
     x.fillStyle = CREAM; x.beginPath(); x.arc(cx, cy, 22, 0, 7); x.fill();
     x.font = sans(120, 900); x.letterSpacing = '4px'; x.fillStyle = k >= 45 ? CORAL : CREAM; x.shadowColor = CORAL; x.shadowBlur = k >= 45 ? 30 : 0;
-    x.fillText(k >= 45 ? '90%+' : `${k * 2}%`, cx, cy - 120); x.shadowBlur = 0;
+    x.fillText(k >= 45 ? '90%+' : `${k * 2}%`, cx, cy + 128); x.shadowBlur = 0;  // below the pivot: the needle never crosses it
     ledGrid(x, w, h, 6);
   });
 }
@@ -1148,8 +1148,12 @@ export async function build(T) {
     const r = hookAt(t), mated = t >= mateT;
     onlineStage(g, t, { pieces: halo(r.pieces, ['K1'], RED, seg(t, mateT, mateT + 0.2, lin)), cams: hookCams(t),
       under: g2 => { moveFx(r).under(g2); if (mated) ledGlow(g2, B, kSq(r), RED, t, mateT, { reach: 1.2 }); },
-      over: g2 => { moveFx(r).over(g2); impact(g2, kSq(r), t, mateT, { flash: 0.35 }); if (mated) tag3(g2, 4, 0.5, -1.2, '0 – 1', RED, seg(t, mateT + 0.1, mateT + 0.35, lin)); } });
-  }, { hud: (g, lt, t) => coverTitle(g, 'GOTHAMCHESS LOST TO', 'THE FAN GOD', 205, { a: 1 - seg(t, fanA - 0.15, fanA + 0.05, lin) }) });
+      over: g2 => { moveFx(r).over(g2); impact(g2, kSq(r), t, mateT, { flash: 0.35 }); } });
+  }, { hud: (g, lt, t) => {
+    coverTitle(g, 'GOTHAMCHESS LOST TO', 'THE FAN GOD', 205, { a: 1 - seg(t, fanA - 0.15, fanA + 0.05, lin) });
+    // the result under the title, not on the board's side over the engraving
+    if (t >= mateT + 0.1) badge(g, '0 – 1', W / 2, 470, { color: RED, size: 60, ...pop(t, mateT + 0.1) });
+  } });
   shot(fanA, (g, lt, t, sh) => {
     const [c] = CAMPOS.fan;
     rig(B, lt, [[0, K(-0.3, 0.06, 10.5, [c[0] - 0.4, c[1], c[2]])], [len(sh), K(-0.2, 0.04, 8.2, [c[0] - 0.2, c[1] + 0.1, c[2]])]], { t });
@@ -1204,9 +1208,9 @@ export async function build(T) {
   // times of the Chess.com archive)
   const RC = moveOf(LV, 48), RCSEC = 11.4, rcAt = t => runTo(LV, 47, [obvT + 0.12], t);
   shot(tenA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.3, 0.5, 13, [4.2, 2.2, 6.5])], [len(sh), K(-0.18, 0.46, 11.8, [4.2, 2.4, 6.8])]], { t, bump: t > obvT + 0.12 && t < obvT + 0.4 ? 1.2 : 0 });
+    rig(B, lt, [[0, K(-0.1, 0.46, 13.4, [5.0, 3.0, 6.6])], [len(sh), K(-0.02, 0.43, 12.2, [5.0, 3.1, 6.8])]], { t, bump: t > obvT + 0.12 && t < obvT + 0.4 ? 1.2 : 0 });
     const r = rcAt(t), sec = RCSEC * seg(t, tenA + 0.1, obvT + 0.1, lin);
-    onlineStage(g, t, { pieces: r.pieces, panel: g2 => flatPanel(g2, timerTex(sec), [4, 5.4, 12.2], 2.6, 2.6, GOLD),
+    onlineStage(g, t, { pieces: r.pieces, panel: g2 => flatPanel(g2, timerTex(sec), [4.4, 4.5, 12.2], 2.2, 2.2, GOLD),
       under: g2 => { moveFx(r).under(g2); if (t < obvT + 0.1) squareFrame(g2, B, RC.to, GOLD, 0.8); },
       over: g2 => { moveFx(r).over(g2); if (t < obvT + 0.1) boardArrow(g2, B, RC.from, RC.to, 0.85, seg(t, tenA + 0.2, tenA + 0.5, lin)); } });
   }, { trans: 'whip', hud: (g, lt, t) => {
@@ -1337,7 +1341,7 @@ export async function build(T) {
   const FAST = [...Array(8)].map((_, i) => matchA + 0.12 + i * Math.min(0.1, (wonA - matchA - 0.3) / 7)), fastAt = t => turnedRun(runTo(M[0], 29, FAST, t, 0.08));
   const score = t => t >= thr3T ? 3 : t >= allT ? 2 : 1;
   shot(matchA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, 1.22, 14, [4, 0, 4])], [len(sh), K(0.35, 1.28, 12.6, [4, 0, 4])]], { t });
+    rig(B, lt, [[0, K(0.0, 1.2, 14.6, [4, 0, 4.7])], [len(sh), K(0.3, 1.26, 13.2, [4, 0, 4.5])]], { t });
     const r = fastAt(t);
     jktStudio(g, t, { tab: JK({ pieces: r.pieces, clock: { names: ['KIPAS', 'IRENE'], cols: [FAN_C, IRENE_C], l: 300 - lt * 40, r: 340 - lt * 20, run: r.k % 2 ? 1 : 2 }, ew: 'worried', eb: 'focus', wPlayer: false, under: g2 => moveFx(r, 0.08, 0.1).under(g2) }) });
   }, { trans: 'whip' });
@@ -1376,7 +1380,6 @@ export async function build(T) {
   shot(peopleA, (g, lt, t) => photoShot(g, lt, PH.levy, { ...lvKeys2, dur: ctaA - peopleA + 0.3 }), { trans: 'zoom', hud: (g, lt, t) => {
     badge(g, '“PEOPLE WHO PLAY UNFAIRLY', W / 2, 200, { color: CREAM, size: 38, ...pop(t, peopleA + 0.1) });
     badge(g, 'WILL BE CAUGHT”', W / 2, 350, { color: LEVY_C, size: 50, a: seg(t, caughtT - 0.3, caughtT - 0.2), ...pop(t, caughtT - 0.3) });
-    credit(g, CREDITS.levy, 0.75, 268);
   } });
   cue(levyA - 0.06, 'whoosh_deep', 0.3); cue(levyA + 0.1, 'ting', 0.25); cue(caughtT, 'gavel', 0.4);
 
