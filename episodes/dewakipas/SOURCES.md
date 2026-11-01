@@ -29,15 +29,29 @@ denies cheating; it never says he cheated.
 
 On screen, drawn rather than documented (the facts behind each are in the table above):
 - all the people are cartoon versions: Levy in his stream room, Dadang Subur at home, his son with a phone, Deddy
-  Corbuzier (bald, black clothes) and Irene Sukandar at the match table; their faces and rooms are ours;
+  Corbuzier (bald, black clothes) and Irene Sukandar at the match table; their faces and rooms are ours (the real
+  Irene is the photo when she is named, the real Levy the photo before the end);
 - the "DEWA KIPAS" account card, the rating graph, the 10-second move timer, the accuracy gauge, the report button, the
   "ACCOUNT CLOSED" stamp, the Facebook-style post and the message bubbles are drawn; the bubbles carry no real messages
   (only icons and blurred lines);
 - the electric fan (a joke on the name), the Jakarta skyline, the studio and its LED wall, the viewer counter that climbs
   to 1.25M are drawn; the counter shows the reported peak, not a recording of the real counter;
-- the games on the boards are not the games of the story: the hook board ends with the mate from Byrne–Fischer 1956,
-  the match board plays Spassky–Fischer 1972, game 3; only the result (0–1 for Levy, 3–0 for Irene) is the story's;
+- the timer counts the real time of one move (24...fxg4, 11.4 s by the game's clock); the match clock's numbers are
+  drawn;
 - the last shot (the fan and the account card with "?") is the question to the viewers.
+
+## The games on the boards
+
+All boards show the real games (STYLE_BIBLE rule 49).
+
+| Board | Game | Source |
+|---|---|---|
+| Hook, Levy's screen, the account card, the CTA | GothamChess (Levy, White) – Dewa_Kipas, Chess.com, 2 March 2021, 10 min, 0–1 ("Dewa_Kipas won on time" after 35...Qh1+, with 36.Kg4 Qh5# next); the hook plays 35.Kh3 Qh1+ | Chess.com game archive: [game 8439364337](https://www.chess.com/game/live/8439364337), via the public API `api.chess.com/pub/player/gothamchess/games/2021/03`; same moves in Nastasio's PGN below. File: [`levy_dewakipas_2021.pgn`](../../engine/data/levy_dewakipas_2021.pgn) |
+| "Ten seconds a move, even the obvious ones" | the same game, 23.hxg4 Bxe5 24.dxe5 fxg4: Dewa_Kipas took 11.4 s over the recapture (clock 4:52.2 → 4:40.8); over the game his moves took 5–17 s, two 42–52 s | the `[%clk]` times of the Chess.com archive |
+| The match table: game 1 fast up to 18...Qc8 19.Bxd6; then the final positions of games 1, 2 and 3 with the score | Irene Sukandar – Dadang Subur ("Dewa Kipas"), Jakarta, 22 March 2021: game 1 Irene White 1–0 (24 moves), game 2 Subur White 0–1 (26...Qxg2+), game 3 Irene White 1–0 (26.Qxb5) | PGN by Davide Nastasio, [Chess News and Views, 29 March 2021](https://chessnewsandviews.com/highest-paid-cheater-in-chess-history/) ([file](https://chessnewsandviews.com/wp-content/uploads/2021/03/sukandar_3_games_match.pgn)); the course of the games matches [detik, 23 March 2021](https://inet.detik.com/games-news/d-5503359/hat-trick-blunder-sang-dewa-kipas): in game 1 "Irene memegang bidak putih" and took the dark-squared bishop without an exchange, game 2 ended with a queen check, in game 3 he lost the exchange, then a bishop and a pawn. Files: [`sukandar_subur_2021_g1.pgn`](../../engine/data/sukandar_subur_2021_g1.pgn), [`g2`](../../engine/data/sukandar_subur_2021_g2.pgn), [`g3`](../../engine/data/sukandar_subur_2021_g3.pgn) |
+
+At the studio table Dadang sits on the near side; in games 1 and 3 Irene had White, so for them the board is turned
+round (White's pieces on her side).
 
 ## Palette (STYLE_BIBLE rule 48)
 
@@ -51,5 +65,6 @@ engraving.
 | File | Where | Author | Licence | Source |
 |---|---|---|---|---|
 | `../levy/photos/levy_closeup.jpg` | "Levy Rozman" (Collision 2024, Toronto) | Piaras Ó Mídheach / Collision via Sportsfile | CC BY 2.0, credit on screen | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Levy_Rozman_at_Collision_2024_(cropped).jpg) |
+| `photos/irene_2013.jpg` | "Irine Kharisma Sukandar", Asian Indoor Games, Incheon, 30 July 2013 (960 px copy) | Kristianus Liem | CC BY-SA 3.0 (also GFDL), credit on screen | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Irine_Kharisma_Sukandar_2013.jpg) |
 
-Line for the post description: `Photo: Piaras Ó Mídheach / Collision via Sportsfile (CC BY 2.0), via Wikimedia Commons`
+Line for the post description: `Photos: Piaras Ó Mídheach / Collision via Sportsfile (CC BY 2.0); Kristianus Liem (CC BY-SA 3.0), via Wikimedia Commons`

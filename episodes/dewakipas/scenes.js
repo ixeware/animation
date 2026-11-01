@@ -33,12 +33,17 @@ const GOLD = SUN, RED = '#E8413A', LIME = HI.good, LEVY_C = '#6CB8FF', FAN_C = C
 // the board: Chess.com green on a walnut slab; the rounded slab, its sides and the engraving stay (rule 46)
 const GREEN = { light: '#EEEED2', dark: '#769656', frame: '#5A3A22', side: '#2A190D', th: 0.45, rc: 0.35 };
 Object.assign(capColor, { coral: '#FF8A6B', teal: '#3FE0CF' });  // the caption colours of this palette
-// illustrative games, not the games of the story: the hook board ends with Black's mate (the Game of the Century), the
-// match boards play game 3 of the 1972 match fast
-const GC = await fetch('../engine/data/game_of_century.json').then(r => r.json());
-const SF = await fetch('../engine/data/spassky_fischer_1972_g3.json').then(r => r.json());
-const PH = { levy: await loadPhoto3d('../episodes/levy/photos/levy_closeup') };
-const CREDITS = { levy: 'Photo: Piaras Ó Mídheach / Collision via Sportsfile, CC BY 2.0' };
+// the real games (SOURCES.md): Levy's game against Dewa_Kipas on 2 March 2021 (Chess.com archive; Levy White, lost on
+// time after 35...Qh1+) and the three match games of 22 March with Irene Sukandar (she had White in games 1 and 3)
+const LV = await fetch('../engine/data/levy_dewakipas_2021.json').then(r => r.json());
+const M = await Promise.all([1, 2, 3].map(n => fetch(`../engine/data/sukandar_subur_2021_g${n}.json`).then(r => r.json())));
+const LVEND = 70;  // 35...Qh1+, the last move: Levy's flag fell in the lost position
+// at the studio table Dadang sits on the near side; in games 1 and 3 Irene had White, so the board turns round for them
+const rsq = sq => String.fromCharCode(201 - sq.charCodeAt(0)) + (9 - +sq[1]);
+const turned = pcs => pcs.map(p => ({ ...p, sq: rsq(p.sq), ...(p.x != null ? { x: 8 - p.x, z: 8 - p.z } : {}), ...(p.trail ? { trail: [8 - p.trail[0], 8 - p.trail[1]] } : {}) }));
+const matchBoard = (n, k) => n === 2 ? board(M[1], k) : turned(board(M[n - 1], k));
+const PH = { levy: await loadPhoto3d('../episodes/levy/photos/levy_closeup'), irene: await loadPhoto3d('../episodes/dewakipas/photos/irene_2013') };
+const CREDITS = { levy: 'Photo: Piaras Ó Mídheach / Collision via Sportsfile, CC BY 2.0', irene: 'Photo: Kristianus Liem (2013), CC BY-SA 3.0' };
 
 // ---------- cast: Levy (the engine's lookalike), Dadang Subur and his son at home, Deddy Corbuzier (bald, in black),
 // IM Irene Sukandar; all cartoon versions ----------
@@ -616,14 +621,14 @@ function graphTex(u) {
     ledGrid(x, w, h, 6);
   });
 }
-// the move timer: a ring that fills over ten seconds
+// the move timer: a ring that fills over ten seconds (the count goes on past ten)
 function timerTex(sec) {
-  const s = Math.min(10, Math.floor(sec * 2) / 2);
+  const s = Math.min(15, Math.floor(sec * 2) / 2);
   return once('timer:' + s, 512, 512, (x, w, h) => {
     x.fillStyle = '#1E1029'; x.fillRect(0, 0, w, h);
     const done = s >= 10, col = done ? CORAL : GOLD;
     x.lineWidth = 34; x.strokeStyle = 'rgba(255,243,224,0.12)'; x.beginPath(); x.arc(w / 2, h / 2 + 20, 170, 0, 7); x.stroke();
-    x.strokeStyle = col; x.shadowColor = col; x.shadowBlur = 24; x.lineCap = 'round'; x.beginPath(); x.arc(w / 2, h / 2 + 20, 170, -Math.PI / 2, -Math.PI / 2 + 6.2832 * s / 10); x.stroke(); x.shadowBlur = 0;
+    x.strokeStyle = col; x.shadowColor = col; x.shadowBlur = 24; x.lineCap = 'round'; x.beginPath(); x.arc(w / 2, h / 2 + 20, 170, -Math.PI / 2, -Math.PI / 2 + 6.2832 * Math.min(1, s / 10)); x.stroke(); x.shadowBlur = 0;
     x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = mono(150, 800); x.fillStyle = CREAM; x.fillText(String(Math.floor(s)), w / 2, h / 2 + 26);
     x.font = sans(36, 900); x.letterSpacing = '8px'; x.fillStyle = 'rgba(255,243,224,0.7)'; x.fillText('SECONDS', w / 2, 54);
     ledGrid(x, w, h, 6);
@@ -1098,6 +1103,7 @@ export async function build(T) {
     under: g => { if (r.m) moveUnder(g, B, r.m, r.lt, { dur: d, hold }); },
     over: g => { if (r.m) moveOver(g, B, r.m, r.lt, { dur: d, hold }); },
   });
+  const turnedRun = r => ({ ...r, pieces: turned(r.pieces), m: r.m && { ...r.m, from: rsq(r.m.from), to: rsq(r.m.to) } });
   const halo = (pieces, ids, col, a) => pieces.map(p => ids.includes(p.id) && a > 0 ? { ...p, halo: col, haloA: a } : p);
   const kingOf = (pieces, c) => pieces.find(p => p.t === 'k' && p.c === c);
 
@@ -1119,9 +1125,9 @@ export async function build(T) {
   const ctaA = s('cta') - 0.05, realT = w('cta', 'real'), comT = w('cta', 'comment'), numT = w('cta', 'number');
 
   // ======================= HOOK (rule 42): Levy's webcam and the Fan God's (a desk fan) over the board; mate =======================
-  const hookAt = t => runTo(GC, 80, [0.32, mateT], t);
+  const hookAt = t => runTo(LV, LVEND - 2, [0.32, mateT], t);
   const hookCams = (t, o = {}) => ({ lev: { e: t >= mateT + 0.1 ? 'shock' : 'focus', shake: t >= mateT + 0.1 && t < mateT + 0.6 ? 0.3 : 0 }, fan: { spin: 7, ...o } });
-  const kSq = r => kingOf(r.pieces, 'w')?.sq || 'c1';
+  const kSq = r => kingOf(r.pieces, 'w')?.sq || 'h3';
   shot(0, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.05, 0.3, 19.5, [4, 3.4, 6.5])], [len(sh), K(0.0, 0.26, 16.8, [4, 3.4, 6.6])]], { t, e: lin, bump: t > mateT && t < mateT + 0.3 ? 1.3 : 0 });
     const r = hookAt(t), mated = t >= mateT;
@@ -1132,7 +1138,7 @@ export async function build(T) {
   shot(fanA, (g, lt, t, sh) => {
     const [c] = CAMPOS.fan;
     rig(B, lt, [[0, K(-0.3, 0.06, 10.5, [c[0] - 0.4, c[1], c[2]])], [len(sh), K(-0.2, 0.04, 8.2, [c[0] - 0.2, c[1] + 0.1, c[2]])]], { t });
-    onlineStage(g, t, { pieces: board(GC, 82), cams: hookCams(t, { spin: lerp(7, 18, seg(t, fanA, recA, lin)) }), under: g2 => ledGlow(g2, B, 'c1', RED, t, mateT, { reach: 1 }) });
+    onlineStage(g, t, { pieces: board(LV, LVEND), cams: hookCams(t, { spin: lerp(7, 18, seg(t, fanA, recA, lin)) }), under: g2 => ledGlow(g2, B, 'h3', RED, t, mateT, { reach: 1 }) });
   }, { trans: 'whip', hud: (g, lt, t) => badge(g, 'THE FAN GOD', W / 2, 230, { color: CORAL, size: 64, ...pop(t, fanA + 0.08) }) });
   cue(0, 'whoosh_soft', 0.2); cue(0.05, 'whirr', 0.25); landCue(0.32, false, 0.45);
   cue(mateT - 0.3, 'revswell', 0.55); boom(mateT, 0.9); cue(mateT, 'hit_punch', 0.4); landCue(mateT, true, 0.6); cue(mateT + 0.15, 'gasp', 0.3);
@@ -1149,9 +1155,9 @@ export async function build(T) {
   cue(recA - 0.06, 'whoosh_deep', 0.35); cue(recA + 0.1, 'murmur', 0.25); cue(mostT - 0.3, 'riser', 0.35); cue(mostT, 'reveal_bell', 0.4); cue(mostT + 0.1, 'cheer', 0.3);
 
   // ======================= MARCH 2021: Levy's stream by day; the account on his screen =======================
-  const cardAt = (t, o = {}) => ({ pieces: board(GC, 82), panel: g2 => flatPanel(g2, cardTex(o), [4, 5.8, 12.2], 5.1, 2.8) });
+  const cardAt = (t, o = {}) => ({ pieces: board(LV, LVEND), panel: g2 => flatPanel(g2, cardTex(o), [4, 5.8, 12.2], 5.1, 2.8) });
   const cardFeed = (g, t, o = {}) => { rig(B, 0, [[0, K(0.04, 0.1, 15.5, [4, 4.6, 10])], [1, K(0.04, 0.1, 15.5, [4, 4.6, 10])]], { t }); onlineStage(g, t, cardAt(t, o)); };
-  const hookFeed = (g, t) => { rig(B, 0, [[0, K(0, 0.27, 17, [4, 3.4, 6.6])], [1, K(0, 0.27, 17, [4, 3.4, 6.6])]], { t }); onlineStage(g, t, { pieces: board(GC, 80), cams: { lev: { e: 'focus' }, fan: { spin: 7 } } }); };
+  const hookFeed = (g, t) => { rig(B, 0, [[0, K(0, 0.27, 17, [4, 3.4, 6.6])], [1, K(0, 0.27, 17, [4, 3.4, 6.6])]], { t }); onlineStage(g, t, { pieces: board(LV, LVEND - 2), cams: { lev: { e: 'focus' }, fan: { spin: 7 } } }); };
   shot(nameA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI + 0.56, 0.26, 8.8, [4, 3.0, -1.4])], [len(sh), K(PI + 0.5, 0.24, 7.6, [4, 3.1, -1.4])]], { t });
     levyRoom(g, t, { screen: monitorScreen(feed(g2 => hookFeed(g2, t))), e: 'focus', over: g2 => tag3(g2, 4, 5.6, -1.4, 'LEVY · GOTHAMCHESS', LEVY_C, seg(t, nameA + 0.3, nameA + 0.6, lin)) });
@@ -1171,7 +1177,7 @@ export async function build(T) {
   cue(fanNT, 'sparkle_pop', 0.3); cue(godNT, 'shimmer', 0.35);
 
   // ======================= +800 IN 11 DAYS; TEN SECONDS A MOVE; 90 % ACCURACY =======================
-  const panelSet = (img, hh = 3.2, o = {}) => ({ pieces: board(GC, 82), panel: g2 => flatPanel(g2, img, [4, 5.8, 12.2], 5.1, hh), ...o });
+  const panelSet = (img, hh = 3.2, o = {}) => ({ pieces: board(LV, LVEND), panel: g2 => flatPanel(g2, img, [4, 5.8, 12.2], 5.1, hh), ...o });
   shot(susA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.22, 0.16, 18, [4, 4.6, 10])], [len(sh), K(0.08, 0.1, 13.5, [4, 5.4, 11])]], { t });
     onlineStage(g, t, panelSet(graphTex(seg(t, susA + 0.1, daysT + 0.1, lin))));
@@ -1179,11 +1185,12 @@ export async function build(T) {
     if (t >= hunT) badge(g, '+800 POINTS', W / 2, 230, { color: GOLD, size: 60, ...pop(t, hunT) });
     if (t >= elvT) badge(g, 'IN 11 DAYS', W / 2, 335, { color: CREAM, size: 50, ...pop(t, elvT) });
   } });
-  // an obvious recapture (7.Qxc4 after 6...dxc4), the timer filling for ten seconds first
-  const RC = moveOf(GC, 13), rcAt = t => runTo(GC, 12, [obvT + 0.12], t);
+  // an obvious recapture from the game itself, 23.hxg4 Bxe5 24.dxe5 fxg4: Dewa_Kipas took 11.4 s over it (the clock
+  // times of the Chess.com archive)
+  const RC = moveOf(LV, 48), RCSEC = 11.4, rcAt = t => runTo(LV, 47, [obvT + 0.12], t);
   shot(tenA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.3, 0.5, 13, [4.2, 2.2, 6.5])], [len(sh), K(-0.18, 0.46, 11.8, [4.2, 2.4, 6.8])]], { t, bump: t > obvT + 0.12 && t < obvT + 0.4 ? 1.2 : 0 });
-    const r = rcAt(t), sec = 10 * seg(t, tenA + 0.1, obvT + 0.1, lin);
+    const r = rcAt(t), sec = RCSEC * seg(t, tenA + 0.1, obvT + 0.1, lin);
     onlineStage(g, t, { pieces: r.pieces, panel: g2 => flatPanel(g2, timerTex(sec), [4, 5.4, 12.2], 2.6, 2.6, GOLD),
       under: g2 => { moveFx(r).under(g2); if (t < obvT + 0.1) squareFrame(g2, B, RC.to, GOLD, 0.8); },
       over: g2 => { moveFx(r).over(g2); if (t < obvT + 0.1) boardArrow(g2, B, RC.from, RC.to, 0.85, seg(t, tenA + 0.2, tenA + 0.5, lin)); } });
@@ -1196,7 +1203,7 @@ export async function build(T) {
     onlineStage(g, t, panelSet(gaugeTex(0.92 * seg(t, ovA + 0.1, accT, lin))));
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= accT) badge(g, 'IN ALMOST EVERY WIN', W / 2, 230, { color: CORAL, size: 50, ...pop(t, accT) }); } });
   cue(susA - 0.06, 'whoosh_fast', 0.3); cue(susA + 0.1, 'riser', 0.3); cue(hunT, 'kaching', 0.35); cue(elvT, 'ting', 0.3);
-  cue(tenA - 0.06, 'whoosh_fast', 0.3); for (let i = 1; i <= 10; i++) cue(lerp(tenA + 0.1, obvT + 0.1, i / 10), 'tick', 0.22);
+  cue(tenA - 0.06, 'whoosh_fast', 0.3); for (let i = 1; i <= 11; i++) cue(lerp(tenA + 0.1, obvT + 0.1, i / RCSEC), 'tick', 0.22);
   landCue(obvT + 0.12, true, 0.6); boom(obvT + 0.12, 0.5); cue(ovA - 0.06, 'whoosh_fast', 0.3); cue(ninT, 'alarm', 0.3); cue(accT, 'sting', 0.35);
 
   // ======================= LEVY REPORTED IT; HOURS LATER THE ACCOUNT CLOSED =======================
@@ -1286,7 +1293,7 @@ export async function build(T) {
   cue(condA - 0.06, 'whoosh_deep', 0.3); cue(condT, 'sting', 0.3);
 
   // ======================= THE TWIST: Deddy Corbuzier's studio in Jakarta, the Fan God against Irene Sukandar =======================
-  const JK = (o = {}) => ({ pieces: board(SF, 0), clock: { names: ['KIPAS', 'IRENE'], cols: [FAN_C, IRENE_C], l: 600, r: 600, run: 0 }, ew: 'focus', eb: 'happy', ...o });
+  const JK = (o = {}) => ({ pieces: matchBoard(1, 0), clock: { names: ['KIPAS', 'IRENE'], cols: [FAN_C, IRENE_C], l: 600, r: 600, run: 0 }, ew: 'focus', eb: 'happy', ...o });
   shot(twistA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.42, 0.2, 21, [2.2, 4.6, 7])], [len(sh), K(-0.34, 0.18, 19.2, [1.4, 4.6, 6.6])]], { t });
     jktStudio(g, t, { wall: 'event', ded: true, dedE: 'happy', tab: JK() });
@@ -1295,29 +1302,32 @@ export async function build(T) {
     rig(B, lt, [[0, K(PI - 0.32, 0.1, 9.4, [4, 3.1, -1.4])], [len(sh), K(PI - 0.26, 0.08, 8.2, [4, 3.2, -1.4])]], { t });
     jktStudio(g, t, { tab: JK({ ew: 'focus' }), over: g2 => tag3(g2, 4, 5.7, -1.4, 'THE FAN GOD', FAN_C, seg(t, fan2A + 0.1, fan2A + 0.4, lin)) });
   }, { trans: 'whip' });
-  shot(ireA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.3, 0.12, 10, [4, 3.1, 9.3])], [len(sh), K(0.22, 0.1, 8.8, [4, 3.2, 9.3])]], { t });
-    jktStudio(g, t, { wall: 'blank', tab: JK({ eb: 'happy' }) });
-  }, { trans: 'whip', hud: (g, lt, t) => { scrim(g); if (t >= ireT - 0.05) nameTitle(g, t - ireT + 0.05, 'Irene Sukandar', 'INTERNATIONAL MASTER', { y: 200, size: 60 }); } });
+  // the real Irene Sukandar (a photo of 2013, Asian Indoor Games), then the match table
+  const ireKeys = { from: { x: 0.5, y: 0.36, zoom: 1.0, dolly: 0 }, to: { x: 0.5, y: 0.35, zoom: 1.08, dolly: 0.06 } };
+  shot(ireA, (g, lt, t) => photoShot(g, lt, PH.irene, { ...ireKeys, dur: matchA - ireA + 0.3, drop: 150 }), { trans: 'whip', hud: (g, lt, t) => {
+    if (t >= ireT - 0.05) nameTitle(g, t - ireT + 0.05, 'Irene Sukandar', 'INTERNATIONAL MASTER', { y: 200, size: 60 });
+    credit(g, CREDITS.irene, seg(lt, 0.3, 0.5) * 0.75);
+  } });
   cue(twistA - 0.06, 'whoosh_deep', 0.35); cue(twistA + 0.1, 'murmur', 0.3); cue(dedT, 'reveal_bell', 0.3); cue(fan2A - 0.06, 'whoosh_fast', 0.3); cue(fan2A + 0.05, 'whirr', 0.3);
   cue(ireA - 0.06, 'whoosh_fast', 0.3); cue(ireT, 'sparkle_pop', 0.3);
 
   // ======================= THREE GAMES, IRENE WON ALL THREE; PERFORMANCE 1127 =======================
-  const FAST = [...Array(18)].map((_, i) => matchA + 0.15 + i * 0.1), fastAt = t => runTo(SF, 20, FAST, t, 0.08);
+  // game 1 fast, up to the blunder: 18...Qc8 and 19.Bxd6 takes the bishop (Irene White, the board turned round)
+  const FAST = [...Array(8)].map((_, i) => matchA + 0.12 + i * Math.min(0.1, (wonA - matchA - 0.3) / 7)), fastAt = t => turnedRun(runTo(M[0], 29, FAST, t, 0.08));
   const score = t => t >= thr3T ? 3 : t >= allT ? 2 : 1;
   shot(matchA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.0, 1.22, 14, [4, 0, 4])], [len(sh), K(0.35, 1.28, 12.6, [4, 0, 4])]], { t });
     const r = fastAt(t);
-    jktStudio(g, t, { tab: JK({ pieces: r.pieces, clock: { names: ['KIPAS', 'IRENE'], cols: [FAN_C, IRENE_C], l: 300 - lt * 40, r: 340 - lt * 20, run: r.k % 2 ? 2 : 1 }, ew: 'worried', eb: 'focus', under: g2 => moveFx(r, 0.08, 0.1).under(g2) }) });
+    jktStudio(g, t, { tab: JK({ pieces: r.pieces, clock: { names: ['KIPAS', 'IRENE'], cols: [FAN_C, IRENE_C], l: 300 - lt * 40, r: 340 - lt * 20, run: r.k % 2 ? 1 : 2 }, ew: 'worried', eb: 'focus', under: g2 => moveFx(r, 0.08, 0.1).under(g2) }) });
   }, { trans: 'whip' });
   shot(wonA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.32, 0.12, 21, [4, 5.4, 9])], [len(sh), K(0.22, 0.1, 18.5, [4, 5.6, 9.5])]], { t });
     const n = score(t), at = n === 3 ? thr3T : n === 2 ? allT : wonA;
-    jktStudio(g, t, { wall: 'score' + Math.max(1, n - 1), wall2: 'score' + n, wallU: n > 1 ? seg(t, at - 0.05, at + 0.15, lin) : 1, tab: JK({ pieces: board(SF, 82), ew: 'worried', eb: 'happy' }) });
+    jktStudio(g, t, { wall: 'score' + Math.max(1, n - 1), wall2: 'score' + n, wallU: n > 1 ? seg(t, at - 0.05, at + 0.15, lin) : 1, tab: JK({ pieces: matchBoard(n, M[n - 1].length - 1), ew: 'worried', eb: 'happy' }) });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= thr3T) stamp(g, '3 – 0', W / 2, 1530, t, thr3T, { color: GOLD, size: 110 }); } });
   shot(perfA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.06, 0.05, 16, [4, 6.0, 15])], [len(sh), K(0.02, 0.04, 13.2, [4, 6.1, 15])]], { t });
-    jktStudio(g, t, { wall: 'score3', wall2: 'perf', wallU: seg(t, prfT - 0.1, prfT + 0.15, lin), tab: JK({ pieces: board(SF, 82), ew: 'worried', eb: 'happy' }) });
+    jktStudio(g, t, { wall: 'score3', wall2: 'perf', wallU: seg(t, prfT - 0.1, prfT + 0.15, lin), tab: JK({ pieces: matchBoard(3, M[2].length - 1), ew: 'worried', eb: 'happy' }) });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= elT) badge(g, 'ELO 1127', W / 2, 230, { color: CORAL, size: 64, ...pop(t, elT) }); } });
   cue(matchA - 0.06, 'whoosh_fast', 0.3); FAST.forEach((a, i) => cue(a - 0.02, 'piece', i % 2 ? 0.18 : 0.24));
   cue(wonA - 0.06, 'whoosh_fast', 0.3); cue(wonA + 0.15, 'ting', 0.3); cue(allT, 'ting', 0.3); cue(thr3T - 0.004, 'boom', 0.6); cue(thr3T, 'stamp', 0.45); cue(thr3T + 0.05, 'success', 0.3);
@@ -1352,8 +1362,8 @@ export async function build(T) {
   // ======================= CTA: back to the hook board; the Fan God's real rating? =======================
   shot(ctaA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.3, 0.3, 12, [5.6, 3.4, 8])], [len(sh), K(0.0, 0.26, 17.5, [4, 3.6, 6.8])]], { t });
-    onlineStage(g, t, { pieces: board(GC, 82), cams: { lev: { e: 'smug' }, fan: { spin: 9 } },
-      under: g2 => ledGlow(g2, B, 'c1', RED, t, ctaA - 2, { reach: 1 }),
+    onlineStage(g, t, { pieces: board(LV, LVEND), cams: { lev: { e: 'smug' }, fan: { spin: 9 } },
+      under: g2 => ledGlow(g2, B, 'h3', RED, t, ctaA - 2, { reach: 1 }),
       over: g2 => tag3(g2, 7.4, 1.0, 10.6, 'RATING: ????', GOLD, seg(t, realT, realT + 0.3, lin)) });
   }, { trans: 'whip', hud: (g, lt, t) => {
     badge(g, 'HIS REAL RATING?', W / 2, 230, { color: GOLD, size: 54, ...pop(t, ctaA + 0.1) });
