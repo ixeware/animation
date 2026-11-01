@@ -456,6 +456,22 @@ function frontOf({ a, b }, x, y, z) {
 
 // ---------- people on their feet (the Rausis walker): the bust over trousers and shoes; walk swings the legs and
 // the hands, face is the way he faces (+z or -z), free leaves one hand out (that arm is drawn by the caller) ----------
+// a forearm raised on the free side, holding a phone in front of the chest (in the standing figure's own coordinates)
+function heldPhone(g, who, x, z, sd, lit = 1, { k = 1, y0 = FLOOR_Y } = {}) {
+  const hy = y0 + 7.1 * k; if (depth(x, hy, z) < 0.8) return;
+  const c = CAST[who], sk = skinOf(who), p = B.project(x, hy, z), sc = p.s * k / 100 * 1.05 * HK;
+  g.save(); g.translate(p.x, p.y); g.scale(sc, sc);
+  g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = c.suit; g.lineWidth = 56;  // the sleeve: down to the elbow, up to the chest
+  g.beginPath(); g.moveTo(sd * 116, 250); g.lineTo(sd * 134, 398); g.lineTo(sd * 52, 356); g.stroke();
+  g.strokeStyle = 'rgba(0,0,0,0.2)'; g.lineWidth = 4; g.stroke();
+  g.save(); g.translate(sd * 14, 292); g.rotate(-sd * 0.14);
+  g.fillStyle = '#15161A'; g.beginPath(); g.roundRect(-46, -84, 92, 168, 14); g.fill();
+  g.fillStyle = `rgba(191,244,255,${(0.5 + 0.4 * lit).toFixed(2)})`; g.beginPath(); g.roundRect(-38, -74, 76, 148, 9); g.fill();
+  g.fillStyle = 'rgba(30,60,80,0.35)'; for (let j = 0; j < 4; j++) g.fillRect(-28, -54 + j * 22, j === 3 ? 34 : 56, 9);
+  g.restore();
+  hand2(g, sd * 40, 362, 30, sk);
+  g.restore();
+}
 function standing(g, who, x, z, { e = 'neutral', t = 0, k = 1, walk = 0, phase = 0, y0 = FLOOR_Y, face = 1, free = null } = {}) {
   const hy = y0 + 7.1 * k; if (depth(x, hy, z) < 0.8) return null;
   const c = CAST[who], sk = skinOf(who), p = B.project(x, hy, z), sc = p.s * k / 100 * 1.05 * HK, bob = walk ? -Math.abs(Math.cos(phase)) * 12 : 0;
@@ -589,8 +605,8 @@ function cardTex({ rating = '2200', closed = 0, q = false } = {}) {
     x.font = sans(84, 900); x.letterSpacing = '2px'; x.fillStyle = CREAM; x.fillText('Dewa_Kipas', 420, 150);
     x.fillStyle = '#E8413A'; x.fillRect(424, 222, 54, 18); x.fillStyle = '#FFFFFF'; x.fillRect(424, 240, 54, 18);
     x.font = sans(38, 800); x.letterSpacing = '6px'; x.fillStyle = 'rgba(255,243,224,0.75)'; x.fillText('INDONESIA', 498, 242);
-    x.font = sans(40, 800); x.letterSpacing = '6px'; x.fillStyle = 'rgba(255,243,224,0.6)'; x.fillText('RATING', 424, 330);
-    x.font = sans(110, 900); x.letterSpacing = '4px'; x.fillStyle = q ? GOLD : CREAM; x.shadowColor = q ? GOLD : 'transparent'; x.shadowBlur = q ? 30 : 0; x.fillText(rating, 600, 336); x.shadowBlur = 0;
+    x.font = sans(40, 800); x.letterSpacing = '6px'; x.fillStyle = 'rgba(255,243,224,0.6)'; x.fillText('RATING', 424, 336);
+    x.font = sans(110, 900); x.letterSpacing = '4px'; x.fillStyle = q ? GOLD : CREAM; x.shadowColor = q ? GOLD : 'transparent'; x.shadowBlur = q ? 30 : 0; x.fillText(rating, 660, 336); x.shadowBlur = 0;
     x.font = sans(34, 800); x.letterSpacing = '6px'; x.fillStyle = 'rgba(255,243,224,0.5)'; x.fillText('10 MIN · ONLINE', 424, 440);
     if (closed > 0.5) {
       x.fillStyle = 'rgba(16,12,20,0.6)'; x.fillRect(0, 0, w, h);
@@ -816,19 +832,19 @@ function accountTiles(g, t, { u = 1, lock = 0 }) {
 }
 // message bubbles flying in at Levy's head from every side; every third red with a warning sign (no real words)
 function storm(g, t, t0, { n = 26, red = 0, target = [4, 3.4, -1.4] } = {}) {
-  const r = rng(21), L = [];
+  // laid out on the screen round his head (its size sets the scale): they fly in from the sides and stop beside the
+  // face, never over it
+  if (depth(...target) < 0.8) return;
+  const r = rng(21), c = B.project(...target), S = c.s, L = [];
   for (let i = 0; i < n; i++) {
-    const sd = i % 2 ? 1 : -1, el = (r() - 0.35) * 3.4, rad = 9 + r() * 4, st = t0 + i * 0.06 + r() * 0.2, dur = 1.1 + r() * 0.5;
+    const sd = i % 2 ? 1 : -1, st = t0 + i * 0.06 + r() * 0.2, dur = 1.1 + r() * 0.5;
+    const to = [sd * (1.75 + r() * 1.15), -1.4 + r() * 2.7], from = [to[0] + sd * (4 + r() * 3), to[1] + (r() - 0.5) * 4], sz = 0.4 + r() * 0.16;
     const u = (t - st) / dur; if (u <= 0) continue;
-    const k = u % 1, to = [target[0] + sd * (1.9 + r() * 1.0), target[1] + el, target[2] + 0.6 + r() * 0.8];
-    const from = [to[0] + sd * rad, to[1] + (r() - 0.5) * 6, to[2] + 4 + r() * 4];
-    const p3 = lerp3(from, to, ease.out(Math.min(1, u))), bad = i % 3 === 0 && red > 0;
-    if (depth(...p3) < 0.8) continue;
-    L.push([depth(...p3), p3, bad, i, k]);
+    const e = ease.out(Math.min(1, u));
+    L.push([i, c.x + lerp(from[0], to[0], e) * S, c.y + lerp(from[1], to[1], e) * S, sz * S, i % 3 === 0 && red > 0]);
   }
-  L.sort((a, b) => b[0] - a[0]).forEach(([, p3, bad, i]) => {
-    const p = B.project(...p3), s = p.s * 0.52;
-    g.save(); g.translate(p.x, p.y); g.rotate(Math.sin(t * 3 + i) * 0.08);
+  L.forEach(([i, x, y, s, bad]) => {
+    g.save(); g.translate(x, y); g.rotate(Math.sin(t * 3 + i) * 0.08);
     g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.roundRect(-s * 1.1 + s * 0.08, -s * 0.6 + s * 0.1, s * 2.2, s * 1.2, s * 0.3); g.fill();
     g.fillStyle = bad ? '#D9302A' : '#FFFFFF'; g.beginPath(); g.roundRect(-s * 1.1, -s * 0.6, s * 2.2, s * 1.2, s * 0.3); g.fill();
     g.beginPath(); g.moveTo(-s * 0.6, s * 0.55); g.lineTo(-s * 0.85, s * 0.95); g.lineTo(-s * 0.2, s * 0.55); g.fill();
@@ -875,11 +891,8 @@ function dadangHome(g, t, { e = 'neutral', son = false, sonE = 'neutral', fanSpi
   const tbl = () => { ab(g, [-0.5, FLOOR_Y, 0.6], [8.5, -0.9, 4.2], '#8A5A34', { spec: 0.15 }); ab(g, [-0.7, -0.9, 0.4], [8.7, -0.6, 4.4], '#A56E40', { spec: 0.25 }); laptop(g, [4, -0.6, 1.8], LAPTOP); lathe(g, 7.2, 2.6, [[-0.6, 0.3, 0.3], [0.1, 0.34, 0.34]], '#F2EEE6', { n: 14, spec: 0.3 }); };
   if (!front) tbl();
   const hb = seated(g, B, 'dad', e, t, { x: 4, z: -1.4, face: 1, side: 1, hands: false });
-  if (son) standing(g, 'son', 10.2, -0.4, { e: sonE, t, face: 1 });
-  if (son && phone > 0) {  // the phone in his hand, its screen lit
-    const c = [11.6, 2.9, 0.2];
-    if (depth(...c) > 0.8) { obox(g, c, [0.42, 0.75, 0.06], '#15161A', { ry: 0.3, rx: -0.2 }, { spec: 0.4 }); const p = B.project(...c); rim(g, p.x, p.y, p.s * 1.4, '#BFF4FF', 0.35 * phone); }
-  }
+  if (son) standing(g, 'son', 10.2, -0.4, { e: sonE, t, face: 1, free: phone > 0 ? 1 : null });
+  if (son && phone > 0) heldPhone(g, 'son', 10.2, -0.4, 1, phone);  // the phone in his raised hand, its screen lit
   if (front) tbl();
   if (over) over(g);
   lowKey(g, { cy: H * 0.45, a: 0.1 });
@@ -983,11 +996,12 @@ function jktStudio(g, t, { wall = 'event', wall2 = null, wallU = 0, ded = false,
 
 // ---------- Jakarta at sunset: blocks of towers round the National Monument (the obelisk with the gold flame), a
 // billboard over the city with the live viewer counter ----------
+const MONAS = [24, 56];  // the National Monument, to the right of the billboard
 const CITYB = (() => {
   const r = rng(31), L = [];
   for (let gx = -6; gx <= 7; gx++) for (let gz = 0; gz <= 11; gz++) {
     const x = gx * 9 + (r() - 0.5) * 3, z = 12 + gz * 9 + (r() - 0.5) * 3;
-    if ((Math.abs(x - 4) < 12 && Math.abs(z - 52) < 12) || (Math.abs(x - 4) < 11 && z < 40)) { r(); r(); r(); continue; }  // the square round the monument, the boulevard to it
+    if ((Math.abs(x - MONAS[0]) < 11 && Math.abs(z - MONAS[1]) < 11) || (Math.abs(x - 4) < 11 && z < 40)) { r(); r(); r(); continue; }  // the square round the monument, the boulevard
     const hw = 1.6 + r() * 2, hd = 1.6 + r() * 2, h = 4 + r() ** 2 * (gz > 6 ? 36 : 22);
     L.push({ x, z, hw, hd, h, col: ['#3A2346', '#45284E', '#2E1C3C', '#523056'][Math.floor(r() * 4)], seed: Math.floor(r() * 1000) });
   }
@@ -1007,10 +1021,11 @@ function building(g, b) {
   g.restore();
 }
 function monas(g) {
-  ab(g, [-4, FLOOR_Y, 44], [12, FLOOR_Y + 3, 60], '#E9DCC8', { amb: 0.6, L: vnorm([-0.6, 0.5, 0.6]) });
-  lathe(g, 4, 52, [[FLOOR_Y + 3, 2.2, 2.2], [FLOOR_Y + 5, 1.5, 1.5], [FLOOR_Y + 30, 0.8, 0.8], [FLOOR_Y + 31, 1.4, 1.4], [FLOOR_Y + 32, 0.9, 0.9]], '#F2E8D8', { n: 4, amb: 0.65, L: vnorm([-0.6, 0.5, 0.6]) });
-  lathe(g, 4, 52, [[FLOOR_Y + 32, 0.6, 0.6], [FLOOR_Y + 33.2, 0.95, 0.95], [FLOOR_Y + 34.4, 0.6, 0.6], [FLOOR_Y + 35.4, 0.05, 0.05]], '#FFC437', { n: 14, spec: 1, amb: 0.75 });
-  if (depth(4, FLOOR_Y + 33.5, 52) > 1) { const p = B.project(4, FLOOR_Y + 33.5, 52); rim(g, p.x, p.y, p.s * 4, GOLD, 0.55); }
+  const [X, Z] = MONAS;
+  ab(g, [X - 5, FLOOR_Y, Z - 5], [X + 5, FLOOR_Y + 2, Z + 5], '#D9CBB5', { amb: 0.6, L: vnorm([-0.6, 0.5, 0.6]) });
+  lathe(g, X, Z, [[FLOOR_Y + 2, 2.2, 2.2], [FLOOR_Y + 4, 1.5, 1.5], [FLOOR_Y + 29, 0.8, 0.8], [FLOOR_Y + 30, 1.4, 1.4], [FLOOR_Y + 31, 0.9, 0.9]], '#F2E8D8', { n: 4, amb: 0.65, L: vnorm([-0.6, 0.5, 0.6]) });
+  lathe(g, X, Z, [[FLOOR_Y + 31, 0.6, 0.6], [FLOOR_Y + 32.2, 0.95, 0.95], [FLOOR_Y + 33.4, 0.6, 0.6], [FLOOR_Y + 34.4, 0.05, 0.05]], '#FFC437', { n: 14, spec: 1, amb: 0.75 });
+  if (depth(X, FLOOR_Y + 32.5, Z) > 1) { const p = B.project(X, FLOOR_Y + 32.5, Z); rim(g, p.x, p.y, p.s * 4, GOLD, 0.55); }
 }
 function counterTex(mode, v) {
   const k = mode === 'count' ? Math.round(v / 1000) : 0;
@@ -1046,7 +1061,7 @@ function skyline(g, t, { mode = 'roll', v = 0, mode2 = null, u2 = 0, fire = null
     g.stroke(); g.restore();
   }
   const items = CITYB.filter(b => depth(b.x, FLOOR_Y + b.h / 2, b.z) > 2).map(b => [depth(b.x, FLOOR_Y + b.h / 2, b.z), () => building(g, b)]);
-  items.push([depth(4, FLOOR_Y + 12, 52), () => monas(g)]);
+  items.push([depth(MONAS[0], FLOOR_Y + 12, MONAS[1]), () => monas(g)]);
   items.push([depth(...BILL.c) - 0.5, () => {
     const { c, hw, hh } = BILL;
     cylinder(g, [c[0] - hw * 0.6, FLOOR_Y, c[2] + 0.4], [c[0] - hw * 0.6, c[1] - hh, c[2] + 0.4], 0.35, '#1A1020', { n: 10 });
@@ -1138,7 +1153,7 @@ export async function build(T) {
   shot(fanA, (g, lt, t, sh) => {
     const [c] = CAMPOS.fan;
     rig(B, lt, [[0, K(-0.3, 0.06, 10.5, [c[0] - 0.4, c[1], c[2]])], [len(sh), K(-0.2, 0.04, 8.2, [c[0] - 0.2, c[1] + 0.1, c[2]])]], { t });
-    onlineStage(g, t, { pieces: board(LV, LVEND), cams: hookCams(t, { spin: lerp(7, 18, seg(t, fanA, recA, lin)) }), under: g2 => ledGlow(g2, B, 'h3', RED, t, mateT, { reach: 1 }) });
+    onlineStage(g, t, { pieces: [], cams: hookCams(t, { spin: lerp(7, 18, seg(t, fanA, recA, lin)) }) });
   }, { trans: 'whip', hud: (g, lt, t) => badge(g, 'THE FAN GOD', W / 2, 230, { color: CORAL, size: 64, ...pop(t, fanA + 0.08) }) });
   cue(0, 'whoosh_soft', 0.2); cue(0.05, 'whirr', 0.25); landCue(0.32, false, 0.45);
   cue(mateT - 0.3, 'revswell', 0.55); boom(mateT, 0.9); cue(mateT, 'hit_punch', 0.4); landCue(mateT, true, 0.6); cue(mateT + 0.15, 'gasp', 0.3);
@@ -1155,7 +1170,7 @@ export async function build(T) {
   cue(recA - 0.06, 'whoosh_deep', 0.35); cue(recA + 0.1, 'murmur', 0.25); cue(mostT - 0.3, 'riser', 0.35); cue(mostT, 'reveal_bell', 0.4); cue(mostT + 0.1, 'cheer', 0.3);
 
   // ======================= MARCH 2021: Levy's stream by day; the account on his screen =======================
-  const cardAt = (t, o = {}) => ({ pieces: board(LV, LVEND), panel: g2 => flatPanel(g2, cardTex(o), [4, 5.8, 12.2], 5.1, 2.8) });
+  const cardAt = (t, o = {}) => ({ pieces: board(LV, LVEND), panel: g2 => flatPanel(g2, cardTex(o), [4, 5.8, 12.2], 4.0, 2.2) });
   const cardFeed = (g, t, o = {}) => { rig(B, 0, [[0, K(0.04, 0.1, 15.5, [4, 4.6, 10])], [1, K(0.04, 0.1, 15.5, [4, 4.6, 10])]], { t }); onlineStage(g, t, cardAt(t, o)); };
   const hookFeed = (g, t) => { rig(B, 0, [[0, K(0, 0.27, 17, [4, 3.4, 6.6])], [1, K(0, 0.27, 17, [4, 3.4, 6.6])]], { t }); onlineStage(g, t, { pieces: board(LV, LVEND - 2), cams: { lev: { e: 'focus' }, fan: { spin: 7 } } }); };
   shot(nameA, (g, lt, t, sh) => {
@@ -1163,7 +1178,7 @@ export async function build(T) {
     levyRoom(g, t, { screen: monitorScreen(feed(g2 => hookFeed(g2, t))), e: 'focus', over: g2 => tag3(g2, 4, 5.6, -1.4, 'LEVY · GOTHAMCHESS', LEVY_C, seg(t, nameA + 0.3, nameA + 0.6, lin)) });
   }, { trans: 'whip', hud: (g, lt, t) => { scrim(g); placeStamp(g, lt, 'On stream', 'MARCH 2, 2021 · 12,000 WATCHING', { y: 200, t0: 0.1 }); } });
   shot(accA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.5, 0.15, 6.8, [4.2, 2.6, 2])], [0.6, PANELK, ease.inOut], [len(sh), PANELK]], { t, shake: lt < 0.6 ? 1 : 0 });
+    rig(B, lt, [[0, K(0.62, 0.32, 6.8, [4.2, 2.6, 2.4])], [0.6, PANELK, ease.inOut], [len(sh), PANELK]], { t, shake: lt < 0.6 ? 1 : 0 });
     levyRoom(g, t, { screen: monitorScreen(feed(g2 => cardFeed(g2, t, { rating: '+800' }))), e: 'focus' });
   }, { kb: 0 });
   shot(indA, (g, lt, t, sh) => {
@@ -1177,7 +1192,7 @@ export async function build(T) {
   cue(fanNT, 'sparkle_pop', 0.3); cue(godNT, 'shimmer', 0.35);
 
   // ======================= +800 IN 11 DAYS; TEN SECONDS A MOVE; 90 % ACCURACY =======================
-  const panelSet = (img, hh = 3.2, o = {}) => ({ pieces: board(LV, LVEND), panel: g2 => flatPanel(g2, img, [4, 5.8, 12.2], 5.1, hh), ...o });
+  const panelSet = (img, hh = 2.5, o = {}) => ({ pieces: board(LV, LVEND), panel: g2 => flatPanel(g2, img, [4, 5.8, 12.2], 4.0, hh), ...o });
   shot(susA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.22, 0.16, 18, [4, 4.6, 10])], [len(sh), K(0.08, 0.1, 13.5, [4, 5.4, 11])]], { t });
     onlineStage(g, t, panelSet(graphTex(seg(t, susA + 0.1, daysT + 0.1, lin))));
@@ -1199,7 +1214,7 @@ export async function build(T) {
     if (t >= obvT) badge(g, 'EVEN THE OBVIOUS ONES', W / 2, 335, { color: CORAL, size: 46, ...pop(t, obvT) });
   } });
   shot(ovA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.2, 0.12, 16, [4, 5, 10.5])], [len(sh), K(-0.06, 0.08, 13, [4, 5.6, 11])]], { t });
+    rig(B, lt, [[0, K(-0.08, 0.12, 16, [4, 5.2, 10.5])], [len(sh), K(-0.03, 0.08, 13, [4, 5.6, 11])]], { t });
     onlineStage(g, t, panelSet(gaugeTex(0.92 * seg(t, ovA + 0.1, accT, lin))));
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= accT) badge(g, 'IN ALMOST EVERY WIN', W / 2, 230, { color: CORAL, size: 50, ...pop(t, accT) }); } });
   cue(susA - 0.06, 'whoosh_fast', 0.3); cue(susA + 0.1, 'riser', 0.3); cue(hunT, 'kaching', 0.35); cue(elvT, 'ting', 0.3);
@@ -1213,19 +1228,25 @@ export async function build(T) {
     x.font = sans(40, 900); x.letterSpacing = '6px'; x.textAlign = 'center'; x.fillStyle = '#FFFFFF'; x.fillText(pressed ? 'REPORTED ✓' : 'REPORT', 220, 567);
     x.font = sans(26, 800); x.letterSpacing = '3px'; x.fillStyle = 'rgba(255,243,224,0.7)'; x.fillText('DEWA_KIPAS', 220, 470);
   };
+  const repP = repT + 0.24, repScreen = t => monitorScreen(feed(g2 => hookFeed(g2, t)), { left: reportLeft(t >= repP) });
   shot(repA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.8, 0.14, 7.6, [3.6, 2.6, 3.0])], [len(sh), K(-0.7, 0.12, 6.6, [3.6, 2.6, 3.2])]], { t, bump: t > repT && t < repT + 0.25 ? 0.8 : 0 });
-    levyRoom(g, t, { screen: monitorScreen(feed(g2 => hookFeed(g2, t)), { left: reportLeft(t >= repT + 0.1) }), e: 'angry' });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= repT + 0.1) badge(g, 'REPORTED', W / 2, 230, { color: LEVY_C, size: 60, ...pop(t, repT + 0.1) }); } });
+    rig(B, lt, [[0, K(PI + 0.66, 0.26, 9.2, [4, 3.0, -1.4])], [len(sh), K(PI + 0.6, 0.25, 8.4, [4, 3.0, -1.4])]], { t });
+    levyRoom(g, t, { screen: repScreen(t), e: 'angry' });
+  }, { trans: 'whip' });
+  // his screen, as he sees it: the REPORT button goes down
+  shot(repT + 0.1, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0, 0.03, 4.8, [MON.x - 0.6, MON.y, MON.z])], [len(sh), K(-0.04, 0.03, 4.0, [MON.x - 1.3, MON.y - 0.15, MON.z])]], { t, bump: t > repP && t < repP + 0.25 ? 0.8 : 0 });
+    levyRoom(g, t, { screen: repScreen(t), e: 'angry' });
+  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= repP) badge(g, 'REPORTED', W / 2, 230, { color: LEVY_C, size: 60, ...pop(t, repP) }); } });
   shot(hrsA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.18, 0.12, 17, [4, 4.8, 10])], [len(sh), K(0.05, 0.08, 13.5, [4, 5.4, 11])]], { t, bump: t > closedT && t < closedT + 0.3 ? 1.2 : 0 });
+    rig(B, lt, [[0, K(0.08, 0.12, 17, [4, 5.0, 10])], [len(sh), K(0.02, 0.08, 13.5, [4, 5.5, 11])]], { t, bump: t > closedT && t < closedT + 0.3 ? 1.2 : 0 });
     onlineStage(g, t, cardAt(t, { rating: '+800', closed: t >= closedT ? 1 : 0 }));
     if (t >= closedT) flashTint(g, RED, 0.3 * (1 - seg(t, closedT, closedT + 0.4, lin)));
   }, { trans: 'whip', hud: (g, lt, t) => {
     if (t < closedT) heading(g, 'HOURS LATER', 200, seg(lt, 0, 0.15));
     if (t >= fpT) badge(g, 'FAIR-PLAY RULES', W / 2, 230, { color: CORAL, size: 56, ...pop(t, fpT) });
   } });
-  cue(repA - 0.06, 'whoosh_fast', 0.3); cue(repT + 0.08, 'beep', 0.35); cue(hrsA - 0.06, 'whoosh_deep', 0.3); cue(hrsA + 0.1, 'clock', 0.3);
+  cue(repA - 0.06, 'whoosh_fast', 0.3); cue(repT + 0.1, 'whoosh_soft', 0.25); cue(repP - 0.02, 'beep', 0.35); cue(hrsA - 0.06, 'whoosh_deep', 0.3); cue(hrsA + 0.1, 'clock', 0.3);
   cue(closedT - 0.004, 'boom', 0.6); cue(closedT, 'stamp', 0.5); cue(closedT + 0.05, 'dun_dun', 0.3); cue(fpT, 'error', 0.3);
 
   // ======================= DADANG SUBUR at home: from the real "kipas" (the ceiling fan) down to him =======================
@@ -1272,7 +1293,7 @@ export async function build(T) {
 
   // ======================= THE STORM: messages fly at Levy, some of them threats =======================
   shot(stormA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI + 0.55, 0.12, 9.6, [4, 3.2, -1.4])], [len(sh), K(PI + 0.4, 0.1, 7.6, [4, 3.2, -1.4])]], { t, shake: t >= deathT ? 1.5 : 1 });
+    rig(B, lt, [[0, K(PI + 0.74, 0.26, 9.8, [4, 3.0, -1.4])], [len(sh), K(PI + 0.62, 0.24, 8.4, [4, 3.0, -1.4])]], { t, shake: t >= deathT ? 1.5 : 1 });
     levyRoom(g, t, { screen: monitorScreen(feed(g2 => hookFeed(g2, t))), e: t >= deathT ? 'shock' : 'worried', over: g2 => storm(g2, t, stormA + 0.05, { red: t >= deathT - 0.1 ? 1 : 0 }) });
     if (t >= deathT) flashTint(g, RED, 0.22 * (1 - seg(t, deathT, deathT + 0.5, lin)));
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= deathT) badge(g, 'DEATH THREATS', W / 2, 230, { color: RED, size: 60, ...pop(t, deathT) }); } });
@@ -1280,7 +1301,7 @@ export async function build(T) {
 
   // ======================= HE LOCKED HIS ACCOUNTS; DADANG AND HIS SON CONDEMNED THE HARASSMENT =======================
   shot(lockA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI + 0.56, 0.26, 10.5, [5.2, 3.8, -0.8])], [len(sh), K(PI + 0.5, 0.24, 9.4, [5.2, 3.8, -0.8])]], { t });
+    rig(B, lt, [[0, K(PI + 0.74, 0.27, 10.5, [5.2, 3.6, -0.8])], [len(sh), K(PI + 0.66, 0.26, 9.4, [5.2, 3.6, -0.8])]], { t });
     levyRoom(g, t, { screen: monitorScreen(feed(g2 => hookFeed(g2, t))), e: 'tired', tiles: { u: seg(t, lockA, lockA + 0.4, lin), lock: seg(t, lockT - 0.15, lockT + 0.7, lin) } });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= lockT) badge(g, 'ACCOUNTS LOCKED', W / 2, 230, { color: GOLD, size: 56, ...pop(t, lockT) }); } });
   shot(condA, (g, lt, t, sh) => {
@@ -1318,7 +1339,7 @@ export async function build(T) {
   shot(matchA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.0, 1.22, 14, [4, 0, 4])], [len(sh), K(0.35, 1.28, 12.6, [4, 0, 4])]], { t });
     const r = fastAt(t);
-    jktStudio(g, t, { tab: JK({ pieces: r.pieces, clock: { names: ['KIPAS', 'IRENE'], cols: [FAN_C, IRENE_C], l: 300 - lt * 40, r: 340 - lt * 20, run: r.k % 2 ? 1 : 2 }, ew: 'worried', eb: 'focus', under: g2 => moveFx(r, 0.08, 0.1).under(g2) }) });
+    jktStudio(g, t, { tab: JK({ pieces: r.pieces, clock: { names: ['KIPAS', 'IRENE'], cols: [FAN_C, IRENE_C], l: 300 - lt * 40, r: 340 - lt * 20, run: r.k % 2 ? 1 : 2 }, ew: 'worried', eb: 'focus', wPlayer: false, under: g2 => moveFx(r, 0.08, 0.1).under(g2) }) });
   }, { trans: 'whip' });
   shot(wonA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.32, 0.12, 21, [4, 5.4, 9])], [len(sh), K(0.22, 0.1, 18.5, [4, 5.6, 9.5])]], { t });
@@ -1327,7 +1348,7 @@ export async function build(T) {
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= thr3T) stamp(g, '3 – 0', W / 2, 1530, t, thr3T, { color: GOLD, size: 110 }); } });
   shot(perfA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.06, 0.05, 16, [4, 6.0, 15])], [len(sh), K(0.02, 0.04, 13.2, [4, 6.1, 15])]], { t });
-    jktStudio(g, t, { wall: 'score3', wall2: 'perf', wallU: seg(t, prfT - 0.1, prfT + 0.15, lin), tab: JK({ pieces: matchBoard(3, M[2].length - 1), ew: 'worried', eb: 'happy' }) });
+    jktStudio(g, t, { wall: 'score3', wall2: 'perf', wallU: seg(t, prfT - 0.1, prfT + 0.15, lin), tab: JK({ pieces: matchBoard(3, M[2].length - 1), ew: 'worried', eb: 'happy', bPlayer: false, bChair: false }) });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= elT) badge(g, 'ELO 1127', W / 2, 230, { color: CORAL, size: 64, ...pop(t, elT) }); } });
   cue(matchA - 0.06, 'whoosh_fast', 0.3); FAST.forEach((a, i) => cue(a - 0.02, 'piece', i % 2 ? 0.18 : 0.24));
   cue(wonA - 0.06, 'whoosh_fast', 0.3); cue(wonA + 0.15, 'ting', 0.3); cue(allT, 'ting', 0.3); cue(thr3T - 0.004, 'boom', 0.6); cue(thr3T, 'stamp', 0.45); cue(thr3T + 0.05, 'success', 0.3);
@@ -1348,20 +1369,20 @@ export async function build(T) {
 
   // ======================= LEVY'S VERDICT (the photo) =======================
   const lvKeys = { from: { x: 0.5, y: 0.36, zoom: 1.0, dolly: 0 }, to: { x: 0.51, y: 0.36, zoom: 1.06, dolly: 0.05 } };
-  const lvKeys2 = { from: { x: 0.52, y: 0.34, zoom: 1.22, dolly: 0.02 }, to: { x: 0.53, y: 0.34, zoom: 1.3, dolly: 0.07 } };
+  const lvKeys2 = { from: { x: 0.5, y: 0.38, zoom: 1.1, dolly: 0.02 }, to: { x: 0.5, y: 0.38, zoom: 1.16, dolly: 0.05 } };
   shot(levyA, (g, lt, t) => photoShot(g, lt, PH.levy, { ...lvKeys, dur: peopleA - levyA + 0.3 }), { trans: 'whip', hud: (g, lt, t) => {
     nameTitle(g, lt, 'Levy Rozman', 'GOTHAMCHESS', { y: 200, size: 62, t0: 0.05 }); credit(g, CREDITS.levy, seg(lt, 0.4, 0.6) * 0.75);
   } });
   shot(peopleA, (g, lt, t) => photoShot(g, lt, PH.levy, { ...lvKeys2, dur: ctaA - peopleA + 0.3 }), { trans: 'zoom', hud: (g, lt, t) => {
-    badge(g, '“PEOPLE WHO PLAY UNFAIRLY', W / 2, 230, { color: CREAM, size: 46, ...pop(t, peopleA + 0.1) });
-    badge(g, 'WILL BE CAUGHT”', W / 2, 330, { color: LEVY_C, size: 54, sub: 'LEVY ROZMAN', a: seg(t, caughtT - 0.3, caughtT - 0.2), ...pop(t, caughtT - 0.3) });
-    credit(g, CREDITS.levy, 0.75);
+    badge(g, '“PEOPLE WHO PLAY UNFAIRLY', W / 2, 200, { color: CREAM, size: 38, ...pop(t, peopleA + 0.1) });
+    badge(g, 'WILL BE CAUGHT”', W / 2, 350, { color: LEVY_C, size: 50, a: seg(t, caughtT - 0.3, caughtT - 0.2), ...pop(t, caughtT - 0.3) });
+    credit(g, CREDITS.levy, 0.75, 268);
   } });
   cue(levyA - 0.06, 'whoosh_deep', 0.3); cue(levyA + 0.1, 'ting', 0.25); cue(caughtT, 'gavel', 0.4);
 
   // ======================= CTA: back to the hook board; the Fan God's real rating? =======================
   shot(ctaA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.3, 0.3, 12, [5.6, 3.4, 8])], [len(sh), K(0.0, 0.26, 17.5, [4, 3.6, 6.8])]], { t });
+    rig(B, lt, [[0, K(-0.03, 0.28, 18.4, [4.1, 3.55, 7.0])], [len(sh), K(0.0, 0.26, 17.5, [4, 3.6, 6.8])]], { t });
     onlineStage(g, t, { pieces: board(LV, LVEND), cams: { lev: { e: 'smug' }, fan: { spin: 9 } },
       under: g2 => ledGlow(g2, B, 'h3', RED, t, ctaA - 2, { reach: 1 }),
       over: g2 => tag3(g2, 7.4, 1.0, 10.6, 'RATING: ????', GOLD, seg(t, realT, realT + 0.3, lin)) });
