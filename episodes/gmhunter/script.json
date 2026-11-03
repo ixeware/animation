@@ -1,0 +1,200 @@
+{
+  "title": "GothamChess: the Grandmaster Hunter",
+  "channel": "THE 64 FILES",
+  "post": "GothamChess has beaten 503 grandmasters… so why isn't he one? 🏹 #chess #gothamchess #grandmaster #chesscom #story",
+  "lead_in": 0.05,
+  "tail": 1.6,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.84,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.28,
+    "max_gap": 0.16
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5.0,
+    "reverb": 0.4,
+    "reverb_sec": 2.3,
+    "duck": 0.5
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "He has beaten five hundred grandmasters. And he's not even one.",
+      "say": "[dramatic] He has beaten five hundred grandmasters. [pause] And he's not even one.",
+      "pause": 0.3,
+      "colors": {
+        "five": "gold",
+        "hundred": "gold",
+        "grandmasters.": "gold",
+        "not": "red",
+        "one.": "red"
+      }
+    },
+    {
+      "id": "name",
+      "text": "Levy Rozman. GothamChess. The Grandmaster Hunter.",
+      "say": "Levy Rozman. GothamChess. [intense] The Grandmaster Hunter.",
+      "pause": 0.3,
+      "colors": {
+        "GothamChess.": "blue",
+        "Grandmaster": "gold",
+        "Hunter.": "gold"
+      }
+    },
+    {
+      "id": "claim",
+      "text": "He claims nearly a third. Then, under a viral video, he wrote:",
+      "say": "He claims nearly a third. Then, under a viral video... he wrote:",
+      "pause": 0.15,
+      "colors": {
+        "third.": "gold",
+        "viral": "blue",
+        "wrote:": "blue"
+      }
+    },
+    {
+      "id": "fifty",
+      "text": "It's gonna be fifty percent soon.",
+      "say": "[smug] \"It's gonna be fifty percent... soon.\"",
+      "pause": 0.35,
+      "colors": {
+        "fifty": "gold",
+        "percent": "gold",
+        "soon.": "lime"
+      }
+    },
+    {
+      "id": "count",
+      "text": "So we counted. Thirty-four thousand games. Five hundred and three grandmasters.",
+      "say": "So we counted. Thirty-four thousand games. [intense] Five hundred and three grandmasters.",
+      "pause": 0.25,
+      "colors": {
+        "counted.": "lime",
+        "Thirty-four": "gold",
+        "thousand": "gold",
+        "three": "gold",
+        "grandmasters.": "red"
+      }
+    },
+    {
+      "id": "hikaru",
+      "text": "Hikaru. Seventeen times.",
+      "say": "Hikaru. [pause] Seventeen times.",
+      "pause": 0.3,
+      "colors": {
+        "Hikaru.": "blue",
+        "Seventeen": "gold"
+      }
+    },
+    {
+      "id": "caruana",
+      "text": "March 2026. Fabiano Caruana. Seven seconds left. Rook h6. Checkmate.",
+      "say": "March twenty twenty-six. Fabiano Caruana. [tense] Seven seconds left... [pause] Rook h6. [pause] Checkmate.",
+      "pause": 0.3,
+      "colors": {
+        "Caruana.": "red",
+        "Seven": "red",
+        "seconds": "red",
+        "h6.": "lime",
+        "Checkmate.": "lime"
+      }
+    },
+    {
+      "id": "peak",
+      "text": "That night, his rating peaks: three thousand and fourteen.",
+      "say": "That night, his rating peaks: [awed] three thousand... and fourteen.",
+      "pause": 0.45,
+      "colors": {
+        "peaks:": "gold",
+        "three": "gold",
+        "thousand": "gold",
+        "fourteen.": "gold"
+      }
+    },
+    {
+      "id": "why",
+      "text": "So why isn't the hunter a grandmaster? Because none of it counts.",
+      "say": "So why isn't the hunter a grandmaster? [pause] [serious] Because none of it counts.",
+      "pause": 0.3,
+      "colors": {
+        "grandmaster?": "gold",
+        "none": "red",
+        "counts.": "red"
+      }
+    },
+    {
+      "id": "rules",
+      "text": "The title is won over the board, in classical. Three norms. A 2500 rating.",
+      "say": "The title is won over the board, in classical. Three norms. A twenty-five hundred rating.",
+      "pause": 0.2,
+      "colors": {
+        "board,": "lime",
+        "classical.": "lime",
+        "Three": "gold",
+        "norms.": "gold",
+        "2500": "gold"
+      }
+    },
+    {
+      "id": "best",
+      "text": "His best ever: 2421. His five hundred wins? Online blitz and bullet.",
+      "say": "His best ever: twenty-four twenty-one. His five hundred wins? [flatly] Online blitz and bullet.",
+      "pause": 0.3,
+      "colors": {
+        "2421.": "red",
+        "Online": "blue",
+        "blitz": "blue",
+        "bullet.": "blue"
+      }
+    },
+    {
+      "id": "comeback",
+      "text": "In 2022, the stress made him quit. In 2024, he came back. For the title.",
+      "say": "In twenty twenty-two, the stress made him quit. [determined] In twenty twenty-four, he came back. For the title.",
+      "pause": 0.3,
+      "colors": {
+        "quit.": "red",
+        "back.": "lime",
+        "title.": "gold"
+      }
+    },
+    {
+      "id": "pace",
+      "text": "And fifty percent soon? At this year's pace... 2033.",
+      "say": "[amused] And fifty percent soon? At this year's pace... twenty thirty-three.",
+      "pause": 0.35,
+      "colors": {
+        "fifty": "gold",
+        "percent": "gold",
+        "2033.": "lime"
+      }
+    },
+    {
+      "id": "cta",
+      "text": "So how many grandmasters have you beaten? Comment a number.",
+      "say": "So... how many grandmasters have you beaten? Comment a number.",
+      "pause": 0,
+      "colors": {
+        "you": "lime",
+        "beaten?": "lime",
+        "number.": "gold"
+      }
+    }
+  ]
+}
