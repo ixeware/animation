@@ -78,6 +78,8 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
   перезапустить.
 - `--from`/`--to` работают для рендера куска (`--out кусок.mp4`), а в `--qa` игнорируются.
 - `./build.sh <ep>` проходит весь путь сразу, без двухпроходного кодирования.
+- Движку нужны `build/narration.wav` и `build/timings.json` от `audio/tts.py`. Без них даже стоп-кадры не
+  отрендерятся.
 
 ## 5. Как устроен `scenes.js`
 
@@ -214,4 +216,7 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
 - После распаковки:
   1. `npm i`;
   2. поставить пакеты Python (раздел 3);
-  3. проверка: `node render.mjs gmhunter --stills 1.0` — кадр должен появиться в `episodes/gmhunter/build/stills/`.
+  3. `python3 audio/tts.py episodes/gmhunter` — озвучка и `timings.json` берутся из кэша, ключ не нужен. Без
+     `build/timings.json` движок не запустится: страница получит 404 и рендер упадёт по таймауту;
+  4. проверка: `node render.mjs gmhunter --stills 1.0` — кадр должен появиться в `episodes/gmhunter/build/stills/`.
+     Так проверено на распакованном архиве 3.11.2026, тайминги совпали с оригиналом байт в байт.
