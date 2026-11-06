@@ -4,6 +4,43 @@
 (драма — один поворот внутри интересной самой по себе истории). Факты ниже проверены по источникам в конце каждого
 пункта; перед сценарием всё равно собрать `SOURCES.md`.
 
+## Отдельный ролик для Chessnut: «2.13 seconds» (06.11.2026)
+Мем октября 2026: Хикару подходит к партии Кеймер–Карлсен и за «2.13 секунды» понимает, что Магнус проигрывает
+(эдит @flashccfx — 17,3 млн за 11 дней, эдит Chess.com — 1,1 млн). Ролик: постановка как в реальном видео → что он
+увидел → как мозг гроссмейстера узнаёт позицию → фигуры двигаются в голове, как на Chessnut Move → восхваление
+Хикару → рассказ про доску. Делать, только если Chessnut согласится на отдельное видео.
+- Первоисточник: ChessBase India, «The pain and agony of Magnus Carlsen losing to 18-year-old Vincent Keymer»
+  (кадры трансляции chess24). Партия: Кеймер–Карлсен, Кубок мира 2023, 4-й круг, 1-я партия, Баку, 9.08.2023, 1–0.
+- Позиция в кадре сверена с записью партии поле за полем: после 38…Rb1
+  (`5k2/1Nn2p2/2p3p1/2R3P1/3P4/4P3/5PK1/1r6 w - - 1 39`, оценка +2,4). Часы в кадре: у Кеймера 0:39 → 0:29
+  (на 39-й ход, контроль на 40-м), у Карлсена 32:09 — то же время стоит в записи после 38…Rb1.
+- Перед этим: 36…Nc7? 37.Nd6! (конь бьёт b7 и f7) g6 38.Nxb7; дальше 39.Nd8 Rb5 40.Rxb5 cxb5 41.Nc6 — коневой
+  эндшпиль, Карлсен сдался на 58-м ходу. Первая победа Кеймера над Карлсеном.
+- Постановка: вид сбоку, синий стол, деревянная доска, цифровые часы, бутылки воды, бланки. Кеймер слева — чёрная
+  рубашка, локти на столе, руки у лица. Карлсен справа — белая футболка, сидит боком, кулак у рта. За ними тёмно-синяя
+  стена с логотипами (у нас без логотипов спонсоров), слева экран с досками. Хикару (тёмно-синяя рубашка, чёрные
+  брюки) играет за соседним столом позади — в тот день Накамура–Праггнанандха, ничья; встаёт, обходит стол, встаёт
+  между игроками, смотрит вниз; крупно снизу — через ~2 с гримаса (глаза зажмурены, рот вниз, брови сведены);
+  общий план спереди — оба игрока держатся за голову.
+- Строки для эдитов: часы 30 секунд против 32 минут; Карлсен о Хикару после финала Speed Chess Championship 2022:
+  «He's just a beast in this format» (Хикару выиграл SCC пять раз подряд, 2018–2022, в 2022-м — у Магнуса);
+  через два года после Баку — мат Гукешу и брошенный в зал король (`episodes/hikaru/SOURCES.md`); «Hikaru Nakamura
+  is not human» — подпись вирусного эдита.
+- Доска: у каждой фигуры свой мотор и колёса, расстановка по фото, все 32 фигуры возвращаются одновременно, игра
+  с соперниками на Chess.com и Lichess — со слов производителя, перед сценарием попросить у Chessnut видео.
+- Источники: [Know Your Meme](https://knowyourmeme.com/memes/213-seconds-chess-realization-that-magnus-is-losing),
+  [ChessBase India (YouTube)](https://www.youtube.com/watch?v=ZVAtu-jBCJo),
+  [Lichess, запись партии с часами](https://lichess.org/broadcast/fide-world-cup-2023-open-section/round-4-game-1/Zd5u7dII/HXDoACg9),
+  [Chess.com, отчёт](https://www.chess.com/news/view/fide-world-cup-2023-round-4-1),
+  [FIDE, отчёт](https://www.fide.com/news/2567),
+  [Chess.com, SCC 2022](https://www.chess.com/news/view/2022-speed-chess-championship-final-nakamura-carlsen),
+  [FIDE, SCC 2023](https://www.fide.com/carlsen-denies-nakamura-sixth-straight-speed-chess-title/),
+  [ChessBase, рекорд Фишера](https://en.chessbase.com/post/hikaru-nakamura-breaks-fischer-s-record),
+  [Gobet & Simon 1996](https://www.Gwern.net/doc/psychology/chess/1996-gobet.pdf),
+  [Reingold et al. 2001](https://www.cs.umb.edu/~marc/pubs/reingold_et_al_psysci2001.pdf),
+  [Bilalić et al. 2011](https://peeref.com/works/12201340),
+  [Chessnut Move](https://www.chessnutech.com/blogs/news/chessnut-move-robotic-chessboard-review).
+
 ## Анализ 31.10.2026 и ещё топ идей
 Статистика `tools/tiktok.py stats` на 31.10: 8481 подписчик (+399 за два дня), 389,6 тыс. лайков, 22 ролика.
 
