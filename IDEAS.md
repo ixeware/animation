@@ -26,6 +26,14 @@
   «He's just a beast in this format» (Хикару выиграл SCC пять раз подряд, 2018–2022, в 2022-м — у Магнуса);
   через два года после Баку — мат Гукешу и брошенный в зал король (`episodes/hikaru/SOURCES.md`); «Hikaru Nakamura
   is not human» — подпись вирусного эдита.
+- Достижение для восхваления: 5.10.2026 Хикару первым в истории Chess.com набрал 3500 в блице — Карлсен в тот
+  момент 3400, на 100 меньше. С 15.09 (3342) за 18 дней: 253 партии, 231 победа, 12 ничьих, 10 поражений
+  (подсчёт ChessBase India); 3 октября выиграл первые 34 партии дня подряд; 6.10 на стриме Titled Tuesday — 3503.
+  «61 победа подряд» не подтверждается: самая длинная найденная серия — 59 подряд в буллете (Bullet Brawl, март 2024).
+  [ChessBase India](https://chessbase.in/news-bites/nakamura-crosses-3500-on-chesscom),
+  [DAZN](https://www.dazn.com/en-US/news/chess/hikaru-nakamura-chess-history-magnus-carlsen-3500-blitz-record-t3r/gxgf06l232l41q3nplzzx6lo7),
+  [Chess.com, 3503](https://www.chess.com/news/view/artemiev-wins-titled-tuesday-october-6-2026),
+  [Chess.com, 59 подряд](https://www.chess.com/news/view/nakamura-wins-bullet-brawl-march-16-2024).
 - Две силы гроссмейстера: мгновенное узнавание (позиция за 5 с, ~50 000 «шаблонов») и доска в голове —
   длинные варианты без доски. Пример с Хикару: январь 2026, ICE Barcelona — первая партия вслепую Карлсен–Накамура
   (15 минут, точность 96 % у обоих): Карлсен взял центральную пешку, Хикару «увидел далеко» — 26…Bxe3!! и
