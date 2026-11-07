@@ -2,9 +2,11 @@
 // seconds, Carlsen thirty-two minutes; Hikaru Nakamura walks over from the next table, looks down at the board and
 // grimaces, and the internet timed it: 2.13 seconds. What he saw (37.Nd6! hits b7 and f7, 38.Nxb7, Carlsen resigned on
 // move 58), how a grandmaster's brain does it (the five-second recall test and scrambled positions: patterns, about
-// fifty thousand; a board in his head), that Hikaru has both (blindfold against Carlsen, Barcelona 2026: 26...Bxe3!!,
-// a draw; the first 3500 blitz on Chess.com, 34 wins in a row), and the sponsor: the Chessnut Move, whose pieces drive
-// themselves, stands only on our own table, never in front of the real players. Sources and what is drawn: SOURCES.md.
+// fifty thousand; a board in his head). The feats come first, right after the clip ("that's not even the scary part"):
+// blindfold against Carlsen, Barcelona 2026 (26...Bxe3!!, a draw), the first 3500 blitz on Chess.com, 34 wins in a row,
+// "not human" (a captcha on his facecam fails), "he IS the engine" (Stockfish is a fish; his own eval bar). The sponsor,
+// the Chessnut Move, whose pieces drive themselves, stands only on our own table, never in front of the real players.
+// Sources and what is drawn: SOURCES.md.
 // Rules 42-45 (reference/rausis_v2.md): the payoff is the first frame (the grimace and the stopwatch at 2.13); every
 // phrase is a 3D set (the Baku stage, a living room whose TV plays the clip, the board in his head, a wall of patterns,
 // the Barcelona stage, a streaming room, two rating towers); cuts go through screens and objects. Palette (rule 48):
@@ -20,9 +22,11 @@ import { bokeh, lowKey, spotCone } from '../../engine/js/light.js';
 import { BOOM_HIT, MOVE_HIT, SLIDE, SLIDE_OPTS, slide, moveOf, moveUnder, moveOver, playRun, brilliantSquare } from '../../engine/js/movefx.js';
 import { drawPiece } from '../../engine/js/pieces.js';
 import { loadPhoto3d, photo3d } from '../../engine/js/photo3d.js';
+import { loadImage } from '../../engine/js/photo.js';
 import { HI, ledGlow, flashTint, speedLines, boardArrow, pieceRing, squareFrame, spread } from '../../engine/js/hifx.js';
-import { confetti } from '../../engine/js/draw.js';
-import { GAMER } from '../../engine/js/witty.js';
+import { confetti, rays, speedlines } from '../../engine/js/draw.js';
+import { shockwave, glint } from '../../engine/js/fx.js';
+import { GAMER, ledStrip } from '../../engine/js/witty.js';
 
 useLookV2();
 const CHANNEL = 'THE 64 FILES';  // whose channel the video is made for: the follow line names it (THE 64 FILES / HAPPYCHESS)
@@ -33,8 +37,8 @@ const NAVY = '#14244A', BLUE = '#2F63B8', AMBER = '#FFB547', MIND = '#5FE3D0', V
 // Keymer-Carlsen, Baku 2023 (ply 73 = 37.Nd6, 75 = 38.Nxb7, 76 = 38...Rb1: the position Hikaru saw; 116 = 58...Kd5, 1-0)
 const G = await fetch('../engine/data/keymer_carlsen_2023.json').then(r => r.json());
 const MEME = 76, LAST = G.length - 1;
-const PH = { hikaru: await loadPhoto3d('../episodes/hikaru/photos/hikaru2026') };
-const CREDIT = 'Photo: Kelly Centrelli / Charlotte Chess Center, CC BY 4.0';
+// the fish of the Stockfish logo (Klein Maetschke, GPLv3), cut out of its green tile and turned level: photos/cut_fish.py
+const FISH = await loadImage('../episodes/hikaru213/photos/stockfish_fish.png');
 
 // ---------- cast: Keymer (black shirt, dark blond hair swept back), Carlsen at 32 (white T-shirt, clean-shaven), Hikaru
 // in Baku (a dark blue shirt, black trousers); blindfolded Carlsen and Hikaru for Barcelona ----------
@@ -826,6 +830,187 @@ function evalBar(g, t, { x = 6.6, z = 9.3, f = 1, ev = 2.53 } = {}) {
   ab(g, [x - 0.31, y0, z - 0.31], [x + 0.31, y0 + hh * wf, z + 0.31], '#F2F1EC', { amb: 0.75, spec: 0.3 });
 }
 
+// ======================= v3: HIKARU'S FACECAM — the stream room seen from his monitor (the camera is the webcam) =======================
+// The wall behind him: acoustic tiles with a neon knight, LED strips along the top and the bottom; violet as in the
+// stream shots, teal when he becomes the engine, red for a moment when the captcha fails.
+const HIK_C = '#B48CFF';
+const wallTex = glow => tex(1024, 660, (x, w, h) => {
+  x.fillStyle = '#141026'; x.fillRect(0, 0, w, h);
+  for (let j = 0; j < 5; j++) for (let i = 0; i < 8; i++) {
+    const gr = x.createLinearGradient(i * 128, j * 132, i * 128 + 128, j * 132 + 132); gr.addColorStop(0, '#2A2350'); gr.addColorStop(1, '#1A1533');
+    x.fillStyle = gr; x.fillRect(i * 128 + 6, j * 132 + 6, 116, 120);
+  }
+  x.shadowColor = glow; x.shadowBlur = 60; drawPiece(x, 'n', 'w', w * 0.79, h * 0.62, 330, {}); drawPiece(x, 'n', 'w', w * 0.79, h * 0.62, 330, {}); x.shadowBlur = 0;
+});
+const WALL_V = wallTex(HIK_C), WALL_T = wallTex(MIND);
+const WALLQ = { tl: [11, 10.4, -11.95], tr: [-3, 10.4, -11.95], bl: [11, 1.4, -11.95] };
+function facecam(g, t, { e = 'focus', power = 0, red = 0, behind = null } = {}) {
+  room(g, B, GAMER, { t });
+  texQuad(g, WALL_V, WALLQ.tl, WALLQ.tr, WALLQ.bl);
+  if (power > 0) texQuad(g, WALL_T, WALLQ.tl, WALLQ.tr, WALLQ.bl, { a: power });
+  const led = red > 0 ? mix(HIK_C, '#FF4A3D', red) : mix(HIK_C, MIND, power);
+  ledStrip(g, B, [16, 10.7, -11.9], [-8, 10.7, -11.9], led, t);
+  ledStrip(g, B, [16, 0.9, -11.9], [-8, 0.9, -11.9], power > 0 ? mix(TEAL, MIND, power) : TEAL, t, { phase: 1 });
+  pool(g, B, 4, 5.4, -11.9, 9, led, 0.16 + 0.3 * power + 0.2 * red, true);
+  if (behind) behind(g);
+  chair(g, B, 4, -1.9, { face: 1, color: '#2A2240' });
+  seated(g, B, 'hikaru', e, t, { z: -1.4, face: 1, hands: false });
+  table(g, B, { table: ['#2A2540', '#141120', '#1C1830'] }, { x1: 8.4 });
+  ab(g, [2.2, -0.35, 0.2], [5.8, -0.25, 1.3], '#1C1A26', { amb: 0.6 });  // the keyboard, in front of him
+  ab(g, [6.4, -0.35, 0.3], [7.2, -0.22, 1.3], '#1C1A26', { amb: 0.6 });  // the mouse
+  // the monitor's cool light on him (it is where the camera is)
+  const p = B.project(4, 3.1, -1.4); rim(g, p.x, p.y, p.s * 3.2, red > 0 ? mix('#DDEBFF', '#FF4A3D', red) : mix('#DDEBFF', MIND, power), 0.12 + 0.18 * power + 0.2 * red);
+}
+// where his eyes are on screen (characters.js draws them at ±38, -2 in head units)
+function eyesAt(x = 4, y = 3.1, z = -1.4) { const p = B.project(x, y, z), s = p.s / 100 * 1.05; return [[p.x - 38 * s, p.y - 2 * s], [p.x + 38 * s, p.y - 2 * s], s]; }
+
+// ======================= THE CAPTCHA: a white card on his stream, a cursor, a click, and it fails =======================
+const CARD = { y: 220, w: 820, h: 290, bar: 72 };
+function cursorAt(g, x, y, k = 1) {
+  g.save(); g.translate(x, y); g.scale(1.7 * k, 1.7 * k);
+  g.beginPath(); g.moveTo(0, 0); g.lineTo(0, 46); g.lineTo(11, 35.5); g.lineTo(19.5, 54); g.lineTo(28, 50); g.lineTo(19.5, 32); g.lineTo(34, 32); g.closePath();
+  g.shadowColor = 'rgba(0,0,0,0.45)'; g.shadowBlur = 10; g.shadowOffsetY = 4; g.fillStyle = '#FFFFFF'; g.fill();
+  g.shadowColor = 'transparent'; g.lineJoin = 'round'; g.lineWidth = 3; g.strokeStyle = '#111317'; g.stroke(); g.restore();
+}
+function captcha(g, t, { t0, tClick, tFail }) {
+  if (t < t0) return;
+  const u = ease.out(clamp((t - t0) / 0.28)), f = t >= tFail ? ease.out(clamp((t - tFail) / 0.18)) : 0;
+  const shake = t >= tFail ? Math.sin((t - tFail) * 62) * 22 * Math.exp(-(t - tFail) * 5) : 0;
+  const cw = CARD.w, ch = CARD.h + CARD.bar * f, cx = W / 2 + shake, top = CARD.y + (1 - u) * 18, L = cx - cw / 2;
+  g.save(); g.globalAlpha *= u; g.translate(cx, top + ch / 2); g.scale(lerp(0.94, 1, u), lerp(0.94, 1, u)); g.translate(-cx, -(top + ch / 2));
+  g.shadowColor = 'rgba(6,4,14,0.45)'; g.shadowBlur = 34; g.shadowOffsetY = 14; g.fillStyle = '#FFFFFF';
+  g.beginPath(); g.roundRect(L, top, cw, ch, 26); g.fill(); g.shadowColor = 'transparent';
+  qaRect(g, L, top, cw, ch, 'text', 'captcha');
+  g.save(); g.beginPath(); g.roundRect(L, top, cw, ch, 26); g.clip();
+  g.textBaseline = 'middle'; g.textAlign = 'center'; g.font = sans(36, 900); g.letterSpacing = '5px'; g.fillStyle = '#4B5563';
+  inkText(g, 'VERIFY YOU ARE HUMAN', cx, top + 62);
+  g.fillStyle = '#E8EAEE'; g.fillRect(L + 40, top + 104, cw - 80, 3);
+  // the checkbox and its label
+  const bx = L + 84, by = top + 190, bs = 104;
+  if (t >= tFail) {
+    g.fillStyle = '#E5484D'; g.beginPath(); g.roundRect(bx - bs / 2, by - bs / 2, bs, bs, 14); g.fill();
+    const k = ease.back(clamp((t - tFail) / 0.22)) * 30; g.strokeStyle = '#FFFFFF'; g.lineWidth = 13; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(bx - k, by - k); g.lineTo(bx + k, by + k); g.moveTo(bx + k, by - k); g.lineTo(bx - k, by + k); g.stroke();
+  } else {
+    g.fillStyle = '#FFFFFF'; g.strokeStyle = '#A3AAB4'; g.lineWidth = 6; g.beginPath(); g.roundRect(bx - bs / 2, by - bs / 2, bs, bs, 14); g.fill(); g.stroke();
+    if (t >= tClick) {  // the spinner
+      const a0 = (t - tClick) * 11; g.strokeStyle = '#3B82F6'; g.lineWidth = 10; g.lineCap = 'round';
+      g.beginPath(); g.arc(bx, by, 30, a0, a0 + 4.2); g.stroke();
+    }
+  }
+  g.textAlign = 'left'; g.font = sans(60, 800); g.letterSpacing = '0px'; g.fillStyle = '#1F2328'; g.fillText("I'm not a robot", bx + bs / 2 + 40, by + 4);
+  if (f > 0) {  // the red bar slides out under the card
+    g.fillStyle = '#E5484D'; g.fillRect(L, top + CARD.h, cw, CARD.bar * f + 2);
+    g.globalAlpha *= f; g.textAlign = 'center'; g.font = sans(40, 900); g.letterSpacing = '5px'; g.fillStyle = '#FFFFFF';
+    inkText(g, 'VERIFICATION FAILED', cx, top + CARD.h + CARD.bar / 2 + 2);
+  }
+  g.restore(); g.restore();
+  // the cursor: in from the lower right, onto the box, a click
+  const m = ease.inOut(clamp((t - t0 - 0.15) / (tClick - 0.1 - t0 - 0.15)));
+  const px = lerp(W * 0.86, bx + 6, m) + shake * 0.6, py = lerp(1010, by + 4, m), press = t >= tClick && t < tClick + 0.12 ? 0.86 : 1;
+  if (t >= tClick && t < tClick + 0.4) { const r = seg(t, tClick, tClick + 0.4, ease.out); g.save(); g.globalAlpha *= 1 - r; g.strokeStyle = '#3B82F6'; g.lineWidth = 6; g.beginPath(); g.arc(px, py, 20 + r * 70, 0, 7); g.stroke(); g.restore(); }
+  cursorAt(g, px, py, press);
+}
+
+// ======================= THE SEA: Stockfish, a fish (as the author's Mittens video has it) =======================
+// a deep blue with light from the surface; a sand floor that fades into the blue, swaying weed, bubbles, specks
+const fogSea = (col, d) => mix(col, '#185E96', clamp((d - 6) / 34) * 0.92);
+const WEED = (() => { const r = rng(57), a = []; for (let i = 0; i < 26; i++) a.push({ x: -14 + r() * 36, z: 2 + r() * 34, h: 1.6 + r() * 3.4, ph: r() * 6, c: r() < 0.5 ? '#2F8A5E' : '#3E9C4E' }); return a; })();
+const ROCKS = (() => { const r = rng(91), a = []; for (let i = 0; i < 9; i++) a.push({ x: -10 + r() * 28, z: 4 + r() * 30, r: 0.6 + r() * 1.4 }); return a; })();
+const SEAY = -6;
+function sea(g, t) {
+  const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#62C9EC'); gr.addColorStop(0.42, '#2384C0'); gr.addColorStop(1, '#0E3F73');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  // the floor, in strips that fog into the water with distance
+  for (let z = 44; z > -6; z -= 2) {
+    const d = depth(4, SEAY, z + 1); if (d < 0.5) continue;
+    if (B.poly(g, [[-30, SEAY, z], [40, SEAY, z], [40, SEAY, z + 2], [-30, SEAY, z + 2]])) { g.fillStyle = fogSea(z % 4 === 0 ? '#D8C48E' : '#CFBA82', d); g.fill(); }
+  }
+  for (const k of ROCKS) { const d = depth(k.x, SEAY, k.z); if (d < 1) continue; const p = B.project(k.x, SEAY, k.z); g.fillStyle = fogSea('#5D6F7A', d); g.beginPath(); g.ellipse(p.x, p.y, k.r * p.s, k.r * p.s * 0.45, 0, Math.PI, 0); g.fill(); }
+  for (const k of [...WEED].sort((a, b) => depth(b.x, SEAY, b.z) - depth(a.x, SEAY, a.z))) {
+    const d = depth(k.x, SEAY, k.z); if (d < 1) continue;
+    const p0 = B.project(k.x, SEAY, k.z), sw = Math.sin(t * 1.3 + k.ph) * 0.5, p1 = B.project(k.x + sw * 0.5, SEAY + k.h * 0.55, k.z), p2 = B.project(k.x + sw, SEAY + k.h, k.z);
+    g.strokeStyle = fogSea(k.c, d); g.lineCap = 'round'; g.lineWidth = Math.max(2, 0.28 * p0.s);
+    g.beginPath(); g.moveTo(p0.x, p0.y); g.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y); g.stroke();
+  }
+  // light shafts from the surface
+  g.save(); g.globalCompositeOperation = 'screen';
+  for (let i = 0; i < 6; i++) {
+    const x0 = -140 + i * 230 + Math.sin(t * 0.5 + i * 1.9) * 50, w0 = 70 + (i * 41) % 80;
+    const lg = g.createLinearGradient(0, 0, 0, H * 0.85); lg.addColorStop(0, 'rgba(225,248,255,0.19)'); lg.addColorStop(1, 'rgba(225,248,255,0)');
+    g.fillStyle = lg; g.beginPath(); g.moveTo(x0, -10); g.lineTo(x0 + w0, -10); g.lineTo(x0 + w0 + 330, H * 0.85); g.lineTo(x0 + 250, H * 0.85); g.closePath(); g.fill();
+  }
+  g.restore();
+}
+// specks and bubbles in the water around the camera (3D points: they slide past as the camera drifts)
+function seaSpecks(g, t, { burst = null } = {}) {
+  const r = rng(33);
+  for (let i = 0; i < 70; i++) {
+    const x = -8 + r() * 24, z = -1 + r() * 26, y = SEAY + ((r() * 14 + t * (0.15 + r() * 0.2)) % 14);
+    if (depth(x, y, z) < 1) continue; const p = B.project(x, y, z);
+    g.fillStyle = `rgba(230,245,255,${(0.25 + 0.3 * r()).toFixed(2)})`; g.beginPath(); g.arc(p.x, p.y, Math.max(1.5, 0.035 * p.s), 0, 7); g.fill();
+  }
+  const bub = (x, y, z, rr) => { if (depth(x, y, z) < 1) return; const p = B.project(x, y, z), R = Math.max(3, rr * p.s);
+    g.strokeStyle = 'rgba(235,250,255,0.75)'; g.lineWidth = Math.max(1.5, R * 0.14); g.beginPath(); g.arc(p.x, p.y, R, 0, 7); g.stroke();
+    g.fillStyle = 'rgba(235,250,255,0.18)'; g.fill(); g.fillStyle = 'rgba(255,255,255,0.85)'; g.beginPath(); g.arc(p.x - R * 0.35, p.y - R * 0.35, R * 0.22, 0, 7); g.fill(); };
+  const r2 = rng(71);
+  for (let i = 0; i < 22; i++) { const x = -5 + r2() * 18, z = 1 + r2() * 16, sp = 0.6 + r2() * 0.8, y = SEAY + ((r2() * 13 + t * sp) % 13); bub(x + Math.sin(t * 2 + i) * 0.08, y, z, 0.06 + r2() * 0.1); }
+  if (burst) { const [bx, by, bz, t0] = burst, dt = t - t0; if (dt > 0 && dt < 1.4) { const r3 = rng(19); for (let i = 0; i < 18; i++) { const a = r3() * 6.28, v = 0.6 + r3() * 1.6; bub(bx + Math.cos(a) * v * dt * 0.6 + 0.6 * r3(), by + dt * (1.2 + r3() * 1.4) + Math.sin(a) * 0.3, bz + (r3() - 0.5) * 0.8, 0.07 + r3() * 0.12); } } }
+}
+// the Stockfish fish (the logo's cod, cut out), facing left: drawn in thin vertical strips that sway more toward the
+// tail, so the body swims; len = its length in pixels
+const FISHC = makeCanvas(FISH.width, Math.ceil(FISH.height * 1.3)), fishx = FISHC.getContext('2d');
+function fishPhoto(g, x, y, len, t, { rot = 0, wag = 1 } = {}) {
+  const iw = FISH.width, ih = FISH.height, ch = FISHC.height, n = 48;
+  fishx.setTransform(1, 0, 0, 1, 0, 0); fishx.clearRect(0, 0, iw, ch);
+  for (let i = 0; i < n; i++) {  // the body in strips, each shifted on the swimming wave (no shadow here: it would band)
+    const u = i / n, x0 = Math.floor(u * iw), x1 = Math.floor((i + 1) / n * iw), amp = ih * 0.055 * wag * Math.pow(u, 1.7);
+    fishx.drawImage(FISH, x0, 0, x1 - x0, ih, x0, (ch - ih) / 2 + Math.sin(t * 8.5 - u * 4.2) * amp, x1 - x0, ih);
+  }
+  g.save(); g.translate(x, y); g.rotate(rot); g.scale(len / iw, len / iw);
+  g.shadowColor = 'rgba(4,30,60,0.35)'; g.shadowBlur = 30; g.shadowOffsetY = 26;
+  g.drawImage(FISHC, -iw / 2, -ch / 2);
+  g.restore();
+}
+function smallCredit(g, text, y) {
+  g.save(); g.font = sans(19, 700); g.letterSpacing = '2px'; const w = inkWidth(g, text) + 36;
+  g.fillStyle = 'rgba(4,24,48,0.55)'; g.beginPath(); g.roundRect(W / 2 - w / 2, y - 18, w, 36, 18); g.fill();
+  g.fillStyle = CREAM; g.textAlign = 'center'; g.textBaseline = 'middle'; inkText(g, text, W / 2, y + 1); g.restore();
+}
+
+// ======================= HE IS THE ENGINE: his own evaluation bar on the stream overlay, rays behind him =======================
+function hudEval(g, t, { f = 1, ev = 2.53, x = 52, y0 = 360, h = 860, w = 70 } = {}) {
+  if (f <= 0) return;
+  const u = ease.out(clamp(f / 0.35)), wf = lerp(0.5, evalFrac(ev), ease.inOut(clamp((f - 0.25) / 0.75)));
+  g.save(); g.globalAlpha *= u; g.translate(-(1 - u) * 120, 0);
+  g.shadowColor = MIND; g.shadowBlur = 40 * u; g.fillStyle = '#2A2D33'; g.beginPath(); g.roundRect(x, y0, w, h, 10); g.fill(); g.shadowBlur = 0;
+  g.save(); g.beginPath(); g.roundRect(x, y0, w, h, 10); g.clip();
+  g.fillStyle = '#F4F3EE'; g.fillRect(x, y0 + h * (1 - wf), w, h * wf + 2);
+  g.restore();
+  g.strokeStyle = rgba(MIND, 0.9); g.lineWidth = 5; g.beginPath(); g.roundRect(x, y0, w, h, 10); g.stroke();
+  g.fillStyle = '#2A2D33'; g.font = sans(26, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.letterSpacing = '0px';
+  inkText(g, ev.toFixed(1), x + w / 2, y0 + h - 30);
+  g.restore();
+}
+function powerBehind(g, t, t0, x, y, pw) {  // rays from behind his head
+  if (t < t0) return;
+  g.save(); g.globalCompositeOperation = 'screen'; rays(g, x, y, t, { n: 16, color: MIND, a: 0.24 * pw, len: 1800 }); g.restore();
+}
+function powerFront(g, t, t0, x, y) {  // speed lines, two rings
+  if (t < t0) return;
+  const d = t - t0;
+  if (d < 0.7) { g.save(); g.globalCompositeOperation = 'screen'; speedlines(g, x, y, t, { a: 0.5 * (1 - d / 0.7), n: 40, r0: 430, color: '#E6FFFB' }); g.restore(); }
+  shockwave(g, x, y, t, t0, { r0: 60, r1: 950, life: 0.6, color: MIND, lw: 16, squash: 1 });
+  shockwave(g, x, y, t, t0 + 0.12, { r0: 40, r1: 650, life: 0.55, color: '#E6FFFB', lw: 8, squash: 1 });
+}
+// "that's not even the scary part": the edges of the frame close in
+function dread(g, u) {
+  if (u <= 0) return;
+  const gr = g.createRadialGradient(W / 2, H * 0.38, H * lerp(0.5, 0.14, u), W / 2, H * 0.38, H * 0.6);
+  gr.addColorStop(0, 'rgba(14,2,6,0)'); gr.addColorStop(1, `rgba(14,2,6,${(0.93 * u).toFixed(3)})`);
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+}
+
 // ======================= THE FILM =======================
 export async function build(T) {
   const s = id => T.s(id), w = (id, k) => T.w(id, k).s;
@@ -953,6 +1138,16 @@ export async function build(T) {
   } });
   cue(twT - 0.1, 'whoosh_soft', 0.25); cue(FF0, 'whirr', 0.35); for (let x = FF0; x < FF1; x += 0.12) cue(x, 'piece', 0.12); cue(resT + 0.3, 'thud', 0.5); cue(resT, 'sting', 0.35);
 
+  // ======================= AND THAT'S NOT EVEN THE SCARY PART: back in Baku, low over the pieces; Hikaru lifts his eyes to us,
+  // the camera creeps in and the frame closes round him (the open loop that carries us into the feats) =======================
+  const sqS = s('scary'), sqNotT = w('scary', 'not'), sqT = w('scary', 'scary');
+  shot(sqS - 0.05, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(PI / 2 - 0.1, -0.2, 9.0, [-2.6, 3.1, 4.0])], [len(sh), K(PI / 2 - 0.05, -0.14, 7.0, [-2.6, 3.4, 4.0]), ease.in]], { t });
+    baku(g, t, { hik: { x: HIKX, z: HIKZ, e: exprAt([[0, DOWN], [sqNotT - 0.05, KNOW]], t) }, clock: { l: 24.0, r: 1929 }, focus: 8, dof: 0.5, players: false });
+    dread(g, seg(t, sqT - 0.12, sqT + 0.3));
+  }, { trans: 'whip', roll: (lt, t) => -0.055 * seg(t, sqT - 0.15, sqT + 0.35, ease.out) });
+  cue(sqS - 0.11, 'whoosh_fast', 0.3); cue(sqS + 0.05, 'heartbeat', 0.35); cue(sqT - 0.004, 'boom', 0.5); cue(sqT, 'sting', 0.3);
+
   // ======================= HOW DID HE KNOW? Back in Baku: Hikaru, a question mark =======================
   const howS = s('how'), howT = w('how', 'how'), showT = w('how', 'show'), gmT = w('how', 'grandmaster'), fiveT = w('how', 'five'), rebT = w('how', 'rebuilds'), itT = w('how', -1);
   shot(howS - 0.05, (g, lt, t, sh) => {
@@ -1039,29 +1234,26 @@ export async function build(T) {
   cue(sk2T - 0.12, 'whoosh_fast', 0.3); cue(sk2T + 0.05, 'reveal_bell', 0.35); cue(headT - 0.6, 'riser', 0.3);
   // ======================= THE BOARD IN HIS HEAD: ghost pieces play the rest of the combination on their own =======================
   const mindAt = [w('skill', 'play') - 0.1, w('skill', 'play') + 0.35, combT, combT + 0.45, combT + 0.9];
-  shot(headT - 0.04, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.55, 0.62, 12.5, [4, 0.3, 4])], [len(sh), K(-0.15, 0.5, 11, [4, 0.4, 4])]], { t, e: x => x });
+  const likeS = s('like'), mA = headT - 0.04, lA = likeS - 0.05;
+  const mindKeys = [[0, K(0.55, 0.62, 12.5, [4, 0.3, 4])], [lA + 0.4 - mA, K(-0.15, 0.5, 11, [4, 0.4, 4])], [s('ad1') - mA, K(-0.4, 0.44, 10.1, [4, 0.3, 3.9])]];
+  shot(mA, (g, lt, t, sh) => {
+    rig(B, t - mA, mindKeys, { t, e: x => x });
     const run = playRun(G, MEME, mindAt, t, piecesAt);
     mindSet(g, t, { pieces: run.pieces,
       under: g2 => run.active.forEach(a => moveUnder(g2, B, a.m, a.lt, { hold: a.hold })),
       over: g2 => run.active.forEach(a => moveOver(g2, B, a.m, a.lt, { hold: a.hold, label: a.label })) });
-  }, { trans: 'zoom', grade: 'night' });
+  }, { trans: 'zoom', grade: 'night', kb: 0 });
   cue(headT - 0.04, 'whoosh_deep', 0.4); cue(headT, 'shimmer', 0.3); mindAt.forEach(x => cue(x + SLIDE - MOVE_HIT, 'move', 0.4));
 
-  // ======================= JUST LIKE THIS BOARD: the same position on the Chessnut; 41...Ke8 drives itself =======================
-  const likeS = s('like'), thisT = w('like', 'this');
-  shot(likeS - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.15, 0.5, 11, [4, 0.4, 4])], [0.9, K(-0.12, 0.42, 10.5, [4, 0.3, 3.6])], [len(sh), K(-0.04, 0.3, 9.2, [4, 0.2, 2.4])]], { t });
-    const ps = drive(piecesAt(G, 81), piecesAt(G, 82), t, thisT - 0.15, 0.5);
-    home(g, t, { pieces: [...ps, ...parked(82).map((p, i) => ({ ...p, ...PARK(p, i) }))] });
-  }, { trans: 'zoom', grade: HOMEG });
-  cue(likeS - 0.05, 'shimmer', 0.25); cue(thisT - 0.15, 'whirr', 0.4); cue(thisT + 0.3, 'piece', 0.3);
-
-  // ======================= AND HIKARU HAS BOTH (the real photo) =======================
-  const bothS = s('both'), hik2T = w('both', 'hikaru'), bothT = w('both', 'both');
-  shot(bothS - 0.06, (g, lt, t) => photoShot(g, lt, PH.hikaru, { from: { x: 0.55, y: 0.3, zoom: 1.0, dolly: 0 }, to: { x: 0.55, y: 0.32, zoom: 1.08, dolly: 0.05 }, dur: 2.2 }),
-    { trans: 'whip', hud: (g, lt, t) => { nameTitle(g, lt, 'Hikaru Nakamura', 'SKILL 1 + SKILL 2', { y: 200, size: 66, t0: hik2T - (t - lt) }); credit(g, CREDIT, seg(lt, 0.4, 0.6) * 0.75); } });
-  cue(bothS - 0.12, 'whoosh_fast', 0.3); cue(bothT, 'ting', 0.3);
+  // ======================= JUST LIKE THIS BOARD: a match dissolve — the same camera path and the same position, the glass board
+  // in his head turns into the Chessnut on our table; then two pieces drive themselves (41...Ke8 42.Nb4) =======================
+  const thisT = w('like', 'this'), bd2T = w('like', 'board'), KE8 = thisT - 0.1, NB4 = bd2T - 0.05;
+  const likePieces = t => t < NB4 ? drive(piecesAt(G, 81), piecesAt(G, 82), t, KE8, 0.55) : drive(piecesAt(G, 82), piecesAt(G, 83), t, NB4, 0.6);
+  shot(lA, (g, lt, t, sh) => {
+    rig(B, t - mA, mindKeys, { t, e: x => x });
+    home(g, t, { pieces: [...likePieces(t), ...parked(83).map((p, i) => ({ ...p, ...PARK(p, i) }))], dof: 0.5 });
+  }, { trans: 'fade', transDur: 0.45, grade: HOMEG, kb: 0 });
+  cue(lA, 'shimmer', 0.25); cue(KE8, 'whirr', 0.4); cue(KE8 + 0.45, 'piece', 0.3); cue(NB4, 'whirr', 0.4); cue(NB4 + 0.5, 'piece', 0.3);
 
   // ======================= BLINDFOLD AGAINST MAGNUS: Barcelona, January 2026 =======================
   const blS = s('blind'), pawnT = w('blind', 'pawn'), saw2T = w('blind', 'saw'), bishT = w('blind', 'bishop'), sacT = w('blind', 'sacrifice'), drawT = w('blind', 'draw');
@@ -1119,35 +1311,56 @@ export async function build(T) {
   }, { trans: 'whip', grade: 'stream', hud: (g, lt, t) => { if (t >= hunT) stamp(g, '−100', W / 2, 330, t, hunT, { color: RED, size: 110, sub: 'POINTS BEHIND' }); } });
   cue(mag2T - 0.14, 'whoosh_fast', 0.3); cue(mag2T + 0.1, 'whoosh_soft', 0.25); cue(hunT, 'stamp', 0.45);
 
-  // ======================= HIKARU NAKAMURA IS NOT HUMAN: his face in the dark; the light goes, the eyes glow =======================
+  // ======================= HIKARU NAKAMURA IS NOT HUMAN: his facecam (the camera sits on his monitor); a captcha pops up on the
+  // stream, the cursor ticks "I'm not a robot" on "not", and on "human" it fails =======================
   const huS = s('human'), notHT = w('human', 'not'), humT = w('human', 'human');
   shot(huS - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0, 0.05, 7.4, [4, 3.0, 9.3])], [len(sh), K(0, 0.03, 5.6, [4, 3.05, 9.3]), ease.inOut]], { t });
-    mindBg(g, t, { a: 1 - 0.7 * seg(t, notHT, notHT + 0.3) });
-    const sil = t >= notHT;
-    actor(g, B, 'hikB', { x: 4, y: 3.1, z: 9.3, e: { ...EXPR.focus, look: [0, 0] }, t, face: -1, ...(sil ? { silhouette: true, shade: 'brightness(0.08) saturate(0.4)', eyeGlow: MIND } : {}) });
-    if (sil) { const p = B.project(4, 3.1, 9.3); rim(g, p.x, p.y, p.s * 3.4, MIND, 0.22 * seg(t, humT, humT + 0.4)); }
-  }, { trans: 'fade', grade: 'night' });
-  cue(huS, 'heartbeat', 0.35); cue(notHT - 0.3, 'revswell', 0.6); cue(notHT, 'tvoff', 0.25); cue(humT - 0.004, 'boom', 0.6); cue(humT, 'shimmer', 0.3);
+    rig(B, lt, [[0, K(PI + 0.13, 0.05, 9.7, [4, 3.0, -1.4])], [len(sh), K(PI + 0.07, 0.04, 8.7, [4, 3.05, -1.4])]], { t, e: x => x, bump: t > humT && t < humT + 0.25 ? 1 : 0 });
+    const red = seg(t, humT, humT + 0.12) * (1 - 0.6 * seg(t, humT + 0.5, humT + 1.2));
+    facecam(g, t, { e: exprAt([[0, { ...EXPR.focus, look: [0.1, -0.15], lid: 0.2 }], [humT + 0.25, KNOW]], t), red });
+    if (t >= humT && t < humT + 0.35) flashTint(g, '#FF4A3D', 0.2 * (1 - (t - humT) / 0.35));
+  }, { trans: 'whip', hud: (g, lt, t) => captcha(g, t, { t0: huS + 0.1, tClick: notHT, tFail: humT }) });
+  cue(huS - 0.11, 'whoosh_fast', 0.3); cue(huS + 0.1, 'notify', 0.3); cue(notHT, 'clack', 0.55); cue(humT, 'error', 0.55); cue(humT + 0.02, 'buzz', 0.25);
 
-  // ======================= HE DOESN'T NEED STOCKFISH: his streaming room in the dark, the engine on the monitor; the screen dies =======================
+  // ======================= HE DOESN'T NEED STOCKFISH: the sea. Stockfish is a fish — the cod of its logo, as in the author's
+  // Mittens video; on its name the plate is struck out and the fish darts off in a burst of bubbles =======================
   const enS = s('engine'), sfT = w('engine', 'stockfish'), he2T = w('engine', 4), isT = w('engine', 'is'), engT = w('engine', -1);
-  const offA = sfT + 0.5, offB = he2T - 0.04;  // after the word the screen dies, down to a dot, and the dot becomes his eyes on "he"
+  const FISH0 = enS - 0.05, DART = sfT + 0.3, FZ = 7.5;
+  const fishAt = t => {
+    const u = ease.out(clamp((t - FISH0) / 0.8)), v = ease.in(clamp((t - DART) / 0.5));
+    return { x: lerp(11, 4.6, u) - v * 15, y: 0.3 + Math.sin(t * 2.2) * 0.1 + v * 2.6, rot: Math.sin(t * 1.8) * 0.04 - v * 0.4, wag: 1 + 2.5 * v + (t > sfT && t < DART ? 1.5 : 0) };
+  };
   shot(enS - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.3, 0.24, 11, [4, 2.4, 5.98], { cy: H * 0.44 })], [len(sh), K(0.24, 0.2, 9.6, [4, 2.4, 5.98], { cy: H * 0.44 })]], { t, e: x => x });
-    streamDark(g, t, engTex(t, enS, clamp((t - offA) / (offB - offA))), 1 - clamp((t - offA) / (offB - offA)));
-  }, { trans: 'zoom', grade: 'night' });
-  cue(enS - 0.08, 'whoosh_soft', 0.25); cue(offA, 'tvoff', 0.45);
-  // ======================= HE IS THE ENGINE: close on the glowing eyes, then back: his own evaluation bar rises beside him =======================
-  shot(offB, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0, 0.02, 2.6, [4, 3.35, 9.3], { cy: H * 0.37 })], [isT - offB + 0.04, K(0, 0.02, 2.8, [4, 3.35, 9.3], { cy: H * 0.37 })], [len(sh), K(-0.1, 0.03, 8.6, [5.1, 3.2, 9.3], { cy: H * 0.42 }), ease.out]], { t });
-    mindBg(g, t, { a: 0.3 + 0.2 * seg(t, isT, isT + 0.4) });
-    evalBar(g, t, { f: seg(t, isT + 0.05, isT + 0.85) });
-    actor(g, B, 'hikB', { x: 4, y: 3.1, z: 9.3, e: { ...EXPR.focus, look: [0, 0] }, t, face: -1, silhouette: true, shade: 'brightness(0.08) saturate(0.4)', eyeGlow: MIND });
-    const p = B.project(4, 3.1, 9.3); rim(g, p.x, p.y, p.s * 3.4, MIND, 0.12 + 0.3 * seg(t, isT, isT + 0.2) * (1 - 0.6 * seg(t, isT + 0.3, isT + 1.1)));
-    tag3(g, 6.6, 6.15, 9.3, '+2.53', CREAM, seg(t, engT, engT + 0.25, x => x));
-  }, { grade: 'night' });
-  cue(isT - 0.3, 'revswell', 0.45); cue(isT - 0.004, 'boom_big', 0.6); cue(engT, 'sparkle_pop', 0.25);
+    rig(B, lt, [[0, K(0.06, 0.03, 9.6, [4.4, 0.3, FZ])], [len(sh), K(-0.05, 0.02, 8.3, [4.2, 0.35, FZ])]], { t, e: x => x });
+    sea(g, t);
+    const f = fishAt(t);
+    if (depth(f.x, f.y, FZ) > 1) { const p = B.project(f.x, f.y, FZ); fishPhoto(g, p.x, p.y, p.s * 4.9, t, { rot: f.rot, wag: f.wag }); }
+    const d = fishAt(DART); seaSpecks(g, t, { burst: [d.x + 1, d.y, FZ, DART] });
+  }, { trans: 'zoom', hud: (g, lt, t) => {
+    if (t < enS + 0.1) return;
+    const st = plate(g, 'STOCKFISH', W / 2, 250, { color: BLUE, size: 66, ...popIn(t, enS + 0.1) });
+    smallCredit(g, 'Logo: Stockfish (GPLv3) · Klein Maetschke', 342);
+    if (st && t >= sfT + 0.06) {  // struck out on its name
+      const u = seg(t, sfT + 0.06, sfT + 0.24, ease.out);
+      g.save(); g.translate(W / 2, 250); g.rotate(-0.07); g.strokeStyle = '#FF4A3D'; g.lineWidth = 15; g.lineCap = 'round';
+      g.shadowColor = 'rgba(0,0,0,0.35)'; g.shadowBlur = 8; g.beginPath(); g.moveTo(-st.w / 2 - 16, 0); g.lineTo(-st.w / 2 - 16 + (st.w + 32) * u, 0); g.stroke(); g.restore();
+    }
+  } });
+  cue(enS - 0.08, 'whoosh_deep', 0.3); cue(enS + 0.1, 'sparkle_pop', 0.22); cue(sfT + 0.06, 'scribble', 0.5); cue(DART, 'whoosh_fast', 0.35); cue(DART + 0.05, 'poof', 0.25);
+
+  // ======================= HE IS THE ENGINE: back on his facecam, lower and closer; on "IS" his eyes flash, the room turns teal
+  // and his own evaluation bar climbs to the engine's verdict on the position he saw (+2.53, SOURCES.md) =======================
+  shot(he2T - 0.04, (g, lt, t, sh) => {
+    const k1 = isT - (he2T - 0.04);
+    rig(B, lt, [[0, K(PI - 0.1, -0.07, 7.9, [4, 2.95, -1.4], { cy: H * 0.46 })], [k1, K(PI - 0.09, -0.07, 7.7, [4, 2.96, -1.4], { cy: H * 0.46 })],
+      [len(sh), K(PI - 0.03, -0.1, 6.9, [4, 3.0, -1.4], { cy: H * 0.46 }), ease.out]], { t, e: x => x, bump: t > isT && t < isT + 0.3 ? 1 : 0 });
+    const pw = seg(t, isT, isT + 0.25), [e1, e2, es] = eyesAt(), cx = (e1[0] + e2[0]) / 2, cy = e1[1];
+    facecam(g, t, { e: KNOW, power: pw, behind: g2 => powerBehind(g2, t, isT, cx, cy, pw) });
+    powerFront(g, t, isT, cx, cy);
+    glint(g, e1[0], e1[1], t, isT, { r: 90 * es, life: 0.55, color: MIND }); glint(g, e2[0], e2[1], t, isT + 0.03, { r: 90 * es, life: 0.55, color: MIND });
+    if (t >= isT && t < isT + 0.3) flashTint(g, MIND, 0.28 * (1 - (t - isT) / 0.3));
+  }, { trans: 'whip', hud: (g, lt, t) => { hudEval(g, t, { f: seg(t, isT + 0.02, isT + 0.9, x => x) }); bdg(g, t, '+2.53', engT, { y: 250, color: '#F4F3EE', size: 66 }); } });
+  cue(he2T - 0.1, 'whoosh_fast', 0.3); cue(isT - 0.3, 'revswell', 0.5); cue(isT - 0.004, 'boom_big', 0.65); cue(isT, 'shimmer', 0.3); cue(engT, 'sparkle_pop', 0.28);
 
   // ======================= AD (Chessnut Move): pieces that move on their own =======================
   const a1S = s('ad1'), moveT = w('ad1', 'move'), nutT = w('ad1', 'chessnut');
@@ -1161,8 +1374,8 @@ export async function build(T) {
   shot(a1S - 0.06, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.12, 0.2, 8.8, [4, 0.5, 2.2])], [len(sh), K(-0.04, 0.22, 8.3, [4, 0.5, 2.3])]], { t });
     home(g, t, { pieces: adPieces(t), focus: 6.5 });
-  }, { trans: 'fade', grade: HOMEG, hud: adHud });
-  cue(a1S, 'whoosh_soft', 0.25); adPlies.forEach(x => { cue(x, 'whirr', 0.3); cue(x + 0.35, 'piece', 0.3); });
+  }, { trans: 'whip', grade: HOMEG, hud: adHud });
+  cue(a1S - 0.11, 'whoosh_fast', 0.3); adPlies.forEach(x => { cue(x, 'whirr', 0.3); cue(x + 0.35, 'piece', 0.3); });
   shot(nutT - 0.45, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.35, 0.55, 12, [4, 0, 3.6])], [len(sh), K(-0.25, 0.42, 11, [4, 0, 3.4])]], { t, e: x => x });
     home(g, t, { pieces: adPieces(t) });
@@ -1248,14 +1461,15 @@ export async function build(T) {
   const tvOff = T.duration - 0.5;
   cue(tvOff, 'tvoff', 0.5);
   const music = [
-    { t: 0, m: 'hook' }, { t: 1.43, m: 'tension' }, { t: t213, m: 'slam' }, { t: tvA, m: 'intrigue' }, { t: howS - 0.05, m: 'clockwork' },
-    { t: sk2T - 0.06, m: 'void' }, { t: bothS - 0.06, m: 'glory' }, { t: rcS - 0.05, m: 'build' }, { t: stS - 0.05, m: 'victory' },
-    { t: huS - 0.05, m: 'void' }, { t: a1S - 0.06, m: 'digital' }, { t: ctaS, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: 0, m: 'hook' }, { t: 1.43, m: 'tension' }, { t: t213, m: 'slam' }, { t: tvA, m: 'intrigue' }, { t: sqS - 0.05, m: 'tension' },
+    { t: blS - 0.06, m: 'glory' }, { t: rcS - 0.05, m: 'build' }, { t: stS - 0.05, m: 'victory' }, { t: huS - 0.05, m: 'digital' },
+    { t: enS - 0.06, m: 'void' }, { t: isT - 0.004, m: 'slam' }, { t: howS - 0.05, m: 'clockwork' }, { t: sk2T - 0.06, m: 'void' },
+    { t: a1S - 0.06, m: 'digital' }, { t: ctaS, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: t213 - 0.32, t1: t213 - 0.01, kind: 'mute' }, { t0: t213, t1: seeT, kind: 'boost', db: 5 },
-    { t0: notHT - 0.3, t1: humT - 0.01, kind: 'mute' },
-    { t0: isT - 0.3, t1: isT - 0.01, kind: 'mute' },
+    { t0: humT - 0.28, t1: humT - 0.01, kind: 'mute' },
+    { t0: isT - 0.3, t1: isT - 0.01, kind: 'mute' }, { t0: isT, t1: isT + 1.2, kind: 'boost', db: 3 },
     { t0: ctaS, t1: T.duration, kind: 'lp', f: 900 },
   ];
   shots.sort((a, b) => a.a - b.a);

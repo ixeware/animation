@@ -71,66 +71,13 @@
       }
     },
     {
-      "id": "how",
-      "text": "How did he know? Show a grandmaster a real position for five seconds, and he rebuilds it.",
-      "say": "So how did he know? Show a grandmaster a real position for five seconds... and he rebuilds it.",
-      "pause": 0.25,
-      "colors": {
-        "five": "gold",
-        "seconds,": "gold",
-        "rebuilds": "lime"
-      }
-    },
-    {
-      "id": "scramble",
-      "text": "Scramble the pieces, and he's barely better than a beginner.",
-      "say": "Scramble the pieces... and he's barely better than a beginner.",
-      "pause": 0.25,
-      "colors": {
-        "Scramble": "red",
-        "beginner.": "red"
-      }
-    },
-    {
-      "id": "patterns",
-      "text": "He sees patterns, not pieces. About fifty thousand.",
-      "say": "[impressed] He sees patterns, not pieces. About fifty thousand.",
+      "id": "scary",
+      "text": "And that's not even the scary part.",
+      "say": "[dramatic] And that's not even the scary part.",
       "pause": 0.3,
       "colors": {
-        "patterns,": "lime",
-        "fifty": "gold",
-        "thousand.": "gold"
-      }
-    },
-    {
-      "id": "skill",
-      "text": "That's skill one. Skill two: a board in his head, where pieces play out whole combinations on their own.",
-      "say": "That's skill one. Skill two... a board in his head, where pieces play out whole combinations on their own.",
-      "pause": 0.2,
-      "colors": {
-        "one.": "gold",
-        "two:": "gold",
-        "head,": "blue",
-        "own.": "lime"
-      }
-    },
-    {
-      "id": "like",
-      "text": "Just like this board.",
-      "say": "[softly] Just like... this board.",
-      "pause": 0.6,
-      "colors": {
-        "board.": "lime"
-      }
-    },
-    {
-      "id": "both",
-      "text": "And Hikaru has both.",
-      "say": "[dramatic] And Hikaru... has both.",
-      "pause": 0.25,
-      "colors": {
-        "Hikaru": "blue",
-        "both.": "gold"
+        "scary": "red",
+        "part.": "red"
       }
     },
     {
@@ -191,6 +138,59 @@
         "Stockfish.": "red",
         "IS": "gold",
         "engine.": "gold"
+      }
+    },
+    {
+      "id": "how",
+      "text": "So how did he know? Show a grandmaster a real position for five seconds, and he rebuilds it.",
+      "say": "So how did he know? Show a grandmaster a real position for five seconds... and he rebuilds it.",
+      "pause": 0.25,
+      "colors": {
+        "five": "gold",
+        "seconds,": "gold",
+        "rebuilds": "lime"
+      }
+    },
+    {
+      "id": "scramble",
+      "text": "Scramble the pieces, and he's barely better than a beginner.",
+      "say": "Scramble the pieces... and he's barely better than a beginner.",
+      "pause": 0.25,
+      "colors": {
+        "Scramble": "red",
+        "beginner.": "red"
+      }
+    },
+    {
+      "id": "patterns",
+      "text": "He sees patterns, not pieces. About fifty thousand.",
+      "say": "[impressed] He sees patterns, not pieces. About fifty thousand.",
+      "pause": 0.3,
+      "colors": {
+        "patterns,": "lime",
+        "fifty": "gold",
+        "thousand.": "gold"
+      }
+    },
+    {
+      "id": "skill",
+      "text": "That's skill one. Skill two: a board in his head, where pieces play out whole combinations on their own.",
+      "say": "That's skill one. Skill two... a board in his head, where pieces play out whole combinations on their own.",
+      "pause": 0.2,
+      "colors": {
+        "one.": "gold",
+        "two:": "gold",
+        "head,": "blue",
+        "own.": "lime"
+      }
+    },
+    {
+      "id": "like",
+      "text": "Just like this board.",
+      "say": "[softly] Just like... this board.",
+      "pause": 0.6,
+      "colors": {
+        "board.": "lime"
       }
     },
     {
