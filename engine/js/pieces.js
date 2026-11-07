@@ -109,12 +109,14 @@ function paint2(type, color, glow) {
   const c = makeCanvas(SW2 * S, SH2 * S), g = c.getContext('2d'); c.base = SH2 - BASE2;
   g.translate(SW2 * S / 2, (SH2 - BASE2) * S); g.scale(S, S);
   const p = new Path2D(); SHAPES2[type](p);
-  const white = color === 'w', rim = white ? '#A3ADB7' : '#8B99A7';
+  // 'k': true black, for a real set whose dark pieces are black (the Chessnut Move in `hikaru213`); 'b' stays slate
+  const white = color === 'w', ink = color === 'k', rim = white ? '#A3ADB7' : ink ? '#5E6873' : '#8B99A7';
   if (glow) { g.save(); g.shadowColor = glow; g.shadowBlur = 26; g.fillStyle = glow; g.fill(p); g.restore(); }
   g.lineJoin = 'round'; g.lineCap = 'round';
   g.strokeStyle = rim; g.lineWidth = 12; g.stroke(p);
   const grad = g.createLinearGradient(-44, 0, 44, 0);
   if (white) { grad.addColorStop(0, '#FFFFFF'); grad.addColorStop(0.5, '#F3F5F7'); grad.addColorStop(1, '#C8CFD6'); }
+  else if (ink) { grad.addColorStop(0, '#3A3F45'); grad.addColorStop(0.45, '#1E2226'); grad.addColorStop(1, '#0F1113'); }
   else { grad.addColorStop(0, '#53606C'); grad.addColorStop(0.45, '#3D4752'); grad.addColorStop(1, '#2A323A'); }
   g.fillStyle = grad; g.fill(p);
   g.save(); g.clip(p);

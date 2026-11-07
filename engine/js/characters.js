@@ -523,6 +523,8 @@ function eye(g, cx, cy, e, side, t, pupilScale, iris = null) {
     g.fillStyle = S.base; g.beginPath(); g.moveTo(cx - rx - 2, cy - ry - 4); g.lineTo(cx + rx + 2, cy - ry - 4);
     g.lineTo(cx + rx + 2, ly2 - tilt); g.lineTo(cx - rx - 2, ly2 + tilt); g.closePath(); g.fill();
     g.strokeStyle = '#3B2A22'; g.lineWidth = 4; g.beginPath(); g.moveTo(cx - rx - 2, ly2 + tilt); g.lineTo(cx + rx + 2, ly2 - tilt); g.stroke();
+    // shut: the lash line would sit below the eye and be clipped away, so draw it across the middle (blinks, a grimace)
+    if (lid > 0.97) { g.lineWidth = 5; g.beginPath(); g.moveTo(cx - rx - 2, cy + 4 + tilt); g.quadraticCurveTo(cx, cy + 9, cx + rx + 2, cy + 4 - tilt); g.stroke(); }
   }
   g.restore();
   g.restore();
