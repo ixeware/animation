@@ -12,7 +12,7 @@
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect, hash, smooth } from '../../engine/js/core.js';
 import { Board, sqXZ, piecesAt, brilliantIcon } from '../../engine/js/board.js';
 import { EXPR, exprAt, CAST, drawChar, hand } from '../../engine/js/characters.js';
-import { badge, nameTitle, placeStamp, stamp, counter, sans, serif, mono, popIn } from '../../engine/js/hud.js';
+import { badge, plate, inkText, inkWidth, nameTitle, placeStamp, stamp, counter, sans, serif, mono, popIn } from '../../engine/js/hud.js';
 import { rig, seated, actor } from '../../engine/js/stage.js';
 import { room, table, FLOOR_Y, texTri, pool, chair } from '../../engine/js/env.js';
 import { useLookV2, SKIN2 } from '../../engine/js/look.js';
@@ -43,11 +43,13 @@ CAST.carlsen = { ...CAST.magnus14, suit: '#F1F1EC', suitD: '#CFD3D2', shirt: 'te
 CAST.hikB = { ...CAST.hikaru, shirt: 'tee', suit: '#23324E', suitD: '#18233A' };
 CAST.magBlind = { ...CAST.magnus, suit: '#23262E', suitD: '#16181E', shirt: 'open', blindfold: '#121316' };
 CAST.hikBlind = { ...CAST.hikaru, blindfold: '#121316' };
-// the grimace of the clip: eyes shut tight, the mouth pulled down, the brows knitted
-const GRIMACE = { brow: 0.85, browY: 10, lid: 1, look: [0, 0.3], mouth: 'line', curve: -0.95, open: 0 };
-const DOWN = { ...EXPR.focus, look: [0, 0.9], lid: 0.42 };
-const KEYMER_E = { ...EXPR.worried, look: [0, 0.75], lid: 0.3, sweat: 0 };
-const CARL_E = { ...EXPR.focus, look: [0, 0.7], lid: 0.35 };
+// the grimace of the clip: the brows knitted, the teeth bared in a wince, the eyes open and fixed on the board
+const GRIMACE = { brow: -0.4, browY: -4, lid: 0.3, look: [0, 0.8], mouth: 'grimace', curve: -0.35, open: 0.4 };
+const DOWN = { ...EXPR.focus, look: [0, 0.9], lid: 0.18 };
+const THINK = { ...EXPR.focus, brow: 0.35, browY: 2, lid: 0.1, look: [0.55, -0.55], browTilt: 0.3, curve: -0.1 };
+const KNOW = { ...EXPR.smug, lid: 0.2, look: [0, 0], curve: 0.5 };  // the end: he looks up at us
+const KEYMER_E = { ...EXPR.worried, look: [0, 0.75], lid: 0.22, sweat: 0 };
+const CARL_E = { ...EXPR.focus, look: [0, 0.7], lid: 0.22 };
 
 // ---------- shared with the Hikaru episode (episodes/hikaru/scenes.js): screen helpers, the 3D toolkit, people ----------
 const pop = (t, t0) => popIn(t, t0);
@@ -55,13 +57,13 @@ function rim(g, x, y, r, col, a = 0.5) {
   const gr = g.createRadialGradient(x, y, r * 0.2, x, y, r); gr.addColorStop(0, rgba(col, a)); gr.addColorStop(1, rgba(col, 0));
   g.save(); g.globalCompositeOperation = 'screen'; g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.restore();
 }
-// a heading in the brilliant type: letter-spaced heavy cream with a teal underline
+// a heading: heavy letter-spaced capitals with a hard shadow, centred by their ink (y is the baseline, as before)
 function heading(g, text, y, a = 1, { size = 44, color = CREAM, spacing = 5 } = {}) {
   if (a <= 0) return;
-  g.save(); g.globalAlpha *= a; g.font = sans(size, 900); g.letterSpacing = `${spacing}px`; g.textAlign = 'center'; g.fillStyle = color;
-  g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowOffsetY = 5; g.fillText(text, W / 2, y); g.shadowColor = 'transparent';
-  const tw = g.measureText(text).width; g.fillStyle = TEAL; g.fillRect(W / 2 - 40, y + 18, 80, 5);
-  qaRect(g, W / 2 - tw / 2, y - size * 0.8, tw, size + 30, 'text', text); g.restore();
+  g.save(); g.globalAlpha *= a; g.font = sans(size, 900); g.letterSpacing = `${spacing}px`; g.fillStyle = color;
+  g.shadowColor = 'rgba(8,6,4,0.55)'; g.shadowOffsetY = Math.max(3, Math.round(size * 0.09));
+  inkText(g, text, W / 2, y - size * 0.35); g.shadowColor = 'transparent';
+  const tw = inkWidth(g, text); qaRect(g, W / 2 - tw / 2, y - size * 0.8, tw, size + 10, 'text', text); g.restore();
 }
 
 // ---------- 3D toolkit: clipped lines, tiled planes, shaded convex solids (boxes, turned shapes, cylinders),
@@ -235,19 +237,14 @@ function mark(g, ch, x, y, z, u, t, { color = CREAM, size = 1.1 } = {}) {
   g.save(); g.globalAlpha *= clamp(u * 3); g.font = sans(Math.round(p.s * size * k), 900); g.textAlign = 'center'; g.fillStyle = color;
   g.shadowColor = 'rgba(0,0,0,0.6)'; g.shadowOffsetY = 5; g.fillText(ch, p.x, p.y - Math.sin(t * 5 + x) * p.s * 0.06); g.restore();
 }
-// a rating tag over a head, in the world
+// a label over a point in the world (a name, a clock, a rating): the flat plate of the HUD, sized by the distance;
+// a label at the edge slides into the frame, and it stays below a HUD element above it (minY)
 function tag3(g, x, y, z, text, col, u, { minY = -1e9 } = {}) {
   if (u <= 0 || depth(x, y, z) < 0.8) return;
-  const p = B.project(x, y, z), k = lerp(1.35, 1, ease.out(clamp(u))), fs = Math.round(clamp(p.s * 0.6, 30, 64));
-  g.font = sans(fs, 900); const tw = g.measureText(text).width + fs * 0.8;
-  if (p.x < -tw / 2 || p.x > W + tw / 2) return;  // the anchor is off screen: no tag
-  p.x = clamp(p.x, tw * k / 2 + 24, W - tw * k / 2 - 24);  // a tag at the edge slides into the frame
-  p.y = Math.max(p.y, minY);  // and stays below a HUD element above it
-  g.save(); g.globalAlpha *= clamp(u * 2); g.translate(p.x, p.y); g.scale(k, k);
-  g.font = sans(fs, 900);
-  g.fillStyle = 'rgba(8,6,4,0.78)'; g.beginPath(); g.roundRect(-tw / 2, -fs * 0.85, tw, fs * 1.4, 10); g.fill();
-  g.strokeStyle = col; g.lineWidth = 4; g.stroke(); g.fillStyle = col; g.textAlign = 'center'; g.fillText(text, 0, fs * 0.38);
-  g.restore(); qaRect(g, p.x - tw / 2, p.y - fs * 0.85, tw, fs * 1.4, 'text', text);
+  const p = B.project(x, y, z), k = lerp(1.25, 1, ease.out(clamp(u))), fs = Math.round(clamp(p.s * 0.6, 30, 64));
+  g.save(); g.font = sans(fs, 900); g.letterSpacing = `${fs <= 34 ? 4 : fs <= 46 ? 2 : 1}px`; const tw = inkWidth(g, text) + fs * 0.95; g.restore();
+  if (p.x < -tw / 2 || p.x > W + tw / 2) return;  // the anchor is off screen: no label
+  plate(g, text, clamp(p.x, tw * k / 2 + 24, W - tw * k / 2 - 24), Math.max(p.y, minY), { color: col, size: fs, a: clamp(u * 2), scale: k, rot: -0.02 });
 }
 
 // a real photograph in 2.5D under a dark band carrying its title
@@ -390,7 +387,7 @@ function bakuBg(g, t, { cone = 0.14 } = {}) {
   g.fillStyle = '#060A14'; g.fillRect(0, 0, W, H);
   tiled(g, [WALLX, FLOOR_Y, -40], [60, 0, 0], [0, 0, 80], { color: '#0F1728', grout: 'rgba(255,255,255,0.025)', tu: 4, tv: 4 });
   tiled(g, [WALLX, FLOOR_Y, -40], [0, 0, 80], [0, 26, 0], { color: NAVY, grout: 'rgba(0,0,0,0.3)', tu: 4, tv: 26, lw: 3,
-    light: g2 => { const p = B.project(WALLX, 4, 4), r = p.s * 16, gr = g2.createRadialGradient(p.x, p.y, 0, p.x, p.y, r); gr.addColorStop(0, 'rgba(90,130,220,0.32)'); gr.addColorStop(1, 'rgba(90,130,220,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, W, H); } });
+    light: g2 => { const p = B.project(WALLX, 4, 4), r = p.s * 16, gr = g2.createRadialGradient(p.x, p.y, 0, p.x, p.y, r); gr.addColorStop(0, 'rgba(120,160,240,0.48)'); gr.addColorStop(1, 'rgba(110,150,235,0)'); g2.fillStyle = gr; g2.fillRect(0, 0, W, H); } });
   // the screen with the live boards, on the left of the wall (low z = the left of the side camera)
   ab(g, [WALLX, 2.6, -15.4], [WALLX + 0.3, 9.6, -3.2], '#05070C', { amb: 0.7 });
   texQuad(g, BOARDS, [WALLX + 0.32, 9.4, -15.2], [WALLX + 0.32, 9.4, -3.4], [WALLX + 0.32, 2.8, -15.2]);
@@ -404,7 +401,7 @@ function bakuBg(g, t, { cone = 0.14 } = {}) {
 const hikFig = (g, t, { x = HIKX, z = HIKZ, e = DOWN, walk = 0, phase = 0, fx = 1, fz = 0, k = 1.08, a = 1 } = {}) =>
   standing(g, 'hikB', x, z, { e, t, k, walk, phase, fx, fz, a, col: ['#17181C', '#0C0D10'] });
 // the whole stage. hik: Hikaru's pose (null: not there); under/over: board effects; pieces default to the meme position
-function baku(g, t, { pieces = null, hik = null, ek = KEYMER_E, ec = CARL_E, clock = null, under = null, over = null, focus = null, cone = 0.14, players = true, hands = true } = {}) {
+function baku(g, t, { pieces = null, hik = null, ek = KEYMER_E, ec = CARL_E, clock = null, under = null, over = null, focus = null, cone = 0.14, players = true, hands = true, dof = 1.4 } = {}) {
   bakuBg(g, t, { cone });
   const hx = hik ? hik.x ?? HIKX : 0, hikFirst = hik && B.E[0] > hx;
   if (hikFirst) hikFig(g, t, hik);
@@ -416,7 +413,7 @@ function baku(g, t, { pieces = null, hik = null, ek = KEYMER_E, ec = CARL_E, clo
   if (!clockLate) lcdClock(g, st);
   B.drawSlab(g, WOOD);
   if (under) under(g);
-  B.drawPieces(g, pieces || piecesAt(G, MEME), { focus: focus ?? B.dist, dof: 1.4 });
+  B.drawPieces(g, pieces || piecesAt(G, MEME), { focus: focus ?? B.dist, dof });
   if (over) over(g);
   if (clockLate) lcdClock(g, st);
   const bl = [[10.3, -0.55], [10.3, 8.55]].sort((p, q) => depth(q[0], 0.5, q[1]) - depth(p[0], 0.5, p[1]));
@@ -435,26 +432,72 @@ function hikPose(t) {
     e, fx: lerp(0.25, 1, seg(u, 0.8, 1)), fz: lerp(1, 0, seg(u, 0.8, 1)) };
 }
 
-// ======================= OUR TABLE: a living room in the evening, a TV on the wall, the Chessnut Move on the table =======================
-const HOME = { base: '#0C0907', wall: ['#4C4239', '#463D35'], seam: '#3A322B', rail: '#5A4A3C', floor: ['#5E4430', '#563E2C'], light: '#FFC98A', lightA: 0.34,
-  table: ['#8A6A48', '#4A3524', '#5E4430'] };
+// ======================= OUR TABLE: a sunny living room, a window onto a garden, a TV on the wall, the Chessnut Move on the table =======================
+const HOME = { base: '#EADFCB', wall: ['#F3E5C9', '#EFDFC1'], seam: '#E6D5B6', rail: '#FFFDF6', floor: ['#C99863', '#C1905C'], light: '#FFF1D4', lightA: 0.3,
+  table: ['#C9996A', '#80593A', '#A67749'] };
+const fogH = (col, x, y, z) => mix(col, HOME.base, clamp((depth(x, y, z) - 9) / 26) * 0.85);  // the room's haze, as env.js fogs its walls
 const FEED = makeCanvas(), feedx = FEED.getContext('2d');  // the frame of another scene, shown on a screen
 const FEED_SRC = [0, (H - 608) / 2, W, 608];
-const TVQ = { tl: [-0.3, 8.1, 12.5], tr: [8.3, 8.1, 12.5], bl: [-0.3, 3.26, 12.5] };
+const TVQ = { tl: [-1.5, 7.375, 12.5], tr: [4.5, 7.375, 12.5], bl: [-1.5, 4.0, 12.5] }, TVC = [1.5, 5.69, 12.5];
+// the view out of the window: a summer sky with clouds, a tree, a hedge and a white fence over the lawn
+const VIEW = tex(900, 1150, (x, w, h) => {
+  const gr = x.createLinearGradient(0, 0, 0, h * 0.7); gr.addColorStop(0, '#62AEE6'); gr.addColorStop(1, '#CBE9F8'); x.fillStyle = gr; x.fillRect(0, 0, w, h);
+  x.fillStyle = 'rgba(255,255,255,0.96)';
+  for (const [cx, cy, s] of [[150, 180, 1], [650, 110, 0.8], [470, 400, 0.62], [70, 540, 0.5]])
+    for (const [dx, dy, r] of [[0, 0, 62], [58, -26, 54], [114, 4, 46], [-52, 12, 40]]) { x.beginPath(); x.arc(cx + dx * s, cy + dy * s, r * s, 0, 7); x.fill(); }
+  x.fillStyle = '#A9D0A0'; x.beginPath(); x.moveTo(0, 700); x.quadraticCurveTo(300, 600, 560, 690); x.quadraticCurveTo(760, 640, 900, 690); x.lineTo(900, h); x.lineTo(0, h); x.fill();  // far hills
+  x.fillStyle = '#7A5638'; x.fillRect(700, 470, 34, 420);  // a tree on the right
+  for (const [cx, cy, r, c] of [[716, 420, 170, '#3F7F3C'], [630, 480, 118, '#4E9447'], [806, 486, 118, '#4E9447'], [706, 318, 110, '#5DA052']]) { x.fillStyle = c; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); }
+  x.fillStyle = '#5DA052'; for (let i = 0; i < 9; i++) { x.beginPath(); x.arc(i * 115 - 20, 800 + Math.sin(i * 2.1) * 18, 90, 0, 7); x.fill(); }  // the hedge
+  x.fillStyle = '#4C8C45'; for (let i = 0; i < 9; i++) { x.beginPath(); x.arc(i * 115 + 30, 846 + Math.cos(i * 1.7) * 14, 70, 0, 7); x.fill(); }
+  x.fillStyle = '#86C46E'; x.fillRect(0, 900, w, h - 900);  // the lawn
+  x.fillStyle = '#FFFFFF'; x.fillRect(0, 930, w, 16); x.fillRect(0, 990, w, 16);  // the fence: two rails and pointed pickets
+  for (let px = 10; px < w; px += 58) { x.beginPath(); x.moveTo(px, 1060); x.lineTo(px, 900); x.lineTo(px + 18, 880); x.lineTo(px + 36, 900); x.lineTo(px + 36, 1060); x.fill(); }
+  x.fillStyle = 'rgba(0,0,0,0.08)'; for (let px = 10; px < w; px += 58) x.fillRect(px + 28, 900, 8, 160);
+});
+const WIN = { x0: 6.8, x1: 12.4, y0: 0.9, y1: 9.4, z: 12.96 };
+function homeWindow(g) {
+  const { x0, x1, y0, y1, z } = WIN, xm = (x0 + x1) / 2, ym = (y0 + y1) / 2 + 0.6, FR = '#FBF8F1', f = 0.2;
+  const p = B.project(xm, ym, z); if (depth(xm, ym, z) > 0.8) rim(g, p.x, p.y, p.s * 7.5, '#FFF4D8', 0.32);  // the daylight round it
+  texQuad(g, VIEW, [x0, y1, z], [x1, y1, z], [x0, y0, z]);
+  ab(g, [x0 - f, y1, z - 0.14], [x1 + f, y1 + f * 1.4, z], FR, { amb: 0.82 });   // the white frame
+  ab(g, [x0 - f, y0, z - 0.14], [x0, y1, z], FR, { amb: 0.82 });
+  ab(g, [x1, y0, z - 0.14], [x1 + f, y1, z], FR, { amb: 0.82 });
+  ab(g, [xm - 0.07, y0, z - 0.09], [xm + 0.07, y1, z], FR, { amb: 0.82 });    // the cross bars
+  ab(g, [x0, ym - 0.07, z - 0.09], [x1, ym + 0.07, z], FR, { amb: 0.82 });
+  ab(g, [x0 - 0.5, y0 - 0.3, z - 0.62], [x1 + 0.5, y0, z], FR, { amb: 0.78 });  // the sill
+  for (const [c0, c1] of [[x0 - 2.0, x0 - 0.12], [x1 + 0.12, x1 + 2.0]])  // the curtains: soft sage folds
+    for (let i = 0, x = c0; x < c1 - 1e-6; x += 0.376, i++) {
+      const xb = Math.min(c1, x + 0.39), k = 0.5 + 0.5 * Math.sin(i * 1.9);
+      quad(g, [[x, y1 + 1.05, z - 0.32], [xb, y1 + 1.05, z - 0.32], [xb, FLOOR_Y + 0.35, z - 0.32], [x, FLOOR_Y + 0.35, z - 0.32]], fogH(mix('#7F9F88', '#AECAB3', k), x, 3, z));
+    }
+  ab(g, [x0 - 2.3, y1 + 1.0, z - 0.42], [x1 + 2.3, y1 + 1.18, z - 0.26], '#B8956C', { amb: 0.7 });  // the rod
+  pool(g, B, xm, FLOOR_Y, z - 4.5, 5.5, '#FFF3D6', 0.26);  // sunlight on the floor
+}
+// a framed print left of the TV: a knight in ink on a cream mat
+const PRINT = tex(300, 380, (x, w, h) => {
+  x.fillStyle = '#F7F1E4'; x.fillRect(0, 0, w, h); x.fillStyle = '#E3D7BF'; x.fillRect(34, 34, w - 68, h - 68);
+  drawPiece(x, 'n', 'k', w / 2, h * 0.74, 190);
+});
 function tvSet(g, feed = 0) {
-  ab(g, [-0.6, 2.95, 12.55], [8.6, 8.4, 12.95], '#0B0C0E', { amb: 0.7 });
+  homeWindow(g);
+  ab(g, [-6.6, 4.3, 12.86], [-3.8, 7.9, 12.97], '#3B2E22', { amb: 0.7 });
+  texQuad(g, PRINT, [-6.45, 7.75, 12.85], [-3.95, 7.75, 12.85], [-6.45, 4.45, 12.85]);
+  ab(g, [-1.75, 3.78, 12.55], [4.75, 7.6, 12.95], '#15171A', { amb: 0.7 });
   if (feed > 0) {
     texQuad(g, FEED, TVQ.tl, TVQ.tr, TVQ.bl, { src: FEED_SRC, a: feed });
-    const p = B.project(4, 5.7, 12.4); rim(g, p.x, p.y, p.s * 7, '#9FC2FF', 0.12 * feed);
-  } else if (B.poly(g, [TVQ.tl, TVQ.tr, [8.3, 3.26, 12.5], TVQ.bl])) { g.fillStyle = '#050607'; g.fill(); }
-  // the console under it, a floor lamp on the right, a plant on the left
-  ab(g, [-1.2, FLOOR_Y, 11.2], [9.2, -1.7, 12.9], '#3A2A1E', { amb: 0.5 });
-  ab(g, [-1.1, -1.72, 11.25], [9.1, -1.66, 12.85], '#5E4430', { amb: 0.55 });
-  cylinder(g, [13, FLOOR_Y, 10.5], [13, 5.6, 10.5], 0.1, '#2A2420', { n: 10 });
-  lathe(g, 13, 10.5, [[5.2, 1.0, 1.0], [6.6, 0.7, 0.7], [7.4, 0.45, 0.45]], '#E8D6B8', { amb: 0.85 });
-  pool(g, B, 13, 6.3, 10.5, 3, '#FFC98A', 0.3);
-  lathe(g, -5, 10.5, [[FLOOR_Y, 0.7, 0.7], [-1.6, 0.85, 0.85], [-1.4, 0.8, 0.8]], '#7A5A44', { amb: 0.6 });
-  g.fillStyle = '#2F4A30'; for (let i = 0; i < 9; i++) { const a = i / 9 * 6.28, q = B.project(-5 + Math.cos(a) * 0.6, -0.4 + (i % 3) * 0.5, 10.5 + Math.sin(a) * 0.5); if (q.z > 0.8) { g.beginPath(); g.ellipse(q.x, q.y, q.s * 0.55, q.s * 0.22, a, 0, 7); g.fill(); } }
+    const p = B.project(1.5, 5.7, 12.4); rim(g, p.x, p.y, p.s * 5, '#9FC2FF', 0.1 * feed);
+  } else if (B.poly(g, [TVQ.tl, TVQ.tr, [4.5, 4.0, 12.5], TVQ.bl])) { g.fillStyle = '#1C1F23'; g.fill(); }
+  // a white console under it with an oak top, a floor lamp right of the window, a plant on the left
+  ab(g, [-2.5, FLOOR_Y, 11.4], [5.5, -1.0, 12.9], '#ECE5D8', { amb: 0.62 });
+  ab(g, [-2.6, -1.02, 11.32], [5.6, -0.9, 12.92], '#C9996A', { amb: 0.62 });
+  cylinder(g, [15.2, FLOOR_Y, 10.8], [15.2, 5.6, 10.8], 0.1, '#3A3430', { n: 10 });
+  lathe(g, 15.2, 10.8, [[5.2, 1.0, 1.0], [6.6, 0.7, 0.7], [7.4, 0.45, 0.45]], '#FFF6E6', { amb: 0.9 });
+  lathe(g, -5.2, 10.6, [[FLOOR_Y, 0.7, 0.7], [-1.6, 0.85, 0.85], [-1.4, 0.8, 0.8]], '#D9C7AE', { amb: 0.65 });
+  for (let i = 0; i < 14; i++) {  // the plant: long leaves fanning out of the pot
+    const a = i / 14 * 6.28, r = 0.5 + (i % 3) * 0.25, q = B.project(-5.2 + Math.cos(a) * r, -0.9 + (i % 4) * 0.55, 10.6 + Math.sin(a) * r * 0.7);
+    if (depth(-5.2, 0, 10.6) > 0.8) { g.fillStyle = i % 2 ? '#4E9447' : '#3F7F3C'; g.beginPath(); g.ellipse(q.x, q.y, q.s * 0.62, q.s * 0.2, a * 0.6 - 0.4, 0, 7); g.fill(); }
+  }
 }
 // the Chessnut Move: white and graphite squares, a wide graphite frame with the name on the front edge and three LEDs
 const NUT = { light: '#ECEBE6', dark: '#2E3034', frame: '#121315', side: '#0B0C0D', m: 0.62, th: 0.5, rc: 0.55, rim: 0.35, shadow: 0.5, mark: null };
@@ -494,7 +537,7 @@ function drive(from, to, t, t0, dur, { stagger = 0.35, park = null, seed = 7, fa
 const PARK = (p, i) => ({ x: p.c === 'w' ? 9.45 : 10.15, z: 0.55 + (i % 12) * 0.62 });
 const parked = ply => { const on = new Set(G[ply].pieces.map(p => p.id)); return G[0].pieces.filter(p => !on.has(p.id)); };
 const withParked = (ply, k = 0) => [...piecesAt(G, ply), ...parked(ply).map((p, i) => ({ ...p, ...PARK(p, i + k) }))];
-function home(g, t, { pieces = null, under = null, over = null, focus = null, feed = 0, leds = 1, logo = 1, extra = null, dof = 1.4 } = {}) {
+function home(g, t, { pieces = null, under = null, over = null, focus = null, feed = 0, leds = 1, logo = 1, extra = null, dof = 0.7 } = {}) {
   room(g, B, HOME, { t });
   tvSet(g, feed);
   table(g, B, HOME, { x1: 10.6 });
@@ -551,16 +594,16 @@ function xray(g, P, h, t, t0) {
   g.restore();
   return [['MOTOR', [cx, by - h * 0.5]], ['BATTERY', [cx - wd * 0.5, by - h * 0.28]], ['WHEELS', [cx + wd * 0.32, by - h * 0.07]], ['SENSOR', [cx - wd * 0.18, by - h * 0.15]]];
 }
-function callout(g, text, [px, py], [lx, ly], u, col = MIND) {
+// a part named on the x-ray: a cream leader line from the part to a flat plate
+function callout(g, text, [px, py], [lx, ly], u, col = CREAM) {
   if (u <= 0) return;
-  g.save(); g.globalAlpha *= clamp(u * 2); g.strokeStyle = col; g.lineWidth = 3;
-  g.beginPath(); g.moveTo(px, py); g.lineTo(lerp(px, lx, ease.out(clamp(u * 1.5))), lerp(py, ly, ease.out(clamp(u * 1.5)))); g.stroke();
-  g.fillStyle = col; g.beginPath(); g.arc(px, py, 6, 0, 7); g.fill();
-  g.font = sans(40, 900); g.letterSpacing = '4px'; g.textAlign = lx < px ? 'right' : 'left'; g.textBaseline = 'middle';
-  const tw = g.measureText(text).width, tx = lx + (lx < px ? -14 : 14);
-  g.fillStyle = 'rgba(6,10,12,0.78)'; g.beginPath(); g.roundRect(lx < px ? tx - tw - 18 : tx - 18, ly - 32, tw + 36, 64, 10); g.fill();
-  g.fillStyle = col; g.fillText(text, tx, ly + 2); qaRect(g, lx < px ? tx - tw - 18 : tx - 18, ly - 32, tw + 36, 64, 'text', text);
+  const v = ease.out(clamp(u * 1.5)), ex = lerp(px, lx, v), ey = lerp(py, ly, v);
+  g.save(); g.globalAlpha *= clamp(u * 2); g.lineCap = 'round';
+  for (const [c, lw] of [['rgba(8,6,4,0.5)', 8], [col, 4]]) { g.strokeStyle = c; g.lineWidth = lw; g.beginPath(); g.moveTo(px, py); g.lineTo(ex, ey); g.stroke(); }
+  g.fillStyle = col; g.beginPath(); g.arc(px, py, 8, 0, 7); g.fill();
   g.restore();
+  g.save(); g.font = sans(40, 900); g.letterSpacing = '2px'; const w = inkWidth(g, text) + 38; g.restore();
+  plate(g, text, lx + (lx < px ? -w / 2 : w / 2), ly, { color: col, size: 40, a: clamp(u * 2), rot: 0, scale: lerp(0.94, 1, v) });
 }
 
 // ======================= THE BOARD IN HIS HEAD: a glass board in the dark, ghost pieces that play on their own =======================
@@ -612,11 +655,11 @@ function patternWall(g, t) {
 
 // ======================= THE STREAMING ROOM: a desk, a monitor with his rating, Hikaru from behind =======================
 const MON = makeCanvas(1280, 720), monx = MON.getContext('2d');
-function monitorTex(t, { rating = 3342, gold = 0, tiles = 0, tT = 0 } = {}) {
+function monitorTex(t, { rating = 3342, gold = 0, tiles = 0, tT = 0, head = true } = {}) {  // head: the header words (off in close-ups, where the frame cuts them)
   const x = monx, w = 1280, h = 720;
   x.setTransform(1, 0, 0, 1, 0, 0); x.fillStyle = '#0D0B16'; x.fillRect(0, 0, w, h);
   x.fillStyle = '#17142A'; x.fillRect(0, 0, w, 84); x.font = sans(36, 800); x.letterSpacing = '4px'; x.textAlign = 'left'; x.fillStyle = '#CFC8F2';
-  x.fillText('BLITZ RATING', 40, 56); x.textAlign = 'right'; x.fillStyle = '#FF4A6A'; x.fillText('● LIVE', w - 40, 56);
+  if (head) { x.fillText('BLITZ RATING', 40, 56); x.textAlign = 'right'; x.fillStyle = '#FF4A6A'; x.fillText('● LIVE', w - 40, 56); }
   if (tiles > 0) {  // the win tiles: a row of green W squares appearing one by one
     const cols = 9, s = 108, ox = (w - cols * (s + 14)) / 2 + 7, oy = 120;
     for (let i = 0; i < Math.min(34, tiles); i++) {
@@ -686,25 +729,29 @@ function barcelona(g, t, { em = 'blind', eh = 'blind' } = {}) {
 }
 
 // ---------- HUD pieces: the stopwatch, the AD tag ----------
+// a number in the counter's type (a dark extrusion under the face) with every digit in a cell of the same width,
+// so a running time stays put; y is the baseline
+function clockNum(g, txt, cx, y, size, color) {
+  g.save(); g.font = sans(size, 900); g.letterSpacing = '0px'; g.textAlign = 'center'; g.lineJoin = 'round';
+  const dw = Math.max(...'0123456789'.split('').map(d => g.measureText(d).width)), pw = g.measureText('.').width * 1.15;
+  const cells = [...txt].map(ch => ch === '.' ? pw : dw), total = cells.reduce((s, c) => s + c, 0), ext = Math.max(3, Math.round(size * 0.055));
+  const pass = (dy, fill) => { let x = cx - total / 2; [...txt].forEach((ch, i) => { const c = x + cells[i] / 2; g.strokeText(ch, c, y + dy); g.fillStyle = fill; g.fillText(ch, c, y + dy); x += cells[i]; }); };
+  g.lineWidth = size * 0.085; g.strokeStyle = 'rgba(16,11,7,0.9)';
+  for (let i = ext; i >= 1; i--) pass(i, 'rgba(16,11,7,0.9)');
+  pass(0, color);
+  g.restore();
+  qaRect(g, cx - total / 2, y - size * 0.72, total, size * 0.74, 'text', txt);
+}
+// the stopwatch of the meme as a big counter: the time in cream while it runs, gold when it stops; SECONDS on a gold tag
 function stopwatch(g, v, { y = 330, done = false, a = 1, scale = 1 } = {}) {
   if (a <= 0) return;
-  const txt = Math.min(v, 2.13).toFixed(2), col = done ? AMBER : CREAM;
-  g.save(); g.globalAlpha *= a; g.translate(W / 2, y); g.scale(scale, scale);
-  g.fillStyle = 'rgba(8,10,14,0.84)'; g.beginPath(); g.roundRect(-210, -120, 420, 160, 24); g.fill();
-  g.strokeStyle = rgba(col, 0.9); g.lineWidth = 5; g.stroke();
-  g.fillStyle = col; g.beginPath(); g.roundRect(-22, -146, 44, 22, 6); g.fill();  // the crown of the stopwatch
-  g.font = mono(124, 800); g.textAlign = 'center'; g.fillStyle = col; if (done) { g.shadowColor = AMBER; g.shadowBlur = 30; }
-  g.fillText(txt, 0, 6); g.shadowBlur = 0;
-  g.font = sans(30, 900); g.letterSpacing = '10px'; g.fillStyle = CREAM; g.fillText('SECONDS', 0, 92);
+  g.save(); g.globalAlpha *= a; g.translate(W / 2, y); g.scale(scale, scale); g.translate(-W / 2, -y);
+  clockNum(g, Math.min(v, 2.13).toFixed(2), W / 2, y, 196, done ? GOLD : CREAM);
+  plate(g, 'SECONDS', W / 2, y + 58, { color: GOLD, size: 32, rot: 0 });
   g.restore();
-  qaRect(g, W / 2 - 210 * scale, y - 146 * scale, 420 * scale, 250 * scale, 'text', txt);
 }
-function adTag(g, a = 1) {
-  g.save(); g.globalAlpha *= a * 0.9; g.font = sans(26, 900); g.letterSpacing = '4px'; g.textBaseline = 'middle';
-  g.fillStyle = 'rgba(8,8,10,0.6)'; g.beginPath(); g.roundRect(54, 122, 84, 46, 10); g.fill();
-  g.fillStyle = CREAM; g.textAlign = 'center'; g.fillText('AD', 96, 146); g.restore();
-  qaRect(g, 54, 122, 84, 46, 'text', 'AD');
-}
+const NUTC = '#1A1C20';  // the graphite of the Chessnut frame: the AD chip and the name plate
+function adTag(g, a = 1) { plate(g, 'AD', 96, 146, { color: NUTC, size: 26, a: a * 0.92, rot: 0 }); }
 const lerp3 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
 
 // ======================= HE DOESN'T NEED STOCKFISH: the engine on his monitor in the dark streaming room =======================
@@ -792,26 +839,27 @@ export async function build(T) {
   const PI = Math.PI;
   const bdg = (g, t, text, t0, { y = 230, color = CREAM, size = 46, sub = null } = {}) => { if (t >= t0) badge(g, text, W / 2, y, { color, size, sub, ...popIn(t, t0) }); };
   const meme = piecesAt(G, MEME), memeP = withParked(MEME);
+  const HOMEG = 'village', SKY = '#5DB8F0';  // the grade of the sunny room; Hikaru's colour on labels
 
   // ======================= HOOK (rule 42): the payoff first — Hikaru's grimace over the board, the stopwatch at 2.13 =======================
   const clkS = s('clocks'), carlT = w('clocks', 'thirty-two');
-  const hookHud = (g, lt, t) => { heading(g, 'HE KNEW IN', 140, 1, { size: 50, spacing: 6 }); stopwatch(g, 2.13, { y: 360, done: true }); };
+  const hookHud = (g, lt, t) => { heading(g, 'HE KNEW IN', 150, 1, { size: 44, spacing: 6 }); stopwatch(g, 2.13, { y: 340, done: true }); };
   shot(0, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI / 2 - 0.05, 0.12, 11.4, [-2.6, 3.9, 4.0], { cy: H * 0.44 })], [len(sh), K(PI / 2 - 0.09, 0.11, 10.4, [-2.6, 3.95, 4.0], { cy: H * 0.44 })]], { t, e: x => x });
-    baku(g, t, { hik: { x: HIKX, z: HIKZ, e: GRIMACE }, clock: { l: 24.0, r: 1929 }, focus: 9, players: false });
+    rig(B, lt, [[0, K(PI / 2 - 0.093, -0.211, 8.83, [-2.6, 3.0, 4.0])], [len(sh), K(PI / 2 - 0.12, -0.215, 8.1, [-2.6, 3.05, 4.0])]], { t, e: x => x });
+    baku(g, t, { hik: { x: HIKX, z: HIKZ, e: GRIMACE }, clock: { l: 24.0, r: 1929 }, focus: 8, dof: 0.5, players: false });
   }, { hud: hookHud, grade: 'neutral' });
   cue(0, 'whoosh_deep', 0.3); cue(0, 'murmur', 0.22); cue(0.05, 'reveal_bell', 0.3);
 
   // ======================= THE CLOCKS: the wide broadcast angle; 0:30 against 32:09; Hikaru gets up at the next table =======================
   const tagsOver = (g, t) => {
-    tag3(g, 4, 6.6, -1.4, 'KEYMER 0:30', '#FF6A55', seg(t, clkS + 1.4, clkS + 1.7, x => x));
+    tag3(g, 4, 6.6, -1.4, 'KEYMER 0:30', RED, seg(t, clkS + 1.4, clkS + 1.7, x => x));
     tag3(g, 4, 6.6, 9.3, 'MAGNUS 32:09', CREAM, seg(t, carlT, carlT + 0.3, x => x));
   };
   shot(w('clocks', 'magnus') - 0.12, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI / 2 + 0.05, 0.12, 24, [2, 1.8, 3.95])], [len(sh), K(PI / 2 + 0.03, 0.115, 22.6, [1.6, 1.9, 3.9])]], { t, e: x => x });
     baku(g, t, { hik: hikPose(t), over: null });
     tagsOver(g, t);
-  }, { trans: 'flash', hud: (g, lt, t) => placeStamp(g, lt, 'Baku', 'WORLD CUP 2023', { y: 200, t0: 0.15 }) });
+  }, { hud: (g, lt, t) => placeStamp(g, lt, 'Baku', 'WORLD CUP 2023', { y: 200, t0: 0.15 }) });
   cue(w('clocks', 'magnus') - 0.16, 'whoosh_fast', 0.3); cue(clkS + 1.45, 'sparkle_pop', 0.25); cue(carlT, 'sparkle_pop', 0.25);
   for (let x = 1.6; x < 6.4; x += 1) cue(x, 'clock_tick', 0.16);
   cue(WALK0 - 0.1, 'fabric', 0.3); cue(WALK0 + 0.1, 'footsteps', 0.35);
@@ -822,13 +870,13 @@ export async function build(T) {
   shot(tmS - 0.06, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI / 2 + 0.06, 0.2, 15.5, [-1.4, 3.0, 3.4])], [len(sh), K(PI / 2 + 0.04, 0.18, 14, [-1.6, 3.2, 3.6])]], { t, e: x => x });
     baku(g, t, { hik: hikPose(t) });
-    tag3(g, hikPose(t).x, 6.9, hikPose(t).z, 'HIKARU', '#9FC2FF', seg(t, hikT, hikT + 0.3, x => x) * (1 - seg(t, walkT + 0.6, walkT + 0.9)));
+    tag3(g, hikPose(t).x, 6.9, hikPose(t).z, 'HIKARU', SKY, seg(t, hikT, hikT + 0.3, x => x) * (1 - seg(t, walkT + 0.6, walkT + 0.9)));
   }, { hud: swHud(330) });
   cue(hikT, 'sparkle_pop', 0.25); cue(walkT, 'clock_press', 0.5);
   // ======================= THE INTERNET TIMED IT: a slow push in on him looking down =======================
   shot(netT - 0.08, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI / 2 + 0.02, 0.06, 9.5, [-2.6, 3.7, 4])], [len(sh), K(PI / 2, 0.04, 7.4, [-2.6, 3.95, 4])]], { t, e: x => x });
-    baku(g, t, { hik: hikPose(t), focus: 7 });
+    rig(B, lt, [[0, K(PI / 2 + 0.147, -0.194, 9.07, [-2.6, 3.0, 4.0])], [len(sh), K(PI / 2 + 0.12, -0.2, 7.3, [-2.6, 3.25, 4.0])]], { t, e: x => x });
+    baku(g, t, { hik: hikPose(t), focus: 8, dof: 0.5 });
   }, { hud: swHud(330) });
   for (let x = walkT + 0.5; x < t213 - 0.1; x += 0.5) cue(x, 'clock_tick', 0.22);
   // ======================= 2.13: the grimace, from below; the stopwatch stops =======================
@@ -836,7 +884,8 @@ export async function build(T) {
   shot(t213, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI / 2 - 0.1, -0.16, 7.2, [-2.6, 4.25, 4.05])], [len(sh), K(PI / 2 - 0.14, -0.18, 6.4, [-2.6, 4.3, 4.05])]], { t, e: x => x, bump: lt < 0.25 ? 1 : 0 });
     baku(g, t, { hik: hikPose(t), focus: 6.5, players: false });
-  }, { trans: 'flash', hud: swHud(330) });
+    if (lt < 0.2) flashTint(g, '#FFE9B8', 0.4 * (1 - lt / 0.2));
+  }, { hud: swHud(330) });
   cue(t213 - 0.32, 'revswell', 0.8); cue(t213 - 0.004, 'boom', 0.8); cue(t213, 'reveal_bell', 0.45); cue(t213 + 0.05, 'gasp', 0.25);
   // ======================= TO SEE MAGNUS WAS LOSING: Carlsen, fist at his mouth =======================
   shot(seeT - 0.1, (g, lt, t, sh) => {
@@ -858,10 +907,10 @@ export async function build(T) {
   const homeTV = t => t < SET0 ? withParked(0) : t < REW0 ? drive(withParked(0), memeP, t, SET0, 0.55, { stagger: 0.45, park: PARK, fade: false }) : null;
   shot(tvA, (g, lt, t, sh) => {
     feedBaku(t);
-    rig(B, lt, [[0, K(0, 0.02, 12.4, [4, 5.68, 12.5])], [1.1, K(-0.3, 0.36, 16, [4, 2.2, 7.5]), ease.inOut], [len(sh), K(-0.36, 0.42, 15, [4, 1.2, 6.5])]], { t });
+    rig(B, lt, [[0, K(0, 0.02, 8.65, TVC)], [1.1, K(-0.26, 0.34, 16, [4.2, 2.2, 7.5]), ease.inOut], [len(sh), K(-0.34, 0.42, 15, [4, 1.2, 6.5])]], { t });
     const ps = t < REW0 ? homeTV(t) : drive(memeP, withParked(72), t, REW0, 0.35, { stagger: 0.1, park: PARK, fade: false });
     home(g, t, { pieces: ps, feed: 1 });
-  }, { trans: 'zoom', grade: 'warm', hud: (g, lt, t) => { if (t >= REW0) { g.save(); g.globalAlpha *= 1 - seg(t, REW0 + 0.4, REW0 + 0.6); g.font = sans(60, 900); g.textAlign = 'center'; g.fillStyle = CREAM; g.fillText('◀◀', W / 2, 260); g.restore(); } } });
+  }, { trans: 'zoom', grade: HOMEG, hud: (g, lt, t) => { if (t >= REW0) plate(g, '◀◀  REWIND', W / 2, 240, { color: CREAM, size: 46, ...popIn(t, REW0), a: 1 - seg(t, REW0 + 0.45, REW0 + 0.6) }); } });
   cue(tvA, 'whoosh_deep', 0.35); cue(SET0, 'whirr', 0.4); for (let i = 0; i < 6; i++) cue(SET0 + 0.08 + i * 0.12, 'piece_slide', 0.18); cue(REW0, 'whirr', 0.35); cue(REW0, 'whoosh_soft', 0.25);
 
   // ======================= A KNIGHT HITTING TWO PAWNS AT ONCE: 37.Nd6! =======================
@@ -877,18 +926,18 @@ export async function build(T) {
         boardArrow(g2, B, 'd6', 'b7', 0.95, seg(t, hitT, hitT + 0.25)); boardArrow(g2, B, 'd6', 'f7', 0.95, seg(t, twoT, twoT + 0.25));
         if (t >= pawT) { pieceRing(g2, B, 'b7', HI.bad, 1, seg(t, pawT, pawT + 0.25)); pieceRing(g2, B, 'f7', HI.bad, 1, seg(t, pawT + 0.08, pawT + 0.33)); }
       } });
-  }, { grade: 'warm', hud: (g, lt, t) => bdg(g, t, '37.Nd6!', kniT, { color: GOLD }) });
+  }, { grade: HOMEG, hud: (g, lt, t) => bdg(g, t, '37.Nd6!', kniT, { color: GOLD }) });
   boom(kniT, 0.6); cue(kniT - MOVE_HIT, 'move', 0.6); cue(hitT, 'whoosh_soft', 0.15); cue(twoT, 'whoosh_soft', 0.15); cue(pawT, 'sparkle_pop', 0.3);
   // ======================= ONE FELL: 37...g6 38.Nxb7 =======================
   const runAt = [oneT - 0.3, fellT - SLIDE];
   shot(oneT - 0.36, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.75, 0.42, 6.8, [1.6, 0.5, 6.4])], [len(sh), K(-0.68, 0.4, 6.0, [1.6, 0.55, 6.5])]], { t });
     const run = playRun(G, 73, runAt, t, piecesAt);
-    home(g, t, { pieces: [...run.pieces, ...parked(73).map((p, i) => ({ ...p, ...PARK(p, i) }))], focus: 6.5,
+    home(g, t, { pieces: [...run.pieces, ...parked(73).map((p, i) => ({ ...p, ...PARK(p, i) }))], dof: 0.45,
       under: g2 => { run.active.forEach(a => moveUnder(g2, B, a.m, a.lt, { hold: a.hold })); if (t >= fellT) spread(g2, B, 'b7', t, fellT, HI.bad); },
       over: g2 => run.active.forEach(a => moveOver(g2, B, a.m, a.lt, { hold: a.hold, label: a.label })) });
     if (t >= fellT && t < fellT + 0.4) flashTint(g, HI.bad, 0.25 * (1 - seg(t, fellT, fellT + 0.4)));
-  }, { trans: 'whip', grade: 'warm' });
+  }, { trans: 'whip', grade: HOMEG });
   cue(oneT - 0.42, 'whoosh_fast', 0.3); cue(runAt[0] + SLIDE - MOVE_HIT, 'move', 0.5); cue(fellT - 0.004, 'hit', 0.6); boom(fellT, 0.6); cue(fellT, 'move_capture', 0.5);
   // ======================= TWENTY MOVES LATER, MAGNUS RESIGNED: fast forward to move 58; the black king falls =======================
   const FF0 = twT, FF1 = resT - 0.2;
@@ -898,7 +947,7 @@ export async function build(T) {
     const k = ffK(t), tip = seg(t, resT, resT + 0.35, ease.in);
     const ps = [...piecesAt(G, k), ...parked(k).map((p, i) => ({ ...p, ...PARK(p, i) }))].map(p => p.id === 'k1' ? { ...p, rot: -1.45 * tip, y: -0.05 * tip } : p);
     home(g, t, { pieces: ps, under: g2 => { if (t >= resT) squareFrame(g2, B, ps.find(p => p.id === 'k1') ? G[LAST].pieces.find(p => p.id === 'k1').sq : 'd5', HI.bad, seg(t, resT, resT + 0.2)); } });
-  }, { grade: 'warm', hud: (g, lt, t) => {
+  }, { grade: HOMEG, hud: (g, lt, t) => {
     const mv = Math.ceil(ffK(t) / 2);
     if (t < resT) badge(g, `MOVE ${mv}`, W / 2, 230, { color: CREAM, size: 46 }); else bdg(g, t, '1–0', resT, { color: HI.bad, size: 60, sub: 'MAGNUS RESIGNS' });
   } });
@@ -907,8 +956,8 @@ export async function build(T) {
   // ======================= HOW DID HE KNOW? Back in Baku: Hikaru, a question mark =======================
   const howS = s('how'), howT = w('how', 'how'), showT = w('how', 'show'), gmT = w('how', 'grandmaster'), fiveT = w('how', 'five'), rebT = w('how', 'rebuilds'), itT = w('how', -1);
   shot(howS - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI / 2 + 0.16, 0.05, 7.6, [-2.6, 4.2, 4])], [len(sh), K(PI / 2 + 0.12, 0.04, 6.8, [-2.6, 4.25, 4])]], { t });
-    baku(g, t, { hik: { x: HIKX, z: HIKZ, e: GRIMACE }, focus: 7 });
+    rig(B, lt, [[0, K(PI / 2 + 0.3, -0.17, 8.6, [-2.6, 3.2, 4.1])], [len(sh), K(PI / 2 + 0.26, -0.17, 7.8, [-2.6, 3.3, 4.1])]], { t });
+    baku(g, t, { hik: { x: HIKX, z: HIKZ, e: THINK }, focus: 7.5, dof: 0.5 });
     mark(g, '?', -2.6, 6.6, 5.4, seg(t, howT, howT + 0.25, x => x), t, { color: GOLD, size: 1.3 });
   }, { trans: 'whip' });
   cue(howS - 0.11, 'whoosh_fast', 0.3); cue(howT, 'sparkle_pop', 0.3);
@@ -917,16 +966,16 @@ export async function build(T) {
     if (t < fiveT) return;
     const u = clamp((t - fiveT) / 0.75), cx = W / 2, cy = 360, r = 92;
     g.save(); g.globalAlpha *= seg(t, fiveT, fiveT + 0.12); g.lineWidth = 16; g.lineCap = 'round';
-    g.strokeStyle = 'rgba(8,10,12,0.6)'; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.stroke();
+    g.strokeStyle = 'rgba(16,11,7,0.55)'; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.stroke();
     g.strokeStyle = GOLD; g.beginPath(); g.arc(cx, cy, r, -PI / 2, -PI / 2 + 2 * PI * (1 - u)); g.stroke();
-    g.font = sans(96, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = CREAM; g.fillText(String(Math.max(1, 5 - Math.floor(u * 5))), cx, cy + 4);
-    g.font = sans(30, 900); g.letterSpacing = '8px'; g.fillText('SECONDS', cx, cy + r + 52); g.restore();
-    qaRect(g, cx - r - 10, cy - r - 10, 2 * r + 20, 2 * r + 90, 'text', '5');
+    g.font = sans(104, 900); g.fillStyle = CREAM; g.shadowColor = 'rgba(8,6,4,0.55)'; g.shadowOffsetY = 6; inkText(g, String(Math.max(1, 5 - Math.floor(u * 5))), cx, cy);
+    g.shadowColor = 'transparent'; plate(g, 'SECONDS', cx, cy + r + 52, { color: GOLD, size: 30, rot: 0 }); g.restore();
+    qaRect(g, cx - r - 10, cy - r - 10, 2 * r + 20, 2 * r + 20, 'text', '5');
   };
   shot(showT - 0.06, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.05, 1.32, 14.8, [4, 0, 3.9])], [len(sh), K(-0.05, 1.3, 13.6, [4, 0, 3.9])]], { t });
     home(g, t, { pieces: memeP });
-  }, { trans: 'whip', grade: 'warm', hud: (g, lt, t) => { bdg(g, t, 'GRANDMASTER', gmT, { y: 200, color: GOLD, size: 42 }); if (t >= fiveT) ring5(g, t); } });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { bdg(g, t, 'GRANDMASTER', gmT, { y: 200, color: GOLD, size: 42 }); if (t >= fiveT) ring5(g, t); } });
   cue(showT - 0.12, 'whoosh_fast', 0.3); for (let i = 0; i < 4; i++) cue(fiveT + i * 0.19, 'clock_tick', 0.3);
   // ======================= AND HE REBUILDS IT: the pieces drive off in a ring and come back to their squares =======================
   const OFF0 = fiveT + 0.78, ON0 = rebT - 0.06;
@@ -936,7 +985,7 @@ export async function build(T) {
     const ps = t < ON0 ? drive(meme, ringOf(meme), t, OFF0, 0.35, { stagger: 0.12 }) : drive(ringOf(meme), meme, t, ON0, 0.4, { stagger: 0.25 });
     home(g, t, { pieces: [...ps, ...parked(MEME).map((p, i) => ({ ...p, ...PARK(p, i) }))],
       under: g2 => { if (t >= itT) meme.forEach(p => squareFrame(g2, B, p.sq, HI.good, 0.8 * seg(t, itT, itT + 0.2) * (1 - seg(t, itT + 0.6, itT + 0.9)))); } });
-  }, { grade: 'warm', hud: (g, lt, t) => bdg(g, t, '✓ REBUILT', itT, { color: HI.good }) });
+  }, { grade: HOMEG, hud: (g, lt, t) => bdg(g, t, '✓ REBUILT', itT, { color: HI.good }) });
   cue(OFF0, 'whirr', 0.35); cue(ON0, 'whirr', 0.35); cue(itT, 'success', 0.35);
   // ======================= SCRAMBLE THE PIECES: they drive to random squares =======================
   const scS = s('scramble'), barT = w('scramble', 'barely'), begT = w('scramble', 'beginner');
@@ -946,7 +995,7 @@ export async function build(T) {
   shot(scS - 0.04, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.2, 1.2, 14.4, [4, 0, 4])], [len(sh), K(-0.45, 0.95, 13.4, [4.6, 0, 4])]], { t });
     home(g, t, { pieces: [...drive(meme, scrambled, t, scS + 0.08, 0.45, { stagger: 0.3 }), ...parked(MEME).map((p, i) => ({ ...p, ...PARK(p, i) }))] });
-  }, { trans: 'whip', grade: 'warm', hud: (g, lt, t) => heading(g, 'SCRAMBLED', 200, seg(t, scS + 0.5, scS + 0.7)) });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => bdg(g, t, 'SCRAMBLED', scS + 0.5, { y: 200, color: RED, size: 54 }) });
   cue(scS - 0.1, 'whoosh_fast', 0.3); cue(scS + 0.08, 'whirr', 0.4); cue(scS + 0.1, 'record_scratch', 0.2);
   // ======================= BARELY BETTER THAN A BEGINNER: two bars beside the board =======================
   shot(barT - 0.06, (g, lt, t, sh) => {
@@ -957,7 +1006,7 @@ export async function build(T) {
       if (u1 > 0) { ab(g2, [9.3, -0.35, 1.4], [10.3, -0.35 + 3.4 * u1, 2.4], GOLD, { amb: 0.6, spec: 0.2 }); tag3(g2, 9.8, -0.35 + 3.4 * u1 + 0.9, 1.9, 'GM', GOLD, u1); }
       if (u2 > 0) { ab(g2, [9.3, -0.35, 5.6], [10.3, -0.35 + 3.0 * u2, 6.6], '#8A96A8', { amb: 0.6, spec: 0.2 }); tag3(g2, 9.8, -0.35 + 3.0 * u2 + 0.9, 6.1, 'BEGINNER', CREAM, u2); }
     } });
-  }, { grade: 'warm', hud: (g, lt, t) => heading(g, 'SCRAMBLED', 200, 1) });
+  }, { grade: HOMEG, hud: (g, lt, t) => badge(g, 'SCRAMBLED', W / 2, 200, { color: RED, size: 54 }) });
   cue(barT, 'notify', 0.25); cue(begT, 'notify', 0.25);
 
   // ======================= HE SEES PATTERNS, NOT PIECES: chunks of squares light up; the pieces fade =======================
@@ -968,7 +1017,7 @@ export async function build(T) {
     const fadeU = seg(t, notT, notT + 0.4);
     home(g, t, { pieces: meme.map(p => ({ ...p, alpha: 1 - 0.85 * fadeU })),
       under: g2 => CHUNK.forEach(([sqs, col], i) => { const u = seg(t, patT + i * 0.18, patT + i * 0.18 + 0.15); if (u > 0) sqs.forEach(q => squareFrame(g2, B, q, col, u, { fill: 0.22 + 0.3 * fadeU, lw: 5 })); }) });
-  }, { trans: 'whip', grade: 'warm', hud: (g, lt, t) => { bdg(g, t, 'PATTERNS', patT, { color: MIND }); } });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { bdg(g, t, 'PATTERNS', patT, { color: MIND }); } });
   cue(ptS - 0.11, 'whoosh_fast', 0.3); CHUNK.forEach((_, i) => cue(patT + i * 0.18, 'sparkle_pop', 0.22)); cue(notT, 'whoosh_soft', 0.25);
   // ======================= ABOUT FIFTY THOUSAND: we pull back from one pattern to a wall of them =======================
   const skS = s('skill'), sk1T = skS + 0.25, sk2T = w('skill', 3), boardT = w('skill', 'board'), headT = w('skill', 'head'), whereT = w('skill', 'where'), combT = w('skill', 'combinations');
@@ -1004,8 +1053,8 @@ export async function build(T) {
   shot(likeS - 0.05, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.15, 0.5, 11, [4, 0.4, 4])], [0.9, K(-0.12, 0.42, 10.5, [4, 0.3, 3.6])], [len(sh), K(-0.04, 0.3, 9.2, [4, 0.2, 2.4])]], { t });
     const ps = drive(piecesAt(G, 81), piecesAt(G, 82), t, thisT - 0.15, 0.5);
-    home(g, t, { pieces: [...ps, ...parked(82).map((p, i) => ({ ...p, ...PARK(p, i) }))], focus: 8 });
-  }, { trans: 'flash', grade: 'warm' });
+    home(g, t, { pieces: [...ps, ...parked(82).map((p, i) => ({ ...p, ...PARK(p, i) }))] });
+  }, { trans: 'zoom', grade: HOMEG });
   cue(likeS - 0.05, 'shimmer', 0.25); cue(thisT - 0.15, 'whirr', 0.4); cue(thisT + 0.3, 'piece', 0.3);
 
   // ======================= AND HIKARU HAS BOTH (the real photo) =======================
@@ -1019,7 +1068,7 @@ export async function build(T) {
   shot(blS - 0.05, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI / 2 + 0.08, 0.14, 22, [4, 2.2, 4])], [len(sh), K(PI / 2 + 0.04, 0.12, 19.5, [4, 2.3, 4])]], { t });
     barcelona(g, t);
-    tag3(g, 4, 5.6, -1.4, 'MAGNUS', CREAM, seg(t, blS + 0.5, blS + 0.8, x => x)); tag3(g, 4, 5.6, 9.3, 'HIKARU', '#9FC2FF', seg(t, blS + 0.7, blS + 1.0, x => x));
+    tag3(g, 4, 5.6, -1.4, 'MAGNUS', CREAM, seg(t, blS + 0.5, blS + 0.8, x => x)); tag3(g, 4, 5.6, 9.3, 'HIKARU', SKY, seg(t, blS + 0.7, blS + 1.0, x => x));
   }, { trans: 'whip', grade: 'night', hud: (g, lt, t) => placeStamp(g, lt, 'Barcelona', 'BLINDFOLD · JAN 2026', { y: 200, t0: 0.15 }) });
   cue(blS - 0.11, 'whoosh_fast', 0.3); cue(blS, 'murmur', 0.2);
   shot(pawnT - 0.08, (g, lt, t, sh) => {
@@ -1052,7 +1101,7 @@ export async function build(T) {
   cue(rcS - 0.11, 'whoosh_fast', 0.3); cue(rcS + 0.2, 'typewriter', 0.18);
   shot(t3500 - 0.16, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.03, 0.02, 5.8, [4, 2.4, 5.98])], [len(sh), K(0, 0.02, 5.2, [4, 2.4, 5.98])]], { t, e: x => x, bump: t > t3500 && t < t3500 + 0.3 ? 1 : 0 });
-    stream(g, t, monitorTex(t, { rating: ratingAt(t), gold: seg(t, t3500, t3500 + 0.3) }), { glow: seg(t, t3500, t3500 + 0.3) });
+    stream(g, t, monitorTex(t, { rating: ratingAt(t), gold: seg(t, t3500, t3500 + 0.3), head: false }), { glow: seg(t, t3500, t3500 + 0.3) });
     if (t >= t3500) confetti(g, t, t3500, { n: 110, seed: 35 });
   }, { grade: 'stream', hud: (g, lt, t) => { bdg(g, t, 'FIRST EVER', t3500 + 0.1, { y: 220, color: GOLD, size: 54 }); bdg(g, t, 'CHESS.COM BLITZ', blitzT, { y: 330, color: CREAM, size: 38 }); } });
   cue(t3500 - 0.004, 'boom', 0.75); cue(t3500, 'confetti', 0.45); cue(t3500 + 0.05, 'success', 0.4); cue(t3500 + 0.2, 'applause', 0.3);
@@ -1112,12 +1161,12 @@ export async function build(T) {
   shot(a1S - 0.06, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.12, 0.2, 8.8, [4, 0.5, 2.2])], [len(sh), K(-0.04, 0.22, 8.3, [4, 0.5, 2.3])]], { t });
     home(g, t, { pieces: adPieces(t), focus: 6.5 });
-  }, { trans: 'fade', grade: 'warm', hud: adHud });
+  }, { trans: 'fade', grade: HOMEG, hud: adHud });
   cue(a1S, 'whoosh_soft', 0.25); adPlies.forEach(x => { cue(x, 'whirr', 0.3); cue(x + 0.35, 'piece', 0.3); });
   shot(nutT - 0.45, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.35, 0.55, 12, [4, 0, 3.6])], [len(sh), K(-0.25, 0.42, 11, [4, 0, 3.4])]], { t, e: x => x });
     home(g, t, { pieces: adPieces(t) });
-  }, { trans: 'whip', grade: 'warm', hud: (g, lt, t) => { adHud(g, lt, t); heading(g, 'CHESSNUT MOVE', 210, seg(t, nutT, nutT + 0.2), { size: 52 }); } });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); if (t >= nutT) badge(g, 'CHESSNUT MOVE', W / 2, 214, { color: NUTC, size: 60, ...popIn(t, nutT) }); } });
   cue(nutT - 0.5, 'whoosh_fast', 0.3); cue(nutT, 'reveal_bell', 0.4);
   // ======================= EACH PIECE HAS ITS OWN MOTOR: the x-ray of the knight on g1 =======================
   const a2S = s('ad2'), motT = w('ad2', 'motor'), snapT = w('ad2', 'snap'), photoT = w('ad2', 'photo'), setsT = w('ad2', 'sets');
@@ -1129,7 +1178,7 @@ export async function build(T) {
     const P = B.project(6.5, 0, 0.5), h = P.s * 1.25;
     const pts = xray(g, P, h, t, motT);
     if (pts) pts.forEach(([name, pt], i) => { const [sd, dt] = LB[i]; callout(g, name, pt, [W / 2 + sd * 250, 560 + i * 120], seg(t, motT + dt, motT + dt + 0.25)); });
-  }, { trans: 'whip', grade: 'warm', hud: adHud });
+  }, { trans: 'whip', grade: HOMEG, hud: adHud });
   cue(a2S - 0.11, 'whoosh_fast', 0.3); cue(motT - 0.35, 'shimmer', 0.3); LB.forEach(([, dt]) => cue(motT + dt, 'sparkle_pop', 0.22));
   // ======================= SNAP A PHOTO OF ANY POSITION: a phone over a diagram on the table =======================
   const BOOK = [9.5, 2.5];
@@ -1151,50 +1200,50 @@ export async function build(T) {
     g.fillStyle = '#F4F2EE'; g.beginPath(); g.arc(0, ph.h / 2 - 90, 44, 0, 7); g.fill(); g.strokeStyle = '#0A0B0D'; g.lineWidth = 6; g.beginPath(); g.arc(0, ph.h / 2 - 90, 34, 0, 7); g.stroke();
     if (t >= SHUT) { g.fillStyle = `rgba(255,255,255,${(1 - seg(t, SHUT, SHUT + 0.3)).toFixed(3)})`; g.fillRect(-ph.w / 2, -ph.h / 2, ph.w, ph.h); }
     g.restore(); g.restore();
-  }, { trans: 'whip', grade: 'warm', hud: (g, lt, t) => { adHud(g, lt, t); bdg(g, t, '✓ POSITION FOUND', SHUT + 0.15, { y: 240, color: HI.good, size: 42 }); } });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); bdg(g, t, '✓ POSITION FOUND', SHUT + 0.15, { y: 240, color: HI.good, size: 42 }); } });
   cue(snapT - 0.14, 'whoosh_fast', 0.3); cue(SHUT, 'camera', 0.6); cue(SHUT + 0.15, 'success', 0.3);
   // ======================= AND IT SETS ITSELF UP: the pieces drive into that position =======================
   const SU0 = setsT - 0.1;
   shot(setsT - 0.42, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.55, 0.85, 14, [5, 0, 4])], [len(sh), K(-0.35, 0.8, 12.8, [5, 0, 4])]], { t, e: x => x });
     home(g, t, { pieces: drive(withParked(3), memeP, t, SU0, 0.6, { stagger: 0.45, park: PARK, fade: false }), extra: bookOnTable });
-  }, { grade: 'warm', hud: adHud });
+  }, { grade: HOMEG, hud: adHud });
   cue(SU0, 'whirr', 0.45); for (let i = 0; i < 8; i++) cue(SU0 + 0.05 + i * 0.1, 'piece_slide', 0.15);
   // ======================= PLAY CHESS.COM OR LICHESS ON A REAL BOARD: the opponent's move arrives =======================
   const a3S = s('ad3'), liT = w('ad3', 'lichess'), realT = w('ad3', 'real'), afterT = w('ad3', 'after'), n32T = w('ad3', '32'), driveT = w('ad3', 'drive'), homeT = w('ad3', 'home');
   const OPP = realT - 0.35;
   shot(a3S - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.12, 0.5, 13.6, [7.6, 1.0, 4.4])], [len(sh), K(-0.2, 0.46, 12.6, [7.4, 1.0, 4.4])]], { t });
+    rig(B, lt, [[0, K(-0.28, 0.5, 13.6, [7.0, 1.0, 4.4])], [len(sh), K(-0.36, 0.46, 12.6, [6.8, 1.0, 4.4])]], { t });
     home(g, t, { pieces: drive(withParked(1), withParked(2), t, realT - 0.12, 0.45), extra: (g2, ph) => { if (ph === 'top') tablet(g2, t, OPP); } });
-  }, { trans: 'whip', grade: 'warm', hud: (g, lt, t) => { adHud(g, lt, t); bdg(g, t, 'CHESS.COM · LICHESS', a3S + 0.15, { y: 220, color: CREAM, size: 40 }); } });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); bdg(g, t, 'CHESS.COM · LICHESS', a3S + 0.15, { y: 220, color: CREAM, size: 40 }); } });
   cue(a3S - 0.11, 'whoosh_fast', 0.3); cue(OPP, 'notify', 0.35); cue(realT - 0.12, 'whirr', 0.4); cue(realT + 0.28, 'piece', 0.3);
   // ======================= AFTER THE GAME, ALL 32 PIECES DRIVE HOME =======================
   const H0 = n32T - 0.05;
   shot(afterT - 0.05, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.42, 1.0, 15.5, [5.2, 0, 4])], [len(sh), K(-0.1, 0.92, 14.2, [4.6, 0, 4])]], { t, e: x => x });
     home(g, t, { pieces: drive(withParked(LAST), p0.filter(p => G[0].pieces.some(q => q.id === p.id)), t, H0, 0.9, { stagger: 0.55, park: null }) });
-  }, { trans: 'whip', grade: 'warm', hud: (g, lt, t) => { adHud(g, lt, t); if (t >= n32T) counter(g, '32', 'PIECES DRIVE HOME', { y: 330, size: 150, color: CREAM, labelColor: GOLD, at: [t, n32T] }); } });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); if (t >= n32T) counter(g, '32', 'PIECES DRIVE HOME', { y: 330, size: 150, color: CREAM, labelColor: GOLD, at: [t, n32T] }); } });
   cue(afterT - 0.11, 'whoosh_fast', 0.3); cue(H0, 'whirr', 0.5); for (let i = 0; i < 10; i++) cue(H0 + 0.1 + i * 0.13, 'piece_slide', 0.14); cue(homeT + 0.1, 'success', 0.35);
   // ======================= LINK IN BIO: the board, set, the name on its edge =======================
   const bioS = s('bio');
   shot(bioS - 0.05, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.16, 0.3, 10, [4, 0.4, 2.6])], [len(sh), K(0.06, 0.27, 9.2, [4, 0.4, 2.4])]], { t });
     home(g, t, { pieces: p0, focus: 8 });
-  }, { trans: 'whip', grade: 'warm', hud: (g, lt, t) => { adHud(g, lt, t); heading(g, 'CHESSNUT MOVE', 200, 1, { size: 52 }); bdg(g, t, 'LINK IN BIO', bioS + 0.1, { y: 320, color: GOLD, size: 50 }); } });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); badge(g, 'CHESSNUT MOVE', W / 2, 204, { color: NUTC, size: 60 }); bdg(g, t, 'LINK IN BIO', bioS + 0.1, { y: 318, color: GOLD, size: 54 }); } });
   cue(bioS - 0.11, 'whoosh_fast', 0.3); cue(bioS + 0.1, 'reveal_bell', 0.35);
 
   // ======================= CTA: Baku again — the grimace and the stopwatch; how many seconds did you need? =======================
   const ctaS = s('cta') - 0.05, two2T = w('cta', 'two'), how2T = w('cta', 'how'), needT = w('cta', 'need');
   shot(ctaS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI / 2 - 0.06, 0.12, 13.4, [-2.6, 3.9, 4.0], { cy: H * 0.6 })], [len(sh), K(PI / 2 - 0.1, 0.11, 12.4, [-2.6, 3.95, 4.0], { cy: H * 0.6 })]], { t, e: x => x });
-    baku(g, t, { hik: { x: HIKX, z: HIKZ, e: GRIMACE }, clock: { l: 24.0, r: 1929 }, focus: 8.5, players: false });
+    rig(B, lt, [[0, K(PI / 2 - 0.093, -0.2, 9.6, [-2.6, 2.9, 4.0], { cy: H * 0.59 })], [len(sh), K(PI / 2 - 0.12, -0.2, 8.9, [-2.6, 2.95, 4.0], { cy: H * 0.59 })]], { t, e: x => x });
+    baku(g, t, { hik: { x: HIKX, z: HIKZ, e: exprAt([[0, GRIMACE], [how2T - 0.15, KNOW]], t) }, clock: { l: 24.0, r: 1929 }, focus: 8.6, dof: 0.5, players: false });
   }, { trans: 'whip', hud: (g, lt, t) => {
-    stopwatch(g, 2.13, { y: 290, done: true });
-    bdg(g, t, 'HOW MANY SECONDS?', how2T, { y: 500, color: GOLD, size: 44 });
-    bdg(g, t, 'COMMENT YOUR TIME', needT, { y: 596, color: TEAL, size: 38 });
-    if (t >= needT + 0.5) badge(g, 'FOLLOW ' + CHANNEL, W / 2, 680, { color: CREAM, size: 32, a: seg(t, needT + 0.5, needT + 0.6) });
+    stopwatch(g, 2.13, { y: 250, done: true });
+    bdg(g, t, 'HOW MANY SECONDS?', how2T, { y: 420, color: GOLD, size: 50 });
+    bdg(g, t, 'COMMENT YOUR TIME', needT, { y: 508, color: TEAL, size: 42 });
+    bdg(g, t, 'FOLLOW ' + CHANNEL, needT + 0.5, { y: 600, color: CREAM, size: 36 });  // rule 29: a readable plate, as in gmhunter
   } });
-  cue(ctaS - 0.06, 'whoosh_fast', 0.3); cue(two2T, 'clock_press', 0.4); cue(how2T, 'sparkle_pop', 0.3); cue(needT, 'sparkle_pop', 0.3);
+  cue(ctaS - 0.06, 'whoosh_fast', 0.3); cue(two2T, 'clock_press', 0.4); cue(how2T, 'sparkle_pop', 0.3); cue(needT, 'sparkle_pop', 0.3); cue(needT + 0.5, 'sparkle_pop', 0.22);
 
   const tvOff = T.duration - 0.5;
   cue(tvOff, 'tvoff', 0.5);

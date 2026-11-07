@@ -723,6 +723,19 @@ function mouth(g, e, c) {
     g.quadraticCurveTo(0, curve * 10 - 4, w + 6, -curve * 8);
     g.quadraticCurveTo(0, hh + curve * 8, -w - 6, -curve * 8); g.fill();
     g.save(); g.clip(); g.fillStyle = '#FFFFFF'; g.fillRect(-w - 6, -20, 2 * w + 12, e.mouth === 'grit' ? hh : 12); g.restore();
+  } else if (e.mouth === 'grimace') {  // "yikes": a wide flat mouth, both rows of clenched teeth bared, the corners pulled down
+    const gw = w + 8, gh = 14 + open * 14, k = -curve * 7;
+    const outline = () => {
+      g.beginPath(); g.moveTo(-gw, -gh / 2 + k); g.bezierCurveTo(-gw * 0.4, -gh / 2, gw * 0.4, -gh / 2, gw, -gh / 2 + k);
+      g.quadraticCurveTo(gw + 6, k, gw, gh / 2 + k); g.bezierCurveTo(gw * 0.4, gh / 2, -gw * 0.4, gh / 2, -gw, gh / 2 + k);
+      g.quadraticCurveTo(-gw - 6, k, -gw, -gh / 2 + k); g.closePath();
+    };
+    outline(); g.fillStyle = '#FFFFFF'; g.fill();
+    g.save(); g.clip(); g.strokeStyle = 'rgba(90,35,32,0.5)'; g.lineWidth = 2.5;  // the line between the rows, the gaps between the teeth
+    g.beginPath(); g.moveTo(-gw, k * 0.7); g.bezierCurveTo(-gw * 0.4, 0, gw * 0.4, 0, gw, k * 0.7); g.stroke();
+    for (let i = -3; i <= 3; i++) { const x = i * gw / 3.6; g.beginPath(); g.moveTo(x, -gh / 2 - 2); g.lineTo(x, gh / 2 + 2); g.stroke(); }
+    g.restore();
+    outline(); g.lineWidth = c.lip ? 6 : 5; g.stroke();
   } else if (e.mouth === 'smirk') {
     g.beginPath(); g.moveTo(-w + 4, 2); g.quadraticCurveTo(4, 8, w + 4, -8 - curve * 10); g.stroke();
   } else {

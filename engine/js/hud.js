@@ -17,6 +17,41 @@ const hard = (ctx, dy = 6) => { ctx.shadowColor = HARD; ctx.shadowBlur = 0; ctx.
 const unhard = ctx => { ctx.shadowColor = 'transparent'; ctx.shadowOffsetY = 0; };
 const lum = hex => { const n = parseInt(hex.replace('#', '').slice(0, 6), 16); return ((n >> 16) * 0.299 + ((n >> 8) & 255) * 0.587 + (n & 255) * 0.114) / 255; };
 
+// Text placed by its ink. Canvas letter-spacing leaves a gap after the last letter and a font's 'middle' is not the
+// middle of its capitals, so text centred the usual way sits left (and in a tag, low) inside its plate. These centre
+// the drawn letters themselves: inkX gives the left-aligned x for letters centred on x; inkText also centres the
+// capital height on y; inkWidth is the width of the letters without the trailing gap.
+export const inkWidth = (ctx, text) => { const m = ctx.measureText(text); return m.actualBoundingBoxRight + m.actualBoundingBoxLeft; };
+export const inkX = (ctx, text, x) => { const m = ctx.measureText(text); return x - (m.actualBoundingBoxRight - m.actualBoundingBoxLeft) / 2; };
+export function inkText(ctx, text, x, y, { stroke = false } = {}) {
+  const al = ctx.textAlign, bl = ctx.textBaseline;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  const x0 = inkX(ctx, text, x), y0 = y + ctx.measureText('H').actualBoundingBoxAscent / 2;
+  if (stroke) ctx.strokeText(text, x0, y0);
+  ctx.fillText(text, x0, y0);
+  ctx.textAlign = al; ctx.textBaseline = bl;
+}
+
+// A flat label, the sticker look of the Mittens episode: a solid block with barely rounded corners, a hard shadow
+// under it, the text centred by its ink in dark or light for contrast; sub is a small second line. Returns its size.
+export function plate(ctx, text, x, y, { color = C.gold, ink = null, size = 40, a = 1, scale = 1, sub = null, dy = 0, blur = 0, rot = -0.016, spacing = null, minW = 0, qa = true } = {}) {
+  if (a <= 0) return null;
+  ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y + dy); ctx.rotate(rot); ctx.scale(scale, scale); blurOn(ctx, blur);
+  const ls = spacing ?? (size <= 34 ? 4 : size <= 46 ? 2 : 1), subS = size * 0.42;
+  ctx.font = sans(size, 900); ctx.letterSpacing = `${ls}px`;
+  let w = Math.max(minW, inkWidth(ctx, text) + size * 0.95);
+  if (sub) { ctx.save(); ctx.font = sans(subS, 800); ctx.letterSpacing = '4px'; w = Math.max(w, inkWidth(ctx, sub) + size * 0.95); ctx.restore(); }
+  const h = size * (sub ? 1.95 : 1.42), r = Math.min(5, size * 0.1);
+  ctx.fillStyle = 'rgba(12,9,6,0.5)'; ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2 + Math.max(4, size * 0.13), w, h, r); ctx.fill();
+  ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, r); ctx.fill();
+  if (qa) qaRect(ctx, -w / 2, -h / 2, w, h, 'text', text);
+  ctx.fillStyle = ink ?? (lum(color) > 0.55 ? C.ink : C.cream);
+  inkText(ctx, text, 0, sub ? -size * 0.27 : 0);
+  if (sub) { ctx.font = sans(subS, 800); ctx.letterSpacing = '4px'; ctx.globalAlpha *= 0.85; inkText(ctx, sub, 0, size * 0.52); }
+  ctx.restore();
+  return { w, h };
+}
+
 // Entrances. Motion 2 (LOOK.motion, rules 41-44): a strong ease-out, from 94% scale, 10-16 px low and a light blur,
 // in about 0.25 s. enter() is that progress for anything an episode draws itself; popIn() is a badge landing on a beat
 // (motion 1: the old 150% pop with an overshoot), spread into badge()'s options.
@@ -33,7 +68,7 @@ export function placeStamp(ctx, lt, place, year, { y = 150, a = 1, t0 = 0, x = W
   const m2 = LOOK.motion >= 2, u = (m2 ? enter(lt, t0, 0.3) : ease.out(clamp((lt - t0) / 0.35))) * a, ur = m2 ? enter(lt, t0 + 0.06, 0.3) * a : u;
   if (u <= 0) return;
   ctx.save(); ctx.globalAlpha *= u; ctx.font = sans(30, 800); ctx.letterSpacing = '6px'; if (m2) blurOn(ctx, (1 - u) * 5);
-  const s1 = place.toUpperCase(), w1 = ctx.measureText(s1).width, w2 = ctx.measureText(year).width, gap = 46;
+  const s1 = place.toUpperCase(), w1 = inkWidth(ctx, s1), w2 = inkWidth(ctx, year), gap = 46;
   const x0 = x - (w1 + gap + w2) / 2, yy = y + (1 - u) * 14;
   ctx.textAlign = 'left'; hard(ctx, 3);
   ctx.fillStyle = C.cream; ctx.fillText(s1, x0, yy); qaRect(ctx, x0, yy - 26, w1 + gap + w2, 46, 'text', place);
@@ -49,13 +84,14 @@ export function nameTitle(ctx, lt, name, sub, { y = 230, a = 1, t0 = 0, subColor
   const ub = m2 ? enter(lt, t0 + 0.08) * a : u, us = m2 ? enter(lt, t0 + 0.14, 0.3) * a : 1;
   ctx.save(); ctx.globalAlpha *= u; ctx.textAlign = 'center';
   ctx.font = serif(size, 700); ctx.letterSpacing = '1px'; hard(ctx, 5); ctx.fillStyle = C.cream; if (m2) blurOn(ctx, (1 - u) * 6);
-  ctx.fillText(name, W / 2, y + (1 - u) * (m2 ? 16 : 18)); unhard(ctx); ctx.filter = 'none';
+  ctx.textAlign = 'left'; ctx.fillText(name, inkX(ctx, name, W / 2), y + (1 - u) * (m2 ? 16 : 18)); unhard(ctx); ctx.filter = 'none'; ctx.textAlign = 'center';
   { const nw = ctx.measureText(name).width; qaRect(ctx, W / 2 - nw / 2, y - size * 0.75, nw, size * 0.75 + (sub ? 72 : 28), 'text', 'name: ' + name); }
   ctx.fillStyle = subColor; ctx.fillRect(W / 2 - 40 * ub, y + 22, 80 * ub, 5);
   if (sub) {
     ctx.font = sans(24, 800); ctx.letterSpacing = '6px'; hard(ctx, 3); ctx.fillStyle = C.cream;
-    if (m2) { ctx.globalAlpha *= us / Math.max(u, 1e-3); blurOn(ctx, (1 - us) * 4); ctx.fillText(sub, W / 2, y + 62 + (1 - us) * 10); }
-    else ctx.fillText(typed(sub, lt, t0 + 0.25, 0.5), W / 2, y + 62);
+    ctx.textAlign = 'left'; const sx = inkX(ctx, sub, W / 2);  // typed letters appear from the left edge of the full line
+    if (m2) { ctx.globalAlpha *= us / Math.max(u, 1e-3); blurOn(ctx, (1 - us) * 4); ctx.fillText(sub, sx, y + 62 + (1 - us) * 10); }
+    else ctx.fillText(typed(sub, lt, t0 + 0.25, 0.5), sx, y + 62);
   }
   ctx.restore();
 }
@@ -66,34 +102,25 @@ export function counter(ctx, value, label, { x = W / 2, y = 330, size = 150, col
   const m2 = at && LOOK.motion >= 2, un = m2 ? enter(at[0], at[1]) : 1, ul = m2 ? enter(at[0], at[1] + 0.06) : 1;
   if (un <= 0) return;
   ctx.save(); ctx.globalAlpha *= a * un; ctx.textAlign = 'center'; if (m2) { blurOn(ctx, (1 - un) * 6); ctx.translate(x, y + (1 - un) * 16); ctx.scale(lerp(0.94, 1, un), lerp(0.94, 1, un)); ctx.translate(-x, -y); }
-  ctx.font = sans(size * 0.92, 900); ctx.letterSpacing = '0px';
-  ctx.lineJoin = 'round'; ctx.lineWidth = size * 0.06; ctx.strokeStyle = 'rgba(10,8,6,0.55)'; ctx.strokeText(value, x, y);
-  hard(ctx, size * 0.06); ctx.fillStyle = color === '#EAF7F3' ? C.cream : color; ctx.fillText(value, x, y); unhard(ctx);
-  { const vw = ctx.measureText(value).width; qaRect(ctx, x - vw / 2, y - size * 0.7, vw, size * 0.72, 'text', value); }
+  ctx.font = sans(size * 0.92, 900); ctx.letterSpacing = '0px'; ctx.textAlign = 'left';
+  const vx = inkX(ctx, value, x), ext = Math.max(3, Math.round(size * 0.055));
+  ctx.lineJoin = 'round'; ctx.lineWidth = size * 0.085; ctx.strokeStyle = 'rgba(16,11,7,0.9)';
+  for (let i = ext; i >= 1; i--) { ctx.strokeText(value, vx, y + i); ctx.fillStyle = 'rgba(16,11,7,0.9)'; ctx.fillText(value, vx, y + i); }  // the extrusion under the face
+  ctx.strokeText(value, vx, y); ctx.fillStyle = color === '#EAF7F3' ? C.cream : color; ctx.fillText(value, vx, y); ctx.textAlign = 'center';
+  { const vw = inkWidth(ctx, value); qaRect(ctx, x - vw / 2, y - size * 0.7, vw, size * 0.72, 'text', value); }
   if (label) {
     if (m2) { ctx.filter = 'none'; ctx.globalAlpha *= ul / Math.max(un, 1e-3); ctx.translate(0, (1 - ul) * 10); }
     const fs = LOOK.v2 ? 32 : 24, th = LOOK.v2 ? 52 : 40;  // LOOK v2: the tag is read on a phone, a size up
-    ctx.font = sans(fs, 800); ctx.letterSpacing = '5px'; const w = ctx.measureText(label).width + 30;
+    ctx.font = sans(fs, 800); ctx.letterSpacing = '5px'; const w = inkWidth(ctx, label) + 36;
     ctx.fillStyle = labelColor; hard(ctx, 4); ctx.fillRect(x - w / 2, y + 26, w, th); unhard(ctx); qaRect(ctx, x - w / 2, y + 26, w, th, 'text', label);
-    ctx.fillStyle = lum(labelColor) > 0.55 ? C.ink : C.cream; ctx.textBaseline = 'middle'; ctx.fillText(label, x + 2, y + 26 + th / 2 + 1);
+    ctx.fillStyle = lum(labelColor) > 0.55 ? C.ink : C.cream; inkText(ctx, label, x, y + 26 + th / 2);
   }
   ctx.restore();
 }
 
-// solid label block (slightly tilted), dark or light text for contrast, optional small subline
-export function badge(ctx, text, x, y, { color = C.gold, size = 40, a = 1, scale = 1, sub = null, fill = null, dy = 0, blur = 0 } = {}) {
-  if (a <= 0) return;
-  ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y + dy); ctx.rotate(-0.018); ctx.scale(scale, scale); blurOn(ctx, blur);
-  ctx.font = sans(size, 900); ctx.letterSpacing = '1px';
-  let w = ctx.measureText(text).width + size * 0.9; const h = size * (sub ? 1.95 : 1.42);
-  if (sub) { ctx.save(); ctx.font = sans(size * 0.4, 800); ctx.letterSpacing = '3px'; w = Math.max(w, ctx.measureText(sub).width + size * 0.9); ctx.restore(); }  // the subline must fit too
-  hard(ctx, Math.max(4, size * 0.14)); ctx.fillStyle = color;
-  ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 6); ctx.fill(); unhard(ctx); qaRect(ctx, -w / 2, -h / 2, w, h, 'text', text);
-  const ink = lum(color) > 0.55 ? C.ink : C.cream;
-  ctx.fillStyle = ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(text, 0, sub ? -size * 0.3 : size * 0.04);
-  if (sub) { ctx.font = sans(size * 0.4, 800); ctx.letterSpacing = '3px'; ctx.globalAlpha *= 0.8; ctx.fillText(sub, 0, size * 0.5); }
-  ctx.restore();
+// solid label block (slightly tilted): the flat plate above, kept under its old name and options
+export function badge(ctx, text, x, y, { color = C.gold, size = 40, a = 1, scale = 1, sub = null, dy = 0, blur = 0 } = {}) {
+  plate(ctx, text, x, y, { color, size, a, scale, sub, dy, blur, rot: -0.018 });
 }
 
 // rubber stamp that slams in (SOLD, FORFEIT…): ink outline with a worn texture, no glow
@@ -102,12 +129,12 @@ export function stamp(ctx, text, x, y, lt, t0, { color = C.red, size = 96, rot =
   if (lt < t0) return;
   const s = lerp(2.4, 1, ease.out(u));
   ctx.save(); ctx.globalAlpha *= clamp(u * 1.5) * 0.92; ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
-  ctx.font = sans(size, 900); ctx.letterSpacing = '4px'; const w = ctx.measureText(text).width + 64, h = size * (sub ? 1.75 : 1.35);
+  ctx.font = sans(size, 900); ctx.letterSpacing = '4px'; const w = inkWidth(ctx, text) + 70, h = size * (sub ? 1.75 : 1.35);
   ctx.strokeStyle = color; ctx.lineWidth = 9;
   ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 10); ctx.stroke(); if (u >= 1) qaRect(ctx, -w / 2, -h / 2, w, h, 'text', text);
   ctx.lineWidth = 3; ctx.beginPath(); ctx.roundRect(-w / 2 + 12, -h / 2 + 12, w - 24, h - 24, 6); ctx.stroke();
-  ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 0, sub ? -size * 0.18 : 4);
-  if (sub) { ctx.font = sans(size * 0.24, 800); ctx.letterSpacing = '5px'; ctx.fillText(sub, 0, size * 0.5); }
+  ctx.fillStyle = color; inkText(ctx, text, 0, sub ? -size * 0.2 : 0);
+  if (sub) { ctx.font = sans(size * 0.24, 800); ctx.letterSpacing = '5px'; inkText(ctx, sub, 0, size * 0.5); }
   // worn ink: knock out small specks
   ctx.globalCompositeOperation = 'destination-out';
   let r = 7; for (let i = 0; i < 70; i++) { r = (r * 16807) % 2147483647; const px = (r % 1000) / 1000 * w - w / 2; r = (r * 16807) % 2147483647; const py = (r % 1000) / 1000 * h - h / 2;
@@ -144,9 +171,9 @@ export function score(ctx, left, right, l, r, { y = 230, a = 1, label = null, lc
   ctx.fillStyle = rgba(C.cream, 0.5); ctx.fillRect(W / 2 - 1.5, ny - 26, 3, vy - ny + 26);
   let bottom = vy + 8;
   if (label) {
-    ctx.font = sans(24, 800); ctx.letterSpacing = '5px'; const w = ctx.measureText(label).width + 30, th = 40, ty = vy + 22;
+    ctx.font = sans(24, 800); ctx.letterSpacing = '5px'; const w = inkWidth(ctx, label) + 36, th = 40, ty = vy + 22;
     ctx.fillStyle = labelColor; hard(ctx, 4); ctx.fillRect(W / 2 - w / 2, ty, w, th); unhard(ctx);
-    ctx.fillStyle = lum(labelColor) > 0.55 ? C.ink : C.cream; ctx.textBaseline = 'middle'; ctx.fillText(label, W / 2 + 2, ty + th / 2 + 1);
+    ctx.fillStyle = lum(labelColor) > 0.55 ? C.ink : C.cream; inkText(ctx, label, W / 2, ty + th / 2);
     bottom = ty + th;
   }
   qaRect(ctx, W / 2 - dx - 160, ny - 30, 2 * dx + 320, bottom - ny + 30, 'text', 'score');
