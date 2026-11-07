@@ -758,77 +758,8 @@ const NUTC = '#1A1C20';  // the graphite of the Chessnut frame: the AD chip and 
 function adTag(g, a = 1) { plate(g, 'AD', 96, 146, { color: NUTC, size: 26, a: a * 0.92, rot: 0 }); }
 const lerp3 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
 
-// ======================= HE DOESN'T NEED STOCKFISH: the engine on his monitor in the dark streaming room =======================
-// Stockfish 17.1, one thread, on the position Hikaru saw (after 38...Rb1): depth, evaluation in pawns, the line (our run, SOURCES.md)
-const SF = [[1, 2.50, '39.Nd6'], [2, 4.27, '39.Nd6'], [3, 2.64, '39.Nd6 Ne6 40.Rxc6 Nxg5'], [4, 2.67, '39.Nd8 Rb5'],
-  [5, 2.65, '39.Nd8 Rb5 40.Nxc6 Rxc5 41.dxc5'], [6, 3.35, '39.Nd8 Rb5 40.Rxc6 Rxg5+ 41.Kf1'], [7, 2.06, '39.Nd8 Rb5 40.Rxc6 Rxg5+ 41.Kf1'],
-  [8, 2.51, '39.Nd6 Ne6 40.Ra5 Rb6 41.Ra8+'], [9, 2.50, '39.Nd6 Rb6 40.Ne4 Ke8 41.Re5+'], [10, 2.23, '39.Nd6 Ne6 40.Ra5 c5 41.dxc5'],
-  [11, 2.08, '39.Nd8 Rb5 40.Rxc6 Rxg5+ 41.Kf1'], [12, 1.99, '39.Nd8 Rb5 40.Rxc6 Rxg5+ 41.Kf1'], [13, 2.39, '39.Nd6 Ne6 40.Ra5 Ke7 41.Ne4'],
-  [14, 2.43, '39.Nd6 Ne6 40.Ra5 Rb2 41.Kg3'], [15, 2.39, '39.Nd6 Ne6 40.Ra5 Ke7 41.Ne4'], [16, 2.22, '39.Nd6 Ne6 40.Ra5 Rb8 41.Ne4'],
-  [17, 2.47, '39.Nd6 Ne6 40.Ra5 Rb2 41.Ra8+'], [18, 2.46, '39.Nd6 Ne6 40.Ra5 Rb2 41.Ra8+'], [19, 2.48, '39.Nd6 Ke7 40.Rxc6 Kd7 41.Rxc7+'],
-  [20, 2.53, '39.Nd6 Ne6 40.Ra5 Rb2 41.Ra8+']];
-const evalFrac = ev => 0.5 + (2 / (1 + Math.exp(-0.368 * ev)) - 1) / 2;  // the white share of an engine bar (the lichess curve)
-const ENG = makeCanvas(1280, 720), engx = ENG.getContext('2d'), ENGC = makeCanvas(1280, 720), engc = ENGC.getContext('2d');
-function engTex(t, t0, off = 0) {
-  const x = engc, w = 1280, h = 720;
-  const d = clamp(Math.floor(1 + (t - t0 - 0.12) * 30), 1, 20), [dep, ev, pv] = SF[d - 1];
-  x.setTransform(1, 0, 0, 1, 0, 0); x.fillStyle = '#15171C'; x.fillRect(0, 0, w, h);
-  x.fillStyle = '#23262C'; x.fillRect(0, 0, w, 78);
-  ['#FF5F57', '#FEBC2E', '#28C840'].forEach((c, i) => { x.fillStyle = c; x.beginPath(); x.arc(34 + i * 28, 39, 9, 0, 7); x.fill(); });
-  x.letterSpacing = '0px'; x.textAlign = 'left'; x.font = sans(48, 900); x.fillStyle = '#F2F0EB'; x.fillText('Stockfish 17.1', 132, 56);
-  x.textAlign = 'right'; x.font = mono(34, 700); x.fillStyle = '#9AA3AB'; x.fillText(`depth ${dep}`, w - 30, 54);
-  const fr = evalFrac(ev), by = 98, bh = 606;  // the bar
-  x.fillStyle = '#3B3E45'; x.fillRect(24, by, 40, bh); x.fillStyle = '#F2F1EC'; x.fillRect(24, by + bh * (1 - fr), 40, bh * fr);
-  x.drawImage(DIAG, 84, 102, 600, 600);
-  const [fs, ts] = pv.startsWith('39.Nd6') ? [[1, 6], [3, 5]] : [[1, 6], [3, 7]];  // b7-d6 or b7-d8: the engine's arrow
-  const sq = ([f, r]) => [84 + (f + 0.5) * 75, 102 + (7 - r + 0.5) * 75];
-  const [ax, ay] = sq(fs), [bx, by2] = sq(ts), an = Math.atan2(by2 - ay, bx - ax);
-  x.strokeStyle = 'rgba(79,163,255,0.85)'; x.fillStyle = 'rgba(79,163,255,0.85)'; x.lineWidth = 16; x.lineCap = 'round';
-  x.beginPath(); x.moveTo(ax, ay); x.lineTo(bx - Math.cos(an) * 30, by2 - Math.sin(an) * 30); x.stroke();
-  x.beginPath(); x.moveTo(bx, by2); x.lineTo(bx - Math.cos(an - 0.5) * 44, by2 - Math.sin(an - 0.5) * 44); x.lineTo(bx - Math.cos(an + 0.5) * 44, by2 - Math.sin(an + 0.5) * 44); x.fill();
-  x.textAlign = 'left'; x.font = sans(26, 800); x.letterSpacing = '4px'; x.fillStyle = '#8D96A0'; x.fillText('EVALUATION', 722, 146);
-  x.letterSpacing = '0px'; x.font = sans(150, 900); x.fillStyle = '#F4F2EE'; x.fillText('+' + ev.toFixed(2), 716, 288);
-  x.font = sans(26, 800); x.letterSpacing = '4px'; x.fillStyle = '#8D96A0'; x.fillText('BEST LINE', 722, 376);
-  x.letterSpacing = '0px'; x.font = mono(40, 700); x.fillStyle = '#CFE3FF';
-  pv.split(/ (?=\d+\.)/).slice(0, 3).forEach((l, i) => x.fillText(l, 722, 440 + i * 58));
-  // the screen dies like an old monitor: the picture squashes into a bright line, the line into a dot
-  const o = engx; o.setTransform(1, 0, 0, 1, 0, 0); o.fillStyle = '#000'; o.fillRect(0, 0, w, h);
-  const a = clamp(off / 0.5), b = clamp((off - 0.5) / 0.4), c = clamp((off - 0.9) / 0.1);
-  if (off <= 0) o.drawImage(ENGC, 0, 0);
-  else if (a < 1) {
-    const sy = 1 - 0.985 * ease.in(a), hh = h * sy;
-    o.drawImage(ENGC, 0, (h - hh) / 2, w, hh); o.fillStyle = `rgba(235,245,255,${0.85 * a})`; o.fillRect(0, (h - hh) / 2, w, hh);
-  } else {
-    const lw = (w - 20) * (1 - ease.in(b)) + 20, r = 14 * (1 - c);
-    o.shadowColor = '#CFE8FF'; o.shadowBlur = 30; o.fillStyle = '#F4FAFF';
-    if (b < 1) o.fillRect((w - lw) / 2, h / 2 - 5, lw, 10);
-    if (r > 0.5) { o.beginPath(); o.arc(w / 2, h / 2, r, 0, 7); o.fill(); }
-    o.shadowBlur = 0;
-  }
-  return ENG;
-}
-function streamDark(g, t, screen, on = 1) {
-  room(g, B, GAMER, { t });
-  table(g, B, { table: ['#1A1726', '#0E0C16', '#141120'] }, { x1: 8.4 });
-  ab(g, [0.4, 0.3, 6.0], [7.6, 4.5, 6.35], '#07060C', { amb: 0.7 });
-  ab(g, [3.6, -0.35, 6.2], [4.4, 0.3, 6.6], '#100E18', { amb: 0.6 });
-  ab(g, [2.2, -0.35, 2.4], [5.8, -0.25, 3.6], '#1C1A26', { amb: 0.6 });
-  ab(g, [6.4, -0.35, 2.6], [7.2, -0.22, 3.6], '#1C1A26', { amb: 0.6 });
-  g.fillStyle = 'rgba(2,2,7,0.74)'; g.fillRect(0, 0, W, H);  // the lights are off: only the monitor shines
-  texQuad(g, screen, MONQ.tl, MONQ.tr, MONQ.bl);
-  const p = B.project(4, 2.4, 5.9); rim(g, p.x, p.y, p.s * 7, '#4FA3FF', 0.2 * on);
-  g.save(); g.filter = 'brightness(0.3)';
-  const back = seated(g, B, 'hikaru', 'focus', t, { z: -1.4, face: 1, hands: false }); back();
-  g.restore();
-}
-// HE IS THE ENGINE: his own evaluation bar, a tall slim box in the dark beside him; it grows, then the white rises to the same verdict
-function evalBar(g, t, { x = 6.6, z = 9.3, f = 1, ev = 2.53 } = {}) {
-  if (f <= 0) return;
-  const y0 = 0.9, hh = 4.6 * ease.out(clamp(f / 0.4)), wf = lerp(0.5, evalFrac(ev), ease.out(clamp((f - 0.4) / 0.6)));
-  const p = B.project(x, y0 + hh / 2, z); rim(g, p.x, p.y, p.s * 3.2, MIND, 0.22 * clamp(f * 2));
-  ab(g, [x - 0.3, y0, z - 0.3], [x + 0.3, y0 + hh, z + 0.3], '#2B2E35', { amb: 0.7 });
-  ab(g, [x - 0.31, y0, z - 0.31], [x + 0.31, y0 + hh * wf, z + 0.31], '#F2F1EC', { amb: 0.75, spec: 0.3 });
-}
+// the white share of an engine bar (the lichess win-chance curve), for his eval bar in "he IS the engine"
+const evalFrac = ev => 0.5 + (2 / (1 + Math.exp(-0.368 * ev)) - 1) / 2;
 
 // ======================= v3: HIKARU'S FACECAM — the stream room seen from his monitor (the camera is the webcam) =======================
 // The wall behind him: acoustic tiles with a neon knight, LED strips along the top and the bottom; violet as in the
