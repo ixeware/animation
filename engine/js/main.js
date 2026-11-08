@@ -102,7 +102,7 @@ function motionBlur(s, t) {
   const px = CAM.px;
   if (!(px > MB_PX)) return false;
   if (QA.on) return true;
-  const n = Math.min(12, Math.ceil(px * 0.8 / 9) + 1);
+  const n = Math.min(s.mbMax || 12, Math.ceil(px * 0.8 / (s.mbStep || 9)) + 1);  // a shot can ask for denser samples (mbStep px apart, up to mbMax)
   actx.globalAlpha = 1; actx.drawImage(layer, 0, 0);
   for (let k = 1; k < n; k++) {
     drawShot(s, t - SHUTTER * k / (n - 1), sctx);

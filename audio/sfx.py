@@ -455,10 +455,24 @@ def airwash():  # the airy wash after a big hit: bright noise, fast attack, a se
     return norm(x, 0.8)
 
 
+def splash():  # something big bursting up out of water: a deep whoomp, the burst, then drops pattering back
+    d = 1.9
+    t = t_(d)
+    sub = np.sin(2 * np.pi * np.cumsum(70 * (0.5 ** (t / 0.25))) / SR) * env_exp(d, 0.18, 0.004) * 0.8
+    burst = lp(noise(d), 2200) * env_exp(d, 0.22, 0.006) + bp(noise(d), 2500, 9000) * env_exp(d, 0.12, 0.003) * 0.45
+    drops = np.zeros(len(t)); r = np.random.default_rng(11)
+    for i in range(70):
+        s0 = 0.08 + 1.5 * r.random() ** 1.6; n = int(0.03 * SR); i0 = int(s0 * SR)
+        if i0 + n >= len(t): continue
+        f = 900 + 2600 * r.random(); tt = t_(0.03)
+        drops[i0:i0 + n] += np.sin(2 * np.pi * np.cumsum(f * (1 + 1.4 * tt / 0.03)) / SR) * env_exp(0.03, 0.006) * (0.25 + 0.5 * r.random()) * (1 - s0 / 1.7)
+    return norm(sub + burst + bp(drops, 600, 7000) * 0.5, 0.85)
+
+
 BANK = {name: fn for name, fn in globals().items()
         if callable(fn) and name in ('boom hit clack whoosh ting static shield tick alarm pluck riser shimmer thud buzz '
                                      'whirr shutter stamp clock lamp cheer confetti poof heartbeat sting spit splat tvoff glass sparkle '
-                                     'creak fire scatter ratchet typewriter flatline beep kaching drawer gavel waves wind scribble coins honk chomp revswell airwash').split()}
+                                     'creak fire scatter ratchet typewriter flatline beep kaching drawer gavel waves wind scribble coins honk chomp revswell airwash splash').split()}
 
 
 def render_all():

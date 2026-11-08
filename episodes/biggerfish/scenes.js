@@ -155,14 +155,23 @@ const fogSea = (col, d) => mix(col, '#185E96', clamp((d - 6) / 34) * 0.92);
 const WEED = (() => { const r = rng(57), a = []; for (let i = 0; i < 26; i++) a.push({ x: -14 + r() * 36, z: 2 + r() * 34, h: 1.6 + r() * 3.4, ph: r() * 6, c: r() < 0.5 ? '#2F8A5E' : '#3E9C4E' }); return a; })();
 const ROCKS = (() => { const r = rng(91), a = []; for (let i = 0; i < 9; i++) a.push({ x: -10 + r() * 28, z: 4 + r() * 30, r: 0.6 + r() * 1.4 }); return a; })();
 const SEAY = -6;
-function sea(g, t, { shade = 0 } = {}) {
-  const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#62C9EC'); gr.addColorStop(0.42, '#2384C0'); gr.addColorStop(1, '#0E3F73');
+function sea(g, t, { shade = 0, top = 0, piles = false } = {}) {
+  const gr = g.createLinearGradient(0, clamp(top, 0, H - 500), 0, H); gr.addColorStop(0, '#62C9EC'); gr.addColorStop(0.42, '#2384C0'); gr.addColorStop(1, '#0E3F73');
   g.fillStyle = gr; g.fillRect(0, 0, W, H);
   for (let z = 44; z > -6; z -= 2) {
     const d = depth(4, SEAY, z + 1); if (d < 0.5) continue;
     if (B.poly(g, [[-30, SEAY, z], [40, SEAY, z], [40, SEAY, z + 2], [-30, SEAY, z + 2]])) { g.fillStyle = fogSea(z % 4 === 0 ? '#D8C48E' : '#CFBA82', d); g.fill(); }
   }
   for (const k of ROCKS) { const d = depth(k.x, SEAY, k.z); if (d < 1) continue; const p = B.project(k.x, SEAY, k.z); g.fillStyle = fogSea('#5D6F7A', d); g.beginPath(); g.ellipse(p.x, p.y, k.r * p.s, k.r * p.s * 0.45, 0, PI, 0); g.fill(); }
+  if (piles) {  // the pier's piles going down to the sand: the near ones dark, the far ones lost in the blue
+    const ps = []; for (let z = 0; z <= PZ1; z += 4) for (const sd of [-1, 1]) ps.push([sd * 1.95, z]);
+    ps.sort((a, b) => depth(b[0], -3, b[1]) - depth(a[0], -3, a[1]));
+    for (const [x, z] of ps) {
+      const d = depth(x, -3, z); if (d < 0.6) continue;
+      quad(g, [[x - 0.2, 0.3, z], [x + 0.2, 0.3, z], [x + 0.2, SEAY, z], [x - 0.2, SEAY, z]], fogSea('#3A3026', d));
+      quad(g, [[x - 0.22, SEAY + 1.8, z - 0.02], [x + 0.22, SEAY + 1.8, z - 0.02], [x + 0.22, SEAY, z - 0.02], [x - 0.22, SEAY, z - 0.02]], fogSea('#2E5B40', d));
+    }
+  }
   for (const k of [...WEED].sort((a, b) => depth(b.x, SEAY, b.z) - depth(a.x, SEAY, a.z))) {
     const d = depth(k.x, SEAY, k.z); if (d < 1) continue;
     const p0 = B.project(k.x, SEAY, k.z), sw = Math.sin(t * 1.3 + k.ph) * 0.5, p1 = B.project(k.x + sw * 0.5, SEAY + k.h * 0.55, k.z), p2 = B.project(k.x + sw, SEAY + k.h, k.z);
@@ -182,14 +191,14 @@ function bubble(g, x, y, R) {
   g.strokeStyle = 'rgba(235,250,255,0.75)'; g.lineWidth = Math.max(1.5, R * 0.14); g.beginPath(); g.arc(x, y, R, 0, 7); g.stroke();
   g.fillStyle = 'rgba(235,250,255,0.18)'; g.fill(); g.fillStyle = 'rgba(255,255,255,0.85)'; g.beginPath(); g.arc(x - R * 0.35, y - R * 0.35, R * 0.22, 0, 7); g.fill();
 }
-function seaSpecks(g, t, { burst = null } = {}) {
+function seaSpecks(g, t, { burst = null, ymax = 99 } = {}) {
   const r = rng(33);
   for (let i = 0; i < 70; i++) {
     const x = -8 + r() * 24, z = -1 + r() * 26, y = SEAY + ((r() * 14 + t * (0.15 + r() * 0.2)) % 14);
-    if (depth(x, y, z) < 1) continue; const p = B.project(x, y, z);
+    if (depth(x, y, z) < 1 || y > ymax) continue; const p = B.project(x, y, z);
     g.fillStyle = `rgba(230,245,255,${(0.25 + 0.3 * r()).toFixed(2)})`; g.beginPath(); g.arc(p.x, p.y, Math.max(1.5, 0.035 * p.s), 0, 7); g.fill();
   }
-  const bub = (x, y, z, rr) => { if (depth(x, y, z) < 1) return; const p = B.project(x, y, z); bubble(g, p.x, p.y, Math.max(3, rr * p.s)); };
+  const bub = (x, y, z, rr) => { if (depth(x, y, z) < 1 || y > ymax) return; const p = B.project(x, y, z); bubble(g, p.x, p.y, Math.max(3, rr * p.s)); };
   const r2 = rng(71);
   for (let i = 0; i < 22; i++) { const x = -5 + r2() * 18, z = 1 + r2() * 16, sp = 0.6 + r2() * 0.8, y = SEAY + ((r2() * 13 + t * sp) % 13); bub(x + Math.sin(t * 2 + i) * 0.08, y, z, 0.06 + r2() * 0.1); }
   if (burst) { const [bx, by, bz, t0] = burst, dt = t - t0; if (dt > 0 && dt < 1.4) { const r3 = rng(19); for (let i = 0; i < 18; i++) { const a = r3() * 6.28, v = 0.6 + r3() * 1.6; bub(bx + Math.cos(a) * v * dt * 0.6 + 0.6 * r3(), by + dt * (1.2 + r3() * 1.4) + Math.sin(a) * 0.3, bz + (r3() - 0.5) * 0.8, 0.07 + r3() * 0.12); } } }
@@ -404,7 +413,7 @@ function lake(g, t, { mood = 'dawn', mist = 0.6, fog = 0, snow = 0, pier = true,
     }
   }
   const r = rng(30);
-  for (let i = 0; i < 150; i++) {
+  if (B.E[1] > 0.05) for (let i = 0; i < 150; i++) {
     const z = (3 + r() * 70) * dir, x = -40 + r() * 80 + Math.sin(t * 0.4 + i) * 0.6; if (depth(x, 0, z) < 1) continue;
     const p = B.project(x, 0, z), a = 0.22 * (1 - Math.abs(z) / 80) * (1 - fog);
     g.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`; g.fillRect(p.x - 0.5 * p.s, p.y, 1.0 * p.s, Math.max(1.2, 0.05 * p.s));
@@ -502,6 +511,13 @@ function arm2(g, [x0, y0], [x1, y1], w0, w1, col, colD) {
   g.fillStyle = gr; g.beginPath(); g.moveTo(x0 + nx * w0, y0 + ny * w0); g.lineTo(x1 + nx * w1, y1 + ny * w1); g.lineTo(x1 - nx * w1, y1 - ny * w1); g.lineTo(x0 - nx * w0, y0 - ny * w0); g.closePath(); g.fill();
   g.beginPath(); g.arc(x1, y1, w1, 0, 7); g.arc(x0, y0, w0, 0, 7); g.fill();
 }
+// the elbow of a two-bone arm from shoulder s to hand h (bone lengths a, b), bent out to the side sd (+1: our right) and down
+function elbowAt(s, h, a, b, sd) {
+  const dx = h[0] - s[0], dy = h[1] - s[1], d = clamp(Math.hypot(dx, dy), 1, a + b - 0.01);
+  const al = Math.acos(clamp((a * a + d * d - b * b) / (2 * a * d), -1, 1)), ph = Math.atan2(dy, dx);
+  const e1 = [s[0] + a * Math.cos(ph + al), s[1] + a * Math.sin(ph + al)], e2 = [s[0] + a * Math.cos(ph - al), s[1] + a * Math.sin(ph - al)];
+  return e1[1] + 0.25 * sd * e1[0] > e2[1] + 0.25 * sd * e2[0] ? e1 : e2;
+}
 // the fisherman: arms down, or both hands on a rod (rod.bend: how far its tip is pulled down), or one hand raised with a
 // stringer. Returns the head's projection and the scale; tip: the rod's tip on screen; grip: the raised fist on screen
 function fisher(g, x, z, { who = 'fischerA', e = STARE, t = 0, k = 1, y0 = PY, fx = 0, fz = -1, a = 1, rod = null, raise = false } = {}) {
@@ -522,17 +538,28 @@ function fisher(g, x, z, { who = 'fischerA', e = STARE, t = 0, k = 1, y0 = PY, f
   g.fillStyle = 'rgba(0,0,0,0.22)'; g.beginPath(); g.moveTo(-150, 436); g.quadraticCurveTo(0, 460, 150, 436); g.lineTo(150, 480); g.lineTo(-150, 480); g.closePath(); g.fill();
   g.restore();
   const sl = c.suit, slD = mix(c.suitD, '#000000', 0.25), cuff = mix(c.suitD, '#000000', 0.2);
-  if (rod) {  // the lower hand at his belt, the upper one forward and to his left (our right); the rod rises to the right
-    const { lo, hi, ux, uy, tip, ctl } = rodGeom(rod);
-    arm2(g, [118, 246], [158, 372], 46, 38, sl, slD); arm2(g, [158, 372], hi, 38, 30, sl, slD);
+  if (rod) {  // the lower hand at his belt, the upper one forward and to his left (our right); the rod rises to the right.
+    // rod.at: the tip's place on screen, the rod bowing up toward it by rod.bend; rod.lift raises both hands
+    let lo, hi, tip, ctl;
+    if (rod.at) {
+      const lift = rod.lift ?? 0; lo = [lerp(-22, -34, lift), lerp(404, 330, lift)];
+      tip = [(rod.at[0] - p.x) / sc, (rod.at[1] - p.y) / sc];
+      const dx = tip[0] - lo[0], dy = tip[1] - lo[1], dl = Math.hypot(dx, dy) || 1, bw = (rod.bend ?? 0.15) * 0.42 * dl;
+      ctl = [lo[0] + dx * 0.45 + dy / dl * bw, lo[1] + dy * 0.45 - dx / dl * bw];
+      const s0 = clamp(130 / dl, 0.06, 0.26), q = 1 - s0;
+      hi = [q * q * lo[0] + 2 * q * s0 * ctl[0] + s0 * s0 * tip[0], q * q * lo[1] + 2 * q * s0 * ctl[1] + s0 * s0 * tip[1]];
+    } else ({ lo, hi, tip, ctl } = rodGeom(rod));
+    const cl = Math.hypot(ctl[0] - lo[0], ctl[1] - lo[1]) || 1, ux = (ctl[0] - lo[0]) / cl, uy = (ctl[1] - lo[1]) / cl;
+    const eL = rod.at ? elbowAt([118, 246], hi, 138, 126, 1) : [158, 372], eR = rod.at ? elbowAt([-118, 246], lo, 150, 140, -1) : [-160, 392];
+    arm2(g, [118, 246], eL, 46, 38, sl, slD); arm2(g, eL, hi, 38, 30, sl, slD);
     g.lineCap = 'round';
     g.strokeStyle = '#3A2A1C'; g.lineWidth = 17; g.beginPath(); g.moveTo(lo[0] - ux * 90, lo[1] - uy * 90); g.lineTo(lo[0] + ux * 40, lo[1] + uy * 40); g.stroke();
     g.strokeStyle = '#17181B'; g.lineWidth = 9; g.beginPath(); g.moveTo(lo[0], lo[1]); g.quadraticCurveTo(ctl[0], ctl[1], tip[0], tip[1]); g.stroke();
     g.strokeStyle = 'rgba(255,255,255,0.22)'; g.lineWidth = 3; g.stroke();
     g.fillStyle = '#6A7078'; g.beginPath(); g.arc(lo[0] + 26, lo[1] + 22, 24, 0, 7); g.fill(); g.fillStyle = '#3E4248'; g.beginPath(); g.arc(lo[0] + 26, lo[1] + 22, 10, 0, 7); g.fill();
-    arm2(g, [-118, 246], [-160, 392], 46, 38, sl, slD); arm2(g, [-160, 392], lo, 38, 30, sl, slD);
+    arm2(g, [-118, 246], eR, 46, 38, sl, slD); arm2(g, eR, lo, 38, 30, sl, slD);
     hand2(g, lo[0], lo[1], 31); hand2(g, hi[0], hi[1], 31);
-    out.tip = at(tip[0], tip[1]);
+    out.tip = rod.at ? rod.at.slice() : at(tip[0], tip[1]);
   } else {
     for (const sd of [-1, 1]) {
       if (raise && sd < 0) {  // his right arm up, the fist at the height of his head
@@ -582,9 +609,12 @@ function splash(g, x, y, t, t0, { n = 46, power = 1100, seed = 3, life = 1.3, si
 // the waterline of a half-under shot: a wavy band across the frame; above() and below() draw the two halves
 const waveY = (x, wl, t) => wl + Math.sin(x * 0.012 + t * 3.1) * 9 + Math.sin(x * 0.031 - t * 4.3) * 4;
 function wavePath(g, wl, t) { g.moveTo(-10, waveY(-10, wl, t)); for (let x = 30; x <= W + 40; x += 40) g.lineTo(x, waveY(x, wl, t)); }
-function overUnder(g, t, wl, above, below) {
+function overUnder(g, t, wl, above, below) { halves(g, t, wl, above, below); meniscus(g, t, wl); }
+function halves(g, t, wl, above, below) {
   if (wl > -40) { g.save(); g.beginPath(); g.moveTo(-10, -10); g.lineTo(W + 40, -10); g.lineTo(W + 40, waveY(W + 40, wl, t)); for (let x = W; x >= -10; x -= 40) g.lineTo(x, waveY(x, wl, t)); g.closePath(); g.clip(); above(g); g.restore(); }
   if (wl < H + 40) { g.save(); g.beginPath(); wavePath(g, wl, t); g.lineTo(W + 40, H + 10); g.lineTo(-10, H + 10); g.closePath(); g.clip(); below(g); g.restore(); }
+}
+function meniscus(g, t, wl) {
   if (wl > -40 && wl < H + 40) {
     g.save(); g.lineCap = 'round';
     g.strokeStyle = 'rgba(20,70,100,0.35)'; g.lineWidth = 22; g.beginPath(); g.translate(0, 14); wavePath(g, wl, t); g.stroke(); g.translate(0, -14);
@@ -592,6 +622,41 @@ function overUnder(g, t, wl, above, below) {
     g.strokeStyle = 'rgba(190,240,255,0.6)'; g.lineWidth = 3; g.beginPath(); g.translate(0, 9); wavePath(g, wl, t); g.stroke();
     g.restore();
   }
+}
+
+// ======================= THE ONE-TAKE CATCH: smooth paths through keys, small vector helpers, the surface seen from below =======================
+// a path through keys [[u, number | [x, y, z], tangent?], ...]: cubic Hermite with Catmull–Rom tangents, at rest at both ends
+function spline(keys) {
+  const n = keys.length, U = keys.map(k => k[0]), one = !Array.isArray(keys[0][1]), P = keys.map(k => one ? [k[1]] : k[1]);
+  const Tn = keys.map((k, i) => k[2] !== undefined ? (one ? [k[2]] : k[2]) : i === 0 || i === n - 1 ? P[i].map(() => 0)
+    : P[i].map((v, j) => (P[i + 1][j] - P[i - 1][j]) / (U[i + 1] - U[i - 1])));
+  return u => {
+    let o;
+    if (u <= U[0]) o = P[0]; else if (u >= U[n - 1]) o = P[n - 1];
+    else {
+      let i = 0; while (u > U[i + 1]) i++;
+      const h = U[i + 1] - U[i], s = (u - U[i]) / h, s2 = s * s, s3 = s2 * s;
+      const a = 2 * s3 - 3 * s2 + 1, b = s3 - 2 * s2 + s, c = 3 * s2 - 2 * s3, d = s3 - s2;
+      o = P[i].map((v, j) => a * v + b * h * Tn[i][j] + c * P[i + 1][j] + d * h * Tn[i + 1][j]);
+    }
+    return one ? o[0] : o.slice();
+  };
+}
+const vsub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], vlen = a => Math.hypot(a[0], a[1], a[2]);
+const vmad = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
+// the underside of the surface from below: bright wavy rows that close up on the horizon as the camera nears the top
+function ceiling(g, t) {
+  const E = B.E; if (E[1] > -0.02) return;
+  const fl = Math.hypot(B.F[0], B.F[2]) || 1, fx = B.F[0] / fl, fz = B.F[2] / fl, yh = B.project(E[0] + fx * 900, 0, E[2] + fz * 900).y;
+  g.save(); g.lineCap = 'round';
+  [2.4, 3.4, 4.8, 6.8, 9.5, 14, 22].forEach((d, k) => {
+    const q = [E[0] + fx * d, 0, E[2] + fz * d]; if (depth(...q) < 0.4) return;
+    const y = B.project(...q).y, amp = (11 - k) * Math.min(1, Math.abs(y - yh) / 120); if (y < -60 || y > H + 60) return;
+    g.strokeStyle = `rgba(232,250,255,${(0.34 * (1 - k / 7.5)).toFixed(3)})`; g.lineWidth = Math.max(1.5, 8 - k);
+    g.beginPath(); for (let x = -20; x <= W + 40; x += 40) { const yy = y + Math.sin(x * 0.011 + t * 2.3 + k * 1.7) * amp; x < 0 ? g.moveTo(x, yy) : g.lineTo(x, yy); }
+    g.stroke();
+  });
+  g.restore();
 }
 
 // ======================= 1956: the club room of the Game of the Century; 1958: the U.S. trophy =======================
@@ -812,7 +877,7 @@ export async function build(T) {
   const shot = (a, draw, o = {}) => shots.push({ a, draw, grade: 'neutral', trans: 'cut', noJump: true, ...o });
   const len = sh => sh.b - sh.a + 0.35;
   const K = (yaw, pitch, dist, target, o = {}) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.5, target, ...o });
-  const lin = x => x;
+  const lin = x => x, glide = x => 0.35 * x + 0.65 * ease.inOut(x);
   const boom = (t, gn = 0.8) => cue(t - BOOM_HIT, 'boom_move', gn);
 
   // ======================= HOOK: the sea; the fish swims up to the camera; the camera tilts up to the surface, where a man
@@ -883,74 +948,194 @@ export async function build(T) {
   } });
   cue(huT - 0.06, 'whoosh_deep', 0.3); cue(notT, 'thud', 0.45);
 
-  // ======================= THE BIGGER FISH: the worm comes down in front of its nose; it goes for it and bites =======================
-  const bgS = s('bigger'), bigT = w('bigger', 'bigger'), fsT = w('bigger', 'fish');
-  const BITE = fsT + 0.06, YANK = BITE + 0.2, HX = 1.5;
+  // ======================= THE CATCH, IN ONE TAKE =======================
+  // The worm comes down in front of its nose; it bites; the line yanks it up and the camera rises with it; both break the
+  // surface at the same instant, in slow motion (a speed ramp). Above: the misty lake at dawn, the pier, the man in the black
+  // suit lifting his rod; the fish swings on the line by his face while the camera flies round to him. One shot, no cuts.
+  const bgS = s('bigger'), bigT = w('bigger', 'bigger'), fsT = w('bigger', 'fish'), fiT = w('name', 'fischer'), fmT = w('name', 'fisherman');
+  const BITE = fsT + 0.06, UC = 0.17, FLEN = 2.3, KB = 1100;
+  // the speed ramp: full speed until r0 (just after the bite), then down to 22 % over a, held for h, back up over b (seconds on
+  // the clock): the hook set, the rise and the burst through the surface all play in slow motion
+  const RM = { r0: BITE + 0.04, a: 0.1, h: 0.75, b: 0.55, k: 0.78 };
+  const story = t => {
+    if (t <= RM.r0) return t;
+    let sg = RM.r0, x = t - RM.r0;
+    const a1 = Math.min(x, RM.a); sg += a1 - RM.k * (a1 - RM.a / PI * Math.sin(PI * a1 / RM.a)) / 2; x -= a1; if (x <= 0) return sg;
+    const a2 = Math.min(x, RM.h); sg += a2 * (1 - RM.k); x -= a2; if (x <= 0) return sg;
+    const a3 = Math.min(x, RM.b); sg += a3 - RM.k * (a3 + RM.b / PI * Math.sin(PI * a3 / RM.b)) / 2; x -= a3; if (x <= 0) return sg;
+    return sg + x;
+  };
+  const real = sg => { let lo = sg, hi = sg + 2; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (story(m) < sg) lo = m; else hi = m; } return hi; };
+  const tc = real(BITE + UC);  // the clock time of the crossing
+  // story offsets u from the bite: the fish's mouth up to the surface (then the simulation), its tilt, the worm, the rod's rest tip
+  const WORM = [4.6, -1.25, -1.6], S0 = [4.45, 0, -1.45], VS = [-0.4, 9.5, 0.6];
+  const FM = spline([[-1.75, [6.5, -2.05, -1.3]], [-0.95, [5.5, -1.98, -1.6]], [-0.45, [5.38, -1.92, -1.6]], [-0.2, [5.22, -1.82, -1.6]], [0, WORM],
+    [0.07, [4.52, -0.78, -1.56]], [UC, S0, VS]]);
+  const PHI = spline([[-1.75, 0.12], [-0.95, 0.22], [-0.45, 0.25], [-0.2, 0.5], [0, 0.72]]);
+  const HOOKY = spline([[-1.75, 2.2, -7], [-0.95, WORM[1]]]);
+  const ROD = spline([[-1.75, [4.6, 7.4, -1.6]], [0, [4.6, 7.4, -1.6], [0, 0, 0]], [0.12, [4.35, 8.9, -1.05]], [0.5, [3.6, 10.2, -0.4]], [1.0, [2.85, 10.9, 0.2]], [4.4, [2.75, 10.95, 0.25]]]);
+  // after the surface: the fish on the line (gravity, a little air drag, the line shortening as he lifts), the rod's tip on a
+  // damped spring to where his hands hold it, so the rod bends under the fish and bounces; sampled every 1/600 s of story time
+  const DT = 1 / 1200, U0 = -1.75, U1 = 4.4;
+  const TAB = (() => {
+    const out = [], G = 38, MT = 0.3, KR = 42, CR = 5.5, DRAG = 0.55, LR = 1.4, LD = 0.8, wt = (1 / MT) / (1 / MT + 1), wf = 1 - wt;
+    const dR = u => vsub(ROD(u + 1e-3), ROD(u - 1e-3)).map(v => v / 2e-3);
+    const D = u => [0, -1.1 * ease.inOut(clamp(u / 0.15)), 0];
+    let M, V = null, P, Vt, Lh, A = [1, 0, 0];
+    for (let i = 0; ; i++) {
+      const u = U0 + i * DT; if (u > U1) break;
+      let L, taut = 1;
+      if (u < UC) { M = FM(u); P = u > 0 ? vmad(ROD(u), D(u)) : ROD(u); L = vlen(vsub(M, P)); }
+      else {
+        if (!V) {
+          M = S0.slice(); V = VS.slice(); P = vmad(ROD(UC), D(UC)); Vt = dR(UC);
+          const d = vsub(M, P), l0 = vlen(d), vapp = -((V[0] - Vt[0]) * d[0] + (V[1] - Vt[1]) * d[1] + (V[2] - Vt[2]) * d[2]) / l0;
+          Lh = spline([[UC, l0, -Math.max(0, vapp)], [UC + LD, LR], [UC + LD + 1, LR]]);
+        }
+        const R = ROD(u), Rv = dR(u);
+        for (let j = 0; j < 3; j++) { Vt[j] += (KR * (R[j] - P[j]) - CR * (Vt[j] - Rv[j])) / MT * DT; P[j] += Vt[j] * DT; }
+        V[1] -= G * DT; for (let j = 0; j < 3; j++) { V[j] *= 1 - DRAG * DT; M[j] += V[j] * DT; }
+        L = Lh(u);
+        const d = vsub(M, P), l = vlen(d);
+        if (l > L) {
+          const ex = l - L, n = d.map(v => v / l), vn = (V[0] - Vt[0]) * n[0] + (V[1] - Vt[1]) * n[1] + (V[2] - Vt[2]) * n[2];
+          for (let j = 0; j < 3; j++) { P[j] += n[j] * ex * wt; M[j] -= n[j] * ex * wf; if (vn > 0) { V[j] -= n[j] * vn * wf; Vt[j] += n[j] * vn * wt; } }
+        } else if (l < L - 0.01) taut = 0;
+      }
+      if (u < 0) { const ph = PHI(u); A = [Math.cos(ph), -Math.sin(ph), 0]; }
+      else { const d = vsub(M, P), l = vlen(d) || 1, k = 1 - Math.exp(-20 * DT); A = A.map((v, j) => v + (d[j] / l - v) * k); const al = vlen(A) || 1; A = A.map(v => v / al); }
+      if (i % 2 === 0) out.push([M.slice(), P.slice(), A.slice(), L, taut]);
+    }
+    return out;
+  })();
+  const fishAt = u => {
+    const f = (clamp(u, U0, U1) - U0) / (2 * DT), i = Math.min(Math.floor(f), TAB.length - 2), k = f - i, a = TAB[i], b = TAB[i + 1];
+    const l3 = (x, y) => x.map((v, j) => lerp(v, y[j], k));
+    return { M: l3(a[0], b[0]), P: l3(a[1], b[1]), A: l3(a[2], b[2]), L: lerp(a[3], b[3], k), taut: a[4] && b[4] };
+  };
+  // the camera: eye and target on their own smooth paths; at UC its eye is exactly at the waterline, as the fish breaks it
+  const EYE = spline([[-1.75, [6.6, -1.8, -7.1]], [-0.5, [6.1, -1.72, -6.7]], [0, [5.8, -1.66, -6.5]],
+    [UC, [6.2, 0, -9.4]], [0.3, [6.0, 0.9, -10.3]], [0.5, [5.6, 2.2, -11.2]], [0.9, [4.6, 4.6, -11.6]], [1.5, [3.0, 6.7, -11.3]], [2.3, [1.0, 7.7, -9.6]], [3.0, [-0.4, 8.1, -8.0]], [3.7, [-1.2, 8.3, -7.1]]]);
+  const TGT = spline([[-1.75, [6.1, -1.45, -1.6]], [-0.5, [5.55, -1.4, -1.6]], [0, [5.2, -1.4, -1.6]],
+    [UC, [3.75, 2.7, -0.7]], [0.3, [3.35, 3.6, -0.4]], [0.5, [2.8, 4.5, -0.1]], [0.9, [2.15, 6.0, 0.3]], [1.5, [1.5, 6.9, 0.5]], [2.3, [1.25, 7.2, 0.7]], [3.0, [1.3, 7.3, 0.85]], [3.7, [1.35, 7.35, 0.9]]]);
+  const camAt = u => { const E = EYE(u), Tg = TGT(u), d = vsub(E, Tg), dist = vlen(d); return { yaw: Math.atan2(d[0], -d[2]), pitch: Math.asin(d[1] / dist), dist, fov: 1500, cy: H * 0.5, target: Tg }; };
+  // the water: a crown and a spray at the surface, drops shed by the fish as it leaves, drips from its tail; rings on the lake
+  const SPRAY = (() => { const r = rng(64), a = []; for (let i = 0; i < 84; i++) { const ring = i < 34;
+    a.push({ ang: r() * 2 * PI, out: ring ? 1.3 + 1.5 * r() : 0.2 + 1.6 * r() ** 1.5, vy: ring ? 2.4 + 3 * r() : 5 + 9 * r(), r0: ring ? 0.4 + 0.3 * r() : 0.08 + 0.25 * r(), s: 0.035 + 0.06 * r() }); } return a; })();
+  const SHED = (() => { const r = rng(65), a = []; for (let i = 0; i < 36; i++) a.push({ u0: UC + i * 0.011, v: [(r() - 0.5) * 1.6, (r() - 0.3) * 1.2, (r() - 0.5) * 1.6], s: 0.03 + 0.05 * r(), f: 0.4 + 0.5 * r() }); return a; })();
+  const DRIPS = []; for (let u0 = UC + 0.45; u0 < 3.9; u0 += 0.075) DRIPS.push(u0);
+  const streak = (g, a, b, sz, al) => {
+    if (depth(...a) < 0.4 || depth(...b) < 0.4) return;
+    const p = B.project(...a), q = B.project(...b);
+    g.strokeStyle = `rgba(242,252,255,${al.toFixed(3)})`; g.lineWidth = Math.max(1.6, sz * q.s); g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(q.x + 0.01, q.y); g.stroke();
+  };
+  const water = (g, u) => {
+    g.save(); g.lineCap = 'round';
+    const k0 = u - UC;
+    if (k0 > 0 && k0 < 1.4) for (const d of SPRAY) {
+      const pos = k => [S0[0] + Math.cos(d.ang) * (d.r0 + d.out * k), d.vy * k - 19 * k * k, S0[2] + Math.sin(d.ang) * (d.r0 + d.out * k)];
+      const b = pos(k0); if (b[1] < -0.02) continue;
+      streak(g, pos(Math.max(0, k0 - 0.016)), b, d.s, 0.85 * (1 - k0 / 1.4));
+    }
+    for (const d of SHED) {
+      const k = u - d.u0; if (k <= 0 || k > 1.1) continue;
+      const f0 = fishAt(d.u0), f1 = fishAt(d.u0 + 0.01), tail = vmad(f0.M, f0.A, FLEN * 0.85), v = vmad(vsub(f1.M, f0.M).map(x => x * 100 * d.f), d.v);
+      const pos = kk => [tail[0] + v[0] * kk, tail[1] + v[1] * kk - 19 * kk * kk, tail[2] + v[2] * kk];
+      const b = pos(k); if (b[1] < -0.02) continue;
+      streak(g, pos(Math.max(0, k - 0.016)), b, d.s, 0.8);
+    }
+    for (const u0 of DRIPS) {
+      const k = u - u0; if (k <= 0 || k > 0.7) continue;
+      const f = fishAt(u0), tl = vmad(f.M, f.A, FLEN * 0.97), y = tl[1] - 19 * k * k; if (y < 0) continue;
+      streak(g, [tl[0], tl[1] - 19 * Math.max(0, k - 0.02) ** 2, tl[2]], [tl[0], y, tl[2]], 0.035, 0.75);
+    }
+    g.restore();
+  };
+  const ringPts = (r, n) => { const pts = []; for (let j = 0; j <= n; j++) { const th = j / n * 2 * PI, q = [S0[0] + Math.cos(th) * r, 0.01, S0[2] + Math.sin(th) * r]; if (depth(...q) < 0.4) return null; pts.push(B.project(...q)); } return pts; };
+  const rings = (g, u) => {
+    const k0 = u - UC; if (k0 < 0) return;
+    g.save();
+    for (const [dl, amp] of [[0, 1], [0.16, 0.7], [0.4, 0.5], [0.75, 0.35]]) {
+      const k = k0 - dl; if (k < 0 || k > 2.2) continue;
+      const pts = ringPts(0.4 + 2.0 * k, 36); if (!pts) continue;
+      g.strokeStyle = `rgba(255,255,255,${(0.6 * amp * (1 - k / 2.2)).toFixed(3)})`; g.lineWidth = Math.max(1.5, 0.06 * pts[9].s);
+      g.beginPath(); pts.forEach((p, j) => j ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y)); g.stroke();
+    }
+    const fk = clamp(k0 / 0.8), pts = fk < 1 ? ringPts(0.45 + 0.9 * fk, 24) : null;
+    if (pts) { g.fillStyle = `rgba(255,255,255,${(0.7 * (1 - fk)).toFixed(3)})`; g.beginPath(); pts.forEach((p, j) => j ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y)); g.closePath(); g.fill(); }
+    g.restore();
+  };
+  const trail = (g, u) => {  // bubbles left behind as it is pulled up
+    if (u < 0) return;
+    const r = rng(41);
+    for (let i = 0; i < 26; i++) {
+      const u0 = i * 0.011, k = u - u0, ox = (r() - 0.5) * 0.5, oz = (r() - 0.5) * 0.5, sp = 1.6 + r(), rr = 0.05 + 0.08 * r(), fr = 0.3 + 0.6 * r();
+      if (k <= 0 || u0 > UC) continue;
+      const f = fishAt(u0), c = vmad(f.M, f.A, FLEN * fr), y = c[1] + sp * k;
+      if (y > -0.05 || k > 1.5) continue;
+      const q = [c[0] + ox + Math.sin(k * 9 + i) * 0.05, y, c[2] + oz]; if (depth(...q) < 0.5) continue;
+      const p = B.project(...q); bubble(g, p.x, p.y, Math.max(3, rr * p.s));
+    }
+  };
+  const fishDraw = (g, st, tt, u) => {
+    const { M, A } = st, qq = vmad(M, A, FLEN); if (depth(...M) < 0.4 || depth(...qq) < 0.4) return;
+    const m = B.project(...M), q = B.project(...qq), dx = m.x - q.x, dy = m.y - q.y, l = Math.hypot(dx, dy) || 1, ln = Math.max(l, FLEN * m.s * 0.62);
+    const th = u > 0 ? 0.3 * Math.sin(38 * u) * Math.exp(-4 * u) + (u > UC ? 0.1 * Math.sin(19 * u + 1) * Math.exp(-0.9 * (u - UC)) : 0) : 0;
+    const rot = Math.atan2(-dy, -dx) + th, wag = u < -0.2 ? 1.2 : u < 0 ? 2.6 : u < UC + 0.5 ? 3.2 : lerp(2.2, 1.2, clamp((u - UC - 0.5) / 1.5));
+    fishPhoto(g, m.x + Math.cos(rot) * 0.5 * ln, m.y + Math.sin(rot) * 0.5 * ln, ln, tt, { rot, wag, shadow: u < UC });
+  };
   shot(bgS - 0.04, (g, lt, t, sh) => {
-    const lk = YANK - (bgS - 0.04);
-    rig(B, lt, [[0, K(0.05, 0.05, 6.6, [3.0, 0.9, 7.5])], [lk, K(-0.02, 0.06, 5.3, [2.7, 1.0, 7.5])], [len(sh), K(-0.02, 0.2, 5.1, [2.7, 2.2, 7.5])]], { t, e: lin, bump: t > BITE && t < BITE + 0.25 ? 1 : 0 });
-    sea(g, t);
-    const app = ease.inOut(clamp((t - bigT + 0.2) / (BITE - bigT + 0.2))), yk = ease.in(clamp((t - YANK + 0.06) / 0.25));
-    const f = { x: lerp(4.9, HX + 2.4, app), y: 0.35 + Math.sin(t * 2.2) * 0.08 + yk * 6, rot: -0.1 * app + yk * 1.2 };
-    const hookY = lerp(7, 0.55, ease.out(clamp((t - bgS) / 0.9)));
-    if (depth(f.x, f.y, 7.5) > 1) {
-      const p = B.project(f.x, f.y, 7.5), L = p.s * 4.9;
-      if (t < BITE) { const hp = B.project(HX, hookY, 7.5); hookWorm(g, hp.x, hp.y, p.s / 95, t, { top: -40 }); }
-      fishPhoto(g, p.x, p.y, L, t, { rot: f.rot, wag: 1 + app * 1.5 + yk * 3 });
-      if (t >= BITE) { const m = mouthAt(p.x, p.y, L, f.rot); g.strokeStyle = 'rgba(240,250,255,0.85)'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(m[0] + (t - BITE) * 60, -40); g.lineTo(m[0], m[1]); g.stroke(); }
-    }
-    seaSpecks(g, t, { burst: [HX, 0.6, 7.5, BITE] });
-  }, { trans: 'whip' });
-  cue(bgS - 0.08, 'whoosh_deep', 0.3); cue(bigT - 0.2, 'riser', 0.4); cue(BITE, 'chomp', 0.6);
-
-  // ======================= THE YANK: up through the surface in slow motion, to the pier and the fisherman =======================
-  const fiT = w('name', 'fischer'), gerT = w('name', 'in'), fmT = w('name', 'fisherman');
-  const warp = tau => tau < 0.22 ? tau : tau < 0.9 ? 0.22 + (tau - 0.22) * 0.33 : 0.4444 + (tau - 0.9);  // story time: slow around the surface
-  const wlAt = s2 => s2 < 0.2 ? lerp(-80, 1060, ease.in(clamp(s2 / 0.2))) : lerp(1060, H + 80, ease.inOut(clamp((s2 - 0.2) / 0.4)));
-  const SC = 0.3, YC = wlAt(SC), XC = 600;
-  const camY = [[0, K(0.34, 0.1, 21, [0.9, PY + 3.55, 1.2], { cy: 700 })], [0.62, K(0.3, 0.08, 17.5, [1.1, PY + 4.3, 1.2], { cy: 820 })], [2.4, K(0.26, 0.07, 14.5, [1.3, PY + 5.0, 1.2])]];
-  const ROD = s2 => ({ len: 700, bend: bendAt(s2) });
-  const bendAt = s2 => lerp(0.6, 0.22, ease.out(clamp((s2 - 0.28) / 0.8)));
-  shot(YANK, (g, lt, t, sh) => {
-    const s2 = warp(lt), tt = YANK + s2, wl = wlAt(s2);
-    rig(B, s2, camY, { t: tt, e: lin });
-    const tip = rodTip(0, 1.2, { rod: ROD(s2) }), fs = B.project(0, PY + 7.1, 1.2).s, FL = fs * 2.6, DROP = fs * 1.15;
-    overUnder(g, tt, wl, g2 => {
+    const tt = story(t), u = tt - BITE, up = story(t - 1 / 30) - BITE;
+    rig(B, 1 / 30, [[0, camAt(up)], [1 / 30, camAt(u)]], { t: tt, shake: 0.4, bump: u > 0 && u < 0.12 ? 0.7 : 0 });
+    const st = fishAt(u), E = B.E, fl = Math.hypot(B.F[0], B.F[2]) || 1, yh = B.project(E[0] + B.F[0] / fl * 900, 0, E[2] + B.F[2] / fl * 900).y, wl = yh + KB * E[1];
+    const tipS = depth(...st.P) > 0.3 ? B.project(...st.P) : null;
+    const bend = clamp(0.12 + 0.3 * vlen(vsub(st.P, ROD(u))), 0.1, 0.7), lift = ease.inOut(clamp(u / 0.95));
+    halves(g, tt, wl, g2 => {
       lake(g2, tt, { mood: 'dawn' });
-      fisher(g2, 0, 1.2, { e: exprAt([[0, COLD], [0.45, SMIRK]], s2), t: tt, rod: ROD(s2), fx: 0.15 });
+      rings(g2, u);
+      const hd = B.project(0, PY + 7.1, 1.2), fc = B.project(...vmad(st.M, st.A, FLEN * 0.5)), toCam = ease.inOut(clamp((t - fmT + 0.15) / 0.25));
+      const lk = [clamp((fc.x - hd.x) / 320, -0.9, 0.9), clamp((fc.y - hd.y) / 320, -0.6, 0.8)], e = exprAt([[0, COLD], [tc + 0.45, SMIRK]], t);
+      fisher(g2, 0, 1.2, { e: { ...e, look: [lerp(lk[0], 0, toCam), lerp(lk[1], 0, toCam)] }, t: tt, fx: 0.12, rod: { at: tipS ? [tipS.x, tipS.y] : null, bend, lift } });
       pierFront(g2);
-    }, g2 => under2d(g2, tt, { top: Math.max(0, wl - 40), rise: clamp(s2 / SC) }));
-    let m;
-    if (s2 < SC) m = [lerp(560, XC, s2 / SC), lerp(1560, YC, s2 / SC)];
-    else {
-      const u = ease.out(clamp((s2 - SC) / 0.5)), ang = Math.sin(tt * 2.3) * 0.12 * u, hang = [tip[0] + Math.sin(ang) * DROP, tip[1] + Math.cos(ang) * DROP];
-      m = [lerp(XC, hang[0], u), lerp(YC, hang[1], u) - Math.sin(PI * u) * 160];
+    }, g2 => {
+      sea(g2, tt, { top: wl, piles: true });
+      ceiling(g2, tt);
+      seaSpecks(g2, tt, { burst: [WORM[0], WORM[1], WORM[2], BITE], ymax: -0.1 });
+      trail(g2, u);
+    });
+    // the line: from the rod's tip to the worm, then to the fish's mouth (sagging when slack)
+    g.save(); g.lineCap = 'round'; g.strokeStyle = 'rgba(244,250,255,0.85)'; g.lineWidth = 2.6;
+    if (u < 0) {
+      const hk = [WORM[0], HOOKY(u) + Math.sin(tt * 3.1) * 0.04, WORM[2]];
+      if (depth(...hk) > 0.4) {
+        const hp = B.project(...hk), hs = hp.s / 205;
+        if (tipS) { g.beginPath(); g.moveTo(tipS.x, tipS.y); g.lineTo(hp.x, hp.y - 78 * hs); g.stroke(); }
+        hookWorm(g, hp.x, hp.y - 18 * hs, hs, tt, { top: hp.y - 78 * hs });
+      }
+    } else if (tipS && depth(...st.M) > 0.4) {
+      const m = B.project(...st.M), l = vlen(vsub(st.M, st.P)), sag = st.taut ? 0 : 0.5 * Math.sqrt(Math.max(0, st.L * st.L - l * l));
+      const mid = B.project(...vmad(vmad(st.P, vsub(st.M, st.P), 0.5), [0, -sag, 0]));
+      g.beginPath(); g.moveTo(tipS.x, tipS.y); g.quadraticCurveTo(2 * mid.x - (tipS.x + m.x) / 2, 2 * mid.y - (tipS.y + m.y) / 2, m.x, m.y); g.stroke();
     }
-    hangFish(g, tip, FL, DROP, tt, { at: m, wag: s2 < 0.9 ? 3 : 1.6 });
-    splash(g, XC, YC, s2, SC, { n: 54, power: 1500, life: 1.6, size: 11 });
-    glint(g, XC + 30, YC - 20, s2, SC, { r: 300, life: 0.5, color: '#FFF6DE' });
-    if (Math.abs(s2 - SC) < 0.06) flashTint(g, '#FFFFFF', 0.28 * (1 - Math.abs(s2 - SC) / 0.06));
-  }, { trans: 'cut', hud: (g, lt, t) => { if (t >= fiT) plate(g, 'BOBBY FISCHER', W / 2, 250, { color: CREAM, size: 70, ...pin(t, fiT) }); } });
-  const crossT = YANK + 0.22 + (SC - 0.22) / 0.33;
-  cue(YANK - 0.02, 'whoosh_fast', 0.5); cue(crossT - 0.3, 'revswell', 0.45); cue(crossT, 'boom_big', 0.6); cue(crossT, 'waves', 0.55); cue(crossT + 0.02, 'shimmer', 0.3); cue(fiT, 'stamp', 0.4);
-
-  // "In German, Fischer means... fisherman.": closer; he looks at his catch with a smirk, then at us
-  shot(gerT - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.2, 0.03, 8.2, [-0.4, PY + 6.2, 1.2])], [len(sh), K(0.12, 0.02, 7.2, [-0.4, PY + 6.3, 1.2])]], { t, e: lin });
-    lake(g, t, { mood: 'dawn' });
-    const F = fisher(g, 0, 1.2, { e: exprAt([[0, { ...SMIRK, look: [-0.8, -0.2] }], [fmT - 0.15, SMIRK]], t), t, raise: true, fx: 0.1 });
-    if (F && F.grip) hangFish(g, F.grip, F.p.s * 2.2, F.p.s * 0.35, t, { swing: 0.08, wag: 2 });
-  }, { hud: (g, lt, t) => {
-    plate(g, 'BOBBY FISCHER', W / 2, 250, { color: CREAM, size: 70, rot: 0 });
+    g.restore();
+    fishDraw(g, st, tt, u);
+    water(g, u);
+    if (u > UC - 0.01 && u < UC + 0.2) { const sp = B.project(...S0); glint(g, sp.x + 20, sp.y - 30, u, UC, { r: 280, life: 0.2, color: '#FFF6DE' }); }
+    if (Math.abs(u - UC) < 0.03) flashTint(g, '#FFFFFF', 0.2 * (1 - Math.abs(u - UC) / 0.03));
+    meniscus(g, tt, wl);
+  }, { trans: 'whip', mbStep: 3, mbMax: 40, hud: (g, lt, t) => {
+    if (t >= fiT) plate(g, 'BOBBY FISCHER', W / 2, 250, { color: CREAM, size: 70, ...pin(t, fiT) });
     if (t >= fmT) plate(g, 'FISCHER = FISHERMAN', W / 2, 360, { color: GOLD, size: 50, ...pin(t, fmT) });
   } });
-  cue(fmT, 'reveal_bell', 0.35);
+  cue(bgS - 0.08, 'whoosh_deep', 0.3); cue(bigT - 0.2, 'riser', 0.4); cue(BITE, 'chomp', 0.6); cue(BITE + 0.03, 'whoosh_fast', 0.5); cue(BITE + 0.06, 'ratchet', 0.3);
+  cue(tc - 0.3, 'revswell', 0.45); cue(tc, 'boom_big', 0.5); cue(tc, 'splash', 0.75); cue(tc + 0.02, 'shimmer', 0.3); cue(tc + 0.3, 'waves', 0.25);
+  cue(real(BITE + UC + 0.32), 'whoosh_soft', 0.3); cue(fiT, 'stamp', 0.4); cue(fmT, 'reveal_bell', 0.35);
 
   // ======================= 1956: the Game of the Century, 17...Be6!!; 1958: champion of America at 14 =======================
   const ygS = s('young'), thT = w('young', 'thirteen'), gmT = w('young', 'game'), f14T = w('young', 'fourteen'), chT = w('young', 'champion');
   const MV = gmT + 0.05, MP = 34, m34 = moveOf(GOC, MP);
   shot(ygS - 0.04, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.42, 0.36, 12.8, [4, 2.0, 6.2])], [len(sh), K(-0.22, 0.32, 10.8, [4, 2.2, 6.4])]], { t, e: lin, bump: t > MV + SLIDE && t < MV + SLIDE + 0.25 ? 1 : 0 });
+    rig(B, lt, [[0, K(-0.58, 0.38, 14, [4, 2.0, 6.2])], [len(sh), K(-0.14, 0.3, 10.2, [4, 2.2, 6.4])]], { t, e: glide, bump: t > MV + SLIDE && t < MV + SLIDE + 0.25 ? 1 : 0 });
     const env = room(g, B, 'wood', { t, ...CLUB });
     const yb = seated(g, B, 'fischer13', exprAt([[0, { ...EXPR.focus, look: [0, 0.75], lid: 0.12 }], [MV + 0.45, { ...EXPR.smug, look: [0.1, 0.1], lid: 0.12, curve: 0.3 }]], t), t, { z: 9.3, face: -1, hands: false });
     const by = seated(g, B, 'byrne', 'focus', t, { z: -1.4, face: 1, hands: false });
@@ -971,10 +1156,12 @@ export async function build(T) {
     const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#30487A'); bg.addColorStop(1, '#16274A'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
     bokeh(g, t, { n: 22, seed: 4, y0: 0.04, y1: 0.7, colors: ['#FFD9A0', '#FFE9C8', '#9FC2E8'], size: [60, 170], a: 0.3 });
     g.fillStyle = '#F4F1EA'; for (let i = 0; i < 9; i++) { const x = 60 + i * 120, y = 140 + (i % 2) * 18; g.beginPath(); for (let k = 0; k < 10; k++) { const a = -PI / 2 + k * PI / 5, r = k % 2 ? 9 : 22; g.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } g.closePath(); g.fill(); }
-    const k = lerp(1.4, 1.5, clamp(lt / 2.8)), cx = W / 2 - 70, cy = 830;
+    const k = lerp(1.4, 1.5, clamp(lt / 2.8)), cx = W / 2 - 70, cy = 830, zu = glide(clamp(lt / 2.8)), zm = lerp(0.94, 1.12, zu);
+    g.save(); g.translate(W / 2, 1050); g.scale(zm, zm); g.translate(-W / 2 + lerp(30, -20, zu), -1050);
     drawChar(g, 'fischer14', { x: cx, y: cy, s: k, e: exprAt([[0, { ...EXPR.happy, look: [0.35, 0] }], [chT, { ...EXPR.happy, look: [0, 0] }]], t), t });
     trophy(g, cx + 300, 1330, 2.3);
     hand2(g, cx + 190, 1130, 34); hand2(g, cx + 400, 1100, 34);
+    g.restore();
     for (const ft of FLASH) { const d = t - ft; if (d < 0 || d > 0.3) continue; const r = rng(Math.round(ft * 100)), x = 120 + r() * 840, y = 300 + r() * 500, R = 260 * (1 - d / 0.3);
       const fg = g.createRadialGradient(x, y, 0, x, y, R); fg.addColorStop(0, `rgba(255,255,255,${(1 - d / 0.3).toFixed(3)})`); fg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = fg; g.fillRect(x - R, y - R, R * 2, R * 2);
       if (d < 0.12) flashTint(g, '#FFFFFF', 0.25 * (1 - d / 0.12)); }
@@ -989,7 +1176,7 @@ export async function build(T) {
   const NF = 20, catchT = i => twnT + 0.05 + i * (wldT + 0.3 - twnT) / (NF - 1);
   shot(skS - 0.04, (g, lt, t, sh) => {
     const hit = (t > s60a && t < s60a + 0.25) || (t > s60b && t < s60b + 0.25);
-    rig(B, lt, [[0, K(-0.22, 0.04, 14, [0.4, PY + 5.8, 1.2])], [len(sh), K(-0.12, 0.03, 12.6, [0.4, PY + 5.9, 1.2])]], { t, e: lin, bump: hit ? 1 : 0 });
+    rig(B, lt, [[0, K(-0.5, 0.1, 15.5, [0.4, PY + 5.6, 1.2])], [len(sh), K(0.14, 0.02, 11.4, [0.4, PY + 6.25, 1.2])]], { t, e: glide, bump: hit ? 1 : 0 });
     lake(g, t, { mood: 'day', mist: 0.3 });
     const F = fisher(g, 0, 1.2, { e: exprAt([[0, SMIRK], [s60a, { ...SMIRK, curve: 0.55 }]], t), t, raise: true });
     pierFront(g);
@@ -1005,8 +1192,8 @@ export async function build(T) {
     let shown = 0; for (let i = 0; i < NF; i++) if (t >= catchT(i)) shown = i + 1;
     const fade = 1 - clamp((t - s60a + 0.1) / 0.2);
     if (shown > 0 && fade > 0) counter(g, String(shown), 'WINS IN A ROW', { y: 330, size: 150, color: GOLD, a: fade, at: [t, twnT] });
-    if (t >= s60a) plate(g, '6–0', W / 2, 225, { color: GOLD, size: 104, sub: 'VS TAIMANOV · 1971', ...pin(t, s60a) });
-    if (t >= s60b) plate(g, '6–0', W / 2, 485, { color: GOLD, size: 104, sub: 'VS LARSEN · 1971', ...pin(t, s60b) });
+    if (t >= s60a) plate(g, '6–0', W / 2, 215, { color: GOLD, size: 104, sub: 'VS TAIMANOV · 1971', ...pin(t, s60a) });
+    if (t >= s60b) plate(g, '6–0', W / 2, 470, { color: GOLD, size: 104, sub: 'VS LARSEN · 1971', ...pin(t, s60b) });
   } });
   cue(skS - 0.08, 'whoosh_fast', 0.3); for (let i = 0; i < NF; i++) cue(catchT(i), i % 2 ? 'piece' : 'pluck', 0.2);
   for (const tt of [s60a, s60b]) { cue(tt - 0.004, 'boom_big', 0.5); cue(tt, 'stamp', 0.4); }
@@ -1025,21 +1212,22 @@ export async function build(T) {
     if (extra) extra(g);
   };
   shot(usS - 0.04, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI - 0.62, 0.3, 22, [4, 3.0, 1.0])], [len(sh), K(PI - 0.48, 0.27, 20, [4, 3.2, 1.0])]], { t, e: lin });
+    rig(B, lt, [[0, K(PI - 0.86, 0.34, 24, [4, 3.0, 1.0])], [len(sh), K(PI - 0.38, 0.24, 18.5, [4, 3.2, 1.0])]], { t, e: glide });
     reyk(g, t, { spin: 0.5 });
   }, { trans: 'whip', hud: (g, lt, t) => plate(g, 'REYKJAVIK · 1972', W / 2, 250, { color: CREAM, size: 56, ...pin(t, y72T) }) });
   shot(tookT - 0.08, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI + 0.08, 0.1, 14.5, [4, 5.4, 1.5])], [len(sh), K(PI + 0.02, 0.12, 12.8, [4, 5.8, 1.5])]], { t, e: lin, bump: t > sovT && t < sovT + 0.25 ? 0.6 : 0 });
+    rig(B, lt, [[0, K(PI + 0.3, 0.06, 16, [4, 5.2, 1.5])], [len(sh), K(PI - 0.06, 0.14, 11.6, [4, 5.9, 1.5])]], { t, e: glide, bump: t > sovT && t < sovT + 0.25 ? 0.6 : 0 });
     const spin = 0.5 + 2.5 * ease.inOut(clamp((t - sovT) / 0.6));
     reyk(g, t, { spin, steam: clamp((t - sovT) * 2), es: { ...EXPR.focus, look: [0, -0.1] }, spot: clamp((t - alnT + 0.1) * 3) });
     if (t >= alnT) { const u = clamp((t - alnT) / 0.4); const vg = g.createRadialGradient(W / 2, H * 0.62, H * 0.15, W / 2, H * 0.62, H * 0.75); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, `rgba(8,2,3,${(0.6 * u).toFixed(3)})`); g.fillStyle = vg; g.fillRect(0, 0, W, H); }
   }, { trans: 'whip', hud: (g, lt, t) => {
-    if (t >= sovT) plate(g, 'THE SOVIET MACHINE', W / 2, 250, { color: RED, size: 56, ...pin(t, sovT) });
-    if (t >= alnT) plate(g, 'ALONE', W / 2, 350, { color: CREAM, size: 56, ...pin(t, alnT) });
+    // under the star in the gold ring (it rides through the top of the frame in this push-in), over the gears
+    if (t >= sovT) plate(g, 'THE SOVIET MACHINE', W / 2, 565, { color: GOLD, size: 56, ...pin(t, sovT) });
+    if (t >= alnT) plate(g, 'ALONE', W / 2, 668, { color: CREAM, size: 56, ...pin(t, alnT) });
   } });
   const CR0 = [7.2, 9.5, -0.5], CR1 = [4, 4.75, 9.3], LAND = wtT + 0.18;
   shot(and2T - 0.06, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.26, 0.14, 10, [4, 3.6, 8.4])], [len(sh), K(0.16, 0.12, 8.9, [4, 3.8, 8.6])]], { t, e: lin, bump: t > LAND && t < LAND + 0.25 ? 1 : 0 });
+    rig(B, lt, [[0, K(0.46, 0.2, 11.5, [4, 3.6, 8.4])], [len(sh), K(0.06, 0.1, 8.4, [4, 3.9, 8.6])]], { t, e: glide, bump: t > LAND && t < LAND + 0.25 ? 1 : 0 });
     const u = ease.inOut(clamp((t - and2T - 0.1) / (LAND - and2T - 0.1)));
     reyk(g, t, { ef: exprAt([[0, COLD], [LAND, SMIRK]], t), spin: 0, stop: 1, extra: g2 => {
       const rb = [4.9, 0.9, 8.2], rt = [6.7, 5.6, 6.6];
@@ -1061,7 +1249,7 @@ export async function build(T) {
   const nkS = s('nick'), gm2T = w('nick', 'grandmaster'), fish2T = w('nick', 'fish'), heT = w('nick', 'he'), fmanT = w('nick', 'fisherman');
   const GMS = [['SPASSKY', '#C8322A'], ['PETROSIAN', '#2F63B8'], ['LARSEN', '#2FA36B'], ['TAIMANOV', '#D98A2B'], ['BYRNE', '#7C5BD6']];
   shot(nkS - 0.04, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.08, 0.05, 10.5, [4, 0.8, 7.5])], [len(sh), K(-0.04, 0.08, 9.2, [4, 1.1, 7.5])]], { t, e: lin });
+    rig(B, lt, [[0, K(0.22, 0.03, 11, [4, 0.8, 7.5])], [len(sh), K(-0.12, 0.09, 8.8, [4, 1.1, 7.5])]], { t, e: glide });
     sea(g, t);
     const yk = ease.in(clamp((t - fish2T - 0.1) / 0.35));
     const tags = [];
@@ -1077,7 +1265,7 @@ export async function build(T) {
   }, { trans: 'whip', hud: (g, lt, t) => plate(g, 'EVERY GRANDMASTER', W / 2, 250, { color: CREAM, size: 54, ...pin(t, gm2T) }) });
   cue(nkS - 0.08, 'whoosh_fast', 0.3); cue(fish2T - 0.3, 'pluck', 0.3); cue(fish2T + 0.1, 'whoosh_fast', 0.45);
   shot(heT - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.05, -0.02, 8.8, [0, PY + 6.6, 1.2], { cy: H * 0.52 })], [len(sh), K(0, -0.03, 6.3, [0, PY + 6.8, 1.2], { cy: H * 0.52 }), ease.out]], { t, e: lin, bump: t > fmanT && t < fmanT + 0.3 ? 1 : 0 });
+    rig(B, lt, [[0, K(-0.6, -0.1, 11, [0, PY + 6.2, 1.2], { cy: H * 0.52 })], [len(sh), K(0.03, -0.03, 6.3, [0, PY + 6.8, 1.2], { cy: H * 0.52 }), ease.out]], { t, e: lin, bump: t > fmanT && t < fmanT + 0.3 ? 1 : 0 });
     lake(g, t, { mood: 'dawn', mist: 0.5 });
     const hp = B.project(0, PY + 7.1, 1.2);
     if (t >= fmanT) { g.save(); g.globalCompositeOperation = 'screen'; rays(g, hp.x, hp.y, t, { n: 16, color: '#FFE2A0', a: 0.22 * seg(t, fmanT, fmanT + 0.3), len: 1800 }); g.restore(); }
@@ -1116,7 +1304,7 @@ export async function build(T) {
   // ======================= "I HATE CHESS": the grey room of the photo; the camera slowly backs away; the words in chalk =======================
   const htS = s('hate'), iT = w('hate', 'i'), hateT = w('hate', 'hate'), chessT = w('hate', 'chess'), dtS = s('death');
   shot(htS - 0.04, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.07, 0.12, 11.5, [0.4, FLOOR_Y + 4.2, RZ - 1.6])], [len(sh), K(0.0, 0.14, 16.5, [0.4, FLOOR_Y + 4.9, RZ - 1.8])]], { t, e: x => ease.inOut(x) });
+    rig(B, lt, [[0, K(0.17, 0.12, 11.5, [0.4, FLOOR_Y + 4.2, RZ - 1.6])], [len(sh), K(-0.08, 0.14, 16.5, [0.4, FLOOR_Y + 4.9, RZ - 1.8])]], { t, e: x => ease.inOut(x) });
     greyRoom(g, t);
     floorSit(g, t, exprAt([[0, EMPTY], [iT - 0.2, { ...EMPTY, look: [0, 0.1], lid: 0.3, curve: -0.35 }]], t));
     chalk(g, t, 'I HATE CHESS…', iT, { x: 0.4, step: (chessT + 0.35 - iT) / 13 });
@@ -1188,7 +1376,7 @@ export async function build(T) {
   const ctS = s('cta'), fish4T = w('cta', 'fish'), fm4T = w('cta', 'fisherman');
   shot(ctS - 0.04, (g, lt, t, sh) => {
     g.save(); g.beginPath(); g.rect(W / 2, 0, W / 2, H); g.clip(); g.translate(W * 0.25, 0);
-    rig(B, lt, [[0, K(0.12, 0.03, 9.6, [0.6, PY + 5.8, 1.2])], [len(sh), K(0.06, 0.03, 8.8, [0.6, PY + 5.9, 1.2])]], { t, e: lin });
+    rig(B, lt, [[0, K(0.42, 0.06, 10.6, [0.6, PY + 5.8, 1.2])], [len(sh), K(-0.1, 0.02, 8.4, [0.6, PY + 5.9, 1.2])]], { t, e: glide });
     lake(g, t, { mood: 'dawn' });
     fisher(g, 0, 1.2, { e: exprAt([[0, STARE], [fm4T, SMIRK]], t), t, rod: { bend: 0.12 } });
     g.restore();
@@ -1207,13 +1395,13 @@ export async function build(T) {
   cue(ctS - 0.06, 'whoosh_fast', 0.3); cue(fish4T, 'sparkle_pop', 0.3); cue(fm4T, 'sparkle_pop', 0.3); cue(fm4T + 0.5, 'sparkle_pop', 0.22); cue(fm4T + 1.0, 'sparkle_pop', 0.2);
 
   const music = [
-    { t: 0, m: 'void' }, { t: stS - 0.05, m: 'digital' }, { t: bgS - 0.05, m: 'tension' }, { t: YANK, m: 'slam' },
+    { t: 0, m: 'void' }, { t: stS - 0.05, m: 'digital' }, { t: bgS - 0.05, m: 'tension' }, { t: tc, m: 'slam' },
     { t: ygS - 0.05, m: 'glory' }, { t: skS - 0.05, m: 'victory' }, { t: usS - 0.05, m: 'build' }, { t: nkS - 0.05, m: 'tension' },
     { t: fmanT - 0.004, m: 'slam' }, { t: flS - 0.05, m: 'elegy' }, { t: htS - 0.05, m: 'void' }, { t: dtS - 0.05, m: 'elegy' },
     { t: sfS - 0.05, m: 'tension' }, { t: ctS - 0.05, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
-    { t0: BITE - 0.35, t1: YANK - 0.01, kind: 'mute' }, { t0: YANK, t1: YANK + 1.4, kind: 'boost', db: 3 },
+    { t0: BITE - 0.35, t1: tc - 0.01, kind: 'mute' }, { t0: tc, t1: tc + 1.4, kind: 'boost', db: 3 },
     { t0: fmanT - 0.3, t1: fmanT - 0.01, kind: 'mute' }, { t0: fmanT, t1: fmanT + 0.9, kind: 'boost', db: 3 },
     { t0: htS - 0.05, t1: dtS - 0.1, kind: 'mute' },
     { t0: ctS, t1: T.duration, kind: 'lp', f: 900 },
