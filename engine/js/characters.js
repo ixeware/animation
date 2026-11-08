@@ -111,14 +111,28 @@ export function exprAt(keys, t) {
   return out;
 }
 
-function headPath(fw, fh, jaw) {
+// the jaw corner and the chin of an angular jaw (CAST jawAngle 0..1): shared by the outline and the jaw contour
+function jawPts(fw, fh, ang) {
+  const w = 100 * fw, h = 125 * fh;
+  return { w, h, jx: w * lerp(0.93, 0.86, ang), jy: h * lerp(0.48, 0.58, ang), cx: w * lerp(0.36, 0.3, ang), cy: h * 0.97 };
+}
+function headPath(fw, fh, jaw, ang = 0) {
   const p = new Path2D();
   const w = 100 * fw, h = 125 * fh;
   p.moveTo(0, -h);
   p.bezierCurveTo(w * 0.62, -h, w, -h * 0.62, w, -h * 0.12);
-  p.bezierCurveTo(w, h * 0.38, w * jaw * 0.95, h * 0.72, w * 0.42, h * 0.92);
-  p.bezierCurveTo(w * 0.22, h * 1.02, -w * 0.22, h * 1.02, -w * 0.42, h * 0.92);
-  p.bezierCurveTo(-w * jaw * 0.95, h * 0.72, -w, h * 0.38, -w, -h * 0.12);
+  if (ang > 0) {  // a sculpted jaw: the cheek runs down to a jaw corner, then a straighter jawline to a squarer chin
+    const J = jawPts(fw, fh, ang);
+    p.bezierCurveTo(w, h * 0.18, w * 0.99, h * 0.36, J.jx, J.jy);
+    p.bezierCurveTo(w * 0.78, h * 0.74, w * 0.52, h * 0.9, J.cx, J.cy);
+    p.bezierCurveTo(w * 0.14, h * 1.02, -w * 0.14, h * 1.02, -J.cx, J.cy);
+    p.bezierCurveTo(-w * 0.52, h * 0.9, -w * 0.78, h * 0.74, -J.jx, J.jy);
+    p.bezierCurveTo(-w * 0.99, h * 0.36, -w, h * 0.18, -w, -h * 0.12);
+  } else {
+    p.bezierCurveTo(w, h * 0.38, w * jaw * 0.95, h * 0.72, w * 0.42, h * 0.92);
+    p.bezierCurveTo(w * 0.22, h * 1.02, -w * 0.22, h * 1.02, -w * 0.42, h * 0.92);
+    p.bezierCurveTo(-w * jaw * 0.95, h * 0.72, -w, h * 0.38, -w, -h * 0.12);
+  }
   p.bezierCurveTo(-w, -h * 0.62, -w * 0.62, -h, 0, -h);
   return p;
 }
@@ -603,7 +617,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   for (const sd of [-1, 1]) { const k = 1 - clamp(sd * turn, 0, 1) * 0.75; g.beginPath(); g.ellipse(sd * 98 * fw - turn * 10, 8, 18 * c.ears * k, 28 * c.ears, 0, 0, 7); g.fill();
     if (V2) { g.fillStyle = rgba(S.deep, 0.45); g.beginPath(); g.ellipse(sd * 101 * fw - turn * 10, 10, 8 * c.ears * k, 17 * c.ears, 0, 0, 7); g.fill(); g.fillStyle = S.base; } }
   // head with soft side shading
-  const hp = headPath(fw, fh, jaw);
+  const hp = headPath(fw, fh, jaw, c.jawAngle || 0);
   const hg = g.createLinearGradient(-110, 0, 110, 0); hg.addColorStop(0, S.base); hg.addColorStop(0.7, S.base); hg.addColorStop(1, S.shade);
   g.fillStyle = V2 ? S.base : hg; g.fill(hp);
   if (V2) {
@@ -696,12 +710,24 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
         const hg = g.createRadialGradient(sd * 64, 14, 2, sd * 64, 14, 30); hg.addColorStop(0, rgba(S.hi, 0.42 * k)); hg.addColorStop(1, rgba(S.hi, 0));
         g.fillStyle = hg; g.beginPath(); g.ellipse(sd * 64, 14, 30, 16, sd * -0.35, 0, 7); g.fill();
         g.save(); g.lineCap = 'round';
+        if (k > 1) { g.strokeStyle = rgba(S.deep, 0.16 * (k - 1)); g.lineWidth = 4; g.beginPath(); g.moveTo(sd * 90, 18); g.quadraticCurveTo(sd * 76, 40, sd * 58, 56); g.stroke(); }
         for (const [w, a] of [[16, 0.07], [9, 0.1]]) {
           g.strokeStyle = rgba(S.deep, a * k); g.lineWidth = w;
           g.beginPath(); g.moveTo(sd * 86, 26); g.quadraticCurveTo(sd * 72, 58, sd * 54, 84); g.stroke();
         }
         g.restore();
       }
+    }
+    if (c.jawLine) {  // the jaw contour: a soft shadow band just inside the jawline, from under the ears to the chin
+      const k = c.jawLine, J = jawPts(fw, fh, c.jawAngle || 0.5), w = J.w, h = J.h, jp = new Path2D();
+      jp.moveTo(w * 0.99, h * 0.12); jp.bezierCurveTo(w, h * 0.26, w * 0.99, h * 0.38, J.jx, J.jy);
+      jp.bezierCurveTo(w * 0.78, h * 0.74, w * 0.52, h * 0.9, J.cx, J.cy); jp.bezierCurveTo(w * 0.14, h * 1.02, -w * 0.14, h * 1.02, -J.cx, J.cy);
+      jp.bezierCurveTo(-w * 0.52, h * 0.9, -w * 0.78, h * 0.74, -J.jx, J.jy); jp.bezierCurveTo(-w * 0.99, h * 0.38, -w, h * 0.26, -w * 0.99, h * 0.12);
+      g.save(); g.clip(hp); g.lineJoin = 'round'; g.lineCap = 'round';
+      g.strokeStyle = rgba(S.deep, 0.16 * k); g.lineWidth = 30; g.stroke(jp);
+      g.strokeStyle = rgba(S.deep, 0.22 * k); g.lineWidth = 12; g.stroke(jp);
+      g.restore();
+      g.strokeStyle = rgba(S.deep, 0.5 * k); g.lineWidth = 3; g.stroke(jp);  // the edge itself, a touch darker
     }
     if (c.chin) {  // a strong chin: a soft shadow under the lower lip and a light on the point of the chin
       const k = c.chin, cy = 100 * fh;
