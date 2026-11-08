@@ -272,6 +272,7 @@ function hairBack(g, c, fw) {
   if (c.hair === 'levy') { g.beginPath(); g.ellipse(0, -52, 104 * fw, 100, 0, 0, 7); g.fill(); }
   if (c.hair === 'slick') { g.beginPath(); g.ellipse(0, -44, 104 * fw, 96, 0, 0, 7); g.fill(); }
   if (c.hair === 'fischer') { g.beginPath(); g.ellipse(-4, -50, 104 * fw, 100, 0, 0, 7); g.fill(); }
+  if (c.hair === 'tousled') { g.beginPath(); g.ellipse(0, -44, 112 * fw, 106, 0, 0, 7); g.fill(); }
   if (c.hair === 'quiff') { g.beginPath(); g.ellipse(4, -70, 98 * fw, 92, 0, 0, 7); g.fill(); }
   if (c.hair === 'longcurly') {  // long curly hair falling past the shoulders, bumpy outline
     const w = 100 * fw; g.beginPath(); g.moveTo(-w - 30, -40);
@@ -305,6 +306,14 @@ function hairFront(g, c, fw, fh) {
       p.bezierCurveTo(34, -106, 0, -108, -24, -101);  // a high hairline across the forehead
       p.bezierCurveTo(-44, -114, -62, -104, -70, -86);  // the part dips at his right temple
       p.bezierCurveTo(-80, -64, -w + 4, -40, -w - 2, -6); break; }
+    case 'tousled':  // young Fischer in the author's portrait: wavy, tousled hair with volume on top, a lock on the forehead
+      p.moveTo(-w - 4, -2); p.bezierCurveTo(-w - 14, -h * 0.7, -w - 2, -h - 10, -60, -h - 18);
+      p.quadraticCurveTo(-46, -h - 40, -18, -h - 27); p.quadraticCurveTo(4, -h - 46, 30, -h - 27);
+      p.quadraticCurveTo(58, -h - 40, 72, -h - 10); p.bezierCurveTo(w + 10, -h * 0.8, w + 12, -h * 0.4, w + 4, -6);
+      p.bezierCurveTo(w - 8, -50, w - 20, -76, 58, -86); p.quadraticCurveTo(44, -97, 30, -88);
+      p.bezierCurveTo(26, -76, 16, -57, 0, -59);  // the lock's tip on the forehead
+      p.bezierCurveTo(-14, -61, -10, -80, -22, -92); p.quadraticCurveTo(-46, -99, -66, -84);
+      p.bezierCurveTo(-82, -66, -w + 2, -40, -w - 4, -2); break;
     case 'fringe':
       p.moveTo(-w - 4, -6); p.bezierCurveTo(-w - 8, -h * 0.95, -30, -h - 16, 10, -h - 14);
       p.bezierCurveTo(70, -h - 8, w + 8, -h * 0.7, w + 4, -10);
@@ -449,6 +458,16 @@ function hairFront(g, c, fw, fh) {
         g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo((x0 + x1) / 2 + 8, Math.min(y0, y1) - 16, x1, y1); g.stroke();
       }
       if (!tuft) { g.strokeStyle = rgba(mix(c.hairC, '#000000', 0.45), 0.7); g.lineWidth = 3; g.beginPath(); g.moveTo(-36, -h - 12); g.quadraticCurveTo(-34, -h + 30, -34, -98); g.stroke(); }
+    } else if (c.hair === 'tousled') {  // waves: big soft arcs over the top, strands down the forehead lock
+      const sg = g.createLinearGradient(-40, -h - 40, 30, -90); sg.addColorStop(0, rgba(hi, 0)); sg.addColorStop(0.5, rgba(hi, 0.3)); sg.addColorStop(1, rgba(hi, 0));
+      g.fillStyle = sg; g.beginPath(); g.ellipse(-4, -h - 14, 76, 28, -0.1, 0, 7); g.fill();
+      for (let i = 0; i < 9; i++) {
+        const x = -70 + i * 18, y = -h - 22 + Math.abs(i - 4) * 9 + (i % 2) * 6, r = 14 + (i % 3) * 4, a0 = Math.PI * (1.05 + (i % 2) * 0.15);
+        g.strokeStyle = i % 2 ? rgba('#000000', 0.22) : rgba(hi, 0.42); g.lineWidth = i % 2 ? 3 : 4;
+        g.beginPath(); g.arc(x, y, r, a0, a0 + 1.9); g.stroke();
+      }
+      g.strokeStyle = rgba(hi, 0.4); g.lineWidth = 3.5;
+      for (const [x0, x1] of [[20, 4], [32, 14], [8, -4]]) { g.beginPath(); g.moveTo(x0, -92); g.bezierCurveTo(x0 + 2, -80, x1 + 8, -70, x1, -62); g.stroke(); }
     } else if (c.hair === 'fischer') {  // the swoop: comb lines sweeping up and back from the part, a sheen on the crest
       const sg = g.createLinearGradient(-60, -h - 30, 40, -100); sg.addColorStop(0, rgba(hi, 0)); sg.addColorStop(0.55, rgba(hi, 0.38)); sg.addColorStop(1, rgba(hi, 0));
       g.fillStyle = sg; g.beginPath(); g.ellipse(-6, -h - 6 * (c.swoop ?? 1), 70, 26, -0.12, 0, 7); g.fill();
@@ -621,7 +640,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
     g.filter = 'none';
     if (eyeGlow) for (const sd of [-1, 1]) { g.save(); g.shadowColor = eyeGlow; g.shadowBlur = 30; g.fillStyle = eyeGlow; g.beginPath(); g.ellipse(sd * 38, -2, 14, 8, sd * 0.25, 0, 7); g.fill(); g.restore(); }
   } else {
-    if (V2) for (const sd of [-1, 1]) { const eg = g.createRadialGradient(sd * 38, -4, 12, sd * 38, -4, 42); eg.addColorStop(0, rgba(S.deep, 0.24)); eg.addColorStop(1, rgba(S.deep, 0)); g.fillStyle = eg; g.beginPath(); g.ellipse(sd * 38, -4, 44, 40, 0, 0, 7); g.fill(); }
+    if (V2) for (const sd of [-1, 1]) { const eg = g.createRadialGradient(sd * 38, -4, 12, sd * 38, -4, 42); eg.addColorStop(0, rgba(S.deep, Math.min(0.7, 0.24 * (c.sockets ?? 1)))); eg.addColorStop(1, rgba(S.deep, 0)); g.fillStyle = eg; g.beginPath(); g.ellipse(sd * 38, -4, 44, 40, 0, 0, 7); g.fill(); }
     for (const sd of [-1, 1]) eye(g, sd * 38, -2, ee, sd, t, e.pupil ?? 1, c.iris ?? (V2 ? '#6A4A34' : null));
     // brows; a CAST entry may make them thicker (browH), longer (browL) or set lower at the inner ends (browSet)
     g.fillStyle = c.brow;
@@ -765,6 +784,12 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
 function mouth(g, e, c) {
   const my = c.beardBig ? 66 : 64, w = 30, curve = e.curve ?? 0, open = e.open ?? 0;
   g.save(); g.translate(0, my);
+  if (c.lipFull && e.mouth !== 'o' && !(open > 0.15)) {  // a full lower lip under the mouth line
+    const k = c.lipFull, lc = c.lipC || '#C98276';
+    g.fillStyle = rgba(lc, 0.6); g.beginPath(); g.moveTo(-w * 0.74, 3 - curve * 6); g.quadraticCurveTo(0, 3 + 16 * k + curve * 8, w * 0.74, 3 - curve * 6);
+    g.quadraticCurveTo(0, 7 + curve * 6, -w * 0.74, 3 - curve * 6); g.fill();
+    g.fillStyle = rgba('#FFFFFF', 0.2); g.beginPath(); g.ellipse(-4, 8 + 5 * k, 9, 3, 0, 0, 7); g.fill();
+  }
   g.strokeStyle = c.lip || '#6B2E2A'; g.lineCap = 'round'; g.lineWidth = c.lip ? 8 : 7;
   if (e.mouth === 'o') {
     g.fillStyle = '#5A2320'; g.beginPath(); g.ellipse(0, 4, 13 + open * 6, 10 + open * 16, 0, 0, 7); g.fill();
