@@ -133,7 +133,9 @@ npm i                      # playwright (браузер берётся сист�
 | `chatterbox` | не нужен, локально, бесплатно (MIT) | выравнивание whisper; каждая фраза сверяется со сценарием, при ошибке переозвучивается |
 | `kokoro` | не нужен, локально | из модели |
 
-Если ключа нет, а в `voice.fallback` указан Kokoro, сборка идёт на нём.
+Если ключа нет, а в `voice.fallback` указан Kokoro, сборка идёт на нём. В облаке ключ ElevenLabs подставляет прокси
+(сетевой секрет окружения для `api.elevenlabs.io`), поэтому переменной хватает заглушки:
+`ELEVENLABS_API_KEY=proxy-injected python3 audio/tts.py episodes/<ep>`.
 
 `script.json` → `voice_fx` обрабатывает готовую озвучку: `tempo` ускоряет её без смены высоты (ffmpeg atempo),
 `sts` прогоняет каждую фразу через ElevenLabs speech-to-speech (`voice_id`, `model`), после чего тайминги слов

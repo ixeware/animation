@@ -25,8 +25,10 @@
 ## Как собрать ролик
 1. Факты с источниками — `episodes/<ep>/SOURCES.md`; партии — PGN и JSON в `engine/data/`.
 2. Текст и голос — `episodes/<ep>/script.json`: фразы, Callum на `eleven_v3`, аудиотеги в `say`, `channel`, `post`.
-3. Озвучка: `python3 audio/tts.py episodes/<ep>`. Нужна переменная `ELEVENLABS_API_KEY`; ответы кэшируются в
-   `build/tts_cache`, повторный запуск кредитов не тратит.
+3. Озвучка: `ELEVENLABS_API_KEY=proxy-injected python3 audio/tts.py episodes/<ep>`. Ключ лежит в облачном окружении
+   сетевым секретом для `api.elevenlabs.io`, прокси сам подставляет его в заголовок `xi-api-key`; переменной нужна
+   только заглушка (без неё `tts.py` остановится или уйдёт в запасной голос). Ответы кэшируются в `build/tts_cache`,
+   повторный запуск кредитов не тратит.
 4. Сцены — `episodes/<ep>/scenes.js`, функция `build(T)` возвращает shots, cues, music, musicFx.
 5. Кадры для проверки: `node render.mjs <ep> --stills 1.0,2.5` (в `build/stills`).
 6. Вёрстка: `node render.mjs <ep> --qa --step 0.1`; до рендера должно быть «no issues».
