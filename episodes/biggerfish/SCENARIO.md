@@ -66,10 +66,10 @@ ROW». Два табло «6–0» (Тайманов, Ларсен) ударяю
 **На экране.** Пустой стул за доской (1975: титул уходит без игры). Лодка рыбака дрейфует пустой в тумане.
 
 ### 10. hate (42–46 с) — максимум драмы
-**Голос.** «[quietly] The man who caught them all... came to hate the game.»
+**Голос.** «[quietly] The man who caught them all... said three words. [whispers] I hate chess.»
 **На экране.** Пустая серая комната, как на фото: Фишер сидит на полу у стены, рядом бумажный стаканчик и
-рассыпанные фигуры. Музыка обрывается, остаётся сердцебиение. Камера медленно отъезжает. Плашка печатается по
-буквам: «I HATE CHESS…».
+рассыпанные фигуры. Музыка обрывается, остаётся сердцебиение. Камера медленно отъезжает. На шёпот «I hate chess» плашка
+печатается по буквам: «I HATE CHESS…».
 
 ### 11. death (46–52 с)
 **Голос.** «He died in January two thousand eight, at sixty-four... one year for every square of the board.»
@@ -88,5 +88,8 @@ ROW». Два табло «6–0» (Тайманов, Ларсен) ударяю
 ## Музыка (план)
 
 hook — void; Stockfish — digital; «bigger fish» — riser и тишина; рывок и раскрытие — slam; подвиги — glory, 1972 —
-victory; уход — elegy; «hate the game» — тишина и сердцебиение; смерть — elegy; «the fish came up» — tension; CTA —
+victory; уход — elegy; «I hate chess» — тишина и сердцебиение; смерть — elegy; «the fish came up» — tension; CTA —
 hook под фильтром.
+
+Внешность утверждена: вариант A; губы тоньше (тонкая линия и лёгкая тень нижней губы), фраза «I hate chess» — его слова
+(решение автора, см. SOURCES.md).

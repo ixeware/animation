@@ -132,12 +132,13 @@
     },
     {
       "id": "hate",
-      "text": "The man who caught them all came to hate the game.",
-      "say": "[quietly] The man who caught them all... came to hate the game.",
-      "pause": 0.3,
+      "text": "The man who caught them all said three words: I hate chess.",
+      "say": "[quietly] The man who caught them all... said three words. [whispers] I hate chess.",
+      "pause": 0.45,
       "colors": {
+        "three": "gold",
         "hate": "red",
-        "game.": "red"
+        "chess.": "red"
       }
     },
     {
