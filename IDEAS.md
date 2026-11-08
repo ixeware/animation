@@ -4,6 +4,127 @@
 (драма — один поворот внутри интересной самой по себе истории). Факты ниже проверены по источникам в конце каждого
 пункта; перед сценарием всё равно собрать `SOURCES.md`.
 
+## Фишер с эдит-байтом (08.11.2026)
+
+Задание автора: найти, что про Фишера популярно в TikTok, и придумать ролик с эдит-байтом (правило 54), как в
+роликах про Миттенс («…but not an alien») и GM Hunter («The Grandmaster Hunter»). Идея автора: начать со Stockfish,
+потом «there's always a bigger fish» — Бобби Фишер.
+
+**Что про Фишера популярно в TikTok.** Данные со страниц TikTok Discover в поисковой выдаче. Цифры — лайки, снимки
+разных дат. Топ по просмотрам собрать не удалось: автоматический сбор TikTok из облака заблокирован, так что
+проверять руками в приложении.
+- Главный жанр — эдиты: «Bobby Fischer edit» и «Robert James Fischer edit» (полное имя работает как титул). Это
+  нарезки под медленный фанк и фонк. Эдит 2026 года — около 298 тыс. лайков; «The ICC Bobby Fischer» («Was it really
+  Fischer?») — 62 тыс.
+- Клип «Bobby Fischer saying he hates chess» — около 274 тыс. лайков.
+- Что ищут (по страницам Discover): «Fischer vs Kasparov» (кто сильнее), «gone insane explained», «brilliant move» и
+  «move of the century» (клип GothamChess), «why Bobby Fischer has no bot» (у Chess.com есть боты Таля, Капабланки и
+  Ласкера, а Фишера нет; официальной причины не нашли).
+- Его поздние политические и антисемитские высказывания тоже набирают, но это не наша тема.
+
+**Что показали комментарии под нашими роликами** (`tools/tiktok.py`, 8.11; верхние комментарии по лайкам).
+- GM Hunter: зрители сами дописали прозвище до афоризмов: «not a grandmaster cause he hunts them» (19,1 тыс.♥),
+  «the hunter cant become a prey» (10,8 тыс.♥), «The predator cannot wear the title of its prey» (1 тыс.♥). Ещё —
+  сравнения: «The neymar of chess» (3 тыс.♥), «Toji of chess» (персонаж аниме).
+- Миттенс: «No human or alien beat Mittens 😂» (26,4 тыс.♥), «"STOCKFISH."» (748♥), «Kinda poetic how a fish beat a
+  cat», «Crazy witty alien Edit potential».
+- `fischer` (12.10): «Best chess player of all time by rating» (36♥), «soviets larping chess» (33♥), «Died at 64.
+  64 squares on the chess board. He could beat anyone, yet he lost to himself», «he only beat 1 person and vanished»
+  (6 ответов). Последнее — заблуждение, на которое можно ответить целым роликом.
+
+**Разбор идеи автора.**
+- Сильные стороны:
+  - каламбур слышен и по-английски: Fischer звучит как fisher;
+  - Stockfish знает вся аудитория;
+  - идея продолжает пищевую цепочку канала: в ролике про Миттенс рыба съела кошку, и зрители это заметили.
+- Ловушка: «рыба покрупнее» буквально значит, что Фишер сильнее Stockfish, а это неправда: 3650 против 2785. Зрители
+  поправят (правило 40). Лечится одним словом: не «рыба покрупнее», а рыбак. По-немецки Fischer и значит «рыбак».
+- Находка для финала: Фишер умер 17.01.2008, а первый релиз Stockfish вышел 2.11.2008. Рыбак умер — и в тот же год
+  родилась рыба.
+
+**1. «The Fisherman» — рекомендую.** Идея автора с рыбаком вместо большей рыбы. Титул в кадре:
+BOBBY "THE FISHERMAN" FISCHER. Набросок фраз, 62–66 с:
+1. Хук: «This fish is rated 3650. No human alive can beat it.» На первом кадре — рыба из логотипа Stockfish
+   (настоящая вырезка, как в `hikaru213`) над доской, плашка 3650.
+2. «It even ate Mittens.» Отсылка к ролику про Миттенс; оставить, если там Stockfish обыгрывает кошку.
+3. «But there's always a bigger fish… No. A fisherman. In German — Fischer.» Удар музыки, чистый кадр с титулом.
+4. «At fourteen, champion of America. At fifteen, the youngest grandmaster on Earth.»
+5. «Then eleven games, eleven wins. Nobody has done that since.»
+6. «But the big fish were Soviet: they had held the world title for 24 years. He even learned Russian to read their
+   chess magazines.»
+7. «He beat the best players in the world twenty times in a row.» Счётчик 1→20, короли падают.
+8. «Taimanov: six–zero. The Soviets took away his salary. Larsen: six–zero.»
+9. «Reykjavik, 1972. After game six, the world champion himself applauded.» Вслед за этим — фраза для эдитов:
+   «Stockfish beats people. Fischer beat a superpower.»
+10. «He was 125 points above number two. Even Magnus never got that far ahead.»
+11. Петля: «He died in January 2008. That same year… the fish was born.» Ролик возвращается к хуку.
+12. Вопрос: «Stockfish: 3650. Fischer: 2785. What's yours?» Зритель отвечает своим рейтингом (правило 39).
+
+- Афоризмы на выбор для комментариев и эдитов: «Every fish has a fisherman», «The fisherman died. The fish was born»,
+  «Stockfish beats people. Fischer beat a superpower».
+- Доски — настоящие партии (правило 49): матчи с Таймановым и Ларсеном 1971 года, шестая партия со Спасским (1972).
+- Чистые кадры для эдитов: титул, счётчик 1→20, аплодисменты Спасского, полоса «125» против Магнуса.
+- Подпись: «There's always a bigger fish 🎣 #chess #bobbyfischer #stockfish #story».
+- Источники:
+  [Wikipedia, Фишер](https://en.wikipedia.org/wiki/Bobby_Fischer) (14 лет — чемпион США, 15 — самый молодой GM;
+  11–0; 20 побед подряд; 6–0 и 6–0; 2785 — на 125 выше Спасского; учил русский ради журналов; умер 17.01.2008 в
+  64 года);
+  [Wikipedia, матч 1972](https://en.wikipedia.org/wiki/World_Chess_Championship_1972) (24 года монополии СССР;
+  аплодисменты после шестой партии);
+  [Wikipedia, Тайманов](https://en.wikipedia.org/wiki/Mark_Taimanov) (лишили зарплаты и выезда, предлог — книга
+  Солженицына);
+  [Wikipedia, Stockfish](https://en.wikipedia.org/wiki/Stockfish_(chess)) (около 3650 по CCRL, октябрь 2026; первый
+  релиз 2.11.2008; имя — «produced in Norway and cooked in Italy»);
+  [ChessBase, отрывы №1 от №2](https://en.chessbase.com/post/the-name-of-the-game-is-domination) (Фишер 125 —
+  рекорд; у Карлсена в 2014 году около 52);
+  [Wiktionary, Fischer](https://en.wiktionary.org/wiki/Fischer) («рыбак»).
+
+**2. «Фальшивый Фишер» (ICC, 2001).** Детектив с поворотом про движок; эдиты «Was it really Fischer?» уже
+набирают.
+- Хук: «In 2001, a world title challenger was 99% sure he was playing Bobby Fischer. Online.» Найджел Шорт играл с
+  Каспаровым за титул в 1993 году.
+- Фишер к тому времени давно пропал. Аккаунт на ICC назывался «Fischer», партии по три минуты. Шорт проиграл первую
+  встречу 0:8 (октябрь 2000), за 2001 год сыграл почти 50 партий.
+- Проверка: «Do you know Armando Acevedo?» — «Siegen 1970». Фишер действительно играл с Асеведо на Олимпиаде в
+  Зигене. Шорт рассказал всё The Telegraph: «99 per cent sure».
+- Поворот: это был не Бобби. Ходы совпадали с линиями движка. В 2006–2007 годах Фишер по телефону сказал Фридели,
+  что понятия не имеет, о чём речь.
+- Фраза для эдитов: «A machine had to pretend to be him.»
+- Вопрос: «Short was 99% sure. How sure would you be? Give a percent.»
+- Источник: [ChessBase, «The third coming of Bobby Fischer?»](https://en.chessbase.com/post/the-third-coming-of-bobby-fischer)
+  (Шорт, Асеведо, вывод Фридели).
+
+**3. «You said he only beat one person».** Ответ на комментарий под `fischer`. Зрители любят, когда им отвечают
+(идея «Witty Alien, часть 2»).
+- Хук: карточка ответа на комментарий «he only beat 1 person and vanished» → «He beat twenty. In a row.»
+- Дальше лестница: 7 побед в конце межзонального турнира в Пальме, 6–0 Тайманову (СССР лишает его зарплаты), 6–0
+  Ларсену, победа над Петросяном.
+- Петля: «Then he beat the one person you've heard of. And yes… then he vanished.»
+- Титул «THE 20». Вопрос: «What's your longest win streak?»
+- Источник: [Wikipedia, Фишер](https://en.wikipedia.org/wiki/Bobby_Fischer).
+
+**4. «Two kings who walked away».** Фишер и Магнус; современные звёзды в кадре.
+- Фишер отдал корону в 1975 году без игры, Магнус в 2023-м отказался её защищать.
+- Фишер решил, что шахматы стали заучиванием дебютов, и 19.06.1996 в Буэнос-Айресе показал шахматы Фишера —
+  960 начальных позиций.
+- Магнус — сооснователь тура Freestyle Chess (это шахматы-960). Он выиграл тур 2025 года, а в феврале 2026-го стал
+  чемпионом мира FIDE по фристайлу, обыграв Каруану в финале. Перед сценарием сверить по первоисточникам.
+- Каждые «+2» в блице — тоже Фишер: он запатентовал часы с добавлением времени.
+- Фраза для эдитов: «Fifty years later, the best player alive plays by his rules.»
+- Вопрос: «What's your 960 rating?»
+- Источники:
+  [FIDE, история шахмат-960](https://www.fide.com/history-of-chess960/),
+  [Wikipedia, Freestyle Chess Grand Slam Tour](https://en.wikipedia.org/wiki/Freestyle_Chess_Grand_Slam_Tour),
+  [Wikipedia, чемпионат мира FIDE по фристайлу 2026](https://en.wikipedia.org/wiki/FIDE_Freestyle_Chess_World_Championship_2026).
+
+**Чего не говорить:**
+- что Фишер обыграл бы Stockfish;
+- «лучший по рейтингу в истории»: рейтинг выше у Магнуса, Фишеру принадлежит рекорд отрыва от второго номера;
+- фразу Тайманова «at least I still have my music»: источника не нашли;
+- политику.
+Уже были в `fischer` (12.10): «Партия века», матч 1972 года целиком, пломбы, смерть в 64 — 64 клетки. Повторять
+только мельком.
+
 ## Отдельный ролик для Chessnut: «2.13 seconds» (06.11.2026)
 **Сделан 07.11.2026** — [`episodes/hikaru213`](episodes/hikaru213/SOURCES.md), 85 с; превью с пометкой PREVIEW —
 для письма Стелле (письмо ещё не отправлено). Перед публикацией: голос заново на платном тарифе ElevenLabs,
