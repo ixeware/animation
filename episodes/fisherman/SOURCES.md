@@ -28,7 +28,13 @@ ours; every number and date in the video is checked below.
 ## Drawn, not documented
 
 - The sea, the boat, the fishing rod and the fish: our metaphor. Stockfish was not "waiting"; the two dates are real.
-- Leela is drawn as a rival fish with a plain "LEELA" plate, not with the Lc0 logo.
+- Hikaru sits under water across from the fish (2014 match); the pawn floating to him stands for the pawn odds.
+- The salary envelope with a CANCELLED stamp is our picture of Taimanov's salary being taken away.
+- The twenty black kings dropping into the boat stand for the twenty wins; the Soviet school is red fish with stars.
+- The MIT room, the cabinets and the teletype are drawn; the game on the board is the real one (21.Qh6#).
+- The empty room is after the author's photo of Fischer on the floor; he ages there into the old man of the Iceland
+  interview, which is where the quote comes from. The pieces falling off the wall board are our image.
+- The winter harbour with the empty boat is drawn; the date and the place (Reykjavik, 17 January 2008) are real.
 - Fischer, Nakamura, Taimanov, Larsen, Spassky and Carlsen appear as cartoon doubles.
 - The Stockfish fish is the cut-out from the Stockfish logo (Klein Maetschke, GPLv3) made for `hikaru213`
   (`episodes/hikaru213/photos/stockfish_fish.png`, the same fish as in the Mittens video); credit it in the frame.
