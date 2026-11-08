@@ -35,11 +35,63 @@
   "phrases": [
     {
       "id": "hook",
-      "text": "This fish is rated 3650. And it waited until one man was dead.",
-      "say": "[serious] This fish is rated thirty-six fifty. [pause] And it waited... until one man was dead.",
+      "text": "This fish is the strongest chess player on Earth.",
+      "say": "[serious] This fish... is the strongest chess player on Earth.",
+      "pause": 0.25,
+      "colors": {
+        "strongest": "gold",
+        "Earth.": "gold"
+      }
+    },
+    {
+      "id": "stockfish",
+      "text": "Stockfish. Rated 3650.",
+      "say": "Stockfish. [pause] Rated thirty-six fifty.",
+      "pause": 0.25,
+      "colors": {
+        "Stockfish.": "blue",
+        "3650.": "gold"
+      }
+    },
+    {
+      "id": "tcec",
+      "text": "It has won the top engine championship nineteen times.",
+      "say": "It has won the top engine championship... nineteen times.",
+      "pause": 0.2,
+      "colors": {
+        "nineteen": "gold",
+        "times.": "gold"
+      }
+    },
+    {
+      "id": "leela",
+      "text": "Its biggest rival, Leela, met it in ten finals. Leela won two.",
+      "say": "Its biggest rival, Leela, met it in ten finals. [pause] Leela won two.",
+      "pause": 0.25,
+      "colors": {
+        "Leela,": "blue",
+        "ten": "gold",
+        "two.": "red"
+      }
+    },
+    {
+      "id": "hikaru",
+      "text": "It gave Hikaru Nakamura a free pawn, and still beat him.",
+      "say": "It gave Hikaru Nakamura a free pawn... [smug] and still beat him.",
       "pause": 0.3,
       "colors": {
-        "3650.": "gold",
+        "Hikaru": "blue",
+        "Nakamura": "blue",
+        "pawn,": "gold"
+      }
+    },
+    {
+      "id": "secret",
+      "text": "But this fish has a secret. It waited until one man was dead.",
+      "say": "But this fish has a secret. [pause] [serious] It waited... until one man was dead.",
+      "pause": 0.3,
+      "colors": {
+        "secret.": "gold",
         "dead.": "red"
       }
     },
@@ -64,44 +116,12 @@
       }
     },
     {
-      "id": "young",
-      "text": "At fourteen, champion of America. At fifteen, the youngest grandmaster on Earth.",
-      "say": "At fourteen, champion of America. At fifteen... the youngest grandmaster on Earth.",
-      "pause": 0.25,
-      "colors": {
-        "fourteen,": "gold",
-        "fifteen,": "gold",
-        "youngest": "gold"
-      }
-    },
-    {
-      "id": "perfect",
-      "text": "Eleven games, eleven wins. Nobody has done it since.",
-      "say": "Eleven games, eleven wins. [pause] Nobody has done it since.",
-      "pause": 0.3,
-      "colors": {
-        "Eleven": "gold",
-        "eleven": "gold",
-        "wins.": "gold"
-      }
-    },
-    {
-      "id": "deep",
-      "text": "Then he went for the deep sea. The Soviets had held the world title for 24 years.",
-      "say": "Then he went for the deep sea. [tense] The Soviets had held the world title for twenty-four years.",
-      "pause": 0.25,
-      "colors": {
-        "Soviets": "red",
-        "24": "red",
-        "years.": "red"
-      }
-    },
-    {
       "id": "streak",
-      "text": "He beat the best players in the world twenty times in a row.",
-      "say": "He beat the best players in the world... [intense] twenty times in a row.",
+      "text": "Then the deep sea: the Soviets. He beat the world's best twenty times in a row.",
+      "say": "Then the deep sea: the Soviets. [intense] He beat the world's best twenty times in a row.",
       "pause": 0.3,
       "colors": {
+        "Soviets.": "red",
         "twenty": "gold",
         "row.": "gold"
       }
@@ -118,8 +138,8 @@
     },
     {
       "id": "spassky",
-      "text": "1972. World champion Spassky. After game six, even he applauded.",
-      "say": "Nineteen seventy-two. World champion Spassky. [pause] After game six... [awed] even he applauded.",
+      "text": "World champion Spassky. After game six, even he applauded.",
+      "say": "World champion Spassky. After game six... [awed] even he applauded.",
       "pause": 0.35,
       "colors": {
         "Spassky.": "red",
@@ -129,7 +149,7 @@
     {
       "id": "gap",
       "text": "His rating: 125 above number two. Magnus never got that far ahead.",
-      "say": "His rating: a hundred and twenty-five above number two. [pause] Magnus never got that far ahead.",
+      "say": "His rating: a hundred and twenty-five above number two. Magnus never got that far ahead.",
       "pause": 0.3,
       "colors": {
         "125": "gold",
@@ -170,7 +190,7 @@
     {
       "id": "cta",
       "text": "Stockfish: 3650. Fischer: 2785. What's yours?",
-      "say": "Stockfish: thirty-six fifty. Fischer: twenty-seven eighty-five. [curious] What's yours?",
+      "say": "Stockfish: thirty-six fifty. Fischer: twenty-seven eighty-five. What's yours?",
       "pause": 0,
       "colors": {
         "3650.": "gold",

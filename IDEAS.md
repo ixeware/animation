@@ -47,8 +47,10 @@ BOBBY "THE FISHERMAN" FISCHER.
 
 Автор выбрал эту идею 8.11 и уточнил главную мысль: «после смерти рыбака рыба посмела выйти на поверхность, до этого
 он ловил их всех». Значит, ролик держится на этой метафоре от хука до финала. Черновик сценария —
-[`episodes/fisherman`](episodes/fisherman/SCENARIO.md): хук «This fish is rated 3650. And it waited until one man was
-dead», финал «That same year, the fish finally dared to surface». Ниже — первый набросок фраз, 62–66 с:
+[`episodes/fisherman`](episodes/fisherman/SCENARIO.md). В v2 по просьбе автора первые 18 с — про Stockfish:
+сильнейший на Земле, 19 побед на главном чемпионате движков, Leela выиграла у него два финала из десяти, Хикару
+проиграл ему даже с лишней пешкой; затем «But this fish has a secret. It waited until one man was dead». Финал — «That
+same year, the fish finally dared to surface». Ниже — первый набросок фраз, 62–66 с:
 1. Хук: «This fish is rated 3650. No human alive can beat it.» На первом кадре — рыба из логотипа Stockfish
    (настоящая вырезка, как в `hikaru213`) над доской, плашка 3650.
 2. «It even ate Mittens.» Отсылка к ролику про Миттенс; оставить, если там Stockfish обыгрывает кошку.
