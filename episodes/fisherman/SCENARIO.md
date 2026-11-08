@@ -1,5 +1,8 @@
 # «The Fisherman» — сценарий (v4, озвучено 8.11.2026)
 
+**Готово 8.11.2026 (v1):** `build/fisherman.mp4` — 66,0 с, 1080×1920, −16,0 LUFS, истинный пик −1,5 dBTP; QA без ошибок.
+Сборка: `node render.mjs fisherman --workers 4 && python3 audio/mix.py episodes/fisherman` (рендер около 4,5 минуты).
+
 Ролик для The 64 Files (@the64files): вертикаль 1080×1920, 66,0 с, английский, аудитория США. Голос — Callum
 (ElevenLabs, `eleven_v3`, теги в квадратных скобках), темп 1.3. Текст и теги — [script.json](script.json), факты —
 [SOURCES.md](SOURCES.md). Озвучка: `ELEVENLABS_API_KEY=proxy-injected python3 audio/tts.py episodes/fisherman`
@@ -27,7 +30,7 @@
 Автор забраковал первый вариант («слишком вытянутое лицо»). Варианты лица — в `episodes/_lab` (не в git); в
 `engine/js/characters.js` добавлены необязательные параметры: `browH`, `browL`, `browSet` (брови), `cheeks`
 (скулы), `chin`, `blushK`, `neckLift`/`neckW` (шея), рубашка `dress`, причёска `fischer` с высотой `swoop`. Финальный
-вид выбирает автор.
+вид выбрал автор: вариант E (по портрету) с контуром челюсти и скулами.
 
 ## Текст и раскадровка
 
