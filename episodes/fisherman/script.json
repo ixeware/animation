@@ -1,0 +1,181 @@
+{
+  "title": "The Fisherman: Bobby Fischer (Stockfish waited for one man)",
+  "channel": "THE 64 FILES",
+  "post": "Stockfish waited for one man to die 🎣 #chess #bobbyfischer #stockfish #story",
+  "lead_in": 0.05,
+  "tail": 1.6,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.84,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.28,
+    "max_gap": 0.16
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5.0,
+    "reverb": 0.4,
+    "reverb_sec": 2.3,
+    "duck": 0.5
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "This fish is rated 3650. And it waited until one man was dead.",
+      "say": "[serious] This fish is rated thirty-six fifty. [pause] And it waited... until one man was dead.",
+      "pause": 0.3,
+      "colors": {
+        "3650.": "gold",
+        "dead.": "red"
+      }
+    },
+    {
+      "id": "name",
+      "text": "Bobby Fischer. In German, Fischer means fisherman.",
+      "say": "Bobby Fischer. [pause] In German, Fischer means... [intense] fisherman.",
+      "pause": 0.35,
+      "colors": {
+        "Bobby": "blue",
+        "Fischer.": "blue",
+        "fisherman.": "gold"
+      }
+    },
+    {
+      "id": "safe",
+      "text": "While he was alive, no big fish was safe.",
+      "say": "While he was alive... no big fish was safe.",
+      "pause": 0.3,
+      "colors": {
+        "safe.": "red"
+      }
+    },
+    {
+      "id": "young",
+      "text": "At fourteen, champion of America. At fifteen, the youngest grandmaster on Earth.",
+      "say": "At fourteen, champion of America. At fifteen... the youngest grandmaster on Earth.",
+      "pause": 0.25,
+      "colors": {
+        "fourteen,": "gold",
+        "fifteen,": "gold",
+        "youngest": "gold"
+      }
+    },
+    {
+      "id": "perfect",
+      "text": "Eleven games, eleven wins. Nobody has done it since.",
+      "say": "Eleven games, eleven wins. [pause] Nobody has done it since.",
+      "pause": 0.3,
+      "colors": {
+        "Eleven": "gold",
+        "eleven": "gold",
+        "wins.": "gold"
+      }
+    },
+    {
+      "id": "deep",
+      "text": "Then he went for the deep sea. The Soviets had held the world title for 24 years.",
+      "say": "Then he went for the deep sea. [tense] The Soviets had held the world title for twenty-four years.",
+      "pause": 0.25,
+      "colors": {
+        "Soviets": "red",
+        "24": "red",
+        "years.": "red"
+      }
+    },
+    {
+      "id": "streak",
+      "text": "He beat the best players in the world twenty times in a row.",
+      "say": "He beat the best players in the world... [intense] twenty times in a row.",
+      "pause": 0.3,
+      "colors": {
+        "twenty": "gold",
+        "row.": "gold"
+      }
+    },
+    {
+      "id": "sixzero",
+      "text": "Taimanov: 6–0. His own country took his salary. Larsen: 6–0.",
+      "say": "Taimanov: six, zero. His own country took his salary. [pause] Larsen: six, zero.",
+      "pause": 0.3,
+      "colors": {
+        "6–0.": "gold",
+        "salary.": "red"
+      }
+    },
+    {
+      "id": "spassky",
+      "text": "1972. World champion Spassky. After game six, even he applauded.",
+      "say": "Nineteen seventy-two. World champion Spassky. [pause] After game six... [awed] even he applauded.",
+      "pause": 0.35,
+      "colors": {
+        "Spassky.": "red",
+        "applauded.": "gold"
+      }
+    },
+    {
+      "id": "gap",
+      "text": "His rating: 125 above number two. Magnus never got that far ahead.",
+      "say": "His rating: a hundred and twenty-five above number two. [pause] Magnus never got that far ahead.",
+      "pause": 0.3,
+      "colors": {
+        "125": "gold",
+        "Magnus": "blue"
+      }
+    },
+    {
+      "id": "computer",
+      "text": "In 1977, he played a computer. Three games, three wins.",
+      "say": "In nineteen seventy-seven, he played a computer. [smug] Three games... three wins.",
+      "pause": 0.4,
+      "colors": {
+        "computer.": "blue",
+        "Three": "gold",
+        "three": "gold",
+        "wins.": "gold"
+      }
+    },
+    {
+      "id": "died",
+      "text": "He died in January 2008.",
+      "say": "[softly] He died in January, two thousand eight.",
+      "pause": 0.6,
+      "colors": {
+        "2008.": "red"
+      }
+    },
+    {
+      "id": "surface",
+      "text": "That same year, the fish finally dared to surface.",
+      "say": "That same year... [whispers] the fish finally dared to surface.",
+      "pause": 0.5,
+      "colors": {
+        "fish": "gold",
+        "surface.": "gold"
+      }
+    },
+    {
+      "id": "cta",
+      "text": "Stockfish: 3650. Fischer: 2785. What's yours?",
+      "say": "Stockfish: thirty-six fifty. Fischer: twenty-seven eighty-five. [curious] What's yours?",
+      "pause": 0,
+      "colors": {
+        "3650.": "gold",
+        "2785.": "gold"
+      }
+    }
+  ]
+}
