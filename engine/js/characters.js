@@ -138,6 +138,15 @@ function body(g, c, open) {
     g.beginPath(); g.moveTo(-62, 150); g.lineTo(-8, 300); g.lineTo(-70, 230); g.closePath(); g.fill();
     g.beginPath(); g.moveTo(62, 150); g.lineTo(8, 300); g.lineTo(70, 230); g.closePath(); g.fill();
   }
+  if (c.shirt === 'dress') {  // a dress shirt and no jacket (c.suit is the shirt): pointed collar, top button open, placket
+    g.fillStyle = S.shade; g.beginPath(); g.moveTo(-20, 148); g.lineTo(20, 148); g.lineTo(0, 192); g.closePath(); g.fill();
+    g.fillStyle = mix(c.suit, '#FFFFFF', 0.3); g.strokeStyle = rgba('#000000', 0.14); g.lineWidth = 3;
+    for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(sd * 6, 148); g.lineTo(sd * 46, 144); g.lineTo(sd * 36, 196); g.lineTo(sd * 10, 184); g.closePath(); g.fill(); g.stroke(); }
+    g.strokeStyle = rgba('#000000', 0.13); g.beginPath(); g.moveTo(0, 200); g.lineTo(0, 520); g.stroke();
+    g.fillStyle = rgba('#000000', 0.2); for (const y of [250, 316, 382, 448]) { g.beginPath(); g.arc(9, y, 4.5, 0, 7); g.fill(); }
+    g.strokeStyle = rgba('#000000', 0.1); g.lineWidth = 5;  // soft folds where the sleeves join
+    for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(sd * 150, 200); g.quadraticCurveTo(sd * 132, 300, sd * 150, 420); g.stroke(); }
+  }
   if (c.shirt === 'tie') { g.fillStyle = c.tie; g.beginPath(); g.moveTo(-10, 160); g.lineTo(10, 160); g.lineTo(14, 250); g.lineTo(0, 268); g.lineTo(-14, 250); g.closePath(); g.fill(); }
   if (c.shirt === 'bow') { g.fillStyle = c.tie; g.beginPath(); g.moveTo(0, 165); g.lineTo(-26, 152); g.lineTo(-26, 180); g.closePath(); g.moveTo(0, 165); g.lineTo(26, 152); g.lineTo(26, 180); g.closePath(); g.fill(); g.beginPath(); g.arc(0, 165, 7, 0, 7); g.fill(); }
   if (c.shirt === 'polo') {
@@ -262,6 +271,7 @@ function hairBack(g, c, fw) {
   if (c.hair === 'magnus' || c.hair === 'parted') { g.beginPath(); g.ellipse(0, -44, 108 * fw, 100, 0, 0, 7); g.fill(); }
   if (c.hair === 'levy') { g.beginPath(); g.ellipse(0, -52, 104 * fw, 100, 0, 0, 7); g.fill(); }
   if (c.hair === 'slick') { g.beginPath(); g.ellipse(0, -44, 104 * fw, 96, 0, 0, 7); g.fill(); }
+  if (c.hair === 'fischer') { g.beginPath(); g.ellipse(-4, -50, 104 * fw, 100, 0, 0, 7); g.fill(); }
   if (c.hair === 'quiff') { g.beginPath(); g.ellipse(4, -70, 98 * fw, 92, 0, 0, 7); g.fill(); }
   if (c.hair === 'longcurly') {  // long curly hair falling past the shoulders, bumpy outline
     const w = 100 * fw; g.beginPath(); g.moveTo(-w - 30, -40);
@@ -287,6 +297,14 @@ function hairFront(g, c, fw, fh) {
       p.bezierCurveTo(w - 6, -60, w - 20, -78, 50, -82);
       p.bezierCurveTo(10, -86, -30, -100, -44, -92); // side part swoop
       p.bezierCurveTo(-70, -84, -w + 6, -60, -w - 4, -10); break;
+    case 'fischer': {  // Bobby Fischer around 1972: short sides, a swoop combed up and back from a part on his right
+      const sw = c.swoop ?? 1;  // how tall the swoop stands above the head
+      p.moveTo(-w - 2, -6); p.bezierCurveTo(-w - 8, -h * 0.86, -58, -h - 30 * sw, -4, -h - 36 * sw);
+      p.bezierCurveTo(54, -h - 40 * sw, w + 8, -h * 0.8, w + 2, -10);
+      p.bezierCurveTo(w - 4, -56, w - 16, -82, 62, -94);
+      p.bezierCurveTo(34, -106, 0, -108, -24, -101);  // a high hairline across the forehead
+      p.bezierCurveTo(-44, -114, -62, -104, -70, -86);  // the part dips at his right temple
+      p.bezierCurveTo(-80, -64, -w + 4, -40, -w - 2, -6); break; }
     case 'fringe':
       p.moveTo(-w - 4, -6); p.bezierCurveTo(-w - 8, -h * 0.95, -30, -h - 16, 10, -h - 14);
       p.bezierCurveTo(70, -h - 8, w + 8, -h * 0.7, w + 4, -10);
@@ -431,6 +449,16 @@ function hairFront(g, c, fw, fh) {
         g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo((x0 + x1) / 2 + 8, Math.min(y0, y1) - 16, x1, y1); g.stroke();
       }
       if (!tuft) { g.strokeStyle = rgba(mix(c.hairC, '#000000', 0.45), 0.7); g.lineWidth = 3; g.beginPath(); g.moveTo(-36, -h - 12); g.quadraticCurveTo(-34, -h + 30, -34, -98); g.stroke(); }
+    } else if (c.hair === 'fischer') {  // the swoop: comb lines sweeping up and back from the part, a sheen on the crest
+      const sg = g.createLinearGradient(-60, -h - 30, 40, -100); sg.addColorStop(0, rgba(hi, 0)); sg.addColorStop(0.55, rgba(hi, 0.38)); sg.addColorStop(1, rgba(hi, 0));
+      g.fillStyle = sg; g.beginPath(); g.ellipse(-6, -h - 6 * (c.swoop ?? 1), 70, 26, -0.12, 0, 7); g.fill();
+      for (let i = 0; i < 7; i++) {
+        const x0 = -64 + i * 17, y0 = -98 - i * 2, x1 = -24 + i * 22, y1 = -h - 30 * (c.swoop ?? 1) + Math.abs(i - 3) * 6;
+        g.strokeStyle = i % 2 ? rgba('#000000', 0.2) : rgba(hi, 0.45); g.lineWidth = i % 2 ? 3 : 4;
+        g.beginPath(); g.moveTo(x0, y0); g.bezierCurveTo(x0 + 6, y0 - 30, x1 - 30, y1 + 4, x1, y1); g.stroke();
+      }
+      g.strokeStyle = rgba(mix(c.hairC, '#000000', 0.5), 0.75); g.lineWidth = 3;  // the part line
+      g.beginPath(); g.moveTo(-70, -88); g.quadraticCurveTo(-62, -h - 4, -46, -h - 26 * (c.swoop ?? 1)); g.stroke();
     } else if (c.hair === 'slick') {  // comb lines running back from the hairline over the crown
       const hl = c.hairline ?? -90;
       for (let i = -3; i <= 3; i++) {
@@ -544,8 +572,12 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   g.save(); g.globalAlpha *= alpha; g.translate(x, y); g.scale(s, s); g.rotate(tilt);
   if (silhouette) g.filter = shade;
   if (!silhouette) qaRect(g, -118 * fw, -165, 236 * fw, 300, 'face', who);
-  if (!noBody) { if (c.bodyScale) { g.save(); g.translate(0, 96); g.scale(c.bodyScale, c.bodyScale); g.translate(0, -96); body(g, c); g.restore(); } else body(g, c); }
-  if (V2 && !noBody) { g.fillStyle = 'rgba(40,20,10,0.22)'; g.beginPath(); g.ellipse(0, 114 * fh, 52 * fw, 18, 0, 0, 7); g.fill(); }
+  if (!noBody && c.neckLift) {  // a long neck: the bust sits lower and a narrower neck fills the gap up to the jaw
+    g.save(); g.translate(0, c.neckLift); body(g, c); g.restore();
+    const nw = c.neckW || 40; g.fillStyle = S.shade; g.fillRect(-nw / 2, 90, nw, 64 + c.neckLift);
+    g.fillStyle = rgba(S.deep, 0.25); g.fillRect(-nw / 2, 90, nw, 30);
+  } else if (!noBody) { if (c.bodyScale) { g.save(); g.translate(0, 96); g.scale(c.bodyScale, c.bodyScale); g.translate(0, -96); body(g, c); g.restore(); } else body(g, c); }
+  if (V2 && !noBody) { g.fillStyle = 'rgba(40,20,10,0.22)'; g.beginPath(); g.ellipse(0, 114 * fh, c.neckLift ? (c.neckW || 40) * 0.5 : 52 * fw, c.neckLift ? 12 : 18, 0, 0, 7); g.fill(); }
   hairBack(g, c, fw);
   // ears
   g.fillStyle = V2 ? S.base : S.shade;
@@ -591,12 +623,13 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   } else {
     if (V2) for (const sd of [-1, 1]) { const eg = g.createRadialGradient(sd * 38, -4, 12, sd * 38, -4, 42); eg.addColorStop(0, rgba(S.deep, 0.24)); eg.addColorStop(1, rgba(S.deep, 0)); g.fillStyle = eg; g.beginPath(); g.ellipse(sd * 38, -4, 44, 40, 0, 0, 7); g.fill(); }
     for (const sd of [-1, 1]) eye(g, sd * 38, -2, ee, sd, t, e.pupil ?? 1, c.iris ?? (V2 ? '#6A4A34' : null));
-    // brows
+    // brows; a CAST entry may make them thicker (browH), longer (browL) or set lower at the inner ends (browSet)
     g.fillStyle = c.brow;
+    const bh = c.browH || 1, bl = c.browL || 1;
     for (const sd of [-1, 1]) {
       g.save(); g.translate(sd * 40, -46 - (e.browY || 0) + (e.brow || 0) * 4);
-      g.rotate(-sd * (e.brow || 0) * 0.34 - (sd < 0 ? (e.browTilt || 0) * 0.25 : 0));
-      g.beginPath(); g.roundRect(-30, -8, 60, 16, 8); g.fill(); g.restore();
+      g.rotate(-sd * ((e.brow || 0) * 0.34 + (c.browSet || 0)) - (sd < 0 ? (e.browTilt || 0) * 0.25 : 0));
+      g.beginPath(); g.roundRect(-30 * bl, -8 * bh, 60 * bl, 16 * bh, 8 * bh); g.fill(); g.restore();
     }
     // nose
     g.save(); g.translate(turn * 12, 0);
@@ -614,7 +647,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
     }
     g.restore();
     if (V2) {
-      const ba = 0.42 + 0.35 * Math.max(e.blush || 0, c.blushAlways || 0);
+      const ba = (0.42 + 0.35 * Math.max(e.blush || 0, c.blushAlways || 0)) * (c.blushK ?? 1);
       for (const sd of [-1, 1]) { const bg = g.createRadialGradient(sd * 60, 36, 2, sd * 60, 36, 30); bg.addColorStop(0, rgba(S.blush, ba)); bg.addColorStop(1, rgba(S.blush, 0)); g.fillStyle = bg; g.beginPath(); g.ellipse(sd * 60, 36, 32, 22, 0, 0, 7); g.fill(); }
       if (c.mole) { g.fillStyle = '#6B4232'; g.beginPath(); g.arc(c.mole[0], c.mole[1], 4.5, 0, 7); g.fill(); }
       if (c.age) {  // nasolabial folds, crow's feet, bags under the eyes, forehead lines
@@ -637,6 +670,25 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
       g.strokeStyle = rgba('#9a958c', 0.5); g.lineWidth = 4;
       for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(i * 22, 90); g.quadraticCurveTo(i * 26, 140, i * 18, 180); g.stroke(); }
       g.fillStyle = '#DAD6CF'; g.beginPath(); g.ellipse(-26, 52, 34, 13, 0.25, 0, 7); g.ellipse(26, 52, 34, 13, -0.25, 0, 7); g.fill(); // mustache
+    }
+    if (c.cheeks) {  // a lean face: high cheekbones lit from above, a soft hollow under them running to the jaw
+      const k = c.cheeks;
+      for (const sd of [-1, 1]) {
+        const hg = g.createRadialGradient(sd * 64, 14, 2, sd * 64, 14, 30); hg.addColorStop(0, rgba(S.hi, 0.42 * k)); hg.addColorStop(1, rgba(S.hi, 0));
+        g.fillStyle = hg; g.beginPath(); g.ellipse(sd * 64, 14, 30, 16, sd * -0.35, 0, 7); g.fill();
+        g.save(); g.lineCap = 'round';
+        for (const [w, a] of [[16, 0.07], [9, 0.1]]) {
+          g.strokeStyle = rgba(S.deep, a * k); g.lineWidth = w;
+          g.beginPath(); g.moveTo(sd * 86, 26); g.quadraticCurveTo(sd * 72, 58, sd * 54, 84); g.stroke();
+        }
+        g.restore();
+      }
+    }
+    if (c.chin) {  // a strong chin: a soft shadow under the lower lip and a light on the point of the chin
+      const k = c.chin, cy = 100 * fh;
+      g.fillStyle = rgba(S.deep, 0.16 * k); g.beginPath(); g.ellipse(0, cy - 12, 22, 7, 0, 0, 7); g.fill();
+      const cg = g.createRadialGradient(0, cy + 6, 2, 0, cy + 6, 20); cg.addColorStop(0, rgba(S.hi, 0.4 * k)); cg.addColorStop(1, rgba(S.hi, 0));
+      g.fillStyle = cg; g.beginPath(); g.ellipse(0, cy + 6, 22, 13, 0, 0, 7); g.fill();
     }
     if (c.gaunt) {  // hollow cheeks and tired eyes
       g.strokeStyle = 'rgba(120,70,50,0.28)'; g.lineWidth = 5; g.lineCap = 'round';
