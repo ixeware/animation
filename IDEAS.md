@@ -49,7 +49,7 @@ BOBBY "THE FISHERMAN" FISCHER.
 он ловил их всех». Значит, ролик держится на этой метафоре от хука до финала. Черновик сценария —
 [`episodes/fisherman`](episodes/fisherman/SCENARIO.md). В v2 по просьбе автора первые 18 с — про Stockfish:
 сильнейший на Земле, 19 побед на главном чемпионате движков, Leela выиграла у него два финала из десяти, Хикару
-проиграл ему даже с лишней пешкой; затем «But this fish has a secret. It waited until one man was dead». Финал — «That
+проиграл ему даже с лишней пешкой; с намёком в первой же фразе («But it was afraid of one man»), затем «And still, it hid until that man was dead». Финал — «That
 same year, the fish finally dared to surface». Ниже — первый набросок фраз, 62–66 с:
 1. Хук: «This fish is rated 3650. No human alive can beat it.» На первом кадре — рыба из логотипа Stockfish
    (настоящая вырезка, как в `hikaru213`) над доской, плашка 3650.
