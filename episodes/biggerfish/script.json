@@ -1,0 +1,176 @@
+{
+  "title": "There's always a bigger fish (Stockfish and Bobby Fischer)",
+  "channel": "THE 64 FILES",
+  "post": "Every engine is a fish. Bobby Fischer was the fisherman. 🎣 Are you the fish or the fisherman? #chess #bobbyfischer #stockfish #chessedit #story",
+  "lead_in": 0.05,
+  "tail": 1.8,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.95,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.32,
+    "max_gap": 0.14
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5.0,
+    "reverb": 0.4,
+    "reverb_sec": 2.3,
+    "duck": 0.5
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "The strongest chess player on Earth is a fish. And it only dared to come up after one man died.",
+      "say": "[mysterious] The strongest chess player on Earth... is a fish. And it only dared to come up... after one man died.",
+      "pause": 0.3,
+      "colors": {
+        "fish.": "lime",
+        "died.": "red"
+      }
+    },
+    {
+      "id": "stock",
+      "text": "Stockfish. Nineteen engine world titles, twelve in a row. Every engine is food for it. Humans? Not even close.",
+      "say": "Stockfish. Nineteen engine world titles... twelve in a row. Every engine is food for it. Humans? [scoffs] Not even close.",
+      "pause": 0.3,
+      "colors": {
+        "Stockfish.": "lime",
+        "Nineteen": "gold",
+        "twelve": "gold",
+        "food": "red"
+      }
+    },
+    {
+      "id": "bigger",
+      "text": "But there's always a bigger fish.",
+      "say": "[dramatic] But there's always... a bigger fish.",
+      "pause": 0.3,
+      "colors": {
+        "bigger": "gold",
+        "fish.": "gold"
+      }
+    },
+    {
+      "id": "name",
+      "text": "Bobby Fischer. In German, Fischer means fisherman.",
+      "say": "Bobby Fischer. In German, Fischer means... fisherman.",
+      "pause": 0.3,
+      "colors": {
+        "Bobby": "blue",
+        "Fischer.": "blue",
+        "fisherman.": "gold"
+      }
+    },
+    {
+      "id": "young",
+      "text": "At thirteen, the Game of the Century. At fourteen, champion of America.",
+      "say": "At thirteen... the Game of the Century. At fourteen... champion of America.",
+      "pause": 0.3,
+      "colors": {
+        "thirteen,": "gold",
+        "Century.": "lime",
+        "fourteen,": "gold"
+      }
+    },
+    {
+      "id": "streak",
+      "text": "Then twenty wins in a row against the best in the world. 6–0. 6–0.",
+      "say": "Then twenty wins in a row against the best in the world. [excited] Six–nothing. Six–nothing.",
+      "pause": 0.3,
+      "colors": {
+        "twenty": "gold",
+        "6–0.": "lime"
+      }
+    },
+    {
+      "id": "ussr",
+      "text": "In 1972, he took on the Soviet chess machine alone, and reeled in the world title.",
+      "say": "In nineteen seventy-two, he took on the Soviet chess machine alone... and reeled in the world title.",
+      "pause": 0.3,
+      "colors": {
+        "Soviet": "red",
+        "alone,": "gold",
+        "world": "gold",
+        "title.": "gold"
+      }
+    },
+    {
+      "id": "nick",
+      "text": "Every grandmaster was a fish. He was the fisherman.",
+      "say": "[proud] Every grandmaster was a fish. He was... the fisherman.",
+      "pause": 0.3,
+      "colors": {
+        "fish.": "lime",
+        "fisherman.": "gold"
+      }
+    },
+    {
+      "id": "fall",
+      "text": "Then he walked away from his title without a single game, and vanished for twenty years.",
+      "say": "Then he walked away from his title without a single game... and vanished for twenty years.",
+      "pause": 0.3,
+      "colors": {
+        "walked": "red",
+        "away": "red",
+        "vanished": "red"
+      }
+    },
+    {
+      "id": "hate",
+      "text": "The man who caught them all came to hate the game.",
+      "say": "[quietly] The man who caught them all... came to hate the game.",
+      "pause": 0.3,
+      "colors": {
+        "hate": "red",
+        "game.": "red"
+      }
+    },
+    {
+      "id": "death",
+      "text": "He died in January 2008, at sixty-four: one year for every square of the board.",
+      "say": "He died in January two thousand eight, at sixty-four... one year for every square of the board.",
+      "pause": 0.3,
+      "colors": {
+        "2008,": "gold",
+        "sixty-four:": "gold",
+        "square": "lime"
+      }
+    },
+    {
+      "id": "surface",
+      "text": "That November, with the fisherman gone, the fish came up. Its name: Stockfish.",
+      "say": "That November, with the fisherman gone... the fish came up. [whispers] Its name... Stockfish.",
+      "pause": 0.3,
+      "colors": {
+        "November,": "gold",
+        "gone,": "red",
+        "Stockfish.": "lime"
+      }
+    },
+    {
+      "id": "cta",
+      "text": "So in your games, are you the fish, or the fisherman?",
+      "say": "[curious] So in your games... are you the fish, or the fisherman?",
+      "pause": 0.3,
+      "colors": {
+        "fish,": "lime",
+        "fisherman?": "gold"
+      }
+    }
+  ]
+}

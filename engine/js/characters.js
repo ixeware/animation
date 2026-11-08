@@ -251,6 +251,7 @@ function body(g, c, open) {
 
 function hairBack(g, c, fw) {
   g.fillStyle = c.hairC;
+  if (c.hairFx) { c.hairFx(g, 'back', { fw, S }); return; }  // a cast that draws its own hair
   if (c.hair === 'messy') { g.beginPath(); g.ellipse(0, -20, 118 * fw, 125, 0, 0, 7); g.fill(); }
   if (c.hair === 'wavy') { g.beginPath(); g.ellipse(0, -40, 112 * fw, 105, 0, 0, 7); g.fill(); }
   if (c.hair === 'wig' || c.hair === 'tied') { g.beginPath(); g.ellipse(0, -30, 112 * fw, 112, 0, 0, 7); g.fill(); }
@@ -279,6 +280,7 @@ function hairBack(g, c, fw) {
 function hairFront(g, c, fw, fh) {
   const w = 100 * fw, h = 125 * fh;
   g.fillStyle = c.hairC;
+  if (c.hairFx) { c.hairFx(g, 'front', { fw, fh, S }); return; }
   const p = new Path2D();
   switch (c.hair) {
     case 'swept':
@@ -563,6 +565,8 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
     g.fillStyle = tg; g.fillRect(-150, -180, 300, 130);
     g.restore();
   }
+  const fx = (phase, o = {}) => { if (c.faceFx && !silhouette) c.faceFx(g, phase, { e, t, fw, fh, jaw, S, hp, turn, ...o }); };
+  fx('head');
   if (c.beardStyle === 'full') {  // close full beard: sideburns, a cheek line down to the mouth corners, moustache
     const bp = dy => { const q = new Path2D(); q.moveTo(-130, -30); q.lineTo(-82, -4 - dy); q.bezierCurveTo(-80, 22 - dy, -70, 46 - dy, -48, 58 - dy);
       q.quadraticCurveTo(-38, 62 - dy, -34, 54 - dy); q.quadraticCurveTo(-18, 46 - dy, 0, 50 - dy); q.quadraticCurveTo(18, 46 - dy, 34, 54 - dy);
@@ -590,6 +594,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
     if (eyeGlow) for (const sd of [-1, 1]) { g.save(); g.shadowColor = eyeGlow; g.shadowBlur = 30; g.fillStyle = eyeGlow; g.beginPath(); g.ellipse(sd * 38, -2, 14, 8, sd * 0.25, 0, 7); g.fill(); g.restore(); }
   } else {
     if (V2) for (const sd of [-1, 1]) { const eg = g.createRadialGradient(sd * 38, -4, 12, sd * 38, -4, 42); eg.addColorStop(0, rgba(S.deep, 0.24)); eg.addColorStop(1, rgba(S.deep, 0)); g.fillStyle = eg; g.beginPath(); g.ellipse(sd * 38, -4, 44, 40, 0, 0, 7); g.fill(); }
+    fx('eyes', { ee });
     for (const sd of [-1, 1]) eye(g, sd * 38, -2, ee, sd, t, e.pupil ?? 1, c.iris ?? (V2 ? '#6A4A34' : null));
     // brows
     g.fillStyle = c.brow;
@@ -652,6 +657,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
       g.fillStyle = rgba('#000000', 0.18); for (let i = 0; i < 18; i++) { const x = Math.sin(i * 51.3) * 18, y = 92 + (Math.sin(i * 17.9) * 0.5 + 0.5) * 22; g.fillRect(x, y, 3, 3); }
     }
     mouth(g, e, c);
+    fx('mouth');
     if (c.mustache) {  // curled moustache over the mouth
       g.fillStyle = c.mustache;
       for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(0, 52); g.bezierCurveTo(sd * 30, 38, sd * 60, 44, sd * 74, 30); g.bezierCurveTo(sd * 70, 50, sd * 40, 66, 0, 60); g.fill(); }
