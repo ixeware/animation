@@ -351,6 +351,49 @@ def m_auction(S, a, b):  # the saleroom: pizzicato ostinato over ticking, a slow
     S.add(a, strings([note('D3'), note('A3'), note('D4')], b - a + 0.4, cut=3000, att=max(0.3, (b - a) * 0.8)), 0.3, rev=0.5, until=b + 0.2)
 
 
+# ---------- football: the terraces ----------
+def bombo(d=0.55):  # the big felt-beater bass drum of the Argentine fan bands: a falling low body and a woody thud
+    t = t_(d)
+    body = np.sin(2 * np.pi * (48 + 34 * np.exp(-t * 16)) * t) * np.exp(-t / 0.22)
+    thud = lp(noise(d), 900) * env_exp(d, 0.03, 0.001) * 0.6
+    return (body + thud) * 0.9
+
+
+def redoblante(a=1.0, d=0.12):  # a snare stroke, brighter and shorter than the orchestral one
+    return (bp(noise(d), 1800, 7000) * env_exp(d, 0.035, 0.001) * 0.8 + np.sin(2 * np.pi * 190 * t_(d)) * env_exp(d, 0.02) * 0.3) * a
+
+
+def platillo(d=1.2):  # a hand cymbal crash
+    return hp(noise(d), 4500) * env_exp(d, 0.35, 0.002) * 0.5
+
+
+def m_stands(S, a, b, hot=0.0):
+    """The stands: bombo on the terrace pattern (1, 2-and, 3, 4-and), sixteenth-note snare with accents, a cymbal crash
+    every two bars, a low drone under it; hot > 0 adds a brass-like call on the chords."""
+    for t in beats(a, b, 2):
+        q = round((t / BEAT) * 2) % 8  # eighth-note position in the bar
+        if q in (0, 3, 4, 7):
+            S.add(t, bombo(), 0.9 if q in (0, 4) else 0.7, pan=-0.1, rev=0.25, until=b)
+    for i, t in enumerate(beats(a, b, 4)):
+        q = round((t / BEAT) * 4) % 16
+        S.add(t, redoblante(1.0 if q % 4 == 2 else 0.45), 0.32 + 0.15 * hot, pan=0.25, rev=0.15, until=b)
+    for t in beats(a, b, 0.125):
+        S.add(t, platillo(), 0.32 + 0.1 * hot, pan=0.35, rev=0.3, until=b + 0.4)
+    S.add(a, pad([note('D2'), note('A2')], b - a + 0.4, cut=900, att=0.4), 0.22, rev=0.3, until=b + 0.2)
+    if hot:
+        for t in beats(a, b, 0.5):
+            S.add(t, pad(chord_at(t), BEAT * 1.6, cut=3400, att=0.02, rel=0.25), 0.3 * hot, pan=-0.25, rev=0.35, until=b)
+
+
+def m_stands_hot(S, a, b):
+    m_stands(S, a, b, hot=1.0)
+
+
+def m_fiesta(S, a, b):  # the trophy: the terrace drums under a major-key fanfare
+    m_stands(S, a, b, hot=0.6)
+    m_victory(S, a, b)
+
+
 MOODS = {k[2:]: v for k, v in globals().items() if k.startswith('m_')}
 
 

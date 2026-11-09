@@ -1,0 +1,15 @@
+{
+  "whistle": { "prompt": "Referee whistle, one short sharp blast, outdoor football stadium, close to the microphone, no crowd", "duration": 1.0, "variants": 2, "influence": 0.6 },
+  "kick": { "prompt": "Football being kicked hard, a powerful leather boot thump on the ball, close up, outdoors, no crowd, no music", "duration": 0.8, "variants": 2, "influence": 0.6 },
+  "touch": { "prompt": "Soft football dribble touch, a boot tapping a leather ball lightly on grass, close, single touch, no crowd", "duration": 0.5, "variants": 3, "influence": 0.6 },
+  "net": { "prompt": "Football hitting the back of the goal net, net ripple swish and rattle of the frame, close, no crowd", "duration": 1.2, "variants": 1, "influence": 0.6 },
+  "fist": { "prompt": "A fist punching a leather football, short slap and thump, close, no crowd", "duration": 0.5, "variants": 1, "influence": 0.6 },
+  "bounce": { "prompt": "Leather football bouncing once on grass, dull thud, close, no crowd", "duration": 0.5, "variants": 1, "influence": 0.6 },
+  "crowd_roar": { "prompt": "Huge football stadium crowd erupting after a goal, over 100,000 fans roaring and cheering, sudden burst then sustained, no music", "duration": 6.0, "variants": 2, "influence": 0.5 },
+  "crowd_gasp": { "prompt": "Large football stadium crowd gasping in surprise, a rising ooh, then murmuring, no music", "duration": 2.5, "variants": 1, "influence": 0.5 },
+  "crowd_protest": { "prompt": "Football stadium crowd whistling and booing in protest, loud, no music", "duration": 3.0, "variants": 1, "influence": 0.5 },
+  "crowd_bed": { "prompt": "Football stadium crowd ambience during a match, 100,000 fans, steady murmur, distant chanting and drums, daytime, no music, no commentary", "duration": 20.0, "loop": true, "variants": 1, "influence": 0.4 },
+  "radio_static": { "prompt": "Old 1980s AM radio static crackle and a quick tuning sweep", "duration": 1.5, "variants": 1, "influence": 0.5 },
+  "studs": { "prompt": "Footsteps of football boots with metal studs on a concrete corridor floor, two players walking, clacking, echo", "duration": 2.5, "variants": 1, "influence": 0.5 },
+  "market": { "prompt": "Busy outdoor street market in Mexico City, vendors calling, chatter, distant traffic, daytime ambience, no music", "duration": 12.0, "loop": true, "variants": 1, "influence": 0.4 }
+}

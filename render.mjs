@@ -9,8 +9,10 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = path.dirname(new URL(import.meta.url).pathname);
+// fileURLToPath, not URL.pathname: on Windows the pathname is "/C:/..." and every served path would 404
+const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const ep = args[0];
 const opt = k => { const i = args.indexOf('--' + k); return i >= 0 ? args[i + 1] : null; };
@@ -68,7 +70,9 @@ function qaCheck(fr, t, W = 1080, H = 1920) {
   return out.filter(([type]) => !(fr.allow || []).includes(type)).map(([type, what]) => ({ t, type, what, shot: fr.shot }));
 }
 
-const browser = await chromium.launch({ args: ['--disable-gpu-vsync', '--force-color-profile=srgb', '--disable-web-security'] });
+// PW_CHANNEL=msedge (or chrome) renders with an installed browser instead of Playwright's own Chromium download
+const browser = await chromium.launch({ ...(process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {}),
+  args: ['--disable-gpu-vsync', '--force-color-profile=srgb', '--disable-web-security'] });
 try {
   if (args.includes('--qa')) {
     const step = +(opt('step') || 0.1), N = +(opt('workers') || 4);
@@ -110,12 +114,12 @@ try {
     console.log('stills ->', dir);
   } else if (args.includes('--cues')) {  // cues.json only: re-mix after a sound edit without re-rendering the video
     const page = await openPage(browser);
-    fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC, musicFx: window.MUSICFX})'), null, 1));
+    fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC, musicFx: window.MUSICFX, ambience: window.AMBIENCE})'), null, 1));
     console.log('cues ->', path.join(BUILD, 'cues.json'));
   } else {
     const page0 = await openPage(browser);
     const dur = await page0.evaluate('window.DURATION');
-    fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page0.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC, musicFx: window.MUSICFX})'), null, 1));
+    fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page0.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC, musicFx: window.MUSICFX, ambience: window.AMBIENCE})'), null, 1));
     await page0.close();
     const from = +(opt('from') || 0), to = +(opt('to') || dur);
     const f0 = Math.round(from * FPS), f1 = Math.round(to * FPS);

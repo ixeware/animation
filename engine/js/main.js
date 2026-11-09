@@ -191,5 +191,7 @@ const autoCues = shots.slice(1).flatMap(s => s.trans === 'shatter' ? [{ t: s.a, 
 window.CUES = [...(film.cues || []), ...(film.autoWhoosh === false ? [] : autoCues)];
 window.MUSIC = film.music || [];
 window.MUSICFX = film.musicFx || [];  // music cut-outs before a big hit and muffled passages: [{t0, t1, kind: 'mute' | 'lp', f}]
+// looped beds on their own bus (a stadium crowd, a street market): [{id, t0, t1, gain, fi, fo, keys: [[t, gain], ...]}]
+window.AMBIENCE = film.ambience || [];
 window.READY = true;
 if (q.has('t')) renderFrame(+q.get('t'));

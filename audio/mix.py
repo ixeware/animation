@@ -140,7 +140,38 @@ def mix_v2(b, meta, vv, n, dur, cfg):
     if len(act):  # the loud moments of the SFX bus land `sfx_gap` LU under the voice
         fx *= 10 ** ((lv - cfg.get('sfx_gap', 0.5) - np.percentile(act, 90)) / 20)
     print(f'  v2: voice {lv:.1f} LUFS, music {lv - cfg.get("music_gap", 8):.1f}, sfx p90 {lv - cfg.get("sfx_gap", 0.5):.1f} LUFS; samples used: {sum(used.values())}')
-    return m, fx
+    amb = ambience(meta.get('ambience', []), n, bank)
+    if np.abs(amb).max() > 1e-5:  # its own bus: dry, `amb_gap` LU under the voice, ducked while the narrator speaks
+        la = meter.integrated_loudness(amb)
+        amb *= 10 ** ((lv - cfg.get('amb_gap', 14) - la) / 20)
+        amb *= (1 - cfg.get('amb_duck', 0.3) * np.clip(envelope(vv[:, 0], 0.25) * 2.2, 0, 1))[:, None]
+        print(f'  ambience: {len(meta["ambience"])} bed(s) at {lv - cfg.get("amb_gap", 14):.1f} LUFS')
+    return m, fx, amb
+
+
+def ambience(segs, n, bank):
+    """Looped beds (a stadium crowd, a street market) over [t0, t1]: the sample is tiled with 0.3 s crossfades from a
+    seeded offset, faded in over fi and out over fo seconds, scaled by gain or by keys [[t, gain], ...] (absolute time)."""
+    out = np.zeros((n, 2)); r = np.random.default_rng(11)
+    for sg in segs:
+        x = bank.get(sg['id'], [None])[0]
+        if x is None:
+            print('  unknown ambience', sg['id']); continue
+        s0, s1 = int(sg['t0'] * SR), min(n, int(sg['t1'] * SR))
+        L = s1 - s0
+        if L <= 0: continue
+        xf = min(int(0.3 * SR), len(x) // 4)
+        buf = x[int(r.uniform(0, 0.6) * len(x)):]
+        while len(buf) < L:  # append another copy, crossfaded
+            k = np.linspace(0, 1, xf)[:, None]
+            buf = np.concatenate([buf[:-xf], buf[-xf:] * (1 - k) + x[:xf] * k, x[xf:]])
+        seg = buf[:L].copy()
+        t = (s0 + np.arange(L)) / SR
+        env = np.clip((t - sg['t0']) / max(1e-3, sg.get('fi', 0.3)), 0, 1) * np.clip((sg['t1'] - t) / max(1e-3, sg.get('fo', 0.3)), 0, 1)
+        if sg.get('keys'):
+            env *= np.interp(t, [k[0] for k in sg['keys']], [k[1] for k in sg['keys']])
+        out[s0:s1] += seg * (env * sg.get('gain', 1))[:, None]
+    return out
 
 
 def main(ep):
@@ -165,9 +196,10 @@ def main(ep):
     cfg = script.get('mix', {})
     if cfg.get('engine') == 'v2':
         vv = np.stack([v, v], 1)
-        m, fx = mix_v2(b, meta, vv, n, dur, cfg)
-        mixd = vv + m + fx
+        m, fx, amb = mix_v2(b, meta, vv, n, dur, cfg)
+        mixd = vv + m + fx + amb
         sf.write(b / 'stems_voice.wav', vv, SR); sf.write(b / 'stems_music.wav', m, SR); sf.write(b / 'stems_sfx.wav', fx, SR)
+        if np.abs(amb).max() > 1e-5: sf.write(b / 'stems_amb.wav', amb, SR)
         return finish(b, mixd)
     # music with ducking under the voice
     m = music.render(meta['music'], dur)[:n]

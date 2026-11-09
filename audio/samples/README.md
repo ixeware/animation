@@ -17,3 +17,5 @@ confetti, notify, tvoff, glass, heartbeat.
 `move_*` and `move_capture_*` are not from ElevenLabs: they are synthesized from scratch by `audio/sfx_move.py`
 (a swish into a wooden knock, a sub thump and a high glint; the capture is heavier, with a crunch). Their hit sits
 85 ms into the file, so cue them at landing − 0.085 s (`MOVE_HIT` in `engine/js/movefx.js`).
+
+Football (the `handofgod` episode; list and prompts in `football.json`, made with `tools/eleven_sfx.py`): whistle, kick, touch, net, fist, bounce, crowd_roar, crowd_gasp, crowd_protest, radio_static, studs; loops for the ambience bus (`ambience` in a film, see `audio/mix.py`): crowd_bed, market.

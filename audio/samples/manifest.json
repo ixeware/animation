@@ -320,5 +320,103 @@
   ],
   "prompt": "own design: falling sub boom with a swell, driven 2nd harmonic, low thump, hall tail (long, for mate and the biggest reveals)",
   "source": "synthesized by audio/sfx_boom.py"
+ },
+ "whistle": {
+  "files": [
+   "whistle_0.flac",
+   "whistle_1.flac"
+  ],
+  "prompt": "Referee whistle, one short sharp blast, outdoor football stadium, close to the microphone, no crowd",
+  "source": "ElevenLabs sound generation"
+ },
+ "kick": {
+  "files": [
+   "kick_0.flac",
+   "kick_1.flac"
+  ],
+  "prompt": "Football being kicked hard, a powerful leather boot thump on the ball, close up, outdoors, no crowd, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "touch": {
+  "files": [
+   "touch_0.flac",
+   "touch_1.flac",
+   "touch_2.flac"
+  ],
+  "prompt": "Soft football dribble touch, a boot tapping a leather ball lightly on grass, close, single touch, no crowd",
+  "source": "ElevenLabs sound generation"
+ },
+ "net": {
+  "files": [
+   "net_0.flac"
+  ],
+  "prompt": "Football hitting the back of the goal net, net ripple swish and rattle of the frame, close, no crowd",
+  "source": "ElevenLabs sound generation"
+ },
+ "fist": {
+  "files": [
+   "fist_0.flac"
+  ],
+  "prompt": "A fist punching a leather football, short slap and thump, close, no crowd",
+  "source": "ElevenLabs sound generation"
+ },
+ "bounce": {
+  "files": [
+   "bounce_0.flac"
+  ],
+  "prompt": "Leather football bouncing once on grass, dull thud, close, no crowd",
+  "source": "ElevenLabs sound generation"
+ },
+ "crowd_roar": {
+  "files": [
+   "crowd_roar_0.flac",
+   "crowd_roar_1.flac"
+  ],
+  "prompt": "Huge football stadium crowd erupting after a goal, over 100,000 fans roaring and cheering, sudden burst then sustained, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "crowd_gasp": {
+  "files": [
+   "crowd_gasp_0.flac"
+  ],
+  "prompt": "Large football stadium crowd gasping in surprise, a rising ooh, then murmuring, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "crowd_protest": {
+  "files": [
+   "crowd_protest_0.flac"
+  ],
+  "prompt": "Football stadium crowd whistling and booing in protest, loud, no music",
+  "source": "ElevenLabs sound generation"
+ },
+ "crowd_bed": {
+  "files": [
+   "crowd_bed_0.flac"
+  ],
+  "prompt": "Football stadium crowd ambience during a match, 100,000 fans, steady murmur, distant chanting and drums, daytime, no music, no commentary",
+  "source": "ElevenLabs sound generation",
+  "loop": true
+ },
+ "radio_static": {
+  "files": [
+   "radio_static_0.flac"
+  ],
+  "prompt": "Old 1980s AM radio static crackle and a quick tuning sweep",
+  "source": "ElevenLabs sound generation"
+ },
+ "studs": {
+  "files": [
+   "studs_0.flac"
+  ],
+  "prompt": "Footsteps of football boots with metal studs on a concrete corridor floor, two players walking, clacking, echo",
+  "source": "ElevenLabs sound generation"
+ },
+ "market": {
+  "files": [
+   "market_0.flac"
+  ],
+  "prompt": "Busy outdoor street market in Mexico City, vendors calling, chatter, distant traffic, daytime ambience, no music",
+  "source": "ElevenLabs sound generation",
+  "loop": true
  }
 }

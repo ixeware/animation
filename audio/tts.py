@@ -18,7 +18,10 @@ A phrase can hold its breath: "hold": {"after": "it,", "sec": 1.0} puts a second
   {"sts": {"voice_id": "...", "model": "eleven_multilingual_sts_v2", "stability": 0.5, "similarity_boost": 0.85}}
                                                    ElevenLabs speech-to-speech: our take keeps its timing and
                                                    intonation, the timbre becomes the chosen narrator (env ELEVENLABS_API_KEY)
-Word timings are re-measured with whisper after post-processing.
+Word timings are re-measured with whisper after post-processing, unless the voice has "timing": "alignment"
+(ElevenLabs): then the API's own character alignment is used, with the [audio tags] cut out and the times carried
+through the trim, the tempo change and the squeezed pauses (no whisper, no torch).
+"hold" may also be a list of such holds (spacing out a run of short words).
 """
 import base64
 import hashlib
@@ -97,26 +100,33 @@ def align(caps, heard, dur):
     return times
 
 
-def squeeze(a, max_gap=0.25, thr_db=-32, fade=0.02):
-    """Shorten silences inside a take to at most max_gap seconds (dramatic engines pause a lot)."""
+def squeeze(a, max_gap=0.25, thr_db=-32, fade=0.02, with_map=False):
+    """Shorten silences inside a take to at most max_gap seconds (dramatic engines pause a lot).
+    with_map: also return (in_samples, out_samples) knots, so word times can follow the cut (np.interp)."""
     hop = int(0.01 * SR)
     n = len(a) // hop
     if n < 3:
-        return a
+        return (a, (np.array([0.0, len(a)]), np.array([0.0, len(a)]))) if with_map else a
     rms = np.sqrt(np.mean(a[:n * hop].reshape(n, hop) ** 2, axis=1) + 1e-12)
     quiet = 20 * np.log10(rms / (rms.max() + 1e-12)) < thr_db
     out, i, keep, f = [], 0, int(max_gap * SR), int(fade * SR)
+    kin, kout, pos = [0], [0], 0
     while i < n:
         j = i
         while j < n and quiet[j] == quiet[i]:
             j += 1
-        seg = a[i * hop:(j * hop if j < n else len(a))]
+        s0, s1 = i * hop, (j * hop if j < n else len(a))
+        seg = a[s0:s1]
         if quiet[i] and 0 < i and j < n and len(seg) > keep:  # an inner pause: keep its two ends, cross-faded
             h = keep // 2
             seg = np.concatenate([seg[:h] * np.r_[np.ones(h - f), np.linspace(1, 0, f)], seg[-h:] * np.r_[np.linspace(0, 1, f), np.ones(h - f)]])
-        out.append(seg)
+            kin += [s0 + h, s1 - h, s1]; kout += [pos + h, pos + h, pos + 2 * h]  # the cut middle collapses to one instant
+        else:
+            kin.append(s1); kout.append(pos + len(seg))
+        out.append(seg); pos += len(seg)
         i = j
-    return np.concatenate(out)
+    res = np.concatenate(out)
+    return (res, (np.array(kin, float), np.array(kout, float))) if with_map else res
 
 
 def tempo(a, k):
@@ -213,10 +223,19 @@ class ElevenLabs(Cached):
             f.write_text(r.text)
         d = json.loads(f.read_text())
         al = d.get('alignment') or d.get('normalized_alignment')
-        if TAG.search(text):  # character timings would include the [tags]: measure the words with whisper instead
-            return recognize(decode(base64.b64decode(d['audio_base64'])), untag(text))
+        chars = al['characters']
+        if TAG.search(text):
+            if self.v.get('timing') != 'alignment':  # character timings would include the [tags]: measure the words with whisper instead
+                return recognize(decode(base64.b64decode(d['audio_base64'])), untag(text))
+            # "timing": "alignment": v3 aligns every input character, the [tags] too (a tag's span covers the pause it
+            # makes). Blank the tag characters so they split words and never become words; the spoken words keep the
+            # API's own timings (no whisper, no torch)
+            s = ''.join(chars)
+            if len(s) == len(chars):
+                drop = {i for m in TAG.finditer(s) for i in range(m.start(), m.end())}
+                chars = [' ' if i in drop else ch for i, ch in enumerate(chars)]
         return decode(base64.b64decode(d['audio_base64'])), words_from_chars(
-            al['characters'], al['character_start_times_seconds'], al['character_end_times_seconds'])
+            chars, al['character_start_times_seconds'], al['character_end_times_seconds'])
 
 
 class Fish(Cached):
@@ -347,10 +366,16 @@ def main(ep):
         say = p.get('say', p['text'])
         audio, heard = tts(say, ph[i - 1].get('say', ph[i - 1]['text']) if i else '', ph[i + 1].get('say', ph[i + 1]['text']) if i + 1 < len(ph) else '')
         if fx.get('tempo', 1) != 1 or sts or fx.get('max_gap'):
-            audio = tempo(trim(audio)[0], fx.get('tempo', 1))
-            if fx.get('max_gap'): audio = squeeze(audio, fx['max_gap'])
+            a0, off = trim(audio)
+            k = fx.get('tempo', 1)
+            audio, knots = tempo(a0, k), None
+            if fx.get('max_gap'): audio, knots = squeeze(audio, fx['max_gap'], with_map=True)
             if sts: audio = sts(audio)
-            audio, heard = recognize(audio, untag(say))  # timings change with tempo and voice: measure again
+            if v.get('timing') == 'alignment' and not sts:  # carry the API's word times through the trim, tempo and squeeze
+                rem = (lambda x: float(np.interp(x * SR, knots[0], knots[1])) / SR) if knots else (lambda x: x)
+                heard = [(w, rem(max(0.0, s - off) / k), rem(max(0.0, e - off) / k)) for w, s, e in heard]
+            else:
+                audio, heard = recognize(audio, untag(say))  # timings change with tempo and voice: measure again
         audio, cut = trim(audio)
         if p.get('echo'):  # [delay s, decay]: a shouted line rings out like in a hall
             dl, dk = p['echo']; n = int(dl * SR)
@@ -365,8 +390,10 @@ def main(ep):
         else:
             print(f"  [{p['id']}] {len(heard)} heard vs {len(caps)} words -> aligned")
             spans = align(caps, heard, dur)
-        if p.get('hold'):  # {"after": word, "sec": s}: a held breath inside the line, for a big move to land in
-            k = caps.index(p['hold']['after']); hs = p['hold']['sec']
+        # {"after": word, "sec": s} or a list of them: held breaths inside the line, for a big move to land in (a list
+        # spaces out a run of short words, e.g. the names of the players a dribbler goes past)
+        for hd in ([p['hold']] if isinstance(p.get('hold'), dict) else p.get('hold') or []):
+            k = caps.index(hd['after']); hs = hd['sec']
             n0, f = int(((spans[k][1] + spans[k + 1][0]) / 2 if k + 1 < len(spans) else spans[k][1]) * SR), int(0.01 * SR)
             audio = audio.copy(); audio[max(0, n0 - f):n0] *= np.linspace(1, 0, n0 - max(0, n0 - f)); audio[n0:n0 + f] *= np.linspace(0, 1, len(audio[n0:n0 + f]))
             audio = np.concatenate([audio[:n0], np.zeros(int(hs * SR)), audio[n0:]])
