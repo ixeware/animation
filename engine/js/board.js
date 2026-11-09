@@ -10,11 +10,11 @@ const norm = a => { const l = Math.hypot(...a); return [a[0] / l, a[1] / l, a[2]
 
 export const sqXZ = name => [name.charCodeAt(0) - 97 + 0.5, +name[1] - 1 + 0.5];
 
-// the outline of the slab, -m..8+m with corners rounded to rc: points with their outward normals, the corners'
-// arcs in n steps (with rc = 0 an arc's points coincide and its quads are skipped)
-function slabRing(m, rc, n = 14) {
-  const lo = -m + rc, hi = 8 + m - rc, out = [];
-  for (const [cx, cz, a0] of [[hi, lo, -Math.PI / 2], [hi, hi, 0], [lo, hi, Math.PI / 2], [lo, lo, Math.PI]])
+// the outline of the slab, -mx..8+mx across the files and -mz..8+mz along them, corners rounded to rc: points with
+// their outward normals, the corners' arcs in n steps (with rc = 0 an arc's points coincide and its quads are skipped)
+export function slabRing(mx, mz, rc, n = 14) {
+  const out = [];
+  for (const [cx, cz, a0] of [[8 + mx - rc, -mz + rc, -Math.PI / 2], [8 + mx - rc, 8 + mz - rc, 0], [-mx + rc, 8 + mz - rc, Math.PI / 2], [-mx + rc, -mz + rc, Math.PI]])
     for (let i = 0; i <= n; i++) {
       const a = a0 + i / n * Math.PI / 2, nx = Math.cos(a), nz = Math.sin(a);
       out.push({ x: cx + nx * rc, z: cz + nz * rc, nx, nz });
@@ -61,10 +61,11 @@ export class Board {
 
   // the slab as in the reference (STYLE_BIBLE rule 46): rounded corners (rc), a soft light rim along the top edge, dark
   // sides that catch a little light from the camera's right, a soft shadow round the foot, and the channel's mark
-  // engraved on every side that faces the camera (LOOK.mark; mark: null leaves the sides bare)
-  drawSlab(ctx, { light = C.sq2, dark = C.sq1, frame = '#151A1D', side = '#0B0E10', m = 0.35, th = 0.35, rc = 0.3, rim = 0.45,
+  // engraved on every side that faces the camera (LOOK.mark; mark: null leaves the sides bare). mx / mz: a frame wider
+  // across the files than along them (a rectangular board, as the Chessnut Move); both default to m
+  drawSlab(ctx, { light = C.sq2, dark = C.sq1, frame = '#151A1D', side = '#0B0E10', m = 0.35, mx = m, mz = m, th = 0.35, rc = 0.3, rim = 0.45,
     shadow = 0.4, mark = LOOK.mark, ink = null, tint = null, tintA = 0 } = {}) {
-    const ring = slabRing(m, Math.min(rc, m)), E = this.E;
+    const ring = slabRing(mx, mz, Math.min(rc, mx, mz)), E = this.E;
     if (shadow > 0) {
       ctx.save(); this.poly(ctx, ring.map(p => [p.x, -th, p.z]));
       ctx.shadowColor = `rgba(0,0,0,${shadow})`; ctx.shadowBlur = clamp(this.project(4, -th, 4).s * 0.22, 3, 36);
@@ -103,14 +104,14 @@ export class Board {
       ctx.fillStyle = (f + r) % 2 ? light : dark; ctx.fill();
     }
     if (tint && tintA > 0) { this.quad(ctx, 0, 0, 8, 8); ctx.fillStyle = rgba(tint, tintA); ctx.fill(); }
-    if (mark) this.engrave(ctx, mark, { m, th, rc: Math.min(rc, m), ink: ink || mix(side, '#E4ECEE', 0.3) });
+    if (mark) this.engrave(ctx, mark, { m: Math.min(mx, mz), mx, mz, th, rc: Math.min(rc, mx, mz), ink: ink || mix(side, '#E4ECEE', 0.3) });
   }
 
   // a mark engraved on the sides of the slab, in Cinzel caps a little over half the side's height, centred. Glyph by
   // glyph: each one is mapped onto the side with the perspective of its own spot (the Jacobian of the projection
   // there), so the line of letters follows the side into the distance. A dark copy above and a faint light one below
   // cut it in.
-  engrave(ctx, text, { m, th, rc, ink }) {
+  engrave(ctx, text, { m, mx = m, mz = m, th, rc, ink }) {
     const fs = 100, chars = [...text];
     ctx.save(); ctx.font = `700 ${fs}px Cinzel`; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.letterSpacing = '0px';
     const capPx = ctx.measureText('H').actualBoundingBoxAscent, gw = chars.map(ch => ctx.measureText(ch).width), track = fs * 0.1;
@@ -118,7 +119,7 @@ export class Board {
     const k = Math.min(th * 0.56 / capPx, (8 + 2 * m - 2 * rc - 1.2) / span), cap = capPx * k;  // world units per font px
     const base = ctx.getTransform(), a0 = ctx.globalAlpha, e = 0.05;
     for (const [nx, nz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
-      const rx = -nz, rz = nx, cx = 4 + nx * (4 + m), cz = 4 + nz * (4 + m), cy = -th / 2;
+      const rx = -nz, rz = nx, cx = 4 + nx * (4 + mx), cz = 4 + nz * (4 + mz), cy = -th / 2;
       const v = norm(sub(this.E, [cx, cy, cz])), a = smooth(clamp((nx * v[0] + nz * v[2] - 0.06) / 0.24));
       if (a <= 0.01) continue;
       let u = -span * k / 2;
@@ -224,7 +225,7 @@ export class Board {
         gr.addColorStop(0, rgba(p.halo, 0.55 * p.haloA)); gr.addColorStop(1, rgba(p.halo, 0));
         ctx.fillStyle = gr; ctx.beginPath(); ctx.ellipse(g.x, g.y, r, r * 0.4, 0, 0, 7); ctx.fill(); ctx.restore();
       }
-      drawPiece(ctx, p.t, p.c, p.pr.x, p.pr.y, h, { blur, alpha: p.alpha ?? 1, glow: p.glow, rot: p.rot || 0, sx: p.sx || 1, sy: p.sy || 1 });
+      drawPiece(ctx, p.t, p.c, p.pr.x, p.pr.y, h, { blur, alpha: p.alpha ?? 1, glow: p.glow, rot: p.rot || 0, sx: p.sx || 1, sy: p.sy || 1, skin: p.skin || null });
       if (p.bow) drawBow(ctx, p.pr.x, p.pr.y - h * 0.62, h * 0.32, p.bow);
       if (p.brill) brilliantIcon(ctx, p.pr.x - h * 0.34, p.pr.y - h * 1.04, Math.max(32, h * 0.3), p.brill);  // left: the move label sits on the right
     }

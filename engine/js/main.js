@@ -183,6 +183,7 @@ function renderFrame(t, frame = Math.round(t * FPS)) {
 }
 
 window.DURATION = DURATION;
+window.SHOTS = shots.map(s => ({ i: s.i, a: +s.a.toFixed(3), b: +s.b.toFixed(3) }));  // for tools: where each shot starts and ends
 window.renderFrame = renderFrame;
 window.qaFrame = t => { renderFrame(t); return { items: QA.items, M: QA.M, skip: QA.skip, shot: QA.shot, allow: QA.allow }; };
 // every stylized cut gets a soft whoosh; glass breaks get their crash

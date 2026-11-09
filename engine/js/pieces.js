@@ -105,7 +105,22 @@ const SW2 = 132, SH2 = 186, BASE2 = 14;  // v2 sprite box: base line BASE2 units
 
 // thick outline around the outer silhouette only (stroke first, body over it), flat body with a soft cylindrical
 // shade, details (collars, band, plinth step, eye, mane) in the outline colour
-function paint2(type, color, glow) {
+// skin 'nut': the Chessnut Move set (episodes/hikaru213) — glossy bodies on the robot base, a ring of brushed copper
+// with a dark seam over it and a dark lip at the floor, where the wheels are
+function nutBase(g) {
+  const b = new Path2D(); base2(b);
+  g.save(); g.lineJoin = 'round'; g.strokeStyle = '#4A3324'; g.lineWidth = 12; g.stroke(b);
+  const cu = g.createLinearGradient(-44, 0, 44, 0);
+  cu.addColorStop(0, '#9C7656'); cu.addColorStop(0.22, '#F0D3B0'); cu.addColorStop(0.42, '#D2A57E'); cu.addColorStop(0.78, '#9A6D4D'); cu.addColorStop(1, '#6E4C36');
+  g.fillStyle = cu; g.fill(b);
+  g.clip(b);
+  g.fillStyle = 'rgba(40,24,14,0.55)'; g.fillRect(-46, -5, 92, 6);                 // the dark lip at the floor
+  g.fillStyle = 'rgba(255,240,220,0.55)'; g.fillRect(-46, -25.5, 92, 2.4);         // the light catching the top edge
+  g.fillStyle = 'rgba(60,36,22,0.5)'; g.fillRect(-46, -15.5, 92, 2);               // the seam between the two steps
+  g.fillStyle = 'rgba(255,248,236,0.35)'; g.fillRect(-27, -28, 6, 28);             // a vertical sheen
+  g.restore();
+}
+function paint2(type, color, glow, skin = null) {
   const c = makeCanvas(SW2 * S, SH2 * S), g = c.getContext('2d'); c.base = SH2 - BASE2;
   g.translate(SW2 * S / 2, (SH2 - BASE2) * S); g.scale(S, S);
   const p = new Path2D(); SHAPES2[type](p);
@@ -122,7 +137,7 @@ function paint2(type, color, glow) {
   g.save(); g.clip(p);
   const v = g.createLinearGradient(0, 0, 0, -60); v.addColorStop(0, rgba('#000000', white ? 0.12 : 0.24)); v.addColorStop(1, 'rgba(0,0,0,0)');
   g.fillStyle = v; g.fillRect(-66, -60, 132, 74);
-  g.fillStyle = rgba('#FFFFFF', white ? 0.6 : 0.1); g.fillRect(-25, -175, 9, 175);
+  g.fillStyle = rgba('#FFFFFF', white ? 0.6 : skin === 'nut' ? 0.2 : 0.1); g.fillRect(-25, -175, 9, 175);
   g.restore();
   g.strokeStyle = rgba(rim, white ? 0.9 : 0.8); g.lineWidth = 3.2;
   g.beginPath(); g.moveTo(-35, -16); g.lineTo(35, -16); g.stroke();
@@ -133,6 +148,7 @@ function paint2(type, color, glow) {
     g.fillStyle = white ? '#4A535B' : '#C4CED7'; g.beginPath(); g.ellipse(-14, -112, 4.5, 5.5, 0, 0, Math.PI * 2); g.fill();
     g.beginPath(); g.moveTo(11, -130); g.bezierCurveTo(27, -104, 31, -72, 25, -42); g.stroke();
   }
+  if (skin === 'nut') nutBase(g);
   return c;
 }
 
@@ -169,15 +185,15 @@ function paint(type, color, glow) {
   return c;
 }
 
-export function sprite(type, color, glow = null) {
-  const key = (LOOK.v2 ? 'v2' : '') + type + color + (glow || '');
-  if (!cache.has(key)) { const c = LOOK.v2 ? paint2(type, color, glow) : paint(type, color, glow); c.base = c.base ?? SH - 10; cache.set(key, c); }
+export function sprite(type, color, glow = null, skin = null) {
+  const key = (LOOK.v2 ? 'v2' : '') + type + color + (glow || '') + (skin ? '/' + skin : '');
+  if (!cache.has(key)) { const c = LOOK.v2 ? paint2(type, color, glow, skin) : paint(type, color, glow); c.base = c.base ?? SH - 10; cache.set(key, c); }
   return cache.get(key);
 }
 
 // draw a piece standing at (x, y=base) with pixel height h (king-relative scale)
-export function drawPiece(ctx, type, color, x, y, h, { blur = 0, alpha = 1, glow = null, rot = 0, sx = 1, sy = 1 } = {}) {
-  const img = sprite(type, color, glow);
+export function drawPiece(ctx, type, color, x, y, h, { blur = 0, alpha = 1, glow = null, rot = 0, sx = 1, sy = 1, skin = null } = {}) {
+  const img = sprite(type, color, glow, skin);
   const s = h / 150, w = img.width / S * s, hh = img.height / S * s;
   ctx.save(); ctx.globalAlpha *= alpha;
   if (blur > 0.6) ctx.filter = `blur(${blur.toFixed(1)}px)`;

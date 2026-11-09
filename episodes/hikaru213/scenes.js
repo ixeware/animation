@@ -12,7 +12,7 @@
 // the Barcelona stage, a streaming room, two rating towers); cuts go through screens and objects. Palette (rule 48):
 // Baku navy and tournament blue, mind teal on black, Chessnut white and graphite in a warm room, stream violet.
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect, hash, smooth } from '../../engine/js/core.js';
-import { Board, sqXZ, piecesAt, brilliantIcon } from '../../engine/js/board.js';
+import { Board, sqXZ, piecesAt, brilliantIcon, slabRing } from '../../engine/js/board.js';
 import { EXPR, exprAt, CAST, drawChar, hand } from '../../engine/js/characters.js';
 import { badge, plate, inkText, inkWidth, nameTitle, placeStamp, stamp, counter, sans, serif, mono, popIn } from '../../engine/js/hud.js';
 import { rig, seated, actor } from '../../engine/js/stage.js';
@@ -503,23 +503,85 @@ function tvSet(g, feed = 0) {
     if (depth(-5.2, 0, 10.6) > 0.8) { g.fillStyle = i % 2 ? '#4E9447' : '#3F7F3C'; g.beginPath(); g.ellipse(q.x, q.y, q.s * 0.62, q.s * 0.2, a * 0.6 - 0.4, 0, 7); g.fill(); }
   }
 }
-// the Chessnut Move: white and graphite squares, a wide graphite frame with the name on the front edge and three LEDs
-const NUT = { light: '#ECEBE6', dark: '#2E3034', frame: '#121315', side: '#0B0C0D', m: 0.62, th: 0.5, rc: 0.55, rim: 0.35, shadow: 0.5, mark: null };
-const LOGO = tex(1024, 160, (x, w, h) => {
-  x.clearRect(0, 0, w, h); x.font = sans(118, 800); x.letterSpacing = '6px'; x.textBaseline = 'middle'; x.fillStyle = '#D9DEE3';
-  x.fillText('Chessnut', 8, h / 2 + 6);
-});
-function nutBoard(g, t, { leds = 1, logo = 1 } = {}) {
-  B.drawSlab(g, NUT);
-  if (logo > 0 && B.E[2] < 0.5 && B.E[1] > 0) texQuad(g, LOGO, [2.8, 0.004, -0.14], [5.2, 0.004, -0.14], [2.8, 0.004, -0.515], { under: false, a: logo * 0.9 });
-  if (leds > 0 && B.E[1] > 0) [6.9, 7.18, 7.46].forEach((x, i) => {
-    if (depth(x, 0, -0.31) < 0.6) return;
-    const p = B.project(x, 0.005, -0.31), on = 0.6 + 0.4 * Math.sin(t * 3 + i * 1.3), r = Math.max(2, p.s * 0.06);
-    g.save(); g.globalAlpha *= leds; g.fillStyle = i === 0 ? MIND : '#F4F2EE'; g.shadowColor = g.fillStyle; g.shadowBlur = r * 4 * on;
-    g.beginPath(); g.ellipse(p.x, p.y, r, r * 0.5, 0, 0, 7); g.fill(); g.restore();
-  });
+// the Chessnut Move as Chessnut shows it (chessnutech.com: model CM100, 632 × 520 × 22 mm, 55 mm squares; SOURCES.md):
+// a matte charcoal wooden frame, wide at the sides (96 mm = 1.75 squares: the pieces not in play park there, two rows a
+// side, as in Chessnut's own footage) and narrow at the ends (40 mm); a white field with black squares and the coordinates
+// in its border; the logo — the knight of the site's header as the C of CHESSNUT — printed on each side field, facing out;
+// on the front edge the strip of buttons with two blue lights and the logo
+const NUT = { light: '#F3F3EF', dark: '#232427', frame: '#2A2C2F', side: '#141517', mx: 96 / 55, mz: 40 / 55, th: 0.38, rc: 0.42, rim: 0.28, shadow: 0.5, mark: null };
+const NUT_BW = 0.18;  // the white border round the squares
+const ICON = await loadImage('../episodes/hikaru213/photos/chessnut_icon.png');  // the official knight (Icon_store_512.png), cut out
+await document.fonts.load('600 100px Montserrat');  // the site's brand font: HESSNUT after the knight
+const ICON_T = new Map();
+function iconTinted(col) {
+  if (!ICON_T.has(col)) ICON_T.set(col, tex(ICON.width, ICON.height, (x, w, h) => { x.drawImage(ICON, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = col; x.fillRect(0, 0, w, h); }));
+  return ICON_T.get(col);
 }
-const nutPieces = ps => ps.map(p => p.c === 'b' ? { ...p, c: 'k' } : p);
+// the logo: the knight is the C, HESSNUT follows; x is its left end, y the baseline, cap the height of the capitals.
+// Returns its width (draw: false only measures)
+function nutLogo(g, x, y, cap, col, { word = 'HESSNUT', draw = true } = {}) {
+  const ic = iconTinted(col), ih = cap * 1.42, iw = ih * ic.width / ic.height;
+  g.save(); g.font = `600 ${(cap / 0.7).toFixed(1)}px Montserrat`; g.letterSpacing = `${(cap * 0.05).toFixed(1)}px`;
+  const w = iw * 0.94 + g.measureText(word).width;
+  if (draw) { g.drawImage(ic, x, y - ih * 0.9, iw, ih); g.fillStyle = col; g.textBaseline = 'alphabetic'; g.textAlign = 'left'; g.fillText(word, x + iw * 0.94, y); }
+  g.restore();
+  return w;
+}
+let LOGO_F = 0.8;  // the share of the side texture's length the logo itself takes
+const LOGO_SIDE = tex(1200, 240, (x, w, h) => { const lw = nutLogo(x, 0, 186, 118, '#80848A', { draw: false }); LOGO_F = lw / w; nutLogo(x, (w - lw) / 2, 186, 118, '#80848A'); });
+// QA (rule 52): the sponsor's logo is either whole in the frame or out of it, and never under the captions. A logo big
+// enough to read and at least partly in the frame is logged as text, so --qa reports it cut by the edge or under captions
+function qaLogo(g, corners, label, minPx = 60) {
+  if (corners.some(p => depth(...p) < 0.4)) return;
+  const P = corners.map(p => B.project(...p)), xs = P.map(p => p.x), ys = P.map(p => p.y);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  if (Math.max(x1 - x0, y1 - y0) < minPx || x1 < 0 || x0 > W || y1 < 0 || y0 > H) return;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); qaRect(g, x0, y0, x1 - x0, y1 - y0, 'text', label); g.restore();
+}
+// the coordinates printed in the white border: files along the near edge, ranks along the left one
+const FILES = tex(1600, 36, (x, w, h) => { x.font = sans(26, 700); x.fillStyle = '#9C9FA3'; x.textAlign = 'center'; x.textBaseline = 'middle'; 'abcdefgh'.split('').forEach((c, i) => x.fillText(c, (i + 0.5) * w / 8, h / 2 + 1)); });
+const RANKS = tex(36, 1600, (x, w, h) => { x.font = sans(26, 700); x.fillStyle = '#9C9FA3'; x.textAlign = 'center'; x.textBaseline = 'middle'; for (let i = 0; i < 8; i++) x.fillText(String(8 - i), w / 2, (i + 0.5) * h / 8 + 1); });
+// the strip on the front edge: buttons and icons in grey, two blue lights, the logo in the middle
+const PANEL = tex(1440, 80, (x, w, h) => {
+  x.fillStyle = '#1C1D20'; x.beginPath(); x.roundRect(4, 6, w - 8, h - 12, 22); x.fill();
+  x.strokeStyle = '#3A3D42'; x.lineWidth = 3; x.stroke();
+  x.strokeStyle = '#8D9196'; x.fillStyle = '#8D9196'; x.lineWidth = 4;
+  for (const cx of [130, 250, 1190, 1310]) { x.beginPath(); x.roundRect(cx - 22, 18, 44, 44, 9); x.stroke(); }
+  x.beginPath(); x.arc(130, 40, 9, 0, 7); x.stroke(); x.fillRect(244, 30, 12, 20);
+  x.font = sans(30, 800); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('M', 1310, 42); x.beginPath(); x.moveTo(1180, 30); x.lineTo(1200, 40); x.lineTo(1180, 50); x.stroke();
+  const lw = nutLogo(x, 0, 52, 26, '#A9ADB2', { draw: false }); nutLogo(x, (w - lw) / 2, 52, 26, '#A9ADB2');
+});
+const nutGlow = (g, x, y, r, a) => { g.save(); g.globalAlpha *= a; g.fillStyle = '#4FB2FF'; g.shadowColor = '#4FB2FF'; g.shadowBlur = r * 5; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.restore(); };
+function nutBoard(g, t, { leds = 1, logo = 1 } = {}) {
+  const { mx, mz, th } = NUT, E = B.E;
+  B.drawSlab(g, NUT);
+  if (E[1] <= 0) return;
+  // the raised rim: a fine line just inside the edge, all the way round
+  g.save(); g.strokeStyle = 'rgba(122,128,136,0.32)'; g.lineWidth = clamp(B.project(4, 0, 4).s * 0.012, 1, 3); g.lineJoin = 'round';
+  B.poly(g, slabRing(mx - 0.16, mz - 0.16, NUT.rc - 0.12).map(p => [p.x, 0.002, p.z])); g.stroke(); g.restore();
+  // the white border round the squares
+  const bw = NUT_BW;
+  for (const [x0, z0, x1, z1] of [[-bw, -bw, 8 + bw, 0], [-bw, 8, 8 + bw, 8 + bw], [-bw, 0, 0, 8], [8, 0, 8 + bw, 8]]) { B.quad(g, x0, z0, x1, z1, 0.001); g.fillStyle = NUT.light; g.fill(); }
+  texQuad(g, FILES, [0, 0.003, 0], [8, 0.003, 0], [0, 0.003, -bw], { under: false });
+  texQuad(g, RANKS, [-bw, 0.003, 8], [0, 0.003, 8], [-bw, 0.003, 0], { under: false });
+  // the logo on both side fields, each turned to be read from its own side
+  if (logo > 0) {
+    const L = 2.8, hh = L * 0.1, xr = 8 + bw + (mx - bw) / 2, xl = -(bw + (mx - bw) / 2);
+    texQuad(g, LOGO_SIDE, [xr - hh, 0.004, 4 - L / 2], [xr - hh, 0.004, 4 + L / 2], [xr + hh, 0.004, 4 - L / 2], { under: false, a: logo });
+    texQuad(g, LOGO_SIDE, [xl + hh, 0.004, 4 + L / 2], [xl + hh, 0.004, 4 - L / 2], [xl - hh, 0.004, 4 + L / 2], { under: false, a: logo });
+    const lz = L * LOGO_F / 2, lx = hh * 0.7;
+    for (const [xc, side] of [[xr, 'right'], [xl, 'left']]) qaLogo(g, [[xc - lx, 0, 4 - lz], [xc + lx, 0, 4 - lz], [xc - lx, 0, 4 + lz], [xc + lx, 0, 4 + lz]], `Chessnut logo, ${side} field`);
+  }
+  // the strip on the front edge, seen when the camera is in front of it
+  if (E[2] < -mz - 0.05) {
+    const z = -mz - 0.004, y0 = -th * 0.22, y1 = -th * 0.78;
+    texQuad(g, PANEL, [2.0, y0, z], [6.0, y0, z], [2.0, y1, z], { under: false, a: logo });
+    qaLogo(g, [[3.7, y0, z], [4.3, y0, z], [3.7, y1, z], [4.3, y1, z]], 'Chessnut logo, front edge', 50);
+    if (leds > 0) [[3.2, 0], [3.42, 1.7]].forEach(([x, ph]) => { const p = B.project(x, (y0 + y1) / 2, z - 0.002); nutGlow(g, p.x, p.y, Math.max(1.5, p.s * 0.03), leds * (0.75 + 0.25 * Math.sin(t * 2.4 + ph))); });
+  }
+}
+// the Chessnut set: black pieces true black, every piece on its copper robot base (pieces.js, skin 'nut')
+const nutPieces = ps => ps.map(p => ({ ...p, c: p.c === 'b' ? 'k' : p.c, skin: 'nut' }));
 // pieces drive themselves: from one list to another in straight lines (they roll on wheels), a little out of step;
 // a piece missing from `to` drives to park(p, i) and fades (fade) or stays there; one missing from `from` starts there
 function drive(from, to, t, t0, dur, { stagger = 0.35, park = null, seed = 7, fade = true } = {}) {
@@ -537,14 +599,20 @@ function drive(from, to, t, t0, dur, { stagger = 0.35, park = null, seed = 7, fa
   });
   return out;
 }
-// the parking rows on the table beside the board (captured pieces wait there): white on the near row, black behind
-const PARK = (p, i) => ({ x: p.c === 'w' ? 9.45 : 10.15, z: 0.55 + (i % 12) * 0.62 });
+// the side fields of the board hold the pieces that are not in play, two rows a side, as in Chessnut's own footage:
+// white on the right, black on the left, pawns in the outer row, the other pieces in the inner one, each level with the
+// file it started on — so a piece always parks in the same spot
+const SLOT = new Map(G[0].pieces.map(p => {
+  const f = p.sq.charCodeAt(0) - 97, pawn = p.t === 'p', white = p.c === 'w';
+  return [p.id, { x: white ? (pawn ? 9.33 : 8.6) : (pawn ? -1.33 : -0.6), z: 0.5 + f }];
+}));
+const PARK = p => SLOT.get(p.id) || { x: p.c === 'w' ? 8.6 : -0.6, z: 0.5 };
 const parked = ply => { const on = new Set(G[ply].pieces.map(p => p.id)); return G[0].pieces.filter(p => !on.has(p.id)); };
 const withParked = (ply, k = 0) => [...piecesAt(G, ply), ...parked(ply).map((p, i) => ({ ...p, ...PARK(p, i + k) }))];
 function home(g, t, { pieces = null, under = null, over = null, focus = null, feed = 0, leds = 1, logo = 1, extra = null, dof = 0.7 } = {}) {
   room(g, B, HOME, { t });
   tvSet(g, feed);
-  table(g, B, HOME, { x1: 10.6 });
+  table(g, B, HOME, { x0: -2.3, x1: 11.8 });  // wide enough for the board (x -1.75..9.75), the diagram and the tablet
   if (extra) extra(g, 'table');
   nutBoard(g, t, { leds, logo });
   if (under) under(g);
@@ -583,20 +651,30 @@ const DIAG = tex(720, 720, (x, w) => {
   for (const p of G[MEME].pieces) { const [fx, fz] = sqXZ(p.sq); drawPiece(x, p.t, p.c === 'b' ? 'k' : 'w', fx * s, (8 - fz + 0.5) * s - s * 0.05, s * 0.9); }
   x.strokeStyle = '#2A2E33'; x.lineWidth = 6; x.strokeRect(3, 3, w - 6, w - 6);
 });
-// the x-ray of one piece: a motor, a battery, wheels and a sensor inside a glass knight
+// the x-ray of one piece: the robot is its copper base (Chessnut ships spare bases; its own art shows the base lit up),
+// and in it a motor, a battery, wheels and a sensor (the manufacturer's list). h: the drawn height of the piece, whose
+// base is the bottom 18 % of it and 59 % of its height wide (pieces.js, base2)
 function xray(g, P, h, t, t0) {
   const u = seg(t, t0 - 0.35, t0 - 0.05);
   if (u <= 0) return;
-  g.save(); g.globalAlpha *= u; g.strokeStyle = MIND; g.fillStyle = rgba(MIND, 0.16); g.lineWidth = Math.max(2, h * 0.012);
-  g.shadowColor = MIND; g.shadowBlur = 14;
-  const cx = P.x, by = P.y, wd = h * 0.36;
-  g.beginPath(); g.roundRect(cx - wd * 0.5, by - h * 0.36, wd, h * 0.16, 6); g.fill(); g.stroke();             // battery
-  g.beginPath(); g.arc(cx, by - h * 0.5, h * 0.075, 0, 7); g.fill(); g.stroke();                            // motor
-  for (let i = 0; i < 8; i++) { const a = t * 6 + i * 0.785; g.beginPath(); g.moveTo(cx, by - h * 0.5); g.lineTo(cx + Math.cos(a) * h * 0.07, by - h * 0.5 + Math.sin(a) * h * 0.07); g.stroke(); }
-  for (const sd of [-1, 1]) { g.beginPath(); g.arc(cx + sd * wd * 0.32, by - h * 0.07, h * 0.05, 0, 7); g.fill(); g.stroke(); }  // wheels
-  g.beginPath(); g.roundRect(cx - wd * 0.18, by - h * 0.17, wd * 0.36, h * 0.05, 3); g.fill(); g.stroke();    // sensor
+  const cx = P.x, by = P.y;
+  g.save(); g.globalAlpha *= u; g.lineJoin = 'round';
+  g.fillStyle = rgba('#0B1A1F', 0.55); g.beginPath(); g.roundRect(cx - h * 0.3, by - h * 0.19, h * 0.6, h * 0.19, h * 0.025); g.fill();  // the base turns to glass
+  g.strokeStyle = MIND; g.fillStyle = rgba(MIND, 0.18); g.lineWidth = Math.max(2, h * 0.007); g.shadowColor = MIND; g.shadowBlur = 12;
+  g.beginPath(); g.roundRect(cx - h * 0.3, by - h * 0.19, h * 0.6, h * 0.19, h * 0.025); g.stroke();
+  g.beginPath(); g.roundRect(cx + h * 0.02, by - h * 0.16, h * 0.2, h * 0.075, h * 0.012); g.fill(); g.stroke();  // battery
+  g.beginPath(); g.rect(cx + h * 0.22, by - h * 0.134, h * 0.014, h * 0.024); g.fill(); g.stroke();
+  const mx = cx - h * 0.11, my = by - h * 0.112, mr = h * 0.045;
+  g.beginPath(); g.arc(mx, my, mr, 0, 7); g.fill(); g.stroke();                                                  // motor
+  for (let i = 0; i < 6; i++) { const a = t * 7 + i * 1.047; g.beginPath(); g.moveTo(mx, my); g.lineTo(mx + Math.cos(a) * mr * 0.85, my + Math.sin(a) * mr * 0.85); g.stroke(); }
+  for (const sd of [-1, 1]) {                                                                                    // wheels
+    const wx = cx + sd * h * 0.2, wy = by - h * 0.036;
+    g.beginPath(); g.arc(wx, wy, h * 0.03, 0, 7); g.fill(); g.stroke();
+    const a = t * 9; g.beginPath(); g.moveTo(wx - Math.cos(a) * h * 0.024, wy - Math.sin(a) * h * 0.024); g.lineTo(wx + Math.cos(a) * h * 0.024, wy + Math.sin(a) * h * 0.024); g.stroke();
+  }
+  g.beginPath(); g.roundRect(cx - h * 0.075, by - h * 0.034, h * 0.15, h * 0.018, 2); g.fill(); g.stroke();      // sensor
   g.restore();
-  return [['MOTOR', [cx, by - h * 0.5]], ['BATTERY', [cx - wd * 0.5, by - h * 0.28]], ['WHEELS', [cx + wd * 0.32, by - h * 0.07]], ['SENSOR', [cx - wd * 0.18, by - h * 0.15]]];
+  return [['MOTOR', [mx, my]], ['BATTERY', [cx + h * 0.12, by - h * 0.122]], ['WHEELS', [cx + h * 0.2, by - h * 0.036]], ['SENSOR', [cx - h * 0.04, by - h * 0.025]]];
 }
 // a part named on the x-ray: a cream leader line from the part to a flat plate
 function callout(g, text, [px, py], [lx, ly], u, col = CREAM) {
@@ -756,6 +834,21 @@ function stopwatch(g, v, { y = 330, done = false, a = 1, scale = 1 } = {}) {
 }
 const NUTC = '#1A1C20';  // the graphite of the Chessnut frame: the AD chip and the name plate
 function adTag(g, a = 1) { plate(g, 'AD', 96, 146, { color: NUTC, size: 26, a: a * 0.92, rot: 0 }); }
+// the sponsor's name on a flat graphite plate (rule 50): its logo — the official knight as the C, HESSNUT — and MOVE
+function nutPlate(g, y, { a = 1, scale = 1, dy = 0, blur = 0, cap = 40 } = {}) {
+  if (a <= 0) return;
+  g.save(); g.globalAlpha *= a; g.translate(W / 2, y + dy); g.rotate(-0.018); g.scale(scale, scale);
+  if (blur > 0.3) g.filter = `blur(${blur.toFixed(1)}px)`;
+  g.font = `600 ${(cap / 0.7).toFixed(1)}px Montserrat`; g.letterSpacing = `${(cap * 0.05).toFixed(1)}px`;
+  const lw = nutLogo(g, 0, 0, cap, '#FFFFFF', { draw: false }), gap = cap * 0.5, mw = g.measureText('MOVE').width - cap * 0.05;
+  const w = lw + gap + mw + cap * 1.3, hp = cap * 2.1, x0 = -w / 2, lx = x0 + cap * 0.65, base = cap / 2;
+  g.fillStyle = 'rgba(12,9,6,0.5)'; g.beginPath(); g.roundRect(x0, -hp / 2 + Math.max(4, cap * 0.18), w, hp, 5); g.fill();
+  g.fillStyle = NUTC; g.beginPath(); g.roundRect(x0, -hp / 2, w, hp, 5); g.fill();
+  qaRect(g, x0, -hp / 2, w, hp, 'text', 'CHESSNUT MOVE');
+  nutLogo(g, lx, base, cap, '#FFFFFF');
+  g.fillStyle = '#FFFFFF'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText('MOVE', lx + lw + gap, base);
+  g.restore();
+}
 const lerp3 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
 
 // the white share of an engine bar (the lichess win-chance curve), for his eval bar in "he IS the engine"
@@ -1023,7 +1116,7 @@ export async function build(T) {
   const homeTV = t => t < SET0 ? withParked(0) : t < REW0 ? drive(withParked(0), memeP, t, SET0, 0.55, { stagger: 0.45, park: PARK, fade: false }) : null;
   shot(tvA, (g, lt, t, sh) => {
     feedBaku(t);
-    rig(B, lt, [[0, K(0, 0.02, 8.65, TVC)], [1.1, K(-0.26, 0.34, 16, [4.2, 2.2, 7.5]), ease.inOut], [len(sh), K(-0.34, 0.42, 15, [4, 1.2, 6.5])]], { t });
+    rig(B, lt, [[0, K(0, 0.02, 8.65, TVC)], [1.1, K(-0.11, 0.34, 16, [3.45, 2.2, 7.5]), ease.inOut], [len(sh), K(-0.19, 0.42, 15, [3.25, 1.2, 6.5])]], { t });
     const ps = t < REW0 ? homeTV(t) : drive(memeP, withParked(72), t, REW0, 0.35, { stagger: 0.1, park: PARK, fade: false });
     home(g, t, { pieces: ps, feed: 1 });
   }, { trans: 'zoom', grade: HOMEG, hud: (g, lt, t) => { if (t >= REW0) plate(g, '◀◀  REWIND', W / 2, 240, { color: CREAM, size: 46, ...popIn(t, REW0), a: 1 - seg(t, REW0 + 0.45, REW0 + 0.6) }); } });
@@ -1032,7 +1125,7 @@ export async function build(T) {
   // ======================= A KNIGHT HITTING TWO PAWNS AT ONCE: 37.Nd6! =======================
   const NDA = kniT - SLIDE;
   shot(kniT - 0.2, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.3, 0.9, 11.8, [4, 0, 5.0])], [len(sh), K(-0.22, 0.92, 11, [4, 0, 5.2])]], { t });
+    rig(B, lt, [[0, K(-0.25, 0.9, 11.2, [3.75, 0, 4.5])], [len(sh), K(-0.17, 0.92, 10.45, [3.75, 0, 4.7])]], { t });
     const ps = t < NDA ? withParked(72) : [...piecesAt(G, 73, slide(t - NDA), SLIDE_OPTS), ...parked(73).map((p, i) => ({ ...p, ...PARK(p, i) }))];
     const m = moveOf(G, 73);
     home(g, t, { pieces: ps,
@@ -1047,7 +1140,7 @@ export async function build(T) {
   // ======================= ONE FELL: 37...g6 38.Nxb7 =======================
   const runAt = [oneT - 0.3, fellT - SLIDE];
   shot(oneT - 0.36, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.75, 0.42, 6.8, [1.6, 0.5, 6.4])], [len(sh), K(-0.68, 0.4, 6.0, [1.6, 0.55, 6.5])]], { t });
+    rig(B, lt, [[0, K(-0.2, 0.55, 6.0, [2.0, 0.5, 6.4])], [len(sh), K(-0.13, 0.53, 5.28, [2.0, 0.55, 6.5])]], { t });
     const run = playRun(G, 73, runAt, t, piecesAt);
     home(g, t, { pieces: [...run.pieces, ...parked(73).map((p, i) => ({ ...p, ...PARK(p, i) }))], dof: 0.45,
       under: g2 => { run.active.forEach(a => moveUnder(g2, B, a.m, a.lt, { hold: a.hold })); if (t >= fellT) spread(g2, B, 'b7', t, fellT, HI.bad); },
@@ -1059,7 +1152,7 @@ export async function build(T) {
   const FF0 = twT, FF1 = resT - 0.2;
   const ffK = t => Math.min(LAST, 75 + Math.floor(clamp((t - FF0) / (FF1 - FF0)) * (LAST - 75)));
   shot(twT - 0.08, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.12, 1.2, 13.5, [4, 0, 4.2])], [len(sh), K(-0.08, 1.15, 12.4, [4, 0, 4.2])]], { t });
+    rig(B, lt, [[0, K(0.12, 1.2, 12.15, [4, 0, 4.45])], [len(sh), K(-0.08, 1.15, 11.16, [4, 0, 4.45])]], { t });
     const k = ffK(t), tip = seg(t, resT, resT + 0.35, ease.in);
     const ps = [...piecesAt(G, k), ...parked(k).map((p, i) => ({ ...p, ...PARK(p, i) }))].map(p => p.id === 'k1' ? { ...p, rot: -1.45 * tip, y: -0.05 * tip } : p);
     home(g, t, { pieces: ps, under: g2 => { if (t >= resT) squareFrame(g2, B, ps.find(p => p.id === 'k1') ? G[LAST].pieces.find(p => p.id === 'k1').sq : 'd5', HI.bad, seg(t, resT, resT + 0.2)); } });
@@ -1099,15 +1192,15 @@ export async function build(T) {
     qaRect(g, cx - r - 10, cy - r - 10, 2 * r + 20, 2 * r + 20, 'text', '5');
   };
   shot(showT - 0.06, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.05, 1.32, 14.8, [4, 0, 3.9])], [len(sh), K(-0.05, 1.3, 13.6, [4, 0, 3.9])]], { t });
+    rig(B, lt, [[0, K(0.0, 1.32, 15.54, [5, 0, 3.65])], [len(sh), K(-0.1, 1.3, 14.28, [5, 0, 3.65])]], { t });
     home(g, t, { pieces: memeP });
   }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { bdg(g, t, 'GRANDMASTER', gmT, { y: 200, color: GOLD, size: 42 }); if (t >= fiveT) ring5(g, t); } });
   cue(showT - 0.12, 'whoosh_fast', 0.3); for (let i = 0; i < 4; i++) cue(fiveT + i * 0.19, 'clock_tick', 0.3);
   // ======================= AND HE REBUILDS IT: the pieces drive off in a ring and come back to their squares =======================
   const OFF0 = fiveT + 0.78, ON0 = rebT - 0.06;
-  const ringOf = ps => ps.map((p, i) => { const a = i / ps.length * 2 * PI + 0.3; return { ...p, x: 4 + Math.cos(a) * 4.9, z: 4 + Math.sin(a) * 4.9 }; });
+  const ringOf = ps => ps.map(p => ({ ...p, ...PARK(p) }));  // off the squares: every piece drives to its spot on the side fields
   shot(OFF0, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.05, 1.3, 13.6, [4, 0, 3.9])], [len(sh), K(-0.2, 1.2, 14.4, [4, 0, 4])]], { t });
+    rig(B, lt, [[0, K(-0.1, 1.3, 14.28, [5, 0, 3.65])], [len(sh), K(-0.25, 1.2, 15.12, [5, 0, 3.75])]], { t });
     const ps = t < ON0 ? drive(meme, ringOf(meme), t, OFF0, 0.35, { stagger: 0.12 }) : drive(ringOf(meme), meme, t, ON0, 0.4, { stagger: 0.25 });
     home(g, t, { pieces: [...ps, ...parked(MEME).map((p, i) => ({ ...p, ...PARK(p, i) }))],
       under: g2 => { if (t >= itT) meme.forEach(p => squareFrame(g2, B, p.sq, HI.good, 0.8 * seg(t, itT, itT + 0.2) * (1 - seg(t, itT + 0.6, itT + 0.9)))); } });
@@ -1119,18 +1212,18 @@ export async function build(T) {
   const R = rng(213), pick = [...SQ].sort(() => R() - 0.5);
   const scrambled = meme.map((p, i) => ({ ...p, sq: pick[i], ...(([x, z]) => ({ x, z }))(sqXZ(pick[i])) }));
   shot(scS - 0.04, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.2, 1.2, 14.4, [4, 0, 4])], [len(sh), K(-0.45, 0.95, 13.4, [4.6, 0, 4])]], { t });
+    rig(B, lt, [[0, K(-0.25, 1.2, 15.12, [5, 0, 3.75])], [len(sh), K(-0.5, 0.95, 14.07, [5.6, 0, 3.75])]], { t });
     home(g, t, { pieces: [...drive(meme, scrambled, t, scS + 0.08, 0.45, { stagger: 0.3 }), ...parked(MEME).map((p, i) => ({ ...p, ...PARK(p, i) }))] });
   }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => bdg(g, t, 'SCRAMBLED', scS + 0.5, { y: 200, color: RED, size: 54 }) });
   cue(scS - 0.1, 'whoosh_fast', 0.3); cue(scS + 0.08, 'whirr', 0.4); cue(scS + 0.1, 'record_scratch', 0.2);
   // ======================= BARELY BETTER THAN A BEGINNER: two bars beside the board =======================
   shot(barT - 0.06, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.75, 0.32, 15, [7.6, 1.6, 4.4])], [len(sh), K(-0.68, 0.3, 14, [7.8, 1.7, 4.4])]], { t });
+    rig(B, lt, [[0, K(-0.75, 0.32, 15, [8.6, 1.6, 4.4])], [len(sh), K(-0.68, 0.3, 14, [8.8, 1.7, 4.4])]], { t });
     const u1 = seg(t, barT, barT + 0.5, ease.out), u2 = seg(t, begT, begT + 0.5, ease.out);
-    home(g, t, { pieces: scrambled, extra: (g2, ph) => {
+    home(g, t, { pieces: [...scrambled, ...parked(MEME).map(p => ({ ...p, ...PARK(p) }))], extra: (g2, ph) => {
       if (ph !== 'top') return;
-      if (u1 > 0) { ab(g2, [9.3, -0.35, 1.4], [10.3, -0.35 + 3.4 * u1, 2.4], GOLD, { amb: 0.6, spec: 0.2 }); tag3(g2, 9.8, -0.35 + 3.4 * u1 + 0.9, 1.9, 'GM', GOLD, u1); }
-      if (u2 > 0) { ab(g2, [9.3, -0.35, 5.6], [10.3, -0.35 + 3.0 * u2, 6.6], '#8A96A8', { amb: 0.6, spec: 0.2 }); tag3(g2, 9.8, -0.35 + 3.0 * u2 + 0.9, 6.1, 'BEGINNER', CREAM, u2); }
+      if (u1 > 0) { ab(g2, [10.4, -0.35, 1.4], [11.4, -0.35 + 3.4 * u1, 2.4], GOLD, { amb: 0.6, spec: 0.2 }); tag3(g2, 10.9, -0.35 + 3.4 * u1 + 0.9, 1.9, 'GM', GOLD, u1); }
+      if (u2 > 0) { ab(g2, [10.4, -0.35, 5.6], [11.4, -0.35 + 3.0 * u2, 6.6], '#8A96A8', { amb: 0.6, spec: 0.2 }); tag3(g2, 10.9, -0.35 + 3.0 * u2 + 0.9, 6.1, 'BEGINNER', CREAM, u2); }
     } });
   }, { grade: HOMEG, hud: (g, lt, t) => badge(g, 'SCRAMBLED', W / 2, 200, { color: RED, size: 54 }) });
   cue(barT, 'notify', 0.25); cue(begT, 'notify', 0.25);
@@ -1139,9 +1232,9 @@ export async function build(T) {
   const ptS = s('patterns'), patT = w('patterns', 'patterns'), notT = w('patterns', 'not'), aboutT = w('patterns', 'about'), fiftyT = w('patterns', 'fifty');
   const CHUNK = [[['f8', 'f7', 'g6'], GOLD], [['c7', 'b7', 'c6'], MIND], [['c5', 'b1'], RED], [['d4', 'e3', 'f2', 'g2', 'g5'], VIOLET]];
   shot(ptS - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.1, 1.05, 12.6, [4, 0, 4.4])], [len(sh), K(0.25, 1.0, 11.6, [4, 0, 4.4])]], { t });
+    rig(B, lt, [[0, K(0.05, 1.05, 12.6, [4, 0, 4.65])], [len(sh), K(0.2, 1.0, 11.6, [4, 0, 4.65])]], { t });
     const fadeU = seg(t, notT, notT + 0.4);
-    home(g, t, { pieces: meme.map(p => ({ ...p, alpha: 1 - 0.85 * fadeU })),
+    home(g, t, { pieces: [...meme, ...parked(MEME).map(p => ({ ...p, ...PARK(p) }))].map(p => ({ ...p, alpha: 1 - 0.85 * fadeU })),
       under: g2 => CHUNK.forEach(([sqs, col], i) => { const u = seg(t, patT + i * 0.18, patT + i * 0.18 + 0.15); if (u > 0) sqs.forEach(q => squareFrame(g2, B, q, col, u, { fill: 0.22 + 0.3 * fadeU, lw: 5 })); }) });
   }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { bdg(g, t, 'PATTERNS', patT, { color: MIND }); } });
   cue(ptS - 0.11, 'whoosh_fast', 0.3); CHUNK.forEach((_, i) => cue(patT + i * 0.18, 'sparkle_pop', 0.22)); cue(notT, 'whoosh_soft', 0.25);
@@ -1166,7 +1259,7 @@ export async function build(T) {
   // ======================= THE BOARD IN HIS HEAD: ghost pieces play the rest of the combination on their own =======================
   const mindAt = [w('skill', 'play') - 0.1, w('skill', 'play') + 0.35, combT, combT + 0.45, combT + 0.9];
   const likeS = s('like'), mA = headT - 0.04, lA = likeS - 0.05;
-  const mindKeys = [[0, K(0.55, 0.62, 12.5, [4, 0.3, 4])], [lA + 0.4 - mA, K(-0.15, 0.5, 11, [4, 0.4, 4])], [s('ad1') - mA, K(-0.4, 0.44, 10.1, [4, 0.3, 3.9])]];
+  const mindKeys = [[0, K(0.65, 0.62, 11.875, [3.75, 0.3, 3.75])], [lA + 0.4 - mA, K(-0.05, 0.5, 10.45, [3.75, 0.4, 3.75])], [s('ad1') - mA, K(-0.3, 0.44, 9.0, [3.55, 0.3, 3.65])]];
   shot(mA, (g, lt, t, sh) => {
     rig(B, t - mA, mindKeys, { t, e: x => x });
     const run = playRun(G, MEME, mindAt, t, piecesAt);
@@ -1239,7 +1332,10 @@ export async function build(T) {
   shot(mag2T - 0.08, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.1, 0.22, 27, [4.4, 5.6, 4])], [len(sh), K(0.18, 0.2, 24.5, [4.4, 5.8, 4])]], { t, e: x => x });
     towers(g, t, { hik: 1, mag: seg(t, mag2T, mag2T + 0.6, ease.out), gap: seg(t, hunT, hunT + 0.25) });
-  }, { trans: 'whip', grade: 'stream', hud: (g, lt, t) => { if (t >= hunT) stamp(g, '−100', W / 2, 330, t, hunT, { color: RED, size: 110, sub: 'POINTS BEHIND' }); } });
+  }, { trans: 'whip', grade: 'stream', hud: (g, lt, t) => {
+    bdg(g, t, 'CHESS.COM BLITZ · OCT 2026', mag2T + 0.05, { y: 178, color: CREAM, size: 32 });  // rule 40: the gap of the record's day, not of today
+    if (t >= hunT) stamp(g, '−100', W / 2, 330, t, hunT, { color: RED, size: 110, sub: 'POINTS BEHIND' });
+  } });
   cue(mag2T - 0.14, 'whoosh_fast', 0.3); cue(mag2T + 0.1, 'whoosh_soft', 0.25); cue(hunT, 'stamp', 0.45);
 
   // ======================= HIKARU NAKAMURA IS NOT HUMAN: his facecam (the camera sits on his monitor); a captcha pops up on the
@@ -1303,35 +1399,36 @@ export async function build(T) {
   };
   const adHud = (g, lt, t) => adTag(g, 1);
   shot(a1S - 0.06, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.12, 0.2, 8.8, [4, 0.5, 2.2])], [len(sh), K(-0.04, 0.22, 8.3, [4, 0.5, 2.3])]], { t });
+    rig(B, lt, [[0, K(-0.12, 0.32, 8.8, [4, 0.5, 2.7])], [len(sh), K(-0.04, 0.34, 8.3, [4, 0.5, 2.8])]], { t });
     home(g, t, { pieces: adPieces(t), focus: 6.5 });
   }, { trans: 'whip', grade: HOMEG, hud: adHud });
   cue(a1S - 0.11, 'whoosh_fast', 0.3); adPlies.forEach(x => { cue(x, 'whirr', 0.3); cue(x + 0.35, 'piece', 0.3); });
   shot(nutT - 0.45, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.35, 0.55, 12, [4, 0, 3.6])], [len(sh), K(-0.25, 0.42, 11, [4, 0, 3.4])]], { t, e: x => x });
+    rig(B, lt, [[0, K(0.45, 0.55, 17.64, [4, 0, 3.1])], [len(sh), K(-0.15, 0.42, 16.17, [4, 0, 2.9])]], { t, e: x => x });
     home(g, t, { pieces: adPieces(t) });
-  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); if (t >= nutT) badge(g, 'CHESSNUT MOVE', W / 2, 214, { color: NUTC, size: 60, ...popIn(t, nutT) }); } });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); if (t >= nutT) nutPlate(g, 214, popIn(t, nutT)); } });
   cue(nutT - 0.5, 'whoosh_fast', 0.3); cue(nutT, 'reveal_bell', 0.4);
   // ======================= EACH PIECE HAS ITS OWN MOTOR: the x-ray of the knight on g1 =======================
   const a2S = s('ad2'), motT = w('ad2', 'motor'), snapT = w('ad2', 'snap'), photoT = w('ad2', 'photo'), setsT = w('ad2', 'sets');
-  const LB = [[1, 0.0], [-1, 0.12], [1, 0.24], [-1, 0.36]];
+  // the labels sit under the base, clear of the knight and above the captions: [side, delay, row]
+  const LB = [[-1, 0.0, 0], [1, 0.12, 0], [1, 0.24, 1], [-1, 0.36, 1]];
   shot(a2S - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.15, 0.2, 5.6, [6.5, 0.35, 0.5])], [len(sh), K(-0.1, 0.18, 4.8, [6.5, 0.4, 0.5])]], { t });
-    const ps = withParked(3).map(p => p.id === 'N1' ? { ...p, alpha: 1 - 0.55 * seg(t, motT - 0.35, motT - 0.05), sharp: true } : p);
-    home(g, t, { pieces: ps, focus: 5 });
+    rig(B, lt, [[0, K(-0.15, 0.3, 4.7, [6.5, 0.42, 0.1], { cy: H * 0.44 })], [len(sh), K(-0.1, 0.28, 4.0, [6.5, 0.42, 0.1], { cy: H * 0.44 })]], { t });
+    const ps = withParked(3).map(p => p.id === 'N1' ? { ...p, sharp: true } : p);
+    home(g, t, { pieces: ps, focus: 4.2 });
     const P = B.project(6.5, 0, 0.5), h = P.s * 1.25;
     const pts = xray(g, P, h, t, motT);
-    if (pts) pts.forEach(([name, pt], i) => { const [sd, dt] = LB[i]; callout(g, name, pt, [W / 2 + sd * 250, 560 + i * 120], seg(t, motT + dt, motT + dt + 0.25)); });
+    if (pts) pts.forEach(([name, pt], i) => { const [sd, dt, row] = LB[i]; callout(g, name, pt, [W / 2 + sd * 230, 1000 + row * 110], seg(t, motT + dt, motT + dt + 0.25)); });
   }, { trans: 'whip', grade: HOMEG, hud: adHud });
   cue(a2S - 0.11, 'whoosh_fast', 0.3); cue(motT - 0.35, 'shimmer', 0.3); LB.forEach(([, dt]) => cue(motT + dt, 'sparkle_pop', 0.22));
   // ======================= SNAP A PHOTO OF ANY POSITION: a phone over a diagram on the table =======================
-  const BOOK = [9.5, 2.5];
+  const BOOK = [11.2, 2.4];  // on the table right of the board (its side field ends at x 9.75)
   const bookOnTable = (g2, ph) => { if (ph !== 'table') return;
     ab(g2, [BOOK[0] - 1.0, -0.35, BOOK[1] - 1.0], [BOOK[0] + 1.0, -0.25, BOOK[1] + 1.0], '#EDE6D8', { amb: 0.7 });
     texQuad(g2, DIAG, [BOOK[0] - 0.85, -0.245, BOOK[1] + 0.85], [BOOK[0] + 0.85, -0.245, BOOK[1] + 0.85], [BOOK[0] - 0.85, -0.245, BOOK[1] - 0.85], { under: false }); };
   const SHUT = photoT + 0.2;
   shot(snapT - 0.08, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0, 1.45, 7.2, [BOOK[0], -0.25, BOOK[1]])], [len(sh), K(0.05, 1.45, 6.6, [BOOK[0], -0.25, BOOK[1]])]], { t });
+    rig(B, lt, [[0, K(0, 1.45, 7.2, [BOOK[0] - 0.5, -0.25, BOOK[1]])], [len(sh), K(0.05, 1.45, 6.6, [BOOK[0] - 0.5, -0.25, BOOK[1]])]], { t });
     home(g, t, { pieces: withParked(3), extra: bookOnTable });
     // the phone in a hand, its screen the camera's view of the diagram
     const ph = { x: W / 2, y: 800, w: 420, h: 780 }, u = ease.out(seg(t, snapT - 0.08, snapT + 0.25));
@@ -1364,16 +1461,16 @@ export async function build(T) {
   // ======================= AFTER THE GAME, ALL 32 PIECES DRIVE HOME =======================
   const H0 = n32T - 0.05;
   shot(afterT - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.42, 1.0, 15.5, [5.2, 0, 4])], [len(sh), K(-0.1, 0.92, 14.2, [4.6, 0, 4])]], { t, e: x => x });
+    rig(B, lt, [[0, K(-0.42, 1.0, 15.5, [5.7, 0, 4])], [len(sh), K(-0.1, 0.92, 14.2, [5.1, 0, 4])]], { t, e: x => x });
     home(g, t, { pieces: drive(withParked(LAST), p0.filter(p => G[0].pieces.some(q => q.id === p.id)), t, H0, 0.9, { stagger: 0.55, park: null }) });
   }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); if (t >= n32T) counter(g, '32', 'PIECES DRIVE HOME', { y: 330, size: 150, color: CREAM, labelColor: GOLD, at: [t, n32T] }); } });
   cue(afterT - 0.11, 'whoosh_fast', 0.3); cue(H0, 'whirr', 0.5); for (let i = 0; i < 10; i++) cue(H0 + 0.1 + i * 0.13, 'piece_slide', 0.14); cue(homeT + 0.1, 'success', 0.35);
   // ======================= LINK IN BIO: the board, set, the name on its edge =======================
   const bioS = s('bio');
   shot(bioS - 0.05, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.16, 0.3, 10, [4, 0.4, 2.6])], [len(sh), K(0.06, 0.27, 9.2, [4, 0.4, 2.4])]], { t });
+    rig(B, lt, [[0, K(0.06, 0.3, 10, [4, 0.4, 2.85], { cy: H * 0.42 })], [len(sh), K(-0.04, 0.27, 9.2, [4, 0.4, 2.65], { cy: H * 0.42 })]], { t });
     home(g, t, { pieces: p0, focus: 8 });
-  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); badge(g, 'CHESSNUT MOVE', W / 2, 204, { color: NUTC, size: 60 }); bdg(g, t, 'LINK IN BIO', bioS + 0.1, { y: 318, color: GOLD, size: 54 }); } });
+  }, { trans: 'whip', grade: HOMEG, hud: (g, lt, t) => { adHud(g, lt, t); nutPlate(g, 204); bdg(g, t, 'LINK IN BIO', bioS + 0.1, { y: 318, color: GOLD, size: 54 }); } });
   cue(bioS - 0.11, 'whoosh_fast', 0.3); cue(bioS + 0.1, 'reveal_bell', 0.35);
 
   // ======================= CTA: Baku again — the grimace and the stopwatch; how many seconds did you need? =======================

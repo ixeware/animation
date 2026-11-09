@@ -73,7 +73,8 @@ try {
   if (args.includes('--qa')) {
     const step = +(opt('step') || 0.1), N = +(opt('workers') || 4);
     const p0 = await openPage(browser, '&qa=1'); const dur = await p0.evaluate('window.DURATION'); await p0.close();
-    const ts = []; for (let t = 0.05; t < dur - 0.6; t += step) ts.push(+t.toFixed(3));
+    const ts = [], q0 = opt('from') ? +opt('from') : 0.05, q1 = opt('to') ? Math.min(+opt('to'), dur - 0.6) : dur - 0.6;  // --from/--to: check a stretch
+    for (let t = q0; t < q1; t += step) ts.push(+t.toFixed(3));
     const per = Math.ceil(ts.length / N);
     const found = (await Promise.all([...Array(N)].map(async (_, w) => {
       const page = await openPage(browser, '&qa=1'), mine = ts.slice(w * per, (w + 1) * per), res = [];
@@ -108,6 +109,9 @@ try {
       path.join(dir, 'sheet.jpg')]);
     }
     console.log('stills ->', dir);
+  } else if (args.includes('--shots')) {  // where every shot starts and ends
+    const page = await openPage(browser);
+    for (const s of await page.evaluate('window.SHOTS')) console.log(`shot ${s.i}  ${s.a.toFixed(2)}–${s.b.toFixed(2)}s`);
   } else if (args.includes('--cues')) {  // cues.json only: re-mix after a sound edit without re-rendering the video
     const page = await openPage(browser);
     fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC, musicFx: window.MUSICFX})'), null, 1));

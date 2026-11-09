@@ -25,8 +25,40 @@ the rating records); the Chessnut board stands only on our own table, never in f
 | Play Chess.com or Lichess on a real board | "connects to Chess.com and Lichess through the Chessnut app via Bluetooth. Your opponent's moves trigger the pieces on your board to move automatically" | [Chessnut, Move review](https://www.chessnutech.com/blogs/news/chessnut-move-robotic-chessboard-review), [Chessnut, product page](https://www.chessnutech.com/products/chessnut-move-advanced-automatic-chess-board-with-plastic-pieces) |
 | After the game, all 32 pieces drive home | "When the board resets after a game, all 32 pieces drive themselves back to the starting position simultaneously" | [Chessnut, Move review](https://www.chessnutech.com/blogs/news/chessnut-move-robotic-chessboard-review) |
 
-The Chessnut features are the manufacturer's own claims; before the video goes out, ask Chessnut for footage and the
-official logo (the wordmark on our board is set in Rubik as a stand-in).
+The Chessnut features are the manufacturer's own claims. On 9 November 2026 Chessnut (Stella Zhuang) accepted the video
+and offered files "to make it even more accurate"; the author asked to take them from Chessnut's own site instead, so
+version 4 draws the board after chessnutech.com (below).
+
+## The Chessnut Move as drawn (version 4, 9 November 2026)
+
+Everything here was checked against Chessnut's own pages: the product pages for the
+[wooden](https://www.chessnutech.com/products/chessnut-move-advanced-robotic-chessboard-with-wooden-pieces) and
+[plastic](https://www.chessnutech.com/products/chessnut-move-advanced-automatic-chess-board-with-plastic-pieces) sets, the
+[Chessnut Move page](https://www.chessnutech.com/pages/chessnut-move) with its specification sheet, product renders,
+photos and animations, and the [Move review](https://www.chessnutech.com/blogs/news/chessnut-move-robotic-chessboard-review).
+
+| What is drawn | What Chessnut shows | Where in the code |
+|---|---|---|
+| A rectangular board 632 × 520 × 22 mm with 55 mm squares: side fields 96 mm (1.75 squares), end fields 40 mm | specification sheet: model CM100, "Dimension (L*D*H) 632*520*22mm", "55mm Grid" | `NUT` in `scenes.js` (`mx`, `mz`, `th`); `drawSlab` takes `mx`/`mz` |
+| A matte charcoal frame with rounded corners and a fine line round the raised rim; a white field with black squares and the coordinates printed in its white border | product renders and photos; "Material: Wooden Frame" | `nutBoard` |
+| The logo — the knight of the site's header as the C of CHESSNUT — printed in grey on each side field, turned to be read from that side | photos and the endgame-import animation (the logo on both side fields, each facing out) | `LOGO_SIDE`, `nutLogo` |
+| The strip on the front edge: buttons and icons, two blue lights, the logo in the middle | the front render of the board | `PANEL` |
+| Pieces not in play stand on the side fields, two rows a side (white right, black left) and drive back from there | the endgame-import animation (captured pieces lined up on the side fields); "can simultaneously reposition all chess pieces" | `SLOT`, `PARK` |
+| Glossy white and black pieces, each on a copper robot base; the x-ray shows the motor, battery, wheels and sensor in the base | renders of the plastic set and of the pieces; "2 extra piece bases as backups"; the recognition animation lights up the bases; "Every piece has its own small motor, battery, wheels, and built-in sensor inside" (review) | `skin: 'nut'` in `engine/js/pieces.js`; `xray` |
+| The name plate in the ad: the official knight as the C, HESSNUT and MOVE in Montserrat, the site's brand font | the site's header logo and CSS (`ChessnutMontserrat`) | `nutPlate` |
+
+Drawn, not documented: where each part sits inside the base on the x-ray; the icons of the front strip, simplified;
+the letters of HESSNUT are set in Montserrat after the official knight (the site has the knight alone as an image, the
+wordmark only printed on the board). Other specifications on the sheet, not used in the narration: average move within
+3 seconds, any number of pieces moving at once, 1 mm piece recognition, an LED under every square, up to 8 hours on a
+charge for the board and the pieces, voice commands, a built-in engine, Wi-Fi 5 and Bluetooth 5.0.
+
+Our own guard (rule 52): `--qa` logs the logos on the board as text, so a logo cut by the frame or under the captions is
+reported like any text; the cameras of 15 shots were moved until it reported nothing.
+
+Rule 40, checked 9 November 2026 on the Chess.com API: Hikaru's best blitz 3503 (6 October 2026), now 3433; Carlsen's
+blitz in his games of 7 November 3375 (his `/stats` endpoint answers "Data provider not found"). The gap of a hundred
+points is the one of the record's day (3500 against 3400, DAZN), so the towers carry "CHESS.COM BLITZ · OCT 2026".
 
 ## Game data
 
@@ -52,3 +84,5 @@ ply 76 = 38...Rb1 (the meme position), plies 77–81 = 39.Nd8 Rb5 40.Rxb5 cxb5 4
 | File | Where | Author | Licence | Source |
 |---|---|---|---|---|
 | `episodes/hikaru213/photos/stockfish_fish.png` | "He doesn't need Stockfish" | Klein Maetschke (the Stockfish logo) | GPLv3, credit on screen: "Logo: Stockfish (GPLv3) · Klein Maetschke" | [Wikimedia Commons, NewLogoSF.png](https://commons.wikimedia.org/wiki/File:NewLogoSF.png) (the 768 px copy from the author's Mittens folder); the fish cut out of its green tile and turned level by `photos/cut_fish.py` |
+| `episodes/hikaru213/photos/chessnut_icon.png` | the logo on the board, its front strip and the name plate | Chessnut (the sponsor's own mark) | the sponsor's logo, used in the video made for it | [chessnutech.com, Icon_store_512.png](https://www.chessnutech.com/cdn/shop/files/Icon_store_512.png) (the site's header logo, white on black), its brightness turned into transparency |
+| `engine/fonts/montserrat-latin-600-normal.woff2`, `-700-` | HESSNUT and MOVE | Julieta Ulanovsky and the Montserrat Project | SIL Open Font License 1.1 | the npm package `@fontsource/montserrat` 5.3.0 |
