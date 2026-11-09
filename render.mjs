@@ -42,15 +42,19 @@ const shot = (page, t, f) => page.evaluate(([t, f]) => window.renderFrame(t, f),
 
 
 // ---- QA: step through the film and flag layout mistakes from the rectangles the engine logs in QA mode
-function qaCheck(fr, t, W = 1080, H = 1920) {
-  if (fr.skip) return [];
+// rectangles logged on the film layer go through the frame's push-in/jump-cut transform to land on the screen
+function screenItems(fr) {
   const M = fr.M, tf = r => {
     if (r.screen || !M) return r;
     const pts = [[r.x, r.y], [r.x + r.w, r.y], [r.x, r.y + r.h], [r.x + r.w, r.y + r.h]].map(([x, y]) => [M[0] * x + M[2] * y + M[4], M[1] * x + M[3] * y + M[5]]);
     const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
     return { ...r, x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
   };
-  const it = fr.items.map(tf), area = r => Math.max(1, r.w * r.h);
+  return fr.items.map(tf);
+}
+function qaCheck(fr, t, W = 1080, H = 1920) {
+  if (fr.skip) return [];
+  const it = screenItems(fr), area = r => Math.max(1, r.w * r.h);
   const inter = (a, b) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
   const texts = it.filter(r => r.kind === 'text'), faces = it.filter(r => r.kind === 'face' && r.w > 60), caps = it.filter(r => r.kind === 'caption');
   const out = [];
@@ -66,6 +70,24 @@ function qaCheck(fr, t, W = 1080, H = 1920) {
     for (const c of caps) if (inter(f, c) / area(f) > 0.25) out.push(['captions over face', f.label]);
     const inside = inter(f, { x: 0, y: 0, w: W, h: H }) / area(f);
     if (inside > 0.01 && inside < 0.55 && area(f) < W * H * 0.5) out.push(['face cut by frame', f.label]);
+  }
+  // full-body characters (the football format logs each player's box and head with its depth d)
+  const onScreen = r => inter(r, { x: 0, y: 0, w: W, h: H }) / area(r) > 0.25;  // players off the frame do not count
+  const bodies = it.filter(r => r.kind === 'body' && onScreen(r)), pfaces = it.filter(r => r.kind === 'pface' && r.w > 40 && onScreen(r));
+  for (const f of pfaces) for (const b of bodies) {  // a nearer player's body over someone's face: a muddle, move one of them
+    if (b.label === f.label || !(b.d < f.d - 0.25)) continue;
+    if (inter(f, b) / area(f) > 0.3) out.push(['face behind player', `${f.label} behind ${b.label}`]);
+  }
+  // a player hidden behind a nearer one, whichever way he faces: the middle of his body (the box without the arms)
+  // mostly under the middle of the nearer body, his head included (legs behind a defender sliding in at his feet are a
+  // tackle, not a muddle). Small figures far off do not count
+  const core = r => ({ x: r.x + r.w * 0.3, y: r.y, w: r.w * 0.4, h: r.h }), top = r => ({ ...core(r), h: r.h * 0.3 });
+  for (const a of bodies) for (const b of bodies) {
+    if (a === b || a.label === b.label || a.h < 150 || !(b.d < a.d - 0.25)) continue;
+    if (inter(core(a), core(b)) / area(core(a)) > 0.5 && inter(top(a), core(b)) / area(top(a)) > 0.5) out.push(['player hidden', `${a.label} behind ${b.label}`]);
+  }
+  for (const b of bodies) {  // a big figure whose head is above the frame: a headless neck on screen
+    if (b.h > 420 && b.y + b.h * 0.18 < 0 && b.y + b.h > 260) out.push(['head out of frame', b.label]);
   }
   return out.filter(([type]) => !(fr.allow || []).includes(type)).map(([type, what]) => ({ t, type, what, shot: fr.shot }));
 }
@@ -94,6 +116,25 @@ try {
     fs.writeFileSync(path.join(BUILD, 'qa.json'), JSON.stringify(ranges, null, 1));
     console.log(ranges.length ? ranges.map(r => `${r.from.toFixed(2)}–${r.to.toFixed(2)}s  [${r.type}] ${r.what}  (shot ${r.shot})`).join('\n') : 'QA: no issues');
     console.log(`QA: ${ranges.length} issue(s), ${ts.length} frames checked -> ${path.join(BUILD, 'qa.json')}`);
+  } else if (args.includes('--review')) {
+    // frames for the eye review (CLAUDE.md, the review step): a frame every --step s, each with the boxes of its people
+    // and the QA findings; tools/review_sheet.py turns them into contact sheets and large crops of every character
+    const step = +(opt('step') || 0.5), N = +(opt('workers') || 4), dir = path.join(BUILD, 'review');
+    fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
+    const p0 = await openPage(browser, '&qa=1'); const dur = await p0.evaluate('window.DURATION'); await p0.close();
+    const ts = []; for (let t = +(opt('from') || 0.05); t < Math.min(dur - 0.05, +(opt('to') || 1e9)); t += step) ts.push(+t.toFixed(3));
+    const per = Math.ceil(ts.length / N);
+    const frames = (await Promise.all([...Array(N)].map(async (_, w) => {
+      const page = await openPage(browser, '&qa=1'), mine = ts.slice(w * per, (w + 1) * per), res = [];
+      for (const t of mine) {
+        const fr = await page.evaluate(t => window.qaFrame(t), t), file = `f${t.toFixed(2).padStart(6, '0')}.jpg`;
+        fs.writeFileSync(path.join(dir, file), await page.screenshot({ type: 'jpeg', quality: 90, clip: { x: 0, y: 0, width: 1080, height: 1920 } }));
+        res.push({ t, file, shot: fr.shot, people: screenItems(fr).filter(r => r.kind === 'body' || r.kind === 'face'), issues: qaCheck(fr, t) });
+      }
+      await page.close(); return res;
+    }))).flat().sort((a, b) => a.t - b.t);
+    fs.writeFileSync(path.join(dir, 'review.json'), JSON.stringify(frames));
+    console.log(`review: ${frames.length} frames -> ${dir}; issues: ${frames.reduce((a, f) => a + f.issues.length, 0)}`);
   } else if (opt('stills')) {
     const dir = path.join(BUILD, 'stills'); fs.mkdirSync(dir, { recursive: true });
     const page = await openPage(browser);

@@ -90,7 +90,7 @@
       "id": "run",
       "text": "Beardsley. Reid. Butcher. Fenwick. Shilton. Goal!",
       "say": "[building excitement] Beardsley. Reid. Butcher. Fenwick. Shilton... [shouting] Goal!",
-      "hold": [{ "after": "Reid.", "sec": 1.15 }, { "after": "Butcher.", "sec": 0.95 }, { "after": "Fenwick.", "sec": 0.9 }, { "after": "Shilton.", "sec": 0.55 }],
+      "hold": [{ "after": "Reid.", "sec": 1.15 }, { "after": "Butcher.", "sec": 0.95 }, { "after": "Fenwick.", "sec": 0.9 }, { "after": "Shilton.", "sec": 1.1 }],
       "pause": 0.6,
       "colors": { "Beardsley.": "red", "Reid.": "red", "Butcher.": "red", "Fenwick.": "red", "Shilton.": "red", "Goal!": "lime" }
     },

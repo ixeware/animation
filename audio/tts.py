@@ -129,6 +129,39 @@ def squeeze(a, max_gap=0.25, thr_db=-32, fade=0.02, with_map=False):
     return (res, (np.array(kin, float), np.array(kout, float))) if with_map else res
 
 
+def _env_db(a, hop):
+    n = max(1, len(a) // hop)
+    rms = np.sqrt(np.mean(a[:n * hop].reshape(n, hop) ** 2, axis=1) + 1e-12)
+    return 20 * np.log10(rms / (rms.max() + 1e-12))
+
+
+def snap_onsets(a, spans, min_gap=0.1, quiet=-40, loud=-30):
+    """Alignment can start a word late, most of all a word right after an [audio tag] (v3 lets the tag's span swallow
+    the start of a shout). Where the alignment leaves a gap before a word, move the word's start back to where the sound
+    actually comes back: the first loud frame after the quietest point of the gap."""
+    hop = int(0.005 * SR); db = _env_db(a, hop); out = list(spans)
+    for i in range(1, len(out)):
+        p_end, s0 = out[i - 1][1], out[i][0]
+        if s0 - p_end < min_gap: continue
+        f0, f1 = int(p_end / 0.005), min(len(db) - 1, int(s0 / 0.005))
+        if f1 - f0 < 3: continue
+        q = f0 + int(np.argmin(db[f0:f1]))
+        if db[q] > quiet: continue  # no real pause in there: keep the aligned time
+        on = next((k for k in range(q, f1) if db[k] > loud), None)
+        if on is not None and on * 0.005 < s0 - 0.04:
+            out[i] = (on * 0.005, max(out[i][1], on * 0.005 + 0.05))
+    return out
+
+
+def quiet_cut(a, t0, t1):
+    """The quietest instant between t0 and t1 (with 30 ms of slack): where a held breath can be spliced in without
+    cutting into a word."""
+    hop = int(0.005 * SR); db = _env_db(a, hop)
+    f0, f1 = max(0, int((t0 - 0.03) / 0.005)), min(len(db), int((t1 + 0.03) / 0.005) + 1)
+    if f1 <= f0: return int(t0 * SR)
+    return (f0 + int(np.argmin(db[f0:f1]))) * hop + hop // 2
+
+
 def tempo(a, k):
     """Change speed without changing pitch."""
     if abs(k - 1) < 1e-3:
@@ -392,9 +425,13 @@ def main(ep):
             spans = align(caps, heard, dur)
         # {"after": word, "sec": s} or a list of them: held breaths inside the line, for a big move to land in (a list
         # spaces out a run of short words, e.g. the names of the players a dribbler goes past)
+        if v.get('timing') == 'alignment':
+            spans = snap_onsets(audio, spans)
         for hd in ([p['hold']] if isinstance(p.get('hold'), dict) else p.get('hold') or []):
             k = caps.index(hd['after']); hs = hd['sec']
-            n0, f = int(((spans[k][1] + spans[k + 1][0]) / 2 if k + 1 < len(spans) else spans[k][1]) * SR), int(0.01 * SR)
+            # splice at the quietest point between the two words (by the waveform, not the timestamps), short fades
+            n0 = quiet_cut(audio, spans[k][1], spans[k + 1][0]) if k + 1 < len(spans) else int(spans[k][1] * SR)
+            f = int(0.015 * SR)
             audio = audio.copy(); audio[max(0, n0 - f):n0] *= np.linspace(1, 0, n0 - max(0, n0 - f)); audio[n0:n0 + f] *= np.linspace(0, 1, len(audio[n0:n0 + f]))
             audio = np.concatenate([audio[:n0], np.zeros(int(hs * SR)), audio[n0:]])
             spans = [(s + hs, e + hs) if i > k else (s, e) for i, (s, e) in enumerate(spans)]

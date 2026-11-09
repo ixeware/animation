@@ -25,7 +25,7 @@ const CHANNEL = null;  // no channel handle on this one: no FOLLOW plate, neutra
 const B = new Board();
 const PI = Math.PI;
 const SKY = '#5FB3E8', NAVY = '#1E2D5C', GOLD = '#F2C14E', RED = '#E0603F', CREAM = C.cream, LIME = C.lime, BLUE = '#2C55AE';
-const NOON = { con: 1.06, sat: 1.1, bri: 1.03, tone: ['#FFD8A0', 0.12], lift: ['#10243A', 0.07], bloom: 0.28 };  // Mexico City at noon
+const NOON = { con: 1.05, sat: 1.0, bri: 1.03, tone: ['#FFD8A0', 0.1], lift: ['#10243A', 0.06], bloom: 0.18 };  // Mexico City at noon
 const K = (yaw, pitch, dist, target, o = {}) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.5, target, ...o });
 const lin = x => x, glide = x => 0.35 * x + 0.65 * ease.inOut(x);
 const depth = (x, y, z) => B.toCam(x, y, z)[2];
@@ -49,7 +49,7 @@ CAST.bennasser = { face: [0.96, 1.06, 0.9], hair: 'receding', hairC: '#16110D', 
   skin: { base: '#C99A72', shade: '#B3845E', deep: '#93673F', blush: '#C9806E', hi: '#E2B994' } };
 CAST.morales = { face: [0.95, 1.06, 0.88], hair: 'swept', hairC: '#1E1612', brow: '#16100C', suit: '#5A4A3A', suitD: '#42362A', shirt: 'open', ears: 1.0, mustache: '#1E1612', headphones: '#15171C' };
 CAST.moschella = { face: [0.98, 1.04, 0.92], hair: 'receding', hairC: '#6E665E', brow: '#4E4842', suit: '#2C55AE', suitD: '#1C3C86', shirt: 'polo', ears: 1.02, glasses: true, mustache: '#5E5650' };
-CAST.diegoPress = { ...CAST.diego, suit: '#2C55AE', suitD: '#1C3C86', shirt: 'polo' };
+CAST.diegoPress = { ...CAST.diego, suit: '#2C55AE', suitD: '#1C3C86', shirt: 'tee' };
 
 // players: who (head), kit, number, height (m), build
 const DIEGO = { who: 'diego', kit: 'arg86', num: 10, h: 1.65, build: 1.1, captain: '#EDEDE8' };
@@ -123,7 +123,7 @@ function stampPlate(g, place, date, y, t, t0, { color = NAVY, size = 34 } = {}) 
 // a name tag on a player (world-anchored plate); struck through once he has been beaten
 function playerTag(g, name, p, t, t0, { color = RED, struck = null, size = 34 } = {}) {
   if (t < t0 || !p || p.d < 0.8) return;
-  const out = struck ? clamp((t - struck - 0.25) / 0.45) : 0;
+  const out = struck ? clamp((t - struck - 0.1) / 0.25) : 0;
   if (out >= 1) return;
   const y = clamp(Math.min(p.y - 18, CAP_BAND[0] - 40), 160, H - 160), x = clamp(p.x, 190, W - 190);
   p = { ...p, x };
@@ -137,9 +137,9 @@ function playerTag(g, name, p, t, t0, { color = RED, struck = null, size = 34 } 
 // VHS overlay for the rewind: scanlines, a tracking band, chroma fringe, the REW sign
 function vhs(g, t, { label = '◀◀ REW', a = 1 } = {}) {
   g.save(); g.globalAlpha *= a;
-  g.fillStyle = 'rgba(0,0,0,0.16)'; for (let y = 0; y < H; y += 6) g.fillRect(0, y, W, 2);
-  const by = ((t * 900) % (H + 300)) - 150; g.fillStyle = 'rgba(255,255,255,0.10)'; g.fillRect(0, by, W, 46); g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(0, by + 46, W, 18);
-  g.globalCompositeOperation = 'screen'; g.fillStyle = 'rgba(255,0,60,0.05)'; g.fillRect(4, 0, W, H); g.fillStyle = 'rgba(0,160,255,0.05)'; g.fillRect(-4, 0, W, H);
+  g.fillStyle = 'rgba(0,0,0,0.08)'; for (let y = 0; y < H; y += 8) g.fillRect(0, y, W, 3);
+  const by = ((t * 900) % (H + 300)) - 150; g.fillStyle = 'rgba(255,255,255,0.06)'; g.fillRect(0, by, W, 40);
+  g.globalCompositeOperation = 'screen'; g.fillStyle = 'rgba(255,0,60,0.025)'; g.fillRect(3, 0, W, H); g.fillStyle = 'rgba(0,160,255,0.025)'; g.fillRect(-3, 0, W, H);
   g.globalCompositeOperation = 'source-over';
   g.font = '800 54px "JetBrains Mono"'; g.fillStyle = '#FFFFFF'; g.shadowColor = 'rgba(0,0,0,0.7)'; g.shadowOffsetY = 4; g.textAlign = 'left';
   g.fillText(label, 60, 170); qaRect(g, 60, 120, 300, 60, 'text', label);
@@ -159,15 +159,15 @@ function warp(knots) {  // knots: [[t, speed], ...]; tau(t0) = t0 at the first k
 // comes out; Maradona, 18 cm shorter, gets there first with his left fist. England attack nothing here: Argentina
 // attack the goal at x = -52.5. Positions are a reconstruction (SOURCES.md, "drawn, not documented").
 const HG = { pass: 12.6, hook: 14.09, punch: 15.54, jump0: 15.32, jumpD: 0.46, sJump0: 15.34, sJumpD: 0.55, cross: 16.24, net: 16.42 };
-const hgD = new Mover([[11.2, -16.5, -11.5], [12.6, -28.6, -5.4], [14.09, -38.2, -2.4], [15.36, -45.9, 0.1], [15.54, -46.35, 0.35], [16.3, -47.3, 0.8],
+const hgD = new Mover([[11.2, -16.5, -11.5], [12.6, -28.6, -5.4], [14.09, -38.2, -2.4], [15.36, -45.9, 0.1], [15.54, -46.35, 0.35], [16.3, -46.0, 1.6],
   [16.9, -46.6, 2.6], [18.2, -42.5, 7.8], [20.5, -35.5, 13.5], [23, -29, 16]]);
-const hgV = new Mover([[11.2, -26.5, 3.0], [13.0, -33.6, 0.9], [14.6, -40.0, 8.0], [16.5, -43.0, 10.0], [18, -41.5, 9.5], [21, -36.5, 12.5]]);
-const hgH = new Mover([[11.2, -42.5, 11.0], [13.95, -38.85, 6.1, { stop: true }], [14.3, -38.9, 6.0], [15.5, -41.6, 4.6], [17.2, -43.2, 3.4], [19, -40.5, 2.0]],
+const hgV = new Mover([[11.2, -26.5, 3.0], [13.0, -33.6, 0.9], [14.6, -37.5, 1.4], [16.5, -40.8, 6.2], [18, -40.5, 8.5], [21, -36.5, 12.5]]);
+const hgH = new Mover([[11.2, -42.5, 11.0], [13.95, -38.85, 6.1, { stop: true }], [14.3, -38.4, 5.6], [15.5, -36.5, 3.5], [17.2, -38.6, 5.0], [19, -39.3, 5.9]],  // clear of the hook, the referee's close-up and the wide after it
   { face: (t) => (t > 13.6 && t < 14.4 ? -2.2 : null) });
 const hgS = new Mover([[11.2, -51.7, -0.6], [14.09, -51.2, -0.2], [15.0, -48.9, 0.05], [15.3, -47.95, 0.15], [15.54, -47.65, 0.2, { stop: true }], [16.1, -47.65, 0.2], [17.2, -46.6, 1.6], [19.5, -43.3, 3.6], [22, -41.0, 4.6]],
   { face: (t) => (t < 16.2 ? 0.05 : null) });
 const hgF = new Mover([[11.2, -39.5, -8.5], [14.5, -41.8, -6.2], [16.2, -42.3, -5.3], [18.5, -41.0, 0.5], [22, -40.0, 3.5]]);
-const hgB = new Mover([[11.2, -44.0, 4.5], [14.5, -45.4, 2.6], [16.2, -46.4, 2.4], [18.5, -43.6, 3.9], [22, -41.2, 5.0]]);
+const hgB = new Mover([[11.2, -42.0, 6.5], [14.5, -39.8, 1.0], [16.2, -41.0, 2.0], [18.5, -41.5, 5.0], [22, -41.2, 5.0]]);
 const hgSt = new Mover([[11.2, -37.0, -14.0], [15.0, -42.0, -8.5], [18.5, -40.2, -3.5], [22, -38.5, 1.0]]);
 const hgRef = new Mover([[11.2, -27.0, 6.0], [14.5, -32.5, 7.2], [16.5, -35.6, 6.8, { stop: true }], [18.8, -35.6, 6.8, { stop: true }], [23, -34.5, 7.0]], { face: (t) => (t < 18.4 ? PI + 0.2 : 0.1) });
 // the ball: to Hodge, looped back, punched over Shilton into the net. The contact point is Maradona's left fist at the
@@ -251,14 +251,16 @@ function goalOfCentury(T) {
     { t0: tG + 0.12, t1: tG + 1.0, kind: 'roll', from: [net[0], 0.3, net[2]], to: [-53.5, BALL_R, -1.5], decay: 3 },
     { t0: tG + 1.0, t1: tG + 30, kind: 'hold', from: [-53.5, BALL_R, -1.5] },
   ]);
-  const BE = new Mover([[t0, -2.6, -12.8], [tRecv + 0.1, 1.2, -11.2], [tB + 0.05, 2.0, -10.4, { stop: true }], [tB + 0.6, 2.2, -10.5], [tB + 2.5, -3.5, -11.4]]);
-  const RE = new Mover([[t0, -3.6, -7.4], [tRecv + 0.2, 0.6, -9.2], [tR - 0.1, -0.6, -10.5], [tR + 0.8, -6.4, -11.4], [tBu + 0.5, -15.5, -12.0], [tF + 1, -21.5, -12.4]]);
-  const BU = new Mover([[t0, -24.0, -6.5], [tBu - 1.1, -18.6, -9.6], [tBu - 0.12, -15.8, -11.5], [tBu + 0.35, -15.0, -11.9], [tBu + 0.8, -18.6, -12.3], [tF, -26.0, -12.0],
-    [tS, -37.4, -10.0], [tShot - 0.45, -45.6, -8.2], [tShot - 0.05, -47.3, -6.9, { stop: true }], [tG + 1, -47.6, -6.6]]);
-  const FE = new Mover([[t0, -36.0, -6.5], [tF - 1.2, -31.6, -9.6], [tF - 0.1, -28.8, -11.9], [tF + 0.4, -28.4, -12.2], [tF + 1.2, -32.0, -12.0], [tG, -42.0, -9.0]]);
+  const BE = new Mover([[t0, -2.6, -12.8], [tRecv + 0.1, 1.8, -9.6], [tB + 0.05, 2.4, -9.2], [tB + 0.6, 3.6, -9.0], [tB + 2.5, -1.5, -10.6]]);
+  const RE = new Mover([[t0, -1.0, -3.5], [tRecv + 0.2, 3.0, -4.5], [tB + 0.1, 1.6, -5.8], [tR - 0.1, -1.7, -8.4], [tR + 0.8, -6.5, -9.0], [tBu + 0.5, -15.5, -10.5], [tF + 1, -21.5, -11.0]]);
+  // Butcher, beaten, trails off on Maradona's left: the camera follows from behind, and chasing on his line Butcher
+  // hid Maradona and filled the frame at the finish
+  const BU = new Mover([[t0, -24.0, -7.5], [tBu - 1.1, -18.6, -10.6], [tBu - 0.12, -15.5, -12.8], [tBu + 0.35, -14.9, -13.0], [tBu + 0.8, -17.8, -13.2], [tF, -25.2, -13.4],
+    [tS, -33.0, -14.0], [tG + 1, -40.5, -13.0]]);
+  const FE = new Mover([[t0, -36.0, -6.5], [tF - 1.2, -31.6, -10.8], [tF - 0.1, -28.8, -13.4], [tF + 0.4, -28.4, -13.6], [tF + 1.2, -32.0, -13.2], [tG, -42.0, -11.0]]);
   const SH = new Mover([[t0, -51.6, -0.8], [tS - 0.6, -51.2, -2.0], [tS + 0.4, -48.8, -4.6], [tShot - 0.55, -47.6, -5.4, { stop: true }], [tG + 1, -47.6, -5.4]], { face: () => 0.15 });
   const others = [
-    [ENG('engA', 2, 1.8), new Mover([[t0, -30, -22], [tG, -45, -16]])], [ENG('engB', 3, 1.78), new Mover([[t0, -34, 8], [tG, -47, 4]])],
+    [ENG('engA', 2, 1.8), new Mover([[t0, -30, -22], [tG, -43, -21]])], [ENG('engB', 3, 1.78), new Mover([[t0, -34, 9], [tG, -46, 9.5]])],
     [ENG('engA', 4, 1.82), new Mover([[t0, -8, 6], [tG, -26, 1]])], [ENG('engB', 10, 1.75), new Mover([[t0, 6, 14], [tG, -4, 10]])],
     [HODGE, new Mover([[t0, -12, 2], [tG, -30, -2]])], [VALD, new Mover([[t0, -6, -1], [tS, -38, -1.2], [tG, -45.5, -0.5]])],
     [ENRI, new Mover([[t0, 9.0, -6.2], [t0 + 1.2, 8.5, -6.5], [tG, -6, -9]])], [ARG('argB', 7, 1.75), new Mover([[t0, 0, 9], [tG, -24, 5]])],
@@ -273,10 +275,9 @@ function gcItems(t, { tags = true } = {}) {
   if (t > w.tShot - 0.3 && t < w.tShot + 0.45) ds = { ...ds, pose: POSE.kick(clamp((t - w.tShot + 0.3) / 0.65), 'L') };
   if (t > w.tG - 0.15) ds = { ...ds, pose: blend(ds.pose, { sh: [[0.25, 0.25], [2.75, 0.3]], el: [1.1, 0.25] }, clamp((t - w.tG + 0.15) * 3)), e: 'triumph' };
   items.push(P(DIEGO, ds)); tg.D = ds;
-  const lunge = (st, t0, d = 0.55) => (t > t0 && t < t0 + d ? { ...st, pose: blend(st.pose, POSE.slide(), Math.sin(PI * clamp((t - t0) / d)) * 0.75) } : st);
+  const lunge = (st, t0, d = 0.55, k = 0.75) => (t > t0 && t < t0 + d ? { ...st, pose: blend(st.pose, POSE.slide(), Math.sin(PI * clamp((t - t0) / d)) * k) } : st);
   tg.BE = lunge(moving(BE, t, { e: 'worried' }), w.tB - 0.25); tg.RE = moving(RE, t, { e: 'worried' });
-  tg.BU = lunge(moving(BU, t, { e: 'angry' }), w.tBu - 0.2);
-  if (t > w.tShot - 0.3) tg.BU = { ...tg.BU, pose: POSE.slide(), head: BU.at(w.tShot - 0.3).head };
+  tg.BU = lunge(moving(BU, t, { e: 'angry' }), w.tBu - 0.28, 0.75, 1);  // a full slide on the camera's side, low at Maradona's feet: both faces stay clear
   tg.FE = lunge(moving(FE, t, { e: 'worried' }), w.tF - 0.2);
   tg.SH = moving(SH, t, { e: 'focus' });
   if (t > w.tS + 0.35) tg.SH = { ...tg.SH, pose: blend(POSE.stand(), { crouch: 0.22, hip: [[0.35, 0.3], [0.35, 0.3]], knee: [0.7, 0.7], sh: [[0.4, 0.7], [0.4, 0.7]], el: [0.4, 0.4], lean: 0.25 }, 1) };
@@ -296,23 +297,34 @@ const bust = (g, who, x, y, z, { e = 'neutral', t = 0, w = 0.34, alpha = 1, tilt
   drawChar(g, who, { x: p.x, y: p.y, s, e: typeof e === 'string' ? EXPR[e] : e, t, alpha, tilt });
   return { ...p, s };
 };
-// an arm for a bust (drawChar units from the head centre, scale hp.s): a sleeve from inside the shoulder bending at the
-// elbow to a hand at (hx, hy) with the index finger out (up: the finger's angle, 0 = straight up). No floating fists
-function pointArm(g, hp, side, hx, hy, { up = 0, sleeve = '#2C55AE', cuff = '#F4F4F2', skin = SKIN_ARG.base } = {}) {
-  const s = hp.s, sx = hp.x + side * 118 * s, sy = hp.y + 250 * s;
-  const mx = (sx + hx) / 2, my = (sy + hy) / 2, dx = hx - sx, dy = hy - sy, l = Math.hypot(dx, dy) || 1;
-  const bow = Math.max(0, 300 * s - l * 0.35), ex = mx + side * (-dy / l) * bow * -1 + side * 40 * s, ey = my + (dx / l) * bow * side * 0.2 + 40 * s;
-  g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
-  g.strokeStyle = mix(sleeve, '#000000', 0.2); g.lineWidth = 78 * s; g.beginPath(); g.moveTo(sx, sy); g.lineTo(ex, ey); g.lineTo(hx, hy + 30 * s); g.stroke();
-  g.strokeStyle = sleeve; g.lineWidth = 64 * s; g.beginPath(); g.moveTo(sx, sy); g.lineTo(ex, ey); g.lineTo(hx, hy + 30 * s); g.stroke();
-  g.strokeStyle = cuff; g.lineWidth = 66 * s; const cx = lerp(ex, hx, 0.8), cy = lerp(ey, hy + 30 * s, 0.8); g.beginPath(); g.moveTo(cx, cy); g.lineTo(lerp(ex, hx, 0.86), lerp(ey, hy + 30 * s, 0.86)); g.stroke();
-  g.translate(hx, hy); g.rotate(up);
-  g.fillStyle = mix(skin, '#000000', 0.12); g.beginPath(); g.ellipse(0, 6 * s, 36 * s, 40 * s, 0, 0, 7); g.fill();
-  g.fillStyle = skin; g.beginPath(); g.ellipse(-3 * s, 3 * s, 32 * s, 36 * s, 0, 0, 7); g.fill();
-  g.strokeStyle = skin; g.lineWidth = 19 * s; g.beginPath(); g.moveTo(-side * 6 * s, -18 * s); g.lineTo(-side * 8 * s, -78 * s); g.stroke();  // the index finger
-  g.strokeStyle = mix(skin, '#000000', 0.15); g.lineWidth = 3 * s; for (const k of [0, 1, 2]) { g.beginPath(); g.moveTo(-24 * s, (2 + k * 12) * s); g.lineTo(18 * s, (2 + k * 12) * s); g.stroke(); }
+// an arm for a bust (drawChar units from the head centre, scale hp.s), as in the shirt he wore: a short sleeve from the
+// shoulder on the outline, a bare forearm, a hand with the index finger out. Two bones solved so the elbow bends outward,
+// away from the face; dir is the finger's screen angle (-PI/2 = straight up). No floating fists
+function pointArm(g, hp, side, hx, hy, { dir = -PI / 2, sleeve = '#2C55AE', skin = SKIN_ARG.base } = {}) {
+  const s = hp.s, S = [hp.x + side * 150 * s, hp.y + 215 * s], L1 = 175 * s, L2 = 160 * s;
+  let dx = hx - S[0], dy = hy - S[1], d = Math.hypot(dx, dy) || 1;
+  const dc = clamp(d, Math.abs(L1 - L2) + 1, L1 + L2 - 1); if (dc !== d) { hx = S[0] + dx / d * dc; hy = S[1] + dy / d * dc; dx = hx - S[0]; dy = hy - S[1]; d = dc; }
+  const a = Math.acos(clamp((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1)), base = Math.atan2(dy, dx);
+  const e1 = [S[0] + Math.cos(base + a) * L1, S[1] + Math.sin(base + a) * L1], e2 = [S[0] + Math.cos(base - a) * L1, S[1] + Math.sin(base - a) * L1];
+  const E = (e1[0] - hp.x) * side > (e2[0] - hp.x) * side ? e1 : e2;  // the elbow out to the side
+  const W2 = [hx, hy], seg = (p, q, w0, w1, col) => { const ux = q[0] - p[0], uy = q[1] - p[1], l = Math.hypot(ux, uy) || 1, nx = -uy / l, ny = ux / l;
+    g.fillStyle = col; g.beginPath(); g.moveTo(p[0] + nx * w0, p[1] + ny * w0); g.lineTo(q[0] + nx * w1, q[1] + ny * w1); g.arc(q[0], q[1], w1, Math.atan2(ny, nx), Math.atan2(ny, nx) + PI, true);
+    g.lineTo(p[0] - nx * w0, p[1] - ny * w0); g.arc(p[0], p[1], w0, Math.atan2(-ny, -nx), Math.atan2(-ny, -nx) + PI, true); g.closePath(); g.fill(); };
+  g.save();
+  const skD = mix(skin, '#000000', 0.14), sv = [lerp(S[0], E[0], 0.55), lerp(S[1], E[1], 0.55)];
+  seg(E, W2, 31 * s, 26 * s, skD); seg(E, W2, 26 * s, 22 * s, skin);  // forearm, with a shaded edge
+  seg(sv, E, 33 * s, 31 * s, skD); seg(sv, E, 29 * s, 27 * s, skin);  // upper arm below the sleeve
+  seg(S, sv, 46 * s, 42 * s, mix(sleeve, '#000000', 0.25)); seg(S, sv, 42 * s, 38 * s, sleeve);  // the short sleeve
+  g.translate(hx, hy); g.rotate(dir + PI / 2);
+  g.fillStyle = skD; g.beginPath(); g.roundRect(-30 * s, -26 * s, 60 * s, 58 * s, 22 * s); g.fill();  // fist
+  g.fillStyle = skin; g.beginPath(); g.roundRect(-27 * s, -24 * s, 54 * s, 52 * s, 20 * s); g.fill();
+  g.strokeStyle = skD; g.lineWidth = 3.5 * s; for (const k of [0, 1, 2]) { g.beginPath(); g.moveTo(-22 * s, (-6 + k * 13) * s); g.quadraticCurveTo(-4 * s, (-1 + k * 13) * s, 14 * s, (-6 + k * 13) * s); g.stroke(); }  // folded fingers
+  g.fillStyle = skin; g.beginPath(); g.roundRect(-side * 22 * s - 9 * s, -82 * s, 18 * s, 70 * s, 9 * s); g.fill();  // the index finger, pointing
+  g.strokeStyle = skD; g.lineWidth = 2.5 * s; g.beginPath(); g.moveTo(-side * 22 * s, -60 * s); g.lineTo(-side * 22 * s + 6 * s, -58 * s); g.stroke();
   g.restore();
 }
+// the white V of Argentina's 1986 shirt, on a bust drawn with a plain tee
+function vNeck(g, hp) { const s = hp.s; g.save(); g.strokeStyle = '#F4F4F2'; g.lineWidth = 14 * s; g.lineJoin = 'round'; g.beginPath(); g.moveTo(hp.x - 56 * s, hp.y + 150 * s); g.lineTo(hp.x, hp.y + 228 * s); g.lineTo(hp.x + 56 * s, hp.y + 150 * s); g.stroke(); g.restore(); }
 // a T-shirt laid flat or held up: centre (x, y) on screen, width w (px), rotation; back: the number side
 function shirtCloth(g, x, y, w, { kit = KITS.arg86, num = 10, back = true, rot = 0, a = 1, sway = 0, shine = 0 } = {}) {
   if (a <= 0) return;
@@ -486,19 +498,10 @@ function gallery(g, t, { bid = 0, sold = 0 } = {}) {
   quad(g, [[-6, 0, 4], [6, 0, 4], [6, 0, -6], [-6, 0, -6]], '#2A2420');
   quad(g, [[-6, 0, 4], [6, 0, 4], [6, 4.2, 4], [-6, 4.2, 4]], '#1E3A2E');
   for (const sx of [-1, 1]) quad(g, [[sx * 6, 0, 4], [sx * 6, 4.2, 4], [sx * 6, 4.2, -6], [sx * 6, 0, -6]], '#17302A');
-  for (let i = 0; i < 3; i++) { const x = -4.6 + i * 3.4; quad(g, [[x, 1.5, 3.98], [x + 1.4, 1.5, 3.98], [x + 1.4, 3.0, 3.98], [x, 3.0, 3.98]], '#B8924A'); quad(g, [[x + 0.1, 1.6, 3.97], [x + 1.3, 1.6, 3.97], [x + 1.3, 2.9, 3.97], [x + 0.1, 2.9, 3.97]], '#2A2A2A'); }
-  pool(g, B, 0, 0.02, 0.8, 1.8, '#FFF1D8', 0.35);
-  box(g, B, [-0.55, 0, 0.3], [0.55, 1.05, 1.3], { top: '#E8E2D6', side: '#BDB5A6', front: '#D2CBBE' });  // plinth
-  // the case: a thin frame and glass; the shirt mounted inside, back out (the silver 10)
-  const c = B.project(0, 1.75, 0.8), s = c.s;
-  shirtCloth(g, c.x, c.y, s * 0.78, { back: true, num: 10, a: 1 });
-  for (const [a, b] of [[[-0.5, 1.07, 0.35], [-0.5, 2.45, 0.35]], [[0.5, 1.07, 0.35], [0.5, 2.45, 0.35]], [[-0.5, 2.45, 0.35], [0.5, 2.45, 0.35]], [[-0.5, 2.45, 1.25], [0.5, 2.45, 1.25]], [[-0.5, 2.45, 0.35], [-0.5, 2.45, 1.25]], [[0.5, 2.45, 0.35], [0.5, 2.45, 1.25]]]) {
-    if (depth(...a) < 0.3 || depth(...b) < 0.3) continue; const p = B.project(...a), q = B.project(...b); g.strokeStyle = '#C9B27A'; g.lineWidth = Math.max(1.5, p.s * 0.012); g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(q.x, q.y); g.stroke();
-  }
-  quad(g, [[-0.5, 1.07, 0.35], [0.5, 1.07, 0.35], [0.5, 2.45, 0.35], [-0.5, 2.45, 0.35]], 'rgba(200,230,240,0.10)');
-  const gl = B.project(-0.3, 2.2, 0.35); g.save(); g.globalCompositeOperation = 'screen'; g.strokeStyle = 'rgba(255,255,255,0.25)'; g.lineWidth = gl.s * 0.05; g.beginPath(); g.moveTo(gl.x, gl.y); g.lineTo(gl.x + gl.s * 0.2, gl.y + gl.s * 0.35); g.stroke(); g.restore();
-  // the screen on the wall with the online bidding
-  const sc = [[1.1, 1.45, 3.95], [3.7, 1.45, 3.95], [3.7, 2.95, 3.95], [1.1, 2.95, 3.95]];
+  for (let i = 0; i < 2; i++) { const x = -4.6 + i * 3.4; quad(g, [[x, 1.5, 3.98], [x + 1.4, 1.5, 3.98], [x + 1.4, 3.0, 3.98], [x, 3.0, 3.98]], '#B8924A'); quad(g, [[x + 0.1, 1.6, 3.97], [x + 1.3, 1.6, 3.97], [x + 1.3, 2.9, 3.97], [x + 0.1, 2.9, 3.97]], '#2A2A2A'); }
+  // the screen with the online bidding, high on the back wall: drawn before the plinth and the case (it is behind them),
+  // and above the case in the view, so the shirt never hides the bid
+  const sc = [[1.1, 2.6, 3.95], [3.7, 2.6, 3.95], [3.7, 3.9, 3.95], [1.1, 3.9, 3.95]];
   if (quad(g, sc, '#0A0F14')) {
     const a = B.project(...sc[3]), b = B.project(...sc[2]), d = B.project(...sc[0]), w2 = b.x - a.x, h2 = d.y - a.y;
     const fit = (txt, px, wt = 900) => { let fs = px; g.font = sans(Math.round(fs), wt); while (g.measureText(txt).width > w2 * 0.86 && fs > 6) { fs *= 0.92; g.font = sans(Math.round(fs), wt); } };
@@ -509,6 +512,16 @@ function gallery(g, t, { bid = 0, sold = 0 } = {}) {
     g.font = sans(Math.round(h2 * 0.09), 800); g.fillStyle = sold > 0 ? '#7FD18A' : '#9AA4AE'; g.fillText(sold > 0 ? 'SOLD' : 'ONLINE BIDDING', a.x + w2 / 2, a.y + h2 * 0.85);
     g.restore();
   }
+  pool(g, B, 0, 0.02, 0.8, 1.8, '#FFF1D8', 0.35);
+  box(g, B, [-0.55, 0, 0.3], [0.55, 1.05, 1.3], { top: '#E8E2D6', side: '#BDB5A6', front: '#D2CBBE' });  // plinth
+  // the case: a thin frame and glass; the shirt mounted inside, back out (the silver 10)
+  const c = B.project(0, 1.75, 0.8), s = c.s;
+  shirtCloth(g, c.x, c.y, s * 0.78, { back: true, num: 10, a: 1 });
+  for (const [a, b] of [[[-0.5, 1.07, 0.35], [-0.5, 2.45, 0.35]], [[0.5, 1.07, 0.35], [0.5, 2.45, 0.35]], [[-0.5, 2.45, 0.35], [0.5, 2.45, 0.35]], [[-0.5, 2.45, 1.25], [0.5, 2.45, 1.25]], [[-0.5, 2.45, 0.35], [-0.5, 2.45, 1.25]], [[0.5, 2.45, 0.35], [0.5, 2.45, 1.25]]]) {
+    if (depth(...a) < 0.3 || depth(...b) < 0.3) continue; const p = B.project(...a), q = B.project(...b); g.strokeStyle = '#C9B27A'; g.lineWidth = Math.max(1.5, p.s * 0.012); g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(q.x, q.y); g.stroke();
+  }
+  quad(g, [[-0.5, 1.07, 0.35], [0.5, 1.07, 0.35], [0.5, 2.45, 0.35], [-0.5, 2.45, 0.35]], 'rgba(200,230,240,0.10)');
+  const gl = B.project(-0.3, 2.2, 0.35); g.save(); g.globalCompositeOperation = 'screen'; g.strokeStyle = 'rgba(255,255,255,0.25)'; g.lineWidth = gl.s * 0.05; g.beginPath(); g.moveTo(gl.x, gl.y); g.lineTo(gl.x + gl.s * 0.2, gl.y + gl.s * 0.35); g.stroke(); g.restore();
 }
 
 // a generic gold cup with two handles (not the real trophy's design)
@@ -550,7 +563,7 @@ export async function build(T) {
   shot(fourT - 0.06, (g, lt, t) => {
     const tt = GC.w.tBu - 0.7 + lt;  // the run, around Butcher
     const st = GC.D.at(tt), u = clamp(lt / 1.6);
-    rig(B, lt, [[0, K(lerp(0.62, 0.5, u), 0.1, lerp(7.6, 6.9, u), [st.x - 1.4, 0.95, st.z])]], { t });
+    rig(B, lt, [[0, K(lerp(0.24, 0.14, u), 0.1, lerp(7.6, 6.9, u), [st.x - 1.4, 0.95, st.z])]], { t });
     stadium(g, t, gcItems(tt).items, { cheer: 0.3, blur: 2.5 });
   }, { trans: 'whip', mbStep: 4, hud: (g, lt, t) => { if (t < goalT) plate(g, '4 MINUTES LATER', W / 2, 260, { color: GOLD, size: 56, ...pin(t, fourT) }); } });
   shot(goalT - 0.04, (g, lt, t) => {
@@ -588,8 +601,9 @@ export async function build(T) {
   // Argentina | England: a split face-off, each half sliding in on its word
   shot(argT - 0.05, (g, lt, t) => {
     const u = ease.out(clamp((t - engT + 0.05) / 0.3));
-    const left = () => { rig(B, lt, [[0, K(-0.32, -0.04, 2.7, [-1.4, 1.38, -8])], [3, K(-0.22, -0.02, 2.3, [-1.4, 1.4, -8])]], { t }); stadium(g, t, lineup(t), { cheer: 0.6, blur: 4 }); };
-    const right = () => { rig(B, lt, [[0, K(0.32, -0.04, 2.9, [1.4, 1.55, -8])], [3, K(0.22, -0.02, 2.5, [1.4, 1.57, -8])]], { t }); stadium(g, t, lineup(t), { cheer: 0.6, blur: 4 }); };
+    const solo = who => lineup(t).filter(it => it.pl === who);
+    const left = () => { rig(B, lt, [[0, K(-0.32, -0.04, 2.7, [-1.4, 1.38, -8])], [3, K(-0.22, -0.02, 2.3, [-1.4, 1.4, -8])]], { t }); stadium(g, t, solo(DIEGO), { cheer: 0.6, blur: 4 }); };
+    const right = () => { rig(B, lt, [[0, K(0.32, -0.04, 2.9, [1.4, 1.55, -8])], [3, K(0.22, -0.02, 2.5, [1.4, 1.57, -8])]], { t }); stadium(g, t, solo(SHIL), { cheer: 0.6, blur: 4 }); };
     if (u <= 0) { left(); return; }
     g.save(); g.beginPath(); g.rect(0, 0, W - u * W / 2, H); g.clip(); g.translate(-u * W / 4, 0); left(); g.restore();  // Argentina slides to the left half
     g.save(); g.beginPath(); g.rect(W - u * W / 2, 0, u * W / 2, H); g.clip(); g.translate(W / 4 + (1 - u) * W / 4, 0); right(); g.restore();  // England comes in on the right
@@ -635,11 +649,11 @@ export async function build(T) {
     stadium(g, t, H1.items, { cheer: 0.3, blur: 3 });
     if (t > sevT) {  // height marks: a line over each head to a ruler, the gap between them
       const u = ease.out(clamp((t - sevT) / 0.4)), fade = 1 - clamp((t - jumpT + 0.15) / 0.3);
-      const dI = H1.items[0], sI = H1.items[1], yd = 1.65, ys = 1.83, rx = -44.8;
+      const dI = H1.items[0], sI = H1.items[1], yd = 1.65, ys = 1.83, rx = dI.st.x + 1.05, rz = dI.st.z + 0.3;
       g.save(); g.globalAlpha = u * fade; g.setLineDash([12, 10]); g.lineWidth = 4;
-      for (const [it, y, col] of [[dI, yd, SKY], [sI, ys, CREAM]]) { const a = B.project(it.st.x, y, it.st.z), b = B.project(rx, y, 0.3); g.strokeStyle = col; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); }
-      g.setLineDash([]); const r0 = B.project(rx, 0, 0.3), r1 = B.project(rx, 2.0, 0.3); g.strokeStyle = CREAM; g.lineWidth = 6; g.beginPath(); g.moveTo(r0.x, r0.y); g.lineTo(r1.x, r1.y); g.stroke();
-      const bd = B.project(rx, yd, 0.3), bs = B.project(rx, ys, 0.3); g.strokeStyle = GOLD; g.lineWidth = 10; g.beginPath(); g.moveTo(bd.x + 14, bd.y); g.lineTo(bs.x + 14, bs.y); g.stroke();
+      for (const [it, y, col] of [[dI, yd, SKY], [sI, ys, CREAM]]) { const a = B.project(it.st.x, y, it.st.z), b = B.project(rx, y, rz); g.strokeStyle = col; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); }
+      g.setLineDash([]); const r0 = B.project(rx, 0, rz), r1 = B.project(rx, 2.0, rz); g.strokeStyle = CREAM; g.lineWidth = 6; g.beginPath(); g.moveTo(r0.x, r0.y); g.lineTo(r1.x, r1.y); g.stroke();
+      const bd = B.project(rx, yd, rz), bs = B.project(rx, ys, rz); g.strokeStyle = GOLD; g.lineWidth = 10; g.beginPath(); g.moveTo(bd.x + 14, bd.y); g.lineTo(bs.x + 14, bs.y); g.stroke();
       g.restore();
     }
   }, { hud: (g, lt, t) => {
@@ -667,9 +681,10 @@ export async function build(T) {
     const rp = hgRef.at(tau);
     rig(B, lt, [[0, K(-2.2, 0.0, 4.2, [rp.x, 1.55, rp.z])], [gl1T - rfS, K(-2.05, 0.02, 4.6, [rp.x, 1.55, rp.z])], [gl1T - rfS + 0.25, K(0.88, 0.05, 11.7, [-40.0, 1.4, 8.5]), ease.whip], [len({ a: 0, b: s('quote') - rfS }), K(0.84, 0.06, 12.4, [-40.2, 1.4, 8.6])]], { t });
     stadium(g, t, H1.items, { cheer: t > gl1T ? 1 : 0.3, blur: t < gl1T ? 4 : 1, hitL: { t0: tauToFilm(HG.net), y: 0.6, z: 1.2, k: 0.9 } });
-  }, { mbStep: 4, hud: (g, lt, t) => {
+  }, { mbStep: 4, qaAllow: [{ t0: gl1T, t1: gl1T + 0.3, types: ['player hidden', 'face behind player'] }],  // the whip: swinging 170 degrees round, someone lines up with someone for a frame
+  hud: (g, lt, t) => {
     scoreBug(g, t > gl1T ? 1 : 0, 0, "51'");
-    nameTitle(g, lt, 'Ali Bin Nasser', 'REFEREE · TUNISIA', { y: 250, t0: refT - rfS, a: 1 - clamp((t - gl1T + 0.1) / 0.2) });
+    nameTitle(g, lt, 'Ali Bin Nasser', 'REFEREE · TUNISIA', { y: 250, t0: refT - rfS, a: 1 - clamp((t - gl1T + 0.24) / 0.2) });
     if (t > gl1T) plate(g, 'GOAL', W / 2, 300, { color: LIME, size: 80, ...pin(t, gl1T) });
   } });
   cue(rfS, 'crowd_protest', 0.5); cue(gl1T, 'whistle', 0.9); cue(gl1T, 'crowd_roar', 0.8); cue(gl1T, 'stamp', 0.4);
@@ -681,15 +696,17 @@ export async function build(T) {
     rig(B, lt, closer ? [[0, K(-0.06, 0.02, 2.2, [0.1, 1.42, 0.85], { cy: H * 0.46 })], [len({ a: 0, b: s('later') - qSplit }), K(0.06, 0.03, 1.8, [0.08, 1.45, 0.85], { cy: H * 0.46 })]]
       : [[0, K(0.18, 0.08, 3.3, [0, 1.3, 0.7], { cy: H * 0.5 })], [len({ a: 0, b: qSplit - qS }), K(0.06, 0.06, 2.7, [0, 1.33, 0.75], { cy: H * 0.5 })]], { t, e: glide });
     pressRoom(g, t, { lit: closer ? clamp((t - godT + 0.3) / 0.4) : 0 });
-    const tap = clamp((t - headT + 0.1) / 0.25) * (1 - clamp((t - headT - 0.7) / 0.3)), raise = clamp((t - handQ + 0.15) / 0.3);
+    const tap = clamp((t - headT + 0.15) / 0.35) * (1 - clamp((t - headT - 0.7) / 0.35)), raise = clamp((t - handQ + 0.25) / 0.45);
     const e = t > handQ ? { ...EXPR.smug, lid: 0.3, turn: 0.15 } : t > headT ? { ...EXPR.smug, lid: 0.25 } : { ...EXPR.happy, open: 0.25 };
     const hp = bust(g, 'diegoPress', 0, 1.42, 0.85, { e, t, w: 0.36 });
-    if (hp) {  // a sleeved arm from the shoulder and a pointing finger: at his temple on "head", up to the sky on "hand of God"
-      if (tap > 0) pointArm(g, hp, 1, lerp(hp.x + hp.s * 260, hp.x + hp.s * 112, ease.out(tap)), lerp(hp.y + hp.s * 330, hp.y - hp.s * 40, ease.out(tap)), { up: -0.6 });
+    if (hp) {  // his arm from the shoulder and a pointing finger: beside his temple on "head", up to the sky on "hand of God"
+      vNeck(g, hp);
+      // both gestures start with the hand below the table's edge (the table is drawn after him), so the arm rises into view
+      if (tap > 0) pointArm(g, hp, 1, lerp(hp.x + hp.s * 250, hp.x + hp.s * 152, ease.inOut(tap)), lerp(hp.y + hp.s * 500, hp.y - hp.s * 60, ease.inOut(tap)), { dir: lerp(-PI / 2, -PI / 2 - 0.7, ease.inOut(tap)) });
       if (raise > 0) {
-        const hx = lerp(hp.x - hp.s * 250, hp.x - hp.s * 215, raise), hy = lerp(hp.y + hp.s * 320, hp.y - hp.s * 190, ease.out(raise));
+        const hx = lerp(hp.x - hp.s * 250, hp.x - hp.s * 215, raise), hy = lerp(hp.y + hp.s * 500, hp.y - hp.s * 190, ease.inOut(raise));
         g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createRadialGradient(hx, hy - hp.s * 60, 0, hx, hy - hp.s * 60, hp.s * 260 * raise); gr.addColorStop(0, 'rgba(255,226,140,0.55)'); gr.addColorStop(1, 'rgba(255,226,140,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore();
-        pointArm(g, hp, -1, hx, hy, { up: 0 });
+        pointArm(g, hp, -1, hx, hy, { dir: -PI / 2 });
       }
     }
     pressTable(g, t);
@@ -756,16 +773,27 @@ export async function build(T) {
   // ======================= champions, a week later =======================
   const chS = s('champ'), weekT = w('champ', 'week'), chT = w('champ', 'champions');
   shot(chS - 0.04, (g, lt, t) => {
-    rig(B, lt, [[0, K(-0.5, -0.24, 5.0, [2, 2.75, 0.8], { cy: H * 0.6 })], [len({ a: 0, b: s('twist') - chS }), K(-0.28, -0.25, 4.6, [2, 2.78, 0.8], { cy: H * 0.6 })]], { t, e: glide });
+    rig(B, lt, [[0, K(-0.32, 0.03, 5.8, [2, 1.8, 1.1], { cy: H * 0.44 })], [len({ a: 0, b: s('twist') - chS }), K(-0.32, 0.04, 5.1, [2, 1.85, 1.1], { cy: H * 0.44 })]], { t, e: glide });
     const items = [];
-    const mates = [[ARG('argA', 2), [1.2, 0.6]], [ARG('argB', 19), [2.8, 0.7]], [VALD, [0.1, 2.2]], [ARG('argB', 7), [3.9, 2.0]], [ENRI, [-0.6, 0.4]], [ARG('argA', 5), [4.6, 0.2]]];
-    for (const [pl, [x, z]] of mates) items.push(P(pl, { x, z, head: -PI / 2 + (x - 2) * 0.1, pose: blend(POSE.stand(), POSE.armsUp(0.6 + 0.4 * Math.sin(t * 6 + x)), 0.8), e: 'happy', t: t + x }));
-    const up = { x: 2, z: 0.65, head: -PI / 2, pose: { ...POSE.trophy(), hip: [[1.25, 0.25], [1.25, 0.25]], knee: [1.3, 1.3], pelvisY: 1.95 + Math.sin(t * 4) * 0.03, ground: false, lean: -0.05, look: 0.3 }, e: { ...EXPR.triumph, lid: 0.2 }, t };
-    const DIEGO86 = { ...DIEGO };
+    // the team in an arc behind him, each with room round him; arms up in a V (arms waved down to the shoulder crossed
+    // the man beside)
+    const mates = [[ARG('argA', 2), [0.87, 2.51]], [VALD, [2.18, 5.24]], [ARG('argB', 7), [5.14, 5.24]], [ARG('argB', 19), [3.82, 1.27]]];  // by angle from the camera: a gap between each, all inside the frame
+    for (const [pl, [x, z]] of mates) {  // both arms up in a wide V, waving out and in (raised forward, a forearm went across the face)
+      const v = { ...POSE.stand(), sh: [[2.6 + 0.15 * Math.sin(t * 6 + x), 0.55 + 0.12 * Math.sin(t * 7 + x)], [2.6 + 0.15 * Math.sin(t * 6 + x + 1.3), 0.55 + 0.12 * Math.sin(t * 7 + x + 2)]], el: [0.2, 0.2] };
+      items.push(P(pl, { x, z, head: -PI / 2 + (x - 2) * 0.1, pose: v, e: 'happy', t: t + x }));
+    }
+    // Maradona on his own feet in front, little hops, the cup straight up over his head. His arms are longer here: with
+    // the cartoon head (a fifth of his height) real-length arms only reach the top of his hair, and the cup sat on it
+    const hop = Math.pow(Math.max(0, Math.sin(t * 5.2)), 2), kn = 0.12 + 0.2 * (1 - hop), DIEGO86 = { ...DIEGO, arms: 1.34 };
+    const base = { ...POSE.stand(), ...POSE.trophy(), knee: [kn, kn], crouch: 0.05 * (1 - hop), look: 0.25 };
+    const y0 = skeleton(DIEGO86, { x: 2, z: 0.35, head: -PI / 2, pose: base }).pel[1];  // standing on the grass, then the hop on top
+    const up = { x: 2, z: 0.35, head: -PI / 2, pose: { ...base, pelvisY: y0 + 0.11 * hop, ground: false }, e: { ...EXPR.triumph, lid: 0.2 }, t };
     items.push(P(DIEGO86, up));
     stadium(g, t, items, { cheer: 1, blur: 3 });
-    const sk = skeleton(DIEGO86, up), a = B.project(...sk.arms[0].hand), b = B.project(...sk.arms[1].hand);
-    cup(g, (a.x + b.x) / 2, Math.min(a.y, b.y) - a.s * 0.05, a.s * 0.42);
+    // the cup: its foot in his hands (the hands drawn again over it, gripping), the bowl above
+    const sk = skeleton(DIEGO86, up), a = B.project(...sk.arms[0].hand), b = B.project(...sk.arms[1].hand), cs = a.s * 0.36;
+    cup(g, (a.x + b.x) / 2, (a.y + b.y) / 2 - cs * 0.43, cs);
+    for (const q of [a, b]) { g.fillStyle = SKIN_ARG.base; g.beginPath(); g.arc(q.x, q.y, Math.max(1, 0.058 * figureK(DIEGO.h) * q.s), 0, 7); g.fill(); }
     confetti(g, t, chS + 0.3, { n: 160, seed: 9 });
   }, { trans: 'whip', grade: 'gold', hud: (g, lt, t) => {
     stampPlate(g, 'Mexico City · 29 June', '1986', 170, t, weekT);
@@ -803,19 +831,28 @@ export async function build(T) {
     const sg = [[-0.7, 2.3, 21.88], [0.7, 2.3, 21.88], [0.7, 2.62, 21.88], [-0.7, 2.62, 21.88]];
     if (quad(g, sg, '#F2EEE4') && depth(0, 2.46, 21.88) > 1) { const p = B.project(0, 2.46, 21.88); g.fillStyle = NAVY; g.font = sans(Math.max(8, Math.round(p.s * 0.2)), 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('VESTIDORES', p.x, p.y); }
   };
-  const BARE = (skin) => ({ shirt: skin, shirtD: mix(skin, '#000000', 0.15), trim: skin, num: null, shorts: '#86B0DE', socks: '#86B0DE', band: '#F3F3EF', boots: '#141518' });
+  const BARE = (skin, o = {}) => ({ shirt: skin, shirtD: mix(skin, '#000000', 0.15), trim: skin, num: null, shorts: '#86B0DE', socks: '#86B0DE', band: '#F3F3EF', boots: '#141518', bare: true, ...o });
   shot(swapT - 0.05, (g, lt, t) => {
     rig(B, lt, [[0, K(-0.12, 0.03, 3.9, [0.35, 1.3, 1.3])], [len({ a: 0, b: s('shop') - swapT }), K(-0.04, 0.04, 3.1, [0.35, 1.32, 1.35])]], { t, e: glide });
     corridor(g, t);
-    const hodgeB = { ...HODGE, kit: { ...BARE('#EBCDB2'), shirtD: '#D8B699' } }, diegoB = { ...DIEGO, kit: { ...BARE('#DDAA82'), shorts: '#15171D', socks: '#22448E', band: '#EDEDE8' }, captain: null };
+    const hodgeB = { ...HODGE, kit: BARE('#EBCDB2', { shirtD: '#D8B699' }) }, diegoB = { ...DIEGO, kit: BARE('#DDAA82', { shorts: '#15171D', socks: '#22448E', band: '#EDEDE8' }), captain: null };
     const dz = 4.0 + Math.max(0, t - swapT - 0.4) * 1.2, ph = (t - swapT) * 7;
-    const items = [P(diegoB, { x: -0.55, z: dz, head: PI / 2, pose: t > swapT + 0.4 ? POSE.run(ph, 0.25) : POSE.stand(), e: 'happy', t }),
-      P(hodgeB, { x: 0.45, z: 1.0, head: -PI / 2 + 0.2, pose: POSE.hold(), e: { ...EXPR.happy, open: 0.2, look: [0.2, -0.2] }, t })];
-    drawSorted(g, items);
-    // the white England shirt over Maradona's shoulder; the blue 10 in Hodge's hands
-    const sd = skeleton(diegoB, items[0].st), sp = B.project(...sd.arms[1].sh); if (depth(...sd.arms[1].sh) > 0.5) shirtCloth(g, sp.x, sp.y + sp.s * 0.15, sp.s * 0.45, { kit: KITS.eng86, back: false, rot: 0.5, a: 1 });
-    const sh = skeleton(hodgeB, items[1].st), a = B.project(...sh.arms[0].hand), b = B.project(...sh.arms[1].hand);
-    shirtCloth(g, (a.x + b.x) / 2, (a.y + b.y) / 2 + Math.abs(b.x - a.x) * 0.48, Math.abs(b.x - a.x) * 1.1, { back: true, num: 10, sway: Math.sin(t * 2) * 4 });
+    // the white England shirt in Maradona's right hand, hanging by its collar at his side, clear of his back (laid over
+    // his shoulder it read as pasted on top of him); the blue 10 held up in Hodge's hands. Both are props of the players,
+    // sorted with their bodies: the hanging shirt just behind his hand, the held one over Hodge's body and legs and under
+    // his forearms and hands
+    const inHand = { depth: (sk, dp) => dp(sk.arms[1].hand) + 0.01, draw: (g2, sk, pr) => {
+      const hd = pr(sk.arms[1].hand), wd = 0.4 * hd.s, sdx = Math.sign(hd.x - pr(sk.C).x) || 1;
+      shirtCloth(g2, hd.x + sdx * wd * 0.1, hd.y + wd * 0.47, wd, { kit: KITS.eng86, back: false, rot: sdx * 0.05 + Math.sin(t * 5.5) * 0.04, sway: Math.sin(t * 6) * 2 });
+    } };
+    const held = { at: 'hands', draw: (g2, sk, pr) => {
+      const a = pr(sk.arms[0].hand), b = pr(sk.arms[1].hand), wd = Math.abs(b.x - a.x) * 1.6;
+      shirtCloth(g2, (a.x + b.x) / 2, Math.min(a.y, b.y) + wd * 0.49, wd, { back: true, num: 10, sway: Math.sin(t * 2) * 4 });
+    } };
+    const walk = t > swapT + 0.4 ? POSE.run(ph, 0.25) : POSE.stand();
+    walk.sh = [walk.sh[0], [0.1, 0.3]]; walk.el = [walk.el[0], 0.18];  // the carrying arm hangs still, a little out from his side
+    drawSorted(g, [P(diegoB, { x: -0.55, z: dz, head: PI / 2, pose: walk, e: 'happy', t, prop: inHand }),
+      P(hodgeB, { x: 0.45, z: 1.0, head: -PI / 2 + 0.2, pose: POSE.hold(), e: { ...EXPR.happy, open: 0.2, look: [0.2, -0.2] }, t, prop: held })]);
   }, { trans: 'whip', hud: (g, lt, t) => { plate(g, 'SHIRT SWAP', W / 2, 260, { color: GOLD, size: 56, ...pin(t, swapT) }); if (t > w('twist', 'game')) plate(g, 'A FEW METRES FROM THE DRESSING ROOMS', W / 2, 360, { color: CREAM, size: 28, ...pin(t, w('twist', 'game')) }); } });
   cue(swapT - 0.08, 'whoosh_fast', 0.35); cue(swapT, 'studs', 0.5); cue(swapT + 0.4, 'fabric', 0.5);
 
@@ -843,7 +880,7 @@ export async function build(T) {
   // ======================= the auction, 2022 =======================
   const prS = s('price'), yr2T = w('price', '2022'), soldT = w('price', 'sold'), mT = w('price', '$9.3'), endP = s('cta');
   shot(prS - 0.05, (g, lt, t) => {
-    rig(B, lt, [[0, K(-0.75, 0.12, 5.2, [0.2, 1.7, 1.0])], [mT - prS, K(-0.25, 0.08, 3.6, [0.6, 1.9, 1.5]), ease.inOut], [mT - prS + 0.25, K(0.3, 0.04, 4.6, [2.2, 2.15, 3.0]), ease.whip], [len({ a: 0, b: endP - prS }), K(0.34, 0.04, 4.3, [2.3, 2.18, 3.1])]], { t });
+    rig(B, lt, [[0, K(-0.75, 0.12, 5.2, [0.2, 1.7, 1.0])], [mT - prS, K(-0.25, 0.08, 3.6, [0.6, 1.9, 1.5]), ease.inOut], [mT - prS + 0.25, K(0.3, 0.04, 4.6, [2.2, 3.2, 3.0]), ease.whip], [len({ a: 0, b: endP - prS }), K(0.34, 0.04, 4.3, [2.3, 3.23, 3.1])]], { t });
     const bid = t < mT ? 4000000 + 3800000 * ease.inOut(clamp((t - soldT) / (mT - soldT))) : 9300000;
     gallery(g, t, { bid: t < soldT ? 4000000 : bid, sold: t > mT + 0.9 ? 1 : 0 });
   }, { mbStep: 4, hud: (g, lt, t) => {
@@ -889,7 +926,7 @@ export async function build(T) {
     { t0: twS, t1: swapT - 0.05, kind: 'lp', f: 900 }, { t0: mT - 0.25, t1: mT - 0.01, kind: 'mute' }, { t0: ctS, t1: T.duration, kind: 'lp', f: 1200 },
   ];
   shots.sort((a, b) => a.a - b.a);
-  return { shots, cues, music, musicFx, ambience: amb, duration: T.duration, autoWhoosh: false, tvOff: T.duration - 0.55 };
+  return { shots, cues, music, musicFx, ambience: amb, duration: T.duration, autoWhoosh: false, tvOff: T.duration - 0.55, grain: 0.02 };
 }
 // story time -> film time (inverse of the warp), for cues and the net that bulges in film time
 function tauToFilm(tau) { let lo = 0, hi = 40; for (let i = 0; i < 50; i++) { const m = (lo + hi) / 2; if (hgTau(m) < tau) lo = m; else hi = m; } return (lo + hi) / 2; }

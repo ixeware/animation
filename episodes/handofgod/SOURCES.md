@@ -35,7 +35,12 @@ On screen, drawn rather than documented (the facts behind each are in the table 
 - the press room, the backdrop, the microphones and the photographers are our cartoon; the gestures (finger to the
   temple, a finger to the sky) illustrate the quote;
 - the radio booth with its window on the pitch is drawn; the kite with a 10 in the sky is a visual pun on "barrilete";
-- the trophy is a generic gold cup, not the real World Cup trophy's design;
+- Butcher's challenge is drawn as one slide at Maradona's feet; his last lunge as Maradona shot is left out (he is
+  drawn trailing behind), so that no one stands between the camera and Maradona at the finish;
+- the trophy is a generic gold cup, not the real World Cup trophy's design; the lift (on his feet, among four
+  teammates) is staged, not a copy of any photograph;
+- the shirt swap: Maradona walking off with Hodge's white shirt in his hand and Hodge holding up the 10 are drawn;
+  only the swap itself and the place (by the dressing rooms) are from Hodge's account;
 - the shop is drawn as a street market (Flashscore names the Tepito district); the man comparing two blue shirts is the
   kit man's search (Wikipedia: Bilardo could not choose between two; Maradona picked one) — his face is generic;
 - the auction: the gallery, the glass case, the screen with the bids and the "SOLD" stamp illustrate an online sale

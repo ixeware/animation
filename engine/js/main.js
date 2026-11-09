@@ -115,7 +115,9 @@ function motionBlur(s, t) {
 
 function compose(t, frame) {
   const s = shots.find(s => t >= s.a && t < s.b) || shots[shots.length - 1];
-  QA.items = []; QA.M = null; QA.skip = false; QA.shot = s.i; QA.allow = s.qaAllow || [];
+  // qaAllow: finding types this shot may have; an entry {t0, t1, types} allows them only in that window (a whip pan)
+  QA.items = []; QA.M = null; QA.skip = false; QA.shot = s.i;
+  QA.allow = (s.qaAllow || []).flatMap(x => typeof x === 'string' ? [x] : (t >= x.t0 && t <= x.t1 ? x.types : []));
   CAM.px = 0;
   drawShot(s, t, lctx);
   const items = QA.items;
@@ -169,7 +171,7 @@ function compose(t, frame) {
   if (tr === 'flash') flash(ctx, 1 - lt / 0.3);
   vignette(ctx, s.vig ?? 0.55);
   drawCaptions(ctx, chunks, t, { hide: s.noCaptions });
-  grain(ctx, frame, 0.06);
+  grain(ctx, frame, film.grain ?? 0.06);  // a film can ask for less (busy scenes: the grain turns to noise in the encode)
 }
 
 function renderFrame(t, frame = Math.round(t * FPS)) {
