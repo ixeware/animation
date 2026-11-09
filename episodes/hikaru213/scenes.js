@@ -1333,7 +1333,7 @@ export async function build(T) {
     rig(B, lt, [[0, K(0.1, 0.22, 27, [4.4, 5.6, 4])], [len(sh), K(0.18, 0.2, 24.5, [4.4, 5.8, 4])]], { t, e: x => x });
     towers(g, t, { hik: 1, mag: seg(t, mag2T, mag2T + 0.6, ease.out), gap: seg(t, hunT, hunT + 0.25) });
   }, { trans: 'whip', grade: 'stream', hud: (g, lt, t) => {
-    bdg(g, t, 'CHESS.COM BLITZ · OCT 2026', mag2T + 0.05, { y: 178, color: CREAM, size: 32 });  // rule 40: the gap of the record's day, not of today
+    bdg(g, t, 'CHESS.COM BLITZ · OCT 2026', mag2T + 0.05, { y: 1500, color: CREAM, size: 32 });  // rule 40: the gap of the record's day, not of today; under the names, clear of the stamp
     if (t >= hunT) stamp(g, '−100', W / 2, 330, t, hunT, { color: RED, size: 110, sub: 'POINTS BEHIND' });
   } });
   cue(mag2T - 0.14, 'whoosh_fast', 0.3); cue(mag2T + 0.1, 'whoosh_soft', 0.25); cue(hunT, 'stamp', 0.45);
