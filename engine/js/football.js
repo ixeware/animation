@@ -76,7 +76,7 @@ const fillPoly = (g, B, pts, col) => { if (B.poly(g, pts)) { g.fillStyle = col; 
 
 // ---------------------------------------------------------------- sky: a gradient tied to the horizon and far clouds
 const horizonY = B => B.cy - B.f * Math.tan(B.pitch);
-export function sky(g, B, { zen = '#2C6CB8', mid = '#6FA6DB', hor = '#D5E5EC', clouds = 1, seed = 5, t = 0, haze = 0 } = {}) {
+export function sky(g, B, { zen = '#2C6CB8', mid = '#6FA6DB', hor = '#D5E5EC', clouds = 1, seed = 5, t = 0, haze = 0, cloud = '#FFFFFF' } = {}) {
   const hy = horizonY(B), gr = g.createLinearGradient(0, hy - 1900, 0, hy + 40);
   gr.addColorStop(0, zen); gr.addColorStop(0.62, mid); gr.addColorStop(1, hor);
   g.fillStyle = gr; g.fillRect(0, 0, W, H);
@@ -94,7 +94,7 @@ export function sky(g, B, { zen = '#2C6CB8', mid = '#6FA6DB', hor = '#D5E5EC', c
     for (let k = 0; k < n; k++) {
       const ox = (r() - 0.5) * s * 1.8, oy = (r() - 0.6) * s * 0.35, rr = s * (0.32 + r() * 0.3);
       const cg = g.createRadialGradient(p.x + ox, p.y + oy - rr * 0.3, rr * 0.1, p.x + ox, p.y + oy, rr);
-      cg.addColorStop(0, 'rgba(255,255,255,0.95)'); cg.addColorStop(0.7, 'rgba(240,245,250,0.75)'); cg.addColorStop(1, 'rgba(225,235,245,0)');
+      cg.addColorStop(0, rgba(cloud, 0.95)); cg.addColorStop(0.7, rgba(mix(cloud, '#E8EEF4', 0.3), 0.75)); cg.addColorStop(1, rgba(mix(cloud, '#DCE6F0', 0.4), 0));
       g.fillStyle = cg; g.beginPath(); g.ellipse(p.x + ox, p.y + oy, rr * 1.3, rr * 0.8, 0, 0, TAU); g.fill();
     }
     g.restore();
@@ -106,7 +106,7 @@ const CLOTH = [['#E8E5DE', 30], ['#9DBFDB', 10], ['#B5544A', 8], ['#D3B964', 7],
   ['#C98A55', 4], ['#3A3A3E', 8], ['#8C9096', 5], ['#6A82AE', 2]];
 const SKINS = ['#E8C3A0', '#D9A77E', '#C38B62', '#A86E48', '#8A5A3A', '#F0D2B6'];
 const pick = (r, list) => { let s = list.reduce((a, [, w]) => a + w, 0) * r(); for (const [c, w] of list) { if ((s -= w) <= 0) return c; } return list[0][0]; };
-export function crowdTex(w, h, { rows = 30, seed = 3, cheer = 0, step = '#9C978C', riser = '#6E6A62', flags = 4, hats = 0.06 } = {}) {
+export function crowdTex(w, h, { rows = 30, seed = 3, cheer = 0, step = '#9C978C', riser = '#6E6A62', flags = 4, hats = 0.06, density = 1, flagSet = null } = {}) {
   const raw = tex(w, h, (g) => {
     const r = rng(seed), rh = h / rows;
     for (let j = 0; j < rows; j++) {
@@ -119,6 +119,7 @@ export function crowdTex(w, h, { rows = 30, seed = 3, cheer = 0, step = '#9C978C
       const base = (j + 0.82) * rh, pw = rh * 0.62;
       for (let x = r() * pw; x < w; x += pw * (0.82 + r() * 0.5)) {
         if ([0.13, 0.5, 0.87].some(ax => Math.abs(x - w * ax) < 9) || r() < 0.05) continue;
+        if (density < 1 && r() > density) continue;  // empty seats
         const up = cheer > 0 && r() < 0.55 * cheer, jump = up ? rh * 0.12 : 0;
         const body = pick(r, CLOTH), skin = SKINS[Math.floor(r() * SKINS.length)], bw = pw * (0.7 + r() * 0.25), bh = rh * 0.5;
         const by = base - bh - jump;
@@ -137,9 +138,10 @@ export function crowdTex(w, h, { rows = 30, seed = 3, cheer = 0, step = '#9C978C
     const FL = [g2 => { g2.fillStyle = '#7FC1EC'; g2.fillRect(0, 0, 1, 1 / 3); g2.fillStyle = '#FFFFFF'; g2.fillRect(0, 1 / 3, 1, 1 / 3); g2.fillStyle = '#7FC1EC'; g2.fillRect(0, 2 / 3, 1, 1 / 3); g2.fillStyle = '#F0C040'; g2.beginPath(); g2.arc(0.5, 0.5, 0.07, 0, TAU); g2.fill(); },
       g2 => { g2.fillStyle = '#1F7A45'; g2.fillRect(0, 0, 1 / 3, 1); g2.fillStyle = '#FFFFFF'; g2.fillRect(1 / 3, 0, 1 / 3, 1); g2.fillStyle = '#C8262E'; g2.fillRect(2 / 3, 0, 1 / 3, 1); },
       g2 => { g2.fillStyle = '#FFFFFF'; g2.fillRect(0, 0, 1, 1); g2.fillStyle = '#C8262E'; g2.fillRect(0.42, 0, 0.16, 1); g2.fillRect(0, 0.4, 1, 0.2); }];
+    const FS = flagSet || FL;  // flagSet: painters of a unit square, for the match's own flags
     for (let i = 0; i < flags; i++) {
       const fw = rh * (2.2 + r() * 1.6), fh = fw * 0.62, x = r() * (w - fw), y = r() * (h - fh - rh) + rh * 0.2 - (cheer ? rh * 0.25 : 0);
-      g.save(); g.translate(x, y); g.rotate((r() - 0.5) * 0.15 + (cheer ? 0.08 : 0)); g.scale(fw, fh); FL[i % 3](g); g.restore();
+      g.save(); g.translate(x, y); g.rotate((r() - 0.5) * 0.15 + (cheer ? 0.08 : 0)); g.scale(fw, fh); FS[i % FS.length](g); g.restore();
     }
   });
   // softened and a little desaturated: a crowd is texture behind the action, and single-pixel colour noise only turns to
@@ -166,7 +168,8 @@ const PROFILE = {
 };
 const OUTER = new Set(['top', 'outer']);
 export class Stadium {
-  constructor({ hx = 60.5, hz = 44.5, rc = 15, n = 96, rep = 12, seed = 7, sun = nrm([0.18, 1, 0.32]), haze = '#C9D6DC' } = {}) {
+  constructor({ hx = 60.5, hz = 44.5, rc = 15, n = 96, rep = 12, seed = 7, sun = nrm([0.18, 1, 0.32]), haze = '#C9D6DC', density = 1, flags = 4, flagSet = null } = {}) {
+    const cr = { density, flags, flagSet };  // the crowd: how full, and whose flags
     Object.assign(this, { hx, hz, rc, n, rep, sun, haze });
     const straightX = 2 * (hx - rc), straightZ = 2 * (hz - rc), arc = PI / 2 * rc, L = 2 * straightX + 2 * straightZ + 4 * arc;
     const at = s => {  // arc length -> point and outward normal on the base ring, counter-clockwise from (+hx, 0)
@@ -181,8 +184,8 @@ export class Stadium {
     };
     this.ring = Array.from({ length: n + 1 }, (_, i) => { const [[x, z], [nx, nz]] = at(i / n * L); return { x, z, nx, nz }; });
     this.tex = {
-      crowdLow: [crowdTex(1024, 288, { rows: 26, seed: seed }), crowdTex(1024, 288, { rows: 26, seed: seed, cheer: 1 })],
-      crowdUp: [crowdTex(1024, 384, { rows: 36, seed: seed + 5, step: '#8E897F', riser: '#615D56' }), crowdTex(1024, 384, { rows: 36, seed: seed + 5, cheer: 1, step: '#8E897F', riser: '#615D56' })],
+      crowdLow: [crowdTex(1024, 288, { rows: 26, seed: seed, ...cr }), crowdTex(1024, 288, { rows: 26, seed: seed, cheer: 1, ...cr })],
+      crowdUp: [crowdTex(1024, 384, { rows: 36, seed: seed + 5, step: '#8E897F', riser: '#615D56', ...cr }), crowdTex(1024, 384, { rows: 36, seed: seed + 5, cheer: 1, step: '#8E897F', riser: '#615D56', ...cr })],
       boxes: [tex(512, 64, (g, w, h) => { g.fillStyle = '#3B4048'; g.fillRect(0, 0, w, h); for (let x = 6; x < w; x += 42) { const gr = g.createLinearGradient(0, 8, 0, h - 8); gr.addColorStop(0, '#7E97AE'); gr.addColorStop(1, '#2A3442'); g.fillStyle = gr; g.fillRect(x, 10, 34, h - 22); } g.fillStyle = '#C9C4BA'; g.fillRect(0, h - 8, w, 8); })],
       under: [tex(512, 128, (g, w, h) => { g.fillStyle = '#4C4F54'; g.fillRect(0, 0, w, h); g.fillStyle = '#3A3C40'; for (let x = 0; x < w; x += 64) g.fillRect(x, 0, 10, h); g.fillStyle = 'rgba(255,255,255,0.05)'; g.fillRect(0, 0, w, 10); })],
       edge: [tex(512, 64, (g, w, h) => { g.fillStyle = '#E9E6DE'; g.fillRect(0, 0, w, h); g.fillStyle = '#7C7E82'; for (let x = 18; x < w; x += 128) { g.fillRect(x, 14, 44, 24); g.fillStyle = '#F6F3EA'; for (let k = 0; k < 4; k++) g.fillRect(x + 4 + k * 10, 18, 7, 7); g.fillStyle = '#7C7E82'; } g.fillStyle = '#B8B4AA'; g.fillRect(0, h - 6, w, 6); })],
@@ -816,10 +819,11 @@ function drawSkeleton(g, B, pl, st, sk) {
     parts.push({ d, draw: () => {
       const H = pr(L.hip), K = pr(L.knee), A = pr(L.ankle), S = (H.s + K.s) / 2, s2 = (K.s + A.s) / 2;
       const kneeTop = pr(lerp3(L.knee, L.ankle, 0.12)), sockTop = pr(lerp3(L.knee, L.ankle, 0.16)), shortEnd = pr(lerp3(L.hip, L.knee, 0.4));
-      capsule(g, H, K, 0.1 * k * S * b, 0.074 * k * K.s * b, skin);  // thigh
-      capsule(g, K, kneeTop, 0.074 * k * K.s * b, 0.07 * k * kneeTop.s * b, skin);
-      capsule(g, sockTop, A, 0.074 * k * s2 * b, 0.054 * k * A.s * b, kit.socks);  // sock over the shin pad
-      if (kit.band) band(g, sockTop, pr(lerp3(L.knee, L.ankle, 0.23)), 0.077 * k * s2 * b, 0.075 * k * s2 * b, kit.band);  // the sock's turnover
+      const legC = kit.trousers ? kit.shorts : skin;  // kit.trousers: long trousers (medics, staff), no bare knee, no socks
+      capsule(g, H, K, 0.1 * k * S * b, 0.074 * k * K.s * b, legC);  // thigh
+      capsule(g, K, kneeTop, 0.074 * k * K.s * b, 0.07 * k * kneeTop.s * b, legC);
+      capsule(g, kit.trousers ? K : sockTop, A, 0.074 * k * s2 * b, (kit.trousers ? 0.058 : 0.054) * k * A.s * b, kit.trousers ? kit.shorts : kit.socks);  // sock over the shin pad
+      if (kit.band && !kit.trousers) band(g, sockTop, pr(lerp3(L.knee, L.ankle, 0.23)), 0.077 * k * s2 * b, 0.075 * k * s2 * b, kit.band);  // the sock's turnover
       capsule(g, H, shortEnd, 0.108 * k * S * b, 0.098 * k * shortEnd.s * b, kit.shorts);  // the shorts' leg
       const T = pr(L.toe), He = pr(L.heel); capsule(g, He, T, 0.062 * k * A.s, 0.052 * k * T.s, kit.boots);  // boot
       if (T.s * k * 0.05 > 2.5) band(g, pr(lerp3(L.heel, L.toe, 0.15)), pr(lerp3(L.heel, L.toe, 0.95)), 0.012 * k * A.s, 0.012 * k * T.s, 'rgba(255,255,255,0.18)');

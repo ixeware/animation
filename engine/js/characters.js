@@ -140,6 +140,18 @@ function body(g, c, open) {
   }
   if (c.shirt === 'tie') { g.fillStyle = c.tie; g.beginPath(); g.moveTo(-10, 160); g.lineTo(10, 160); g.lineTo(14, 250); g.lineTo(0, 268); g.lineTo(-14, 250); g.closePath(); g.fill(); }
   if (c.shirt === 'bow') { g.fillStyle = c.tie; g.beginPath(); g.moveTo(0, 165); g.lineTo(-26, 152); g.lineTo(-26, 180); g.closePath(); g.moveTo(0, 165); g.lineTo(26, 152); g.lineTo(26, 180); g.closePath(); g.fill(); g.beginPath(); g.arc(0, 165, 7, 0, 7); g.fill(); }
+  if (c.shirt === 'kit') {  // a football shirt: shoulder bands and a V-neck in c.trim, side panels (c.panel), a badge, folds
+    g.save(); g.clip(p);
+    if (c.panel) { g.fillStyle = c.panel; g.fillRect(-230, 150, 78, 380); g.fillRect(152, 150, 78, 380); }
+    g.strokeStyle = c.trim; g.lineWidth = 18; g.lineCap = 'round';
+    for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(sd * 182, 262); g.quadraticCurveTo(sd * 122, 176, sd * 58, 153); g.stroke(); }
+    g.strokeStyle = 'rgba(0,0,0,0.08)'; g.lineWidth = 7;
+    for (const fx of [-92, 24, 104]) { g.beginPath(); g.moveTo(fx, 300); g.quadraticCurveTo(fx + 16, 410, fx - 4, 530); g.stroke(); }
+    g.restore();
+    g.strokeStyle = c.trim; g.lineWidth = 15; g.lineJoin = 'round'; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(-48, 150); g.lineTo(0, 208); g.lineTo(48, 150); g.stroke();
+    if (c.badge) { g.fillStyle = c.badge; g.beginPath(); g.moveTo(72, 252); g.lineTo(114, 252); g.lineTo(114, 288); g.quadraticCurveTo(93, 310, 72, 288); g.closePath(); g.fill(); }
+  }
   if (c.shirt === 'polo') {
     g.fillStyle = 'rgba(255,255,255,0.35)';
     for (let y = 190; y < 520; y += 44) { g.save(); g.clip(p); g.fillRect(-220, y, 440, 18); g.restore(); }

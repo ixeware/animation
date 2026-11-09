@@ -1,0 +1,119 @@
+{
+  "title": "Jesús de Miguel (CD Tenerife, 1996–2026)",
+  "format": "football",
+  "channel": null,
+  "post": "Jesús de Miguel, 1996–2026. Tenerife's number 9 died after a collision in added time against Andorra. Rest in peace. #football #tenerife #jesusdemiguel #laliga",
+  "lead_in": 0.05,
+  "tail": 2.2,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.6,
+    "similarity": 0.8,
+    "timing": "alignment",
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"; a quiet, steady read (a tribute, not a hype short)",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.9,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.17,
+    "max_gap": 0.26
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 12,
+    "music_air": -1,
+    "music_lp": 6500,
+    "sfx_gap": 6,
+    "reverb": 0.35,
+    "reverb_sec": 2.2,
+    "duck": 0.55,
+    "amb_gap": 15,
+    "amb_duck": 0.4
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "Added time. A ball bouncing toward midfield. Jesús de Miguel went for it, and never got up.",
+      "say": "[somber] Added time... A ball bouncing toward midfield. Jesús de Miguel went for it... [softly] and never got up.",
+      "pause": 0.45,
+      "colors": { "Jesús": "gold", "de": "gold", "Miguel": "gold" }
+    },
+    {
+      "id": "who",
+      "text": "He was thirty. A striker from Madrid who climbed through Spain's lower leagues and only turned pro at twenty-seven.",
+      "say": "He was thirty. A striker from Madrid... who climbed through Spain's lower leagues, and only turned pro at twenty-seven.",
+      "pause": 0.3,
+      "colors": { "thirty.": "gold", "twenty-seven.": "gold" }
+    },
+    {
+      "id": "goals",
+      "text": "Last season, his eleven goals helped Tenerife back into the second division.",
+      "say": "Last season, his eleven goals helped Tenerife back into the second division.",
+      "pause": 0.4,
+      "colors": { "eleven": "gold", "Tenerife": "blue" }
+    },
+    {
+      "id": "match",
+      "text": "Monday, November second. Tenerife against Andorra. 2–2, deep in added time.",
+      "say": "Monday, November second. Tenerife against Andorra... two all, deep in added time.",
+      "pause": 0.3,
+      "colors": { "Tenerife": "blue", "2–2,": "gold" }
+    },
+    {
+      "id": "clash",
+      "text": "A clearance bounced toward midfield. He chased it. Andorra's goalkeeper, Jesús Owono, came out for it too.",
+      "say": "A clearance bounced toward midfield. He chased it... Andorra's goalkeeper, Jesús Owono, came out for it too.",
+      "pause": 0.2,
+      "colors": { "Owono,": "gold" }
+    },
+    {
+      "id": "impact",
+      "text": "The keeper's knee caught him in the chest. His heart stopped.",
+      "say": "[quietly] The keeper's knee caught him in the chest... His heart stopped.",
+      "hold": [{ "after": "chest.", "sec": 1.2 }],
+      "pause": 0.6,
+      "colors": { "chest.": "red", "heart": "red", "stopped.": "red" }
+    },
+    {
+      "id": "help",
+      "text": "Players screamed for the medics. He was carried off, and his pulse came back in the ambulance.",
+      "say": "Players screamed for the medics. He was carried off... and his pulse came back in the ambulance.",
+      "pause": 0.4,
+      "colors": { "pulse": "gold" }
+    },
+    {
+      "id": "death",
+      "text": "He died in hospital the next morning, at eight. A preliminary autopsy points to the blow to his chest.",
+      "say": "[sad] He died in hospital the next morning, at eight... A preliminary autopsy points to the blow to his chest.",
+      "pause": 0.45,
+      "colors": { "eight.": "gold", "chest.": "red" }
+    },
+    {
+      "id": "owono",
+      "text": "Owono had run to him with the others. The next day he wrote: these are the hardest days of my life.",
+      "say": "Owono had run to him with the others. The next day he wrote... [softly] these are the hardest days of my life.",
+      "pause": 0.45,
+      "colors": { "Owono": "gold", "hardest": "gold" }
+    },
+    {
+      "id": "tribute",
+      "text": "That weekend, matches across Spain stopped in the ninth minute. His number.",
+      "say": "That weekend, matches across Spain stopped in the ninth minute... His number.",
+      "pause": 0.5,
+      "colors": { "ninth": "gold", "number.": "gold" }
+    },
+    {
+      "id": "end",
+      "text": "Rest in peace, Jesús.",
+      "say": "[softly] Rest in peace, Jesús.",
+      "pause": 0.3,
+      "colors": { "Jesús.": "gold" }
+    }
+  ]
+}
