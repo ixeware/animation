@@ -2,7 +2,7 @@
   "title": "Jesús de Miguel (CD Tenerife, 1996–2026)",
   "format": "football",
   "channel": null,
-  "post": "Jesús de Miguel, 1996–2026. Tenerife's number 9 died after a collision in added time against Andorra. Rest in peace. #football #tenerife #jesusdemiguel #laliga",
+  "post": "One knee to the chest in the 97th minute. Jesús de Miguel, Tenerife's number 9, never got up. He was 30. This is what happened that afternoon, and how Spanish football said goodbye. Rest in peace, Jesús.\n\n#jesusdemiguel #cdtenerife #tenerife #laliga #futbol #football #footballtiktok #descansaenpaz #rip",
   "lead_in": 0.05,
   "tail": 2.2,
   "voice": {
@@ -39,10 +39,11 @@
   "phrases": [
     {
       "id": "hook",
-      "text": "Added time. A ball bouncing toward midfield. Jesús de Miguel went for it, and never got up.",
-      "say": "[somber] Added time... A ball bouncing toward midfield. Jesús de Miguel went for it... [softly] and never got up.",
+      "text": "One knee to the chest. Ninety-seventh minute. Jesús de Miguel never got up.",
+      "say": "[somber] One knee to the chest... Ninety-seventh minute. Jesús de Miguel... [softly] never got up.",
+      "hold": [{ "after": "chest.", "sec": 0.45 }],
       "pause": 0.45,
-      "colors": { "Jesús": "gold", "de": "gold", "Miguel": "gold" }
+      "colors": { "chest.": "red", "Jesús": "gold", "de": "gold", "Miguel": "gold" }
     },
     {
       "id": "who",

@@ -689,6 +689,8 @@ export const POSE = {
   point: () => ({ sh: [[0.08, 0.16], [1.5, 0.02]], el: [0.25, 0.04] }),
   protest: (t = 0) => ({ sh: [[1.1 + 0.15 * Math.sin(t * 6), 0.3], [2.55, 0.35]], el: [1.2, 0.35] }),
   hold: () => ({ sh: [[1.1, 0.12], [1.1, 0.12]], el: [0.6, 0.6] }),
+  // both hands to the head, elbows out: the upper arms go up and out, the forearms fold back in (pose.fore)
+  handsOnHead: () => ({ sh: [[2.75, 0.86], [2.75, 0.86]], el: [0.59, 0.59], fore: [-0.83, -0.83] }),
   // a cup lifted overhead: arms straight up, the hands together under its base (pair with pl.arms > 1: the cartoon
   // head is a fifth of the height, so real-length arms only reach the top of the hair)
   trophy: () => ({ sh: [[3.02, -0.2], [3.02, -0.2]], el: [0.08, 0.08] }),
@@ -732,9 +734,12 @@ export function skeleton(pl, st) {
   const C = add(pel, mul(spine, SKEL.spine * k));
   const arms = [-1, 1].map((sd, i) => {
     const [fl, ab] = P.sh[i], el = P.el[i], sh = add(C, mul(r, sd * SKEL.shW * k * (pl.build || 1)));
-    const dir = a => nrm(add(add(mul(spine, -Math.cos(a) * Math.cos(ab)), mul(ft, Math.sin(a) * Math.cos(ab))), mul(r, sd * Math.sin(ab))));
-    const elbow = add(sh, mul(dir(fl), SKEL.uarm * k * (pl.arms || 1))), wrist = add(elbow, mul(dir(fl + el), SKEL.farm * k * (pl.arms || 1)));
-    return { sh, elbow, wrist, hand: add(wrist, mul(dir(fl + el), 0.045 * k)), sd };
+    // pose.fore: the forearm's own sideways angle (default: the upper arm's). With one angle for the whole arm an elbow
+    // held out to the side takes the hand out with it, and "hands on the head" comes out as a T
+    const fa = P.fore ? lerp(ab, P.fore[i], P.foreW ?? 1) : ab;
+    const dir = (a, b = ab) => nrm(add(add(mul(spine, -Math.cos(a) * Math.cos(b)), mul(ft, Math.sin(a) * Math.cos(b))), mul(r, sd * Math.sin(b))));
+    const elbow = add(sh, mul(dir(fl), SKEL.uarm * k * (pl.arms || 1))), wrist = add(elbow, mul(dir(fl + el, fa), SKEL.farm * k * (pl.arms || 1)));
+    return { sh, elbow, wrist, hand: add(wrist, mul(dir(fl + el, fa), 0.045 * k)), sd };
   });
   const neck = add(C, mul(spine, 0.035 * k)), look = P.look || 0;
   const hdir = nrm(add(spine, mul(ft, -0.25 * look)));

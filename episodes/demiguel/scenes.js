@@ -15,7 +15,7 @@ import { useLookV2, useMark } from '../../engine/js/look.js';
 import { CAP_BAND } from '../../engine/js/captions.js';
 import { room, blindLight, ivStand, bed, box, FLOOR_Y, BACK_Z } from '../../engine/js/env.js';
 import { Stadium, sky, pitch, goalItems, boardItems, boardDesign, flagItems, playerItems, playerShadow, ballItem, groundShadow,
-  drawSorted, POSE, blend, Mover, BallPath, BALL_R, skeleton, tex, texQuadW } from '../../engine/js/football.js';
+  drawSorted, POSE, blend, Mover, BallPath, dribbleSegs, BALL_R, skeleton, tex, texQuadW } from '../../engine/js/football.js';
 
 useLookV2();
 useMark(null);
@@ -66,6 +66,7 @@ const OW = { who: 'owono', kit: AND_GK, num: 25, h: 1.86 };
 const T1 = { who: 'tA', kit: TEN, num: 4, h: 1.84 }, T2 = { who: 'tB', kit: TEN, num: 17, h: 1.78 }, T3 = { who: 'tC', kit: TEN, num: 23, h: 1.82 }, T4 = { who: 'tD', kit: TEN, num: 5, h: 1.86 };
 const A1 = { who: 'aA', kit: AND, num: 6, h: 1.8 }, A2 = { who: 'aB', kit: AND, num: 14, h: 1.76 }, A3 = { who: 'aC', kit: AND, num: 11, h: 1.78 };
 const REF = { who: 'refC', kit: REFK, num: null, h: 1.78 };
+const DM_YOUNG = { who: 'demiguel', kit: { shirt: '#8FA6BE', shirtD: '#6F87A0', trim: '#EDEFF2', num: null, shorts: '#23303F', socks: '#23303F', band: '#EDEFF2', boots: '#141518' }, num: null, h: 1.89 };  // before Tenerife: a plain kit, no club's
 const MED1 = { who: 'medA', kit: MEDIC, num: null, h: 1.78 }, MED2 = { who: 'medB', kit: MEDIC, num: null, h: 1.74 };
 const MED3 = { who: 'medC', kit: MEDIC, num: null, h: 1.8 }, MED4 = { who: 'medD', kit: MEDIC, num: null, h: 1.72 };
 
@@ -80,6 +81,13 @@ const EMPTY = new Stadium({ seed: 11, density: 0, flags: 0, haze: '#B9BFC8' });
 const FULL = new Stadium({ seed: 23, density: 1, flags: 3, flagSet: TF_FLAGS, haze: '#C2CAD0' });
 const BOARDS = [boardDesign('HELIODORO RODRÍGUEZ LÓPEZ'), boardDesign('CD TENERIFE', { bg: TBLUE, ink: '#FFFFFF' }), boardDesign('SANTA CRUZ DE TENERIFE', { bg: '#F4F2EC', ink: TBLUE }),
   boardDesign('ISLAS CANARIAS', { bg: '#F2C200', ink: '#1D2A44' }), boardDesign('BLANQUIAZULES', { bg: TBLUE, ink: '#FFFFFF' })];
+// the lower leagues: a half-empty ground; the boards along the far touchline carry his clubs in the order he runs past
+// them (the ring cycles its designs backwards on that side: see boardItems), the last one Castellón, in gold
+const LOWER = new Stadium({ seed: 5, density: 0.2, flags: 0, haze: '#C2CAD0' });
+const CLUBS = ['LEGANÉS B', 'LUGO FUENLABRADA', 'INTERNACIONAL', 'FUENLABRADA', 'NAVALCARNERO', 'UNIONISTAS'];
+const BOARDS_C = [[CLUBS[2]], [CLUBS[1], { bg: '#22324E', ink: '#F4F2EC' }], [CLUBS[0]], ['MADRID · 2015', { bg: '#22324E', ink: '#F4F2EC' }], ['TENERIFE · 2025', { bg: TBLUE, ink: '#FFFFFF' }],
+  ['CASTELLÓN', { bg: '#E8C35A', ink: '#1D2A44' }], [CLUBS[5], { bg: '#22324E', ink: '#F4F2EC' }], [CLUBS[4]], [CLUBS[3], { bg: '#22324E', ink: '#F4F2EC' }]].map(([txt, o]) => boardDesign(txt, o));
+const BOARD_C_W = { w: 5 };  // 5 m boards there: 23 a side, and with nine designs the far side reads Madrid 2015, Leganés B … Castellón, Tenerife 2025 from x -25 to +15
 const BOARDS_T = [boardDesign('SIEMPRE EN NUESTRO RECUERDO', { bg: '#15171C', ink: '#FFFFFF' }), boardDesign('9', { bg: '#F4F2EC', ink: '#15171C' })];
 const OVER = { zen: '#6C7682', mid: '#98A2AC', hor: '#C7CED3', clouds: 1, cloud: '#D3D8DD', seed: 9 };
 const SUN = { zen: '#2E78C8', mid: '#79B2E2', hor: '#DDEBF0', clouds: 0.7, seed: 4 };
@@ -87,13 +95,13 @@ const DAWN = { zen: '#2F3B58', mid: '#7D8698', hor: '#E2BC9C', clouds: 0.5, clou
 const DUSK = { zen: '#18223E', mid: '#4F5A80', hor: '#D99A74', clouds: 0.35, cloud: '#9C8E98', seed: 8 };
 const WET = { colors: ['#4C8A3A', '#569443'] };
 const BG = makeCanvas(), bgx = BG.getContext('2d');
-function stadium(g, t, items = [], { stad = HELIO, boards = BOARDS, cheer = 0, blur = 0, skyO = SUN, pitchO = WET } = {}) {
+function stadium(g, t, items = [], { stad = HELIO, boards = BOARDS, boardO = {}, cheer = 0, blur = 0, skyO = SUN, pitchO = WET } = {}) {
   const back = c => { sky(c, B, { t, ...skyO }); stad.draw(c, B, t, { cheer }); };
   if (blur > 0.4) { bgx.setTransform(1, 0, 0, 1, 0, 0); back(bgx); g.save(); g.filter = `blur(${blur.toFixed(1)}px)`; g.drawImage(BG, 0, 0); g.restore(); }
   else back(g);
   pitch(g, B, { t, ...pitchO });
   for (const it of items) it.shadow?.(g);
-  drawSorted(g, [...goalItems(B, -1, { t }), ...goalItems(B, 1, { t }), ...boardItems(B, boards), ...flagItems(B, t), ...items]);
+  drawSorted(g, [...goalItems(B, -1, { t }), ...goalItems(B, 1, { t }), ...boardItems(B, boards, boardO), ...flagItems(B, t), ...items]);
 }
 function softStadium(g, t, o, blur) {  // the whole ground out of focus behind a portrait: boards and lines too, not just the stands
   bgx.setTransform(1, 0, 0, 1, 0, 0); stadium(bgx, t, [], { ...o, blur: 0 });
@@ -109,7 +117,7 @@ function moving(mv, tt, { e = 'focus', pose = null, t = tt, I = null } = {}) {
 const headOf = (pl, st, up = 0.35) => { const sk = skeleton(pl, st); return { ...B.project(sk.headC[0], sk.headC[1] + up, sk.headC[2]), d: depth(...sk.headC) }; };
 
 // ---------- on-screen pieces
-function scoreBug(g, a, b, m, { x = 40, y = 76, al = 1 } = {}) {  // flat, as rule 50
+function scoreBug(g, a, b, m, { x = 40, y = 76, al = 1, hot = 0 } = {}) {  // flat, as rule 50; hot: the minute swells and turns gold
   if (al <= 0) return;
   g.save(); g.globalAlpha *= al; g.font = sans(30, 900); g.letterSpacing = '3px';
   const w = 360, hh = 54;
@@ -119,7 +127,9 @@ function scoreBug(g, a, b, m, { x = 40, y = 76, al = 1 } = {}) {  // flat, as ru
   g.fillStyle = C.ink; g.textBaseline = 'middle'; g.textAlign = 'left';
   g.fillText('TEN', x + 26, y + hh / 2 + 2); g.fillText('AND', x + w - 92, y + hh / 2 + 2);
   g.textAlign = 'center'; g.fillText(`${a} – ${b}`, x + w / 2 - 6, y + hh / 2 + 2);
-  g.fillStyle = NAVY; g.fillRect(x + w + 8, y, 132, hh); g.fillStyle = CREAM; g.fillText(m, x + w + 74, y + hh / 2 + 2);
+  g.save(); g.translate(x + w + 74, y + hh / 2); g.scale(1 + 0.22 * hot, 1 + 0.22 * hot); g.translate(-(x + w + 74), -(y + hh / 2));
+  g.fillStyle = mix(NAVY, '#E8C35A', hot); g.fillRect(x + w + 8, y, 132, hh); g.fillStyle = hot > 0.5 ? C.ink : CREAM; g.fillText(m, x + w + 74, y + hh / 2 + 2);
+  g.restore();
   qaRect(g, x, y, w + 140, hh, 'text', 'score bug');
   g.restore();
 }
@@ -154,16 +164,17 @@ const dmM = new Mover([[-14, -29.6, 5.1], [-7.9, -24.5, 4.2], [-5.6, -22.0, 3.9]
   [0.3, 6.75, 1.72], [0.6, 7.33, 1.72], [0.95, DM_END[0], DM_END[1], { stop: true }], [20, DM_END[0], DM_END[1]]],
   { face: (tt) => (tt > -0.25 ? 0.04 : null) });  // he faces his run the whole time: no turning on the spot
 const owM = new Mover([[-14, 46.5, -0.6], [-7.9, 44.0, -0.4], [-5.0, 34.0, 0.2], [-2.5, 18.5, 1.0], [0, 6.42, 1.72],
-  [0.3, 5.6, 2.2], [0.6, 5.05, 2.55], [0.9, 4.8, 2.72], [1.2, 4.7, 2.8, { stop: true }], [2.0, 4.7, 2.8], [2.7, 5.4, 2.55], [3.6, 6.4, 2.3], [20, 6.4, 2.3]],
+  [0.3, 5.6, 2.2], [0.6, 5.05, 2.55], [0.9, 4.8, 2.72], [1.2, 4.7, 2.8, { stop: true }], [2.0, 4.7, 2.8], [2.7, 5.3, 2.6], [3.6, 5.9, 2.5], [20, 5.9, 2.5]],
   { turn: 4, face: (tt, p) => (tt > -0.3 && tt < 2.0 ? PI : tt >= 2.0 ? Math.atan2(DM_END[1] - p.z, DM_END[0] - p.x) : null) });
-const others = [  // the players and the referee nearest the play run to him and wave the medics on (from the far side, so
+const others = [  // each ends up in the half-ring in the order he starts across the frame, so that nobody runs in front of another's face;
+  // the players and the referee nearest the play run to him and wave the medics on (from the far side, so
   // that nobody stands between the camera and him); the centre-back who clears the cross, the winger who sends it in
-  [T1, new Mover([[-14, -33, 9.5], [-7.9, -27, 8.5], [0, -2, 6.5], [1.8, 8.9, 4.2], [20, 8.9, 4.2]])],
-  [T2, new Mover([[-14, -26, 13], [-7.9, -19, 11], [0, 0, 8.8], [2.0, 6.3, 4.6], [20, 6.3, 4.6]])],
-  [T3, new Mover([[-14, -37, 10.5], [-7.9, -31, 9], [0, -6, 8.0], [2.2, 4.6, 5.6], [20, 4.6, 5.6]])],
-  [A1, new Mover([[-14, -27, 4.5], [-7.9, -21, 5.8], [0, 1, 7.5], [1.9, 10.2, 3.4], [20, 10.2, 3.4]])],
-  [A2, new Mover([[-14, -29, 15], [-7.9, -22, 13], [0, 5, 12.8], [2.1, 8.0, 6.4], [20, 8.0, 6.4]])],
-  [REF, new Mover([[-14, -20, 15.5], [-7.9, -14, 14], [0, 2, 10.5], [1.9, 6.6, 7.4], [20, 6.6, 7.4]])],
+  [T1, new Mover([[-14, -33, 9.5], [-7.9, -27, 8.5], [0, -2, 6.5], [1.8, 5.3, 4.9], [20, 5.3, 4.9]])],
+  [T2, new Mover([[-14, -26, 13], [-7.9, -19, 11], [0, -0.6, 8.8], [2.0, 2.2, 6.4], [20, 2.2, 6.4]])],
+  [T3, new Mover([[-14, -37, 10.5], [-7.9, -31, 9], [0, -6, 8.0], [2.2, 2.6, 4.4], [20, 2.6, 4.4]])],
+  [A1, new Mover([[-14, -27, 4.5], [-7.9, -21, 5.8], [0, 1, 7.5], [1.9, 6.0, 5.6], [20, 6.0, 5.6]])],
+  [A2, new Mover([[-14, -29, 15], [-7.9, -22, 13], [0, 5, 12.8], [2.1, 8.5, 4.6], [20, 8.5, 4.6]])],
+  [REF, new Mover([[-14, -20, 15.5], [-7.9, -14, 14], [0, 2, 10.5], [1.9, 7.0, 6.8], [20, 7.0, 6.8]])],
   [T4, new Mover([[-14, -40.5, 5.0], [-8.3, -36.8, 2.4], [-7.9, -36.4, 2.3], [-5.5, -33.0, 3.0], [20, -33.0, 3.0]])],
   [A3, new Mover([[-14, -19.5, -25.0], [-9.3, -28.6, -16.4], [-7.9, -31.5, -12.0], [-4.0, -32.5, -6.5], [20, -32.5, -6.5]])],
 ];
@@ -196,7 +207,7 @@ const KJUMP = u => ({ hip: [[-0.3, 0.06], [1.55, 0.08]], knee: [0.65, 1.7], sh: 
 const LAND = { lean: 0.5, crouch: 0.2, hip: [[0.75, 0.12], [0.35, 0.12]], knee: [1.05, 0.7], sh: [[1.2, 0.55], [1.05, 0.5]], el: [0.5, 0.5] };
 const SITDOWN = { hip: [[1.45, 0.18], [1.3, 0.14]], knee: [0.9, 0.55], sh: [[-0.7, 0.4], [-0.6, 0.35]], el: [0.15, 0.2], lean: -0.42, pelvisY: 0.17, ground: false };
 const CROUCH = { lean: 0.55, crouch: 0.32, hip: [[0.95, 0.12], [0.95, 0.12]], knee: [1.45, 1.45], sh: [[0.7, 0.35], [0.7, 0.35]], el: [0.7, 0.7] };
-const HANDS_HEAD = { sh: [[2.55, 0.85], [2.55, 0.85]], el: [2.3, 2.3] };
+const HANDS_HEAD = POSE.handsOnHead();
 const WAVE = t => ({ sh: [[0.2, 0.15], [2.6 + 0.3 * Math.sin(t * 9), 0.45]], el: [0.3, 0.2 + 0.25 * Math.sin(t * 9 + 1)] });  // one arm waving the medics on
 const WAVE2 = t => ({ sh: [[2.5 + 0.3 * Math.sin(t * 8), 0.5], [2.5 + 0.3 * Math.sin(t * 8 + PI), 0.5]], el: [0.3, 0.3] });  // both arms over the head
 function grounded(pl, st) {  // the pelvis height the grass gives a pose, made explicit
@@ -237,7 +248,10 @@ function owState(tau, t) {
   else if (tau < 1.15) { const u = (tau - 0.72) / 0.43, L = pg(OW, os, LAND); p = blend(L, SITDOWN, u * u); p.pelvisY = lerp(L.pelvisY, SITDOWN.pelvisY, u * u); e = 'shock'; }
   else if (tau < 2.0) { p = { ...SITDOWN, lean: SITDOWN.lean + 0.04 * Math.sin(t * 3) }; rest = true; e = 'shock'; }
   else if (tau < 2.45) { p = blend(SITDOWN, pg(OW, os, CROUCH), ease.inOut((tau - 2.0) / 0.45)); e = 'worried'; }
-  else { p = blend(pg(OW, os, CROUCH), blend(grounded(OW, os).pose, tau < 3.2 ? HANDS_HEAD : WAVE2(t), 1), ease.inOut(clamp((tau - 2.45) / 0.35))); e = 'worried'; }
+  // on his feet, hands to his head, looking down at him. The target pose is spread together, not blended: a pose that
+  // comes out of blend() carries its own weight for the forearm angle, and blending into that sets the weight at once
+  // (the forearms would snap inward on the first frame)
+  else { p = blend(pg(OW, os, CROUCH), { ...grounded(OW, os).pose, ...HANDS_HEAD }, ease.inOut(clamp((tau - 2.45) / 0.35))); e = { ...EXPR.worried, look: [0.25, 0.6] }; }
   return onGrass(OW, { ...os, pose: p, e }, rest);
 }
 // the front of his chest where the knee lands, and the keeper's kneecap: put the one on the other at the blow
@@ -256,7 +270,7 @@ function othersState(pl, mv, tau, t) {
   if (pl === A3 && tau > -9.6 && tau < -8.9) st = { ...st, pose: POSE.kick(clamp((tau + 9.55) / 0.6), 'L'), e: 'focus' };  // the cross
   if (tau > 0.6 && pl !== T4 && pl !== A3) {
     const arms = pl === REF || pl === T1 ? WAVE(t + pl.num) : pl === A1 ? WAVE2(t + 1) : HANDS_HEAD;
-    st = { ...st, e: 'worried', pose: blend(st.pose, arms, ease.inOut(clamp((tau - 0.6) / 0.4))) };
+    st = { ...st, e: { ...EXPR.worried, look: [0, 0.45] }, pose: blend(st.pose, arms, ease.inOut(clamp((tau - 0.6) / 0.4))) };  // all eyes on him
   }
   return st;
 }
@@ -718,6 +732,30 @@ function chestFilm(g, cx, cy, w, h, ring) {
   }
   g.restore();
 }
+// the X-ray over the scene: the dark, both skeletons, the lungs and the heart, the ribs giving a little under the knee
+// and springing back, the shock of the blow across his chest (the ring shows at the blow even before the X-ray is up).
+// xr: 0..1; hitT: when the knee landed; stopT: when the heart stops (never, in the hook); beat0: the heartbeat's clock
+function xrayPass(g, t, tau, { xr, hitT, stopT = Infinity, beat0 = hitT }) {
+  const dS = dmState(tau, t), sk = skeleton(DM, dS), hit = chestPt(sk), kk = sk.k;
+  if (xr > 0) {
+    g.save(); g.fillStyle = rgba('#04101F', 0.92 * xr); g.fillRect(0, 0, W, H); g.restore();
+    const dentAmt = 0.045 * kk * clamp((t - hitT) / 0.25) * (1 - clamp((t - hitT - 0.7) / 1.3));
+    const dent = p => { const v = sub3(p, hit), dd = Math.hypot(v[0], v[1], v[2]); if (dd > 0.14 * kk) return p; const f = (1 - dd / (0.14 * kk)) ** 2; return AT(p, [sk.ft, -dentAmt * f]); };
+    const ph = (t - beat0) / 0.82, beat = t < hitT ? 0 : Math.pow(Math.max(0, Math.sin(ph * 2 * PI)), 6) * clamp(1 - (t - hitT) / 0.9);
+    drawXray(g, [bones(OW, owState(tau, t)), bones(DM, dS, { dent })], { a: xr, under: () => lungs(g, sk, xr), over: {
+      d: depth(...AT(sk.C, [sk.spine, -0.15 * kk])),
+      draw: () => heart3d(g, sk, { beat, fib: t > hitT + 0.3 && t < stopT ? 1 : 0, on: 1 - clamp((t - stopT) / 0.5), a: xr, t }),
+    } });
+  }
+  const u = clamp((t - hitT) / 0.9), ringA = (1 - u) * Math.max(xr, 1 - clamp((t - hitT) / 0.22));
+  if (t > hitT && u < 1 && ringA > 0.01) {
+    const rho = lerp(0.02, 0.26, ease.out(u)) * kk, ring = [];
+    for (let j = 0; j <= 36; j++) { const th = 2 * PI * j / 36; ring.push(B.project(...AT(hit, [sk.r, Math.cos(th) * rho], [sk.spine, Math.sin(th) * rho]))); }
+    g.save(); g.globalCompositeOperation = 'lighter'; g.strokeStyle = `rgba(255,255,255,${(0.85 * ringA).toFixed(3)})`; g.lineWidth = 2 + 9 * (1 - u);
+    g.beginPath(); ring.forEach((q, j) => (j ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y))); g.stroke(); g.restore();
+  }
+}
+
 // ================================================================== the film
 export async function build(T) {
   const s = id => T.s(id), w = (id, k) => T.w(id, k).s;
@@ -734,36 +772,62 @@ export async function build(T) {
   const W0 = warp([[clS - 0.2, 1.0], [chestT - 0.32, 1.0], [chestT - 0.02, 0.07], [chestT + 0.2, 0.012], [xrEnd, 0.012], [xrEnd + 0.4, 1.0], [carT + 2, 1.0]]);
   const tauC = t => W0(t) - W0(chestT);
 
-  // ======================= HOOK: over his shoulder, chasing the ball; held before the leap; the ball alone =======================
-  const neverT = w('hook', 'never');
+  // ======================= HOOK: the blow itself, the frame that shocks first (rule 42). Three strides at full pace, the
+  // knee into his chest, time all but stops and the X-ray shows his heart; then the ball rolling to rest, alone =======================
+  const neverT = w('hook', 'never'), hookCut = w('hook', 'Jesús') - 0.12, HIT = 0.13;
+  const WH = warp([[0, 1.0], [0.09, 1.0], [HIT, 0.04], [0.5, 0.018], [hookCut + 1, 0.018]]);
+  const tauH = t => -0.1108 + WH(t);  // the knee lands at t = HIT
+  const hookCam = t => {  // side-on and a little from his front, both faces in profile; then in on his chest and round it
+    const tau = tauH(t), ds = skeleton(DM, dmState(tau, t)), os = skeleton(OW, owState(tau, t));
+    const chest = AT(ds.C, [ds.spine, -0.12 * ds.k]), oc = AT(os.C, [os.spine, -0.12 * os.k]);
+    const u = clamp(t / hookCut), push = ease.out(clamp((t - 0.08) / 1.4));
+    return K(lerp(0.1, 0.5, ease.inOut(u)), lerp(0.03, 0.1, u), lerp(4.1, 1.9, push), L3(L3(chest, oc, 0.45), chest, push), { cy: lerp(H * 0.56, H * 0.52, push) });
+  };
+  const hookKeys = []; for (let tt = 0; tt <= hookCut + 0.2; tt += 1 / 30) hookKeys.push([tt, hookCam(tt)]);
   shot(0, (g, lt, t) => {
-    const tau = -3.6 + Math.min(t, neverT - 0.45) * 0.56, d = dmM.at(tau);
-    rig(B, lt, [[0, K(-1.4, 0.13, 10.5, [d.x + 4.2, 1.35, d.z + 0.3], { cy: H * 0.55 })], [neverT - 0.4, K(-1.48, 0.11, 9.0, [d.x + 3.8, 1.4, d.z + 0.2], { cy: H * 0.55 })]], { t, e: glide });
-    stadium(g, t, clashItems(tau, t), { cheer: 0.2, blur: 2.5 });
-  }, { hud: (g, lt, t) => bigText(g, 'JESÚS DE MIGUEL', '1996–2026', 300, { a: 1 }), kb: 0 });
-  shot(neverT - 0.08, (g, lt, t) => {  // "and never got up": the ball rolling on alone across the grass
+    const tau = tauH(t);
+    rig(B, lt, hookKeys, { t, e: lin, shake: t < HIT ? 0.8 : 2.2 * (1 - clamp((t - HIT) / 0.45)) });
+    stadium(g, t, clashItems(tau, t), { cheer: 0.35, blur: 3 });
+    xrayPass(g, t, tau, { xr: clamp((t - HIT - 0.08) / 0.25), hitT: HIT });
+  }, { kb: 0, mbStep: 3, mbMax: 24, qaAllow: ['face cut by frame'], hud: (g, lt, t) => {
+    scoreBug(g, 2, 2, "90+7'", { hot: Math.sin(PI * clamp((t - w('hook', 'Ninety-seventh') + 0.05) / 0.8)) });  // "ninety-seventh minute"
+    bigText(g, 'JESÚS DE MIGUEL', '1996–2026', 300, { a: 1 });
+  } });
+  shot(hookCut, (g, lt, t) => {  // "Jesús de Miguel never got up": the ball rolling on alone and coming to rest
     const tau = 1.0 + lt * 0.7, b = ball.at(tau), bp = b.pos;
-    rig(B, lt, [[0, K(-0.35, 0.05, 3.2, [bp[0], 0.3, bp[2]], { cy: H * 0.56 })], [2, K(-0.25, 0.06, 2.8, [bp[0], 0.3, bp[2]], { cy: H * 0.56 })]], { t, e: lin });
+    rig(B, lt, [[0, K(-0.35, 0.05, 3.4, [bp[0], 0.3, bp[2]], { cy: H * 0.56 })], [3.2, K(-0.2, 0.07, 2.6, [bp[0], 0.3, bp[2]], { cy: H * 0.56 })]], { t, e: lin });
     stadium(g, t, [BALL(bp, { spin: b.spin, axis: b.axis })], { cheer: 0, blur: 4 });
-  }, { kb: 0 });
-  cue(0.02, 'crowd_gasp', 0.25); cue(neverT - 0.1, 'whoosh_soft', 0.3); cue(neverT + 0.2, 'bounce', 0.35);
+  }, { kb: 0, hud: (g, lt, t) => bigText(g, 'JESÚS DE MIGUEL', '1996–2026', 300, { a: 1 }) });
+  cue(0, 'studs', 0.3); cue(HIT - 0.04, 'thud', 0.7); cue(HIT - 0.02, 'boom_cine', 0.45); cue(HIT + 0.12, 'crowd_gasp', 0.4);
+  cue(HIT + 0.3, 'heartbeat', 0.6); cue(HIT + 1.75, 'heartbeat', 0.45); cue(hookCut - 0.05, 'whoosh_soft', 0.3); cue(hookCut + 0.35, 'bounce', 0.3);
 
-  // ======================= WHO: a striker from Madrid, up through the lower leagues =======================
+  // ======================= WHO: his portrait; then the climb: he runs the ball up the touchline of a half-empty ground, and
+  // the boards he passes carry his clubs in order, Castellón's in gold as he turns pro =======================
   // a close portrait in natural proportions: the shoulders run out of the bottom of the frame, nothing is stretched
-  const whoS = s('who'), climbT = w('who', 'climbed'), proT = w('who', 'twenty-seven.');
-  const CLUBS = ['LEGANÉS B', 'LUGO FUENLABRADA', 'INTERNACIONAL', 'FUENLABRADA', 'NAVALCARNERO', 'UNIONISTAS'];
+  const whoS = s('who'), climbT = w('who', 'climbed'), proT = w('who', 'twenty-seven.'), runA = w('who', 'who') - 0.08;
   shot(whoS - 0.06, (g, lt, t) => {
-    rig(B, lt, [[0, K(0.45, 0.06, 30, [0, 3, 0])], [len({ a: 0, b: s('goals') - whoS }), K(0.22, 0.09, 25, [0, 3.2, 0])]], { t, e: glide });
+    rig(B, lt, [[0, K(0.45, 0.06, 30, [0, 3, 0])], [3.0, K(0.3, 0.08, 26.5, [0, 3.1, 0])]], { t, e: glide });
     softStadium(g, t, { cheer: 0.3, skyO: SUN, pitchO: {} }, 9);
     g.fillStyle = 'rgba(10,20,40,0.24)'; g.fillRect(0, 0, W, H);
-    const z = 1 + 0.06 * ease.inOut(clamp(lt / 7));  // a slow push on the portrait (rule 55)
-    drawChar(g, 'demiguel', { x: 300 - 12 * clamp(lt / 7), y: 960 - 10 * clamp(lt / 7), s: 1.9 * z, e: { ...EXPR.happy, open: 0.15 }, t });
-  }, { hud: (g, lt, t) => {
-    nameTitle(g, lt, 'Jesús de Miguel', 'STRIKER · MADRID, 1996', { y: 230, t0: 0.15 });
-    CLUBS.forEach((c, i) => { const t0 = climbT + i * 0.24; if (t > t0) plate(g, c, 790, 1080 - i * 92, { color: CREAM, size: 30, ...pin(t, t0) }); });
-    if (t > proT - 0.1) plate(g, 'CASTELLÓN · PRO AT 27', 760, 1080 - 6 * 92 - 18, { color: GOLD, size: 30, ...pin(t, proT - 0.1) });
+    const u = ease.inOut(clamp(lt / 2.7));  // a slow push on the portrait (rule 55)
+    drawChar(g, 'demiguel', { x: W / 2 - 8 * u, y: 960 - 12 * u, s: 1.9 * (1 + 0.07 * u), e: { ...EXPR.happy, open: 0.15 }, t });
+  }, { hud: (g, lt, t) => nameTitle(g, lt, 'Jesús de Miguel', 'STRIKER · MADRID, 1996', { y: 230, t0: 0.15 }) });
+  const climbM = new Mover([[0, -17.75, 30.6], [1.25, -9.25, 30.3], [2.5, -0.75, 30.7], [3.75, 7.75, 30.3], [5.0, 16.25, 30.6], [6.5, 26.45, 30.4]]);
+  const climbDr = dribbleSegs(climbM, climbM.steps(0.15, 6.3, { side: 'L' }), { ahead: 0.5, decay: 2.4 }), climbBall = new BallPath(climbDr.segs);
+  const climbCam = lt => { const m = climbM.at(lt), u = clamp(lt / 5); return K(lerp(0.5, 0.42, u), 0.05, lerp(4.5, 4.1, u), [m.x + 0.72, 1.0, m.z], { cy: H * 0.46 }); };  // close, from his front: his feet and the ball above the caption line
+  const climbKeys = []; for (let tt = 0; tt <= 5.6; tt += 1 / 30) climbKeys.push([tt, climbCam(tt)]);
+  shot(runA, (g, lt, t) => {
+    const m = climbM.at(lt), b = climbBall.at(lt);
+    rig(B, lt, climbKeys, { t, e: lin, shake: 0.6 });
+    stadium(g, t, [P(DM_YOUNG, { x: m.x, z: m.z, head: m.head, pose: POSE.run(m.phase, 1, 0.55), e: { ...EXPR.focus, brow: 0.3, curve: 0.2 }, t }), BALL(b.pos, { spin: b.spin, axis: b.axis })],
+      { stad: LOWER, boards: BOARDS_C, boardO: BOARD_C_W, cheer: 0, blur: 2, skyO: SUN, pitchO: {} });
+  }, { kb: 0, mbStep: 3, mbMax: 24, hud: (g, lt, t) => {
+    CLUBS.forEach((c, i) => { const t0 = climbT + i * 0.24; if (t > t0) plate(g, c, 810, 770 - i * 74, { color: CREAM, size: 26, ...pin(t, t0) }); });  // the ladder, over the stand, clear of the boards
+    if (t > proT - 0.1) plate(g, 'CASTELLÓN · PRO AT 27', 780, 770 - 6 * 74 - 14, { color: GOLD, size: 30, ...pin(t, proT - 0.1) });
   } });
-  cue(whoS, 'whoosh_soft', 0.3); for (let i = 0; i < 6; i++) cue(climbT + i * 0.24, 'piece', 0.12); cue(proT - 0.1, 'sparkle_pop', 0.2);
+  cue(whoS, 'whoosh_soft', 0.3); cue(runA, 'whoosh_fast', 0.25); cue(runA + 0.1, 'studs', 0.3); cue(runA + 2.4, 'studs', 0.25);
+  for (let i = 0; i < 6; i++) cue(climbT + i * 0.24, 'piece', 0.12);
+  cue(proT - 0.1, 'sparkle_pop', 0.2);
 
   // ======================= GOALS: last season, back to the second division =======================
   // he wheels away toward the camera with his arms spread, plants, jumps with both fists up and lands; a teammate runs
@@ -813,10 +877,20 @@ export async function build(T) {
   cue(mtS - 0.08, 'whoosh_deep', 0.35); cue(scoreT, 'stamp', 0.3);
 
   // ======================= THE ONE TAKE: the clearance, the chase at full pace, slow motion at the blow, the X-ray close
-  // round his chest, then real pace again: he goes down and curls up, the keeper ends up sitting on the grass, players run in
+  // round his chest, then real pace again: he goes down onto his back and stays down, the keeper ends up sitting on the grass,
+  // gets up and comes to him with his hands on his head, players run in. It opens close on the centre-back's clearance
+  let kickT = clS; for (let tt = clS - 1.5; tt < clS + 1.5; tt += 1 / 240) if (tauC(tt) >= -7.95) { kickT = tt; break; }  // the centre-back's boot meets the cross
+  const t4M = others.find(o => o[0] === T4)[1];
   const camAt = t => {
     const tau = tauC(t), d = dmM.at(tau), sk = skeleton(DM, dmState(tau, t)), chest = AT(sk.C, [sk.spine, -0.12 * sk.k]);
-    const P1 = K(0.38, 0.14, 21, [d.x + 7, 2.2, d.z + 0.5]);  // the clearance: wide, the ball high over him
+    // it opens on the clearance itself, close on the centre-back as he meets the cross; then back (so the ball stays in
+    // frame as it climbs) and away downfield under it, to the wide view with the ball high over de Miguel. It backs off in
+    // two steps: only to 12 m while it is still level with the winger who crossed (he stays behind the lens), the rest of
+    // the way once it has left him behind
+    const c4 = t4M.at(Math.min(tau, -7.9)), P0 = K(0.04, 0.06, 5.6, [c4.x + 0.9, 1.05, c4.z], { cy: H * 0.47 });
+    const Pw = K(0.38, 0.14, 21, [d.x + 7, 2.2, d.z + 0.5]);
+    const back = t < kickT + 0.75 ? lerp(P0.dist, 12, ease.out(clamp((t - (kickT + 0.05)) / 0.4))) : lerp(12, Pw.dist, ease.inOut(clamp((t - (kickT + 0.75)) / 0.6)));
+    const P1 = { ...lerpCam(P0, Pw, ease.inOut(clamp((t - (kickT + 0.2)) / 1.25))), dist: back };
     const runU = clamp((t - clS - 2) / 5);
     const P2 = K(-1.38, lerp(0.11, 0.08, runU), lerp(8.0, 6.6, runU), [d.x + 4.6, 1.35, d.z + 0.3], { cy: H * 0.55 });  // over his shoulder, the keeper coming
     // round behind him while still far out, and only then in over his shoulder (the camera never passes his face)
@@ -832,45 +906,28 @@ export async function build(T) {
       const two = K(yaw, lerp(cam.pitch, 0.04, sw), lerp(need, 3.4, fin), L3(chest, oc, wO), { cy: lerp(cam.cy, H * 0.5, sw) });
       cam = lerpCam(cam, two, ease.inOut(clamp(sw * 2.5)));
     }
-    if (t > xrIn) {  // the X-ray: in close on the chest and round it (the cage turns in perspective)
+    if (t > xrIn) {  // the X-ray: in close on the chest and round to his front (the cage turns in perspective; the face
+      // changes from the back of his head to his profile under the dark of the X-ray, unseen)
       const k4 = clamp((t - xrIn) / (xrEnd - xrIn)), push = ease.inOut(clamp((t - xrIn) / 0.9));
-      cam = K(lerp(-0.12, -0.62, ease.inOut(k4)), lerp(0.04, 0.12, k4), lerp(3.4, 1.55, push), chest);
+      cam = K(lerp(-0.12, 0.55, ease.inOut(k4)), lerp(0.04, 0.12, k4), lerp(3.4, 1.55, push), chest);
     }
     if (t > xrEnd) {  // out again as he goes down and the keeper tumbles past; then wide enough for both, the players coming
-      const u = clamp((t - xrEnd) / 2.6), end = K(-0.62, 0.12, 1.55, chest);
-      const P5 = K(lerp(-0.55, -0.42, u), lerp(0.2, 0.34, u), lerp(6.4, 9.4, ease.inOut(clamp((t - xrEnd - 0.5) / 1.8))), [lerp(6.5, 6.2, u), lerp(1.0, 0.6, u), lerp(2.1, 2.6, u)]);
+      const u = clamp((t - xrEnd) / 2.6), end = K(0.55, 0.12, 1.55, chest);
+      const P5 = K(lerp(0.5, 0.4, u), lerp(0.2, 0.34, u), lerp(6.4, 9.4, ease.inOut(clamp((t - xrEnd - 0.5) / 1.8))), [lerp(6.6, 6.3, u), lerp(1.0, 0.6, u), lerp(2.1, 2.6, u)]);
       cam = lerpCam(end, P5, ease.inOut(clamp((t - xrEnd) / 0.9)));
     }
     return cam;
   };
-  const takeA = clS - 0.1, takeKeys = []; for (let tt = takeA; tt <= carT + 0.2; tt += 1 / 30) takeKeys.push([tt - takeA, camAt(tt)]);
+  const takeA = kickT - 0.34, takeKeys = []; for (let tt = takeA; tt <= carT + 0.2; tt += 1 / 30) takeKeys.push([tt - takeA, camAt(tt)]);
   shot(takeA, (g, lt, t) => {
     const tau = tauC(t);
     rig(B, lt, takeKeys, { t, e: lin, shake: t < chestT - 0.35 ? 0.9 : t < xrEnd ? 0 : 0.45 });
     const items = clashItems(tau, t);
     stadium(g, t, items, { cheer: 0.35, blur: t < chestT - 1.2 ? 1.5 : 3 });
-    const xr = clamp((t - xrIn) / 0.25) * (1 - clamp((t - xrEnd) / 0.3));
-    if (xr > 0) {
-      g.save(); g.fillStyle = rgba('#04101F', 0.92 * xr); g.fillRect(0, 0, W, H); g.restore();
-      const dS = dmState(tau, t), sk = skeleton(DM, dS), hit = chestPt(sk), kk = sk.k;
-      const dentAmt = 0.045 * kk * clamp((t - chestT) / 0.25) * (1 - clamp((t - chestT - 0.7) / 1.3));  // the ribs give a little under the knee, and spring back
-      const dent = p => { const v = sub3(p, hit), dd = Math.hypot(v[0], v[1], v[2]); if (dd > 0.14 * kk) return p; const f = (1 - dd / (0.14 * kk)) ** 2; return AT(p, [sk.ft, -dentAmt * f]); };
-      const ph = (t - xrIn) / 0.82, beat = t < chestT ? 0 : Math.pow(Math.max(0, Math.sin(ph * 2 * PI)), 6) * clamp(1 - (t - chestT) / 0.9);
-      drawXray(g, [bones(OW, owState(tau, t)), bones(DM, dS, { dent })], { a: xr, under: () => lungs(g, sk, xr), over: {
-        d: depth(...AT(sk.C, [sk.spine, -0.15 * kk])),
-        draw: () => heart3d(g, sk, { beat, fib: t > chestT + 0.3 && t < stopT ? 1 : 0, on: 1 - clamp((t - stopT) / 0.5), a: xr, t }),
-      } });
-      const u = clamp((t - chestT) / 0.9);
-      if (t > chestT && u < 1) {  // the shock of the blow across the chest
-        const rho = lerp(0.02, 0.26, ease.out(u)) * kk, ring = [];
-        for (let j = 0; j <= 36; j++) { const th = 2 * PI * j / 36; ring.push(B.project(...AT(hit, [sk.r, Math.cos(th) * rho], [sk.spine, Math.sin(th) * rho]))); }
-        g.save(); g.globalCompositeOperation = 'lighter'; g.strokeStyle = `rgba(255,255,255,${(0.85 * (1 - u) * xr).toFixed(3)})`; g.lineWidth = 2 + 9 * (1 - u);
-        g.beginPath(); ring.forEach((q, j) => (j ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y))); g.stroke(); g.restore();
-      }
-    }
+    xrayPass(g, t, tau, { xr: clamp((t - xrIn) / 0.25) * (1 - clamp((t - xrEnd) / 0.13)), hitT: chestT, stopT, beat0: xrIn });
   }, { kb: 0, mbStep: 3, mbMax: 24, qaAllow: ['face cut by frame'], hud: (g, lt, t) => {
     scoreBug(g, 2, 2, "90+7'", { al: 1 - clamp((t - xrIn) / 0.3) });
-    const xr = clamp((t - xrIn) / 0.25) * (1 - clamp((t - xrEnd) / 0.3));
+    const xr = clamp((t - xrIn) / 0.25) * (1 - clamp((t - xrEnd) / 0.13));
     if (xr > 0) {
       ecg(g, t, { chaosAt: chestT, flatAt: stopT + 0.05, a: xr });
       if (t > chestT) plate(g, 'KNEE TO THE CHEST', W / 2, 300, { color: CREAM, size: 44, ...pin(t, chestT, xr) });
@@ -878,13 +935,13 @@ export async function build(T) {
     }
     if (t > medT) plate(g, "MATCH STOPPED · 90+7'", W / 2, 260, { color: CREAM, size: 40, ...pin(t, medT) });
   } });
-  cue(clS + 0.05, 'kick', 0.5); cue(clS + 3.0, 'bounce', 0.3); cue(clS + 5.0, 'bounce', 0.25); cue(w('clash', 'chased'), 'studs', 0.35); cue(w('clash', 'came'), 'studs', 0.35);
-  cue(chestT - 0.35, 'whoosh_deep', 0.45); cue(chestT - 0.04, 'thud', 0.55);
+  cue(kickT - 0.02, 'kick', 0.6); cue(takeA, 'whoosh_fast', 0.2); cue(clS + 3.0, 'bounce', 0.3); cue(clS + 5.0, 'bounce', 0.25); cue(w('clash', 'chased'), 'studs', 0.35); cue(w('clash', 'came'), 'studs', 0.35);
+  cue(chestT - 0.35, 'whoosh_deep', 0.45); cue(chestT - 0.04, 'thud', 0.6); cue(chestT - 0.02, 'boom_cine', 0.3);
   for (let k = 0; k < 4; k++) { const tb = xrIn + 0.82 * k + 0.12; if (tb < stopT - 0.15) cue(tb, 'heartbeat', 0.55 - k * 0.1); }
   cue(xrEnd + 0.3, 'crowd_gasp', 0.45); cue(xrEnd + 0.62, 'thud', 0.3); cue(xrEnd + 0.95, 'thud', 0.2); cue(medT - 0.4, 'whistle', 0.4);
 
   // ======================= the stretcher; the ambulance: the monitor inside, then the van racing away =======================
-  const ambT = w('help', 'and'), backT = w('help', 'came') + 0.18, extT = w('help', 'in') - 0.12;
+  const ambT = w('help', 'and'), backT = w('help', 'pulse') + 0.07, extT = w('help', 'ambulance.') - 0.05;  // flat for half a second, then two beats in view before the road
   shot(carT - 0.08, (g, lt, t) => {  // the stretcher off the pitch, from ahead and to the side, a little above: the four bearers apart
     const u = clamp(lt / 2.0), cx = lerp(5.4, 4.7, u), cz = lerp(0.6, -5.4, u), hd = -PI / 2 - 0.12;
     rig(B, lt, [[0, K(0.95, 0.3, 8.4, [cx, 0.85, cz])], [2.0, K(1.08, 0.28, 7.9, [4.7, 0.85, -5.4])]], { t, e: lin, shake: 0.35 });
@@ -940,17 +997,22 @@ export async function build(T) {
   } });
   cue(dtS, 'clock_tick', 0.25); cue(dtS + 0.9, 'clock_tick', 0.2); cue(eightT, 'clock_tick', 0.3); cue(filmA + 0.02, 'touch', 0.35); cue(blowT, 'stamp', 0.25);
 
-  // ======================= OWONO: "the hardest days of my life" =======================
-  const owS = s('owono'), wroteT = w('owono', 'wrote:'), hardT = w('owono', 'hardest');
-  shot(owS - 0.06, (g, lt, t) => {
-    rig(B, lt, [[0, K(-0.12, 0.1, 30, [0, 3, 0])], [len({ a: 0, b: s('tribute') - owS }), K(0.12, 0.1, 26, [0, 3, 0])]], { t, e: glide });
+  // ======================= OWONO: back on the pitch (he had run to him with the others), then his portrait and his words =======================
+  const owS = s('owono'), wroteT = w('owono', 'wrote:'), hardT = w('owono', 'hardest'), owB = w('owono', 'next') - 0.33;  // 'The next day': the phrase has an earlier 'the'
+  shot(owS - 0.06, (g, lt, t) => {  // slowed: he gets up and comes to him with his hands on his head, the others round them
+    const tau = 2.3 + lt * 0.62;
+    rig(B, lt, [[0, K(0.48, 0.22, 7.45, [7.2, 0.8, 2.2], { cy: H * 0.47 })], [1.85, K(0.42, 0.21, 7.3, [7.3, 0.8, 2.2], { cy: H * 0.47 })]], { t, e: glide });
+    stadium(g, t, clashItems(tau, t), { cheer: 0, blur: 3 });
+  }, { grade: GREY, kb: 0, trans: 'fade', hud: (g, lt, t) => nameTitle(g, lt, 'Jesús Owono', 'FC ANDORRA GOALKEEPER', { y: 230, t0: 0.1 }) });
+  shot(owB, (g, lt, t) => {
+    rig(B, lt, [[0, K(-0.12, 0.1, 30, [0, 3, 0])], [len({ a: 0, b: s('tribute') - owB }), K(0.12, 0.1, 26, [0, 3, 0])]], { t, e: glide });
     softStadium(g, t, { stad: EMPTY, skyO: OVER }, 9);
     g.fillStyle = 'rgba(8,14,26,0.12)'; g.fillRect(0, 0, W, H);
     { const gl = g.createRadialGradient(W / 2, 980, 120, W / 2, 980, 760); gl.addColorStop(0, 'rgba(235,240,245,0.28)'); gl.addColorStop(1, 'rgba(235,240,245,0)'); g.fillStyle = gl; g.fillRect(0, 0, W, H); }
-    const z = 1 + 0.06 * ease.inOut(clamp(lt / 6));
-    drawChar(g, 'owono', { x: W / 2 + 10 * clamp(lt / 6), y: 960, s: 1.9 * z, e: { ...EXPR.sad, look: [0, 0.6] }, t });
+    const z = 1 + 0.06 * ease.inOut(clamp(lt / 4));
+    drawChar(g, 'owono', { x: W / 2 + 10 * clamp(lt / 4), y: 960, s: 1.9 * z, e: { ...EXPR.sad, look: [0, 0.6] }, t });
   }, { grade: GREY, hud: (g, lt, t) => {
-    nameTitle(g, lt, 'Jesús Owono', 'FC ANDORRA GOALKEEPER', { y: 230, t0: 0.1 });
+    nameTitle(g, lt + 3, 'Jesús Owono', 'FC ANDORRA GOALKEEPER', { y: 230, t0: 0.1 });  // already up: it carries over from the shot before
     if (t > hardT - 0.3) plate(g, '"THE HARDEST DAYS OF MY LIFE"', W / 2, 1470, { color: GOLD, size: 44, ...pin(t, hardT - 0.3) });
     if (t > wroteT) plate(g, '«ESTÁN SIENDO LOS DÍAS MÁS DIFÍCILES DE MI VIDA»', W / 2, 1565, { color: CREAM, size: 24, ...pin(t, wroteT) });
   } });
@@ -987,14 +1049,14 @@ export async function build(T) {
   cue(enS, 'applause', 0.45);
 
   // ---------- the crowd under the stadium scenes, on its own bus: it falls quiet after the blow
-  amb.push({ id: 'crowd_bed', t0: 0, t1: whoS, gain: 0.55, fi: 0.1, fo: 0.3 });
+  amb.push({ id: 'crowd_bed', t0: 0, t1: whoS, gain: 0.7, fi: 0.02, fo: 0.3, keys: [[0, 1], [HIT, 1], [HIT + 0.25, 0.1], [hookCut, 0.1], [hookCut + 0.5, 0.35]] });
   amb.push({ id: 'crowd_bed', t0: glS - 0.06, t1: mtS, gain: 0.7, fi: 0.2, fo: 0.2 });
   amb.push({ id: 'crowd_bed', t0: mtS - 0.06, t1: ambT, gain: 0.6, fi: 0.3, fo: 0.4, keys: [[0, 1], [chestT - 0.3, 1], [chestT + 0.1, 0.06], [xrEnd, 0.06], [xrEnd + 0.6, 0.35], [carT, 0.2]] });
   amb.push({ id: 'crowd_bed', t0: extT, t1: dtS - 0.06, gain: 0.3, fi: 0.15, fo: 0.4 });
   amb.push({ id: 'crowd_bed', t0: trS - 0.06, t1: T.duration, gain: 0.45, fi: 0.4, fo: 1.5 });
 
   const music = [
-    { t: 0, m: 'void' }, { t: whoS - 0.06, m: 'elegy' }, { t: clS - 0.1, m: 'tension' }, { t: xrEnd, m: 'void' },
+    { t: 0, m: 'void' }, { t: whoS - 0.06, m: 'elegy' }, { t: takeA, m: 'tension' }, { t: xrEnd, m: 'void' },
     { t: dtS - 0.06, m: 'elegy' }, { t: trS - 0.06, m: 'finale' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
