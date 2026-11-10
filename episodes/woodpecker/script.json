@@ -1,0 +1,213 @@
+{
+  "title": "He copied a woodpecker (Hans Tikkanen and the Woodpecker Method) x Chessigma Supercoach",
+  "channel": "THE 64 FILES",
+  "post": "He copied a woodpecker and became a grandmaster. How many puzzles did you solve today? #ad #chessigma #chess #woodpeckermethod #chesstok #story",
+  "lead_in": 0.05,
+  "tail": 1.8,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.95,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.32,
+    "max_gap": 0.14
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5.0,
+    "reverb": 0.4,
+    "reverb_sec": 2.3,
+    "duck": 0.5
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "He became a grandmaster by copying a woodpecker.",
+      "say": "[amused] He became a grandmaster... by copying a woodpecker.",
+      "tail_db": -45,
+      "pause": 0.8,
+      "colors": {
+        "grandmaster": "gold",
+        "woodpecker.": "lime"
+      }
+    },
+    {
+      "id": "norms",
+      "text": "Three grandmaster norms in seven weeks. And wait till you hear his name.",
+      "say": "Three grandmaster norms... in seven weeks. [mischievously] And wait till you hear his name.",
+      "pause": 0.3,
+      "colors": {
+        "Three": "gold",
+        "seven": "gold",
+        "name.": "lime"
+      }
+    },
+    {
+      "id": "bird",
+      "text": "A woodpecker can hit the same tree 12,000 times a day. He did the same thing with chess puzzles.",
+      "say": "A woodpecker can hit the same tree... twelve thousand times a day. [curious] He did the same thing... with chess puzzles.",
+      "pause": 0.3,
+      "colors": {
+        "12,000": "gold",
+        "puzzles.": "lime"
+      }
+    },
+    {
+      "id": "who",
+      "text": "Sweden, 2010. Hans Tikkanen is twenty-five, and still not a grandmaster.",
+      "say": "Sweden, twenty ten. Hans Tikkanen is twenty-five... and still not a grandmaster.",
+      "pause": 0.3,
+      "colors": {
+        "Sweden,": "blue",
+        "2010.": "gold",
+        "Hans": "blue",
+        "Tikkanen": "blue",
+        "not": "red"
+      }
+    },
+    {
+      "id": "plan",
+      "text": "His plan sounds too simple. Over a thousand puzzles. Solve them all. Then solve the same ones again, in half the time.",
+      "say": "His plan sounds... too simple. Over a thousand puzzles. Solve them all. [dramatic] Then solve the same ones again... in half the time.",
+      "pause": 0.3,
+      "colors": {
+        "simple.": "lime",
+        "thousand": "gold",
+        "same": "lime",
+        "half": "gold"
+      }
+    },
+    {
+      "id": "cycles",
+      "text": "Four weeks. Then two. Then one. Then days, until the whole set takes one single day.",
+      "say": "Four weeks. Then two. Then one. Then days... until the whole set takes... one single day.",
+      "pause": 0.3,
+      "colors": {
+        "Four": "gold",
+        "two.": "gold",
+        "one.": "gold",
+        "single": "lime",
+        "day.": "lime"
+      }
+    },
+    {
+      "id": "why",
+      "text": "By then, he isn't calculating anymore. He just sees it.",
+      "say": "[impressed] By then, he isn't calculating anymore. He just... sees it.",
+      "pause": 0.35,
+      "colors": {
+        "calculating": "red",
+        "sees": "lime"
+      }
+    },
+    {
+      "id": "title",
+      "text": "That year, Hans Tikkanen becomes a grandmaster.",
+      "say": "[excited] That year, Hans Tikkanen becomes a grandmaster!",
+      "pause": 0.3,
+      "colors": {
+        "Hans": "blue",
+        "Tikkanen": "blue",
+        "grandmaster.": "gold"
+      }
+    },
+    {
+      "id": "champ",
+      "text": "Then champion of Sweden. Five times.",
+      "say": "Then champion of Sweden. [proud] Five times.",
+      "pause": 0.3,
+      "colors": {
+        "champion": "lime",
+        "Sweden.": "blue",
+        "Five": "gold"
+      }
+    },
+    {
+      "id": "name",
+      "text": "And his name? In Finnish, Tikkanen means little woodpecker.",
+      "say": "[amused] And his name? In Finnish, Tikkanen means... little woodpecker.",
+      "pause": 0.3,
+      "colors": {
+        "name?": "lime",
+        "Tikkanen": "blue",
+        "little": "gold",
+        "woodpecker.": "gold"
+      }
+    },
+    {
+      "id": "method",
+      "text": "That's why it's called the Woodpecker Method.",
+      "say": "That's why it's called... the Woodpecker Method.",
+      "pause": 0.45,
+      "colors": {
+        "Woodpecker": "lime",
+        "Method.": "lime"
+      }
+    },
+    {
+      "id": "ad1",
+      "text": "Today, you don't need a thousand printed puzzles. Chessigma's Supercoach runs the Woodpecker Method for you.",
+      "say": "Today, you don't need a thousand printed puzzles. Chess-Sigma's Supercoach runs the Woodpecker Method for you.",
+      "pause": 0.25,
+      "colors": {
+        "don't": "red",
+        "Chessigma's": "gold",
+        "Supercoach": "gold"
+      }
+    },
+    {
+      "id": "ad2",
+      "text": "Pick a set at your level. It times every cycle, and only lets you move on when you're faster and cleaner.",
+      "say": "Pick a set at your level. It times every cycle... and only lets you move on when you're faster... and cleaner.",
+      "pause": 0.25,
+      "colors": {
+        "level.": "lime",
+        "faster": "lime",
+        "cleaner.": "lime"
+      }
+    },
+    {
+      "id": "ad3",
+      "text": "Then the coach reads your own games, finds the mistakes you keep making, and builds your training plan every morning.",
+      "say": "Then the coach reads your own games, finds the mistakes you keep making... and builds your training plan, every morning.",
+      "pause": 0.3,
+      "colors": {
+        "coach": "gold",
+        "mistakes": "red",
+        "plan": "lime"
+      }
+    },
+    {
+      "id": "bio",
+      "text": "Link in bio.",
+      "say": "Link in bio.",
+      "pause": 0.4,
+      "colors": {
+        "bio.": "gold"
+      }
+    },
+    {
+      "id": "cta",
+      "text": "So, how many puzzles did you solve today?",
+      "say": "[curious] So... how many puzzles did you solve today?",
+      "pause": 0.0,
+      "colors": {
+        "many": "gold",
+        "today?": "lime"
+      }
+    }
+  ]
+}

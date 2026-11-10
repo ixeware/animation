@@ -469,10 +469,29 @@ def splash():  # something big bursting up out of water: a deep whoomp, the burs
     return norm(sub + burst + bp(drops, 600, 7000) * 0.5, 0.85)
 
 
+def knock():  # a woodpecker's beak on a trunk: a dry, hollow "tok"
+    d = 0.16
+    t = t_(d)
+    x = (np.sin(2 * np.pi * 540 * t) * 0.9 + np.sin(2 * np.pi * 1180 * t) * 0.45) * env_exp(d, 0.018, 0.0008)
+    x += np.sin(2 * np.pi * 210 * t) * env_exp(d, 0.03, 0.001) * 0.5
+    x += bp(noise(d), 1500, 6000) * env_exp(d, 0.004, 0.0005) * 0.6
+    return norm(x, 0.9)
+
+
+def drum():  # a woodpecker drumming: about fourteen knocks a second for a second, dying away
+    k = knock()
+    out = np.zeros(int(1.15 * SR))
+    for i in range(14):
+        i0 = int((0.02 + i * 0.068) * SR)
+        n = min(len(k), len(out) - i0)
+        out[i0:i0 + n] += k[:n] * (1 - i / 14) ** 0.6 * (0.75 + 0.125 * ((i * 7) % 3))
+    return norm(out, 0.9)
+
+
 BANK = {name: fn for name, fn in globals().items()
         if callable(fn) and name in ('boom hit clack whoosh ting static shield tick alarm pluck riser shimmer thud buzz '
                                      'whirr shutter stamp clock lamp cheer confetti poof heartbeat sting spit splat tvoff glass sparkle '
-                                     'creak fire scatter ratchet typewriter flatline beep kaching drawer gavel waves wind scribble coins honk chomp revswell airwash splash').split()}
+                                     'creak fire scatter ratchet typewriter flatline beep kaching drawer gavel waves wind scribble coins honk chomp revswell airwash splash knock drum').split()}
 
 
 def render_all():

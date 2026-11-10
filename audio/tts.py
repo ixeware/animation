@@ -15,6 +15,8 @@ API responses are cached in build/tts_cache/, so re-runs cost no credits.
 Optional post-processing of every phrase (script.json -> "voice_fx"):
   {"tempo": 1.1}                                   faster delivery, pitch kept (ffmpeg atempo)
 A phrase can hold its breath: "hold": {"after": "it,", "sec": 1.0} puts a second of silence after that word.
+A take that ends in a long tail of hiss or a stray click (trim() keeps it): "tail_db": -45 cuts the phrase after its last
+30 ms that is louder than that many dB under the take's peak.
   {"sts": {"voice_id": "...", "model": "eleven_multilingual_sts_v2", "stability": 0.5, "similarity_boost": 0.85}}
                                                    ElevenLabs speech-to-speech: our take keeps its timing and
                                                    intonation, the timbre becomes the chosen narrator (env ELEVENLABS_API_KEY)
@@ -352,6 +354,13 @@ def main(ep):
             if sts: audio = sts(audio)
             audio, heard = recognize(audio, untag(say))  # timings change with tempo and voice: measure again
         audio, cut = trim(audio)
+        if p.get('tail_db') is not None:  # a tail of hiss or a click after the last word: cut after the last loud 30 ms
+            n = int(0.03 * SR); k = len(audio) // n
+            r = np.sqrt((audio[:k * n].reshape(k, n) ** 2).mean(axis=1) + 1e-12)
+            loud = np.where(20 * np.log10(r / max(1e-9, np.abs(audio).max())) > p['tail_db'])[0]
+            if len(loud):
+                e = min(len(audio), (loud[-1] + 1) * n + int(0.08 * SR)); f = min(e, int(0.02 * SR))
+                audio = audio[:e].copy(); audio[-f:] *= np.linspace(1, 0, f)
         if p.get('echo'):  # [delay s, decay]: a shouted line rings out like in a hall
             dl, dk = p['echo']; n = int(dl * SR)
             out_e = np.concatenate([audio, np.zeros(n * 4)])
