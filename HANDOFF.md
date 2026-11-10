@@ -226,7 +226,7 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
     points behind» — про день рекорда.
   - Что откуда взято — раздел «The Chessnut Move as drawn» в `SOURCES.md`.
 - Готовые файлы — в `episodes/hikaru213/build/` (в git не попадают): `hikaru213.mp4` — чистовой,
-  `The64Files_2.13seconds_ChessnutMove_v4_PREVIEW.mp4` — 720p с водяным знаком PREVIEW для Chessnut
+  `The64Files_2.13seconds_ChessnutMove_v5_PREVIEW.mp4` — 720p с водяным знаком PREVIEW для Chessnut (v5, 10.11)
   (`tools/preview_overlay.py`).
 - Перед публикацией:
   - промокод или ссылка от Chessnut (запрошены в письме 9.11) — в био и, если дадут код, на финальную плашку;
