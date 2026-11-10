@@ -580,7 +580,7 @@ function nutBoard(g, t, { leds = 1, logo = 1 } = {}) {
     if (leds > 0) [[3.2, 0], [3.42, 1.7]].forEach(([x, ph]) => { const p = B.project(x, (y0 + y1) / 2, z - 0.002); nutGlow(g, p.x, p.y, Math.max(1.5, p.s * 0.03), leds * (0.75 + 0.25 * Math.sin(t * 2.4 + ph))); });
   }
 }
-// the Chessnut set: black pieces true black, every piece on its copper robot base (pieces.js, skin 'nut')
+// the Chessnut plastic set: white and true black pieces, each on a robot base of its own colour (pieces.js, skin 'nut')
 const nutPieces = ps => ps.map(p => ({ ...p, c: p.c === 'b' ? 'k' : p.c, skin: 'nut' }));
 // pieces drive themselves: from one list to another in straight lines (they roll on wheels), a little out of step;
 // a piece missing from `to` drives to park(p, i) and fades (fade) or stays there; one missing from `from` starts there
@@ -651,7 +651,7 @@ const DIAG = tex(720, 720, (x, w) => {
   for (const p of G[MEME].pieces) { const [fx, fz] = sqXZ(p.sq); drawPiece(x, p.t, p.c === 'b' ? 'k' : 'w', fx * s, (8 - fz + 0.5) * s - s * 0.05, s * 0.9); }
   x.strokeStyle = '#2A2E33'; x.lineWidth = 6; x.strokeRect(3, 3, w - 6, w - 6);
 });
-// the x-ray of one piece: the robot is its copper base (Chessnut ships spare bases; its own art shows the base lit up),
+// the x-ray of one piece: the robot is its base (Chessnut ships spare bases; its own art shows the base lit up),
 // and in it a motor, a battery, wheels and a sensor (the manufacturer's list). h: the drawn height of the piece, whose
 // base is the bottom 18 % of it and 59 % of its height wide (pieces.js, base2)
 function xray(g, P, h, t, t0) {

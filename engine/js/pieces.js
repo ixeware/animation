@@ -105,19 +105,21 @@ const SW2 = 132, SH2 = 186, BASE2 = 14;  // v2 sprite box: base line BASE2 units
 
 // thick outline around the outer silhouette only (stroke first, body over it), flat body with a soft cylindrical
 // shade, details (collars, band, plinth step, eye, mane) in the outline colour
-// skin 'nut': the Chessnut Move set (episodes/hikaru213) — glossy bodies on the robot base, a ring of brushed copper
-// with a dark seam over it and a dark lip at the floor, where the wheels are
-function nutBase(g) {
+// skin 'nut': the Chessnut Move plastic set (episodes/hikaru213) — glossy bodies on a robot base of the piece's own colour,
+// white under the white pieces and black under the black ones, ringed by fine grooves, with a darker lip at the floor where
+// the wheels are (Chessnut's renders of the plastic set; the copper bases belong to the wooden set)
+function nutBase(g, white) {
   const b = new Path2D(); base2(b);
-  g.save(); g.lineJoin = 'round'; g.strokeStyle = '#4A3324'; g.lineWidth = 12; g.stroke(b);
-  const cu = g.createLinearGradient(-44, 0, 44, 0);
-  cu.addColorStop(0, '#9C7656'); cu.addColorStop(0.22, '#F0D3B0'); cu.addColorStop(0.42, '#D2A57E'); cu.addColorStop(0.78, '#9A6D4D'); cu.addColorStop(1, '#6E4C36');
-  g.fillStyle = cu; g.fill(b);
+  g.save(); g.lineJoin = 'round'; g.strokeStyle = white ? '#A3ADB7' : '#5E6873'; g.lineWidth = 12; g.stroke(b);
+  const sh = g.createLinearGradient(-44, 0, 44, 0);
+  if (white) { sh.addColorStop(0, '#E9EDF0'); sh.addColorStop(0.25, '#FFFFFF'); sh.addColorStop(0.6, '#F1F3F5'); sh.addColorStop(1, '#C2C9D0'); }
+  else { sh.addColorStop(0, '#30353B'); sh.addColorStop(0.25, '#3E444B'); sh.addColorStop(0.6, '#1D2125'); sh.addColorStop(1, '#0E1012'); }
+  g.fillStyle = sh; g.fill(b);
   g.clip(b);
-  g.fillStyle = 'rgba(40,24,14,0.55)'; g.fillRect(-46, -5, 92, 6);                 // the dark lip at the floor
-  g.fillStyle = 'rgba(255,240,220,0.55)'; g.fillRect(-46, -25.5, 92, 2.4);         // the light catching the top edge
-  g.fillStyle = 'rgba(60,36,22,0.5)'; g.fillRect(-46, -15.5, 92, 2);               // the seam between the two steps
-  g.fillStyle = 'rgba(255,248,236,0.35)'; g.fillRect(-27, -28, 6, 28);             // a vertical sheen
+  const groove = white ? 'rgba(96,106,116,0.55)' : 'rgba(0,0,0,0.6)', glint = white ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.16)';
+  g.fillStyle = white ? 'rgba(70,78,86,0.28)' : 'rgba(0,0,0,0.45)'; g.fillRect(-46, -5, 92, 6);  // the lip at the floor
+  for (const y of [-22.5, -15.5]) { g.fillStyle = groove; g.fillRect(-46, y, 92, 1.8); g.fillStyle = glint; g.fillRect(-46, y + 1.8, 92, 1.2); }  // two fine grooves
+  g.fillStyle = white ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.12)'; g.fillRect(-27, -28, 6, 28);  // a vertical sheen
   g.restore();
 }
 function paint2(type, color, glow, skin = null) {
@@ -148,7 +150,7 @@ function paint2(type, color, glow, skin = null) {
     g.fillStyle = white ? '#4A535B' : '#C4CED7'; g.beginPath(); g.ellipse(-14, -112, 4.5, 5.5, 0, 0, Math.PI * 2); g.fill();
     g.beginPath(); g.moveTo(11, -130); g.bezierCurveTo(27, -104, 31, -72, 25, -42); g.stroke();
   }
-  if (skin === 'nut') nutBase(g);
+  if (skin === 'nut') nutBase(g, white);
   return c;
 }
 
