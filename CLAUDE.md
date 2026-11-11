@@ -7,7 +7,7 @@
 ## Сначала прочитать
 - `Inbox.md` — новые пожелания автора (он пишет их в Obsidian). Разобрать в начале сессии: пожелания — правилами в
   STYLE_BIBLE, идеи — в IDEAS.md; разобранное убрать из «Новое» и записать строкой в журнал внизу файла.
-- `STYLE_BIBLE.md` — правила стиля и все пожелания автора канала: чек-лист в разделе 6 (правила 1–56) и эффекты
+- `STYLE_BIBLE.md` — правила стиля и все пожелания автора канала: чек-лист в разделе 6 (правила 1–59) и эффекты
   ходов в §8. Новое пожелание автора сразу записывать туда отдельным правилом.
 - `reference/rausis_v2.md` — эталонный ролик в раскадровке (правило 45): хук, переходы через предметы и экраны,
   движение камеры. Новый ролик сверять с ним.
@@ -28,11 +28,13 @@
 3. Озвучка: `python3 audio/tts.py episodes/<ep>`. Нужна переменная `ELEVENLABS_API_KEY`; ответы кэшируются в
    `build/tts_cache`, повторный запуск кредитов не тратит.
 4. Сцены — `episodes/<ep>/scenes.js`, функция `build(T)` возвращает shots, cues, music, musicFx.
-5. Кадры для проверки: `node render.mjs <ep> --stills 1.0,2.5` (в `build/stills`).
+5. Кадры для проверки: `node render.mjs <ep> --stills 1.0,2.5` (в `build/stills`). Если в ролике есть записи экрана
+   (`photos/rec/*.mp4`), сначала `python3 tools/frames.py episodes/<ep>`.
 6. Вёрстка: `node render.mjs <ep> --qa --step 0.1`; до рендера должно быть «no issues».
-7. Рендер и сведение: `node render.mjs <ep> --workers 4 && python3 audio/mix.py episodes/<ep>` (получится
-   `build/final.mp4`, около −16 LUFS). Долгий рендер запускать в фоне.
-8. Файл для отправки — два прохода x264:
+7. Рендер и сведение: `node render.mjs <ep> --workers 4 --scale 2 && python3 audio/mix.py episodes/<ep>` (получится
+   `build/final.mp4`, 4К 2160×3840, около −16 LUFS; без `--scale 2` — 1080×1920 и вчетверо быстрее, для черновиков).
+   Долгий рендер запускать в фоне.
+8. Файл для отправки — два прохода x264 (`-b:v 12000k` для 4К, `3300k` для 1080×1920):
    `ffmpeg -y -i final.mp4 -c:v libx264 -preset slow -b:v 3300k -pass 1 -passlogfile <tmp>/p -an -f mp4 /dev/null`, затем
    `ffmpeg -y -i final.mp4 -c:v libx264 -preset slow -b:v 3300k -pass 2 -passlogfile <tmp>/p -c:a aac -b:a 160k -movflags +faststart <имя>.mp4`.
 9. Перед отправкой — покадровый просмотр готового файла (контакт-листы кадров:

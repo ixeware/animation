@@ -1,33 +1,34 @@
-// He copied a woodpecker (sponsored: Chessigma Supercoach). Sweden, 2010: Hans Tikkanen is twenty-five and not a
+// He has seen your position before (sponsored: Chessigma Supercoach). The hook is Magnus Carlsen's memory test (chess24,
+// 30 April 2021): he names famous games from single positions, and the one that stumps him is from Harry Potter. Then
+// the man who built that kind of memory by copying a woodpecker: Sweden, 2010, Hans Tikkanen is twenty-five and not a
 // grandmaster. His plan: over a thousand puzzles, solve them all, then the same ones again in half the time, and again,
-// until the whole set takes a day. Three GM norms in seven weeks, the title that year, five Swedish championships, and
-// in Finnish his name is said to mean "little woodpecker": the Woodpecker Method. The sponsor's block: Chessigma's
-// Woodpecker trainer and its Supercoach on a phone, the pages as they are on chessigma.com (photos/). Sources and what
-// is drawn: SOURCES.md.
-// Rules 42-45 and 53-56: the payoff is the first frame (a man in a red hat hammering a knight in time with a
-// woodpecker); every phrase is a 3D set (a birch wood in the Swedish summer, his study, a wall of 1,128 puzzle cards,
-// the table in the wood with the phone); the method is one accelerating take. Palette (rule 48): birch white and leaf
-// green under a summer sky, the woodpecker's teal and red (the colours of Chessigma's own woodpecker), Swedish blue and
-// yellow, Chessigma's black and yellow in the sponsor's block.
+// until the whole set takes a day. Three GM norms in seven weeks, and in Finnish his name is said to mean "little
+// woodpecker": the Woodpecker Method. The sponsor's block: Chessigma on a phone, the site's Woodpecker page (photos/)
+// and the author's own screen recordings of the app (photos/rec/, turned into frames by tools/frames.py). Sources and
+// what is drawn: SOURCES.md.
+// Rules 42-45 and 53-56: the payoff is the first frame (Magnus in the hall of his memory, a famous position already
+// named); every phrase is a 3D set (the gold hall, a birch wood in the Swedish summer, his study, a wall of 1,128
+// puzzle cards, the table in the wood with the phone); the method is one accelerating take. Palette (rule 48): the
+// hall's gold, birch white and leaf green under a summer sky, the woodpecker's teal and red (the colours of Chessigma's
+// own woodpecker), Chessigma's black and yellow in the sponsor's block.
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect, hash } from '../../engine/js/core.js';
 import { Board, piecesAt } from '../../engine/js/board.js';
 import { EXPR, exprAt, CAST, drawChar, hand } from '../../engine/js/characters.js';
 import { plate, inkText, inkWidth, counter, sans, popIn } from '../../engine/js/hud.js';
 import { rig, seated } from '../../engine/js/stage.js';
-import { room, table, FLOOR_Y, texTri, pool } from '../../engine/js/env.js';
+import { room, table, box, FLOOR_Y, texTri, pool } from '../../engine/js/env.js';
 import { useLookV2 } from '../../engine/js/look.js';
 import { BOOM_HIT, MOVE_HIT, SLIDE, SLIDE_OPTS, moveOf, moveUnder, moveOver } from '../../engine/js/movefx.js';
 import { loadImage } from '../../engine/js/photo.js';
 import { HI, flashTint, boardArrow, squareFrame } from '../../engine/js/hifx.js';
 import { confetti, rays } from '../../engine/js/draw.js';
-import { trophy } from '../../engine/js/witty.js';
 import { drawPiece } from '../../engine/js/pieces.js';
 
 useLookV2();
 const CHANNEL = 'THE 64 FILES';  // whose channel the video is made for: the follow line names it (THE 64 FILES / HAPPYCHESS)
 
 const B = new Board();
-const GOLD = '#F2C14E', RED = '#E0603F', TEAL = C.accent, CREAM = C.cream, INK = C.ink;
+const GOLD = '#F2C14E', RED = '#E0603F', CREAM = C.cream, INK = C.ink;
 const LEAFG = '#8FD35A', SWE_BLUE = '#1F6FB5', SWE_YEL = '#FFCD00';
 // the woodpecker's colours, read off Chessigma's woodpecker icon (photos/chessigma_woodpecker.png)
 const BIRDC = { body: '#12A39B', dark: '#0B7C78', light: '#49C9BC', crest: '#E8492A', crestD: '#BE3520', beak: '#F0612C', beakD: '#C9471C', eye: '#F3EBD6', leg: '#B9793F' };
@@ -37,8 +38,17 @@ const SIG = { bg: '#171717', card: '#232323', yel: '#FBBF24' };
 // file keeps Black's rook on d8, where 1.Qxd8 mates at once; here it stands on f8, so the queen sacrifice is the only way
 const PZ = (await fetch('../engine/data/tal_queen.json').then(r => r.json())).map((p, k) => ({ ...p, from: k === 2 ? 'f8' : p.from,
   pieces: p.pieces.map(q => q.id === 'r1' && k < 2 ? { ...q, sq: 'f8' } : q) }));
-const IMG = Object.fromEntries(await Promise.all(['chessigma_woodpecker.jpg', 'chessigma_supercoach.jpg', 'chessigma_logo.png', 'chessigma_woodpecker.png', 'chessigma_supercoach.png']
+const IMG = Object.fromEntries(await Promise.all(['chessigma_woodpecker.jpg', 'chessigma_memory.jpg', 'chessigma_logo.png']
   .map(async f => [f.replace('chessigma_', '').replace('.', '_'), await loadImage(`../episodes/woodpecker/photos/${f}`)])));
+// the famous positions on the cards of the hook, our own choice of three (SOURCES.md): Fischer's 17...Be6 of 1956, Tal's
+// 21...Nf4 against Botvinnik in 1960, the Polish Immortal a move before the pawn mates
+const [GOC, BT, PI] = await Promise.all(['game_of_century', 'botvinnik_tal_1960_g6', 'polish_immortal'].map(f => fetch(`../engine/data/${f}.json`).then(r => r.json())));
+// the author's screen recordings of the Chessigma app, as frames (tools/frames.py puts them in build/rec; build/ is not in git)
+const RECI = await fetch('../episodes/woodpecker/build/rec/index.json').then(r => r.ok ? r.json() : null).catch(() => null);
+if (!RECI) throw new Error('no frames of the screen recordings: run python3 tools/frames.py episodes/woodpecker');
+const REC = Object.fromEntries(await Promise.all(Object.entries(RECI).map(async ([name, { n }]) =>
+  [name, await Promise.all(Array.from({ length: n }, (_, k) => loadImage(`../episodes/woodpecker/build/rec/${name}/${String(k + 1).padStart(3, '0')}.jpg`)))])));
+const recFrame = (name, sec) => REC[name][clamp(Math.floor(sec * RECI[name].fps), 0, RECI[name].n - 1)];
 
 // ---------- cast: Hans Tikkanen at twenty-five. His look here is ours, not a likeness (SOURCES.md): a red knitted hat
 // and a teal hoodie, the woodpecker's own colours ----------
@@ -73,7 +83,6 @@ const AT_BIRD = { ...EXPR.focus, brow: 0.3, lid: 0.1, look: [-0.95, -0.3], curve
 const AT_BOARD = { ...EXPR.focus, look: [0.25, 0.85], lid: 0.2 };
 const GRIN = { ...EXPR.happy, look: [0, 0], lid: 0.12, blush: 0.4 };
 const SMUG = { ...EXPR.smug, look: [0, 0], lid: 0.3 };
-const GLUM = { ...EXPR.sad, lid: 0.3, look: [0, 0.35], curve: -0.5 };
 const SEES = { ...EXPR.neutral, brow: -0.2, browY: -8, lid: 0.02, look: [0.25, 0.8], curve: 0.35 };
 
 // ---------- shared with the Hikaru episodes (episodes/hikaru213/scenes.js): screen helpers, the 3D toolkit, people ----------
@@ -542,7 +551,7 @@ function forest(g, t, { pieces = null, hans = null, brd = null, under = null, ov
 }
 
 // ======================= HIS STUDY: a bright Swedish room — pale walls, birch furniture, a window onto the birches, a
-// flag on the wall, a shelf waiting for the cups =======================
+// flag on the wall, a shelf of books =======================
 const STUDY = { base: '#E7DFCD', wall: ['#F5EFE0', '#F0E9D8'], seam: '#E6DDC8', rail: '#FFFDF6', floor: ['#D8B27E', '#CFA873'], light: '#FFF3DA', lightA: 0.3,
   table: ['#E3C08C', '#A67C4C', '#C89E67'] };
 const fogS = (col, x, y, z) => mix(col, STUDY.base, clamp((depth(x, y, z) - 9) / 26) * 0.85);
@@ -582,10 +591,9 @@ function studyWindow(g) {
 // the Swedish flag, pinned to the wall: blue, a yellow cross set toward the hoist
 const FLAG = tex(320, 200, (x, w, h) => { x.fillStyle = '#1B62A8'; x.fillRect(0, 0, w, h); x.fillStyle = '#FFCD00'; x.fillRect(100, 0, 40, h); x.fillRect(0, 80, w, 40); });
 const SHELF = { x0: -5.8, x1: 4.4, y: 6.0, z0: 12.0 };
-const CUPS = [-2.84, -1.42, 0, 1.42, 2.84], YEARS = ['2011', '2012', '2013', '2017', '2018'];
 // a framed print right of the shelf's books: a knight in ink
 const PRINT = tex(300, 380, (x, w, h) => { x.fillStyle = '#F7F1E4'; x.fillRect(0, 0, w, h); x.fillStyle = '#E3D7BF'; x.fillRect(34, 34, w - 68, h - 68); drawPiece(x, 'n', 'k', w / 2, h * 0.74, 190); });
-function studyWall(g, t, cups = null) {
+function studyWall(g, t) {
   studyWindow(g);
   texQuad(g, FLAG, [0.3, 4.1, 12.93], [2.86, 4.1, 12.93], [0.3, 2.5, 12.93]);
   ab(g, [-4.9, 1.6, 12.86], [-2.5, 4.7, 12.97], '#B98B55', { amb: 0.75 });
@@ -596,11 +604,6 @@ function studyWall(g, t, cups = null) {
   ab(g, [x0, y, z0], [x1, y + 0.2, 12.96], '#E3C08C', { amb: 0.72 });
   const cols = ['#2F6FA8', '#C9463A', '#E0B13E', '#3F8C63', '#6A5ACD', '#D97A3A'];
   let bx = x0 + 0.25; cols.forEach((c, i) => { const w = 0.3 + (i % 3) * 0.08, h = 1.5 + (i % 2) * 0.35; ab(g, [bx, y + 0.2, 12.2], [bx + w, y + 0.2 + h, 12.9], c, { amb: 0.66 }); bx += w + 0.03; });
-  if (cups) cups.forEach((u, i) => {  // the cups: each pops onto the shelf
-    if (u <= 0 || depth(CUPS[i], y + 1, 12.4) < 1) return;
-    const p = B.project(CUPS[i], y + 0.2, 12.45), k = ease.back(clamp(u * 1.4));
-    trophy(g, p.x, p.y, p.s * 1.4 / 170 * k, { a: clamp(u * 4) });
-  });
 }
 // the desk things: a pile of books by the board, a mug
 function deskThings(g) {
@@ -609,33 +612,22 @@ function deskThings(g) {
   lathe(g, 9.9, 6.4, [[-0.35, 0.36, 0.36], [0.45, 0.4, 0.4]], '#F4F1EA', { n: 20, amb: 0.7 });
   lathe(g, 9.9, 6.4, [[0.38, 0.33, 0.33], [0.44, 0.33, 0.33]], '#5A3A22', { n: 20, amb: 0.8 });
 }
-// the medal on his chest: an empty dashed ring while he is not a grandmaster, a gold GM when he is (u 0..1 drops it in)
-function medal(g, t, { gold = 0, ghost = 1, x = 4, z = 9.3, lift = 3.1 } = {}) {
-  if (depth(x, lift, z) < 0.8) return;
+// the place for the title on his chest: an empty dashed ring with GM in it, while he is not a grandmaster
+function medal(g, t, { ghost = 1, x = 4, z = 9.3, lift = 3.1 } = {}) {
+  if (ghost <= 0 || depth(x, lift, z) < 0.8) return;
   const p = B.project(x, lift, z), s = p.s * 1.05 / 100, bob = Math.sin(t * 1.7 + 4 * 1.7 + p.x * 0.01) * 4 * s;
   const cx = p.x + 78 * s, cy = p.y + 262 * s + bob, r = 44 * s;
-  if (gold <= 0) {
-    if (ghost <= 0) return;
-    g.save(); g.globalAlpha *= ghost; g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = Math.max(2, 5 * s); g.setLineDash([12 * s, 9 * s]); g.beginPath(); g.arc(cx, cy, r, 0, 7); g.stroke(); g.setLineDash([]);
-    g.font = sans(Math.round(34 * s), 900); g.fillStyle = 'rgba(255,255,255,0.85)'; inkText(g, 'GM', cx, cy); g.restore(); return;
-  }
-  const k = ease.back(clamp(gold * 1.25)), yy = cy - (1 - ease.out(clamp(gold * 1.6))) * 900 * s;
-  g.save(); g.translate(cx, yy); g.scale(k, k);
-  g.fillStyle = '#C9463A'; g.beginPath(); g.moveTo(-r * 0.5, -r * 0.2); g.lineTo(-r * 0.75, r * 1.75); g.lineTo(-r * 0.2, r * 1.4); g.lineTo(0, r * 1.75); g.lineTo(r * 0.2, r * 1.4); g.lineTo(r * 0.75, r * 1.75); g.lineTo(r * 0.5, -r * 0.2); g.closePath(); g.fill();  // the ribbon
-  g.fillStyle = '#9A6A1A'; g.beginPath(); g.arc(0, r * 0.08, r * 1.04, 0, 7); g.fill();
-  const gr = g.createLinearGradient(-r, -r, r, r); gr.addColorStop(0, '#FFE9A0'); gr.addColorStop(0.5, '#F2C14E'); gr.addColorStop(1, '#C9922C');
-  g.fillStyle = gr; g.beginPath(); g.arc(0, 0, r, 0, 7); g.fill();
-  g.strokeStyle = 'rgba(154,106,26,0.7)'; g.lineWidth = Math.max(1.5, 3 * s); g.beginPath(); g.arc(0, 0, r * 0.8, 0, 7); g.stroke();
-  g.font = sans(Math.round(36 * s), 900); g.fillStyle = '#5A3A0A'; inkText(g, 'GM', 0, 0);
-  g.restore();
+  g.save(); g.globalAlpha *= ghost; g.strokeStyle = 'rgba(255,255,255,0.85)'; g.lineWidth = Math.max(2, 5 * s); g.setLineDash([12 * s, 9 * s]); g.beginPath(); g.arc(cx, cy, r, 0, 7); g.stroke(); g.setLineDash([]);
+  g.font = sans(Math.round(34 * s), 900); g.fillStyle = 'rgba(255,255,255,0.85)'; inkText(g, 'GM', cx, cy); g.restore();
 }
-// the study with Hans at his board. o.hans: {e, reach, dy, tilt}; o.medal: see medal(); o.cups: [u, ...] for the shelf
-function study(g, t, { pieces = null, hans = {}, under = null, over = null, focus = null, dof = 0.5, md = null, cups = null, extra = null } = {}) {
+// the study with Hans at his board. o.hans: {e, reach, dy, tilt}; o.md: see medal()
+function study(g, t, { pieces = null, hans = {}, under = null, over = null, focus = null, dof = 0.5, md = null, extra = null } = {}) {
   room(g, B, STUDY, { t });
-  studyWall(g, t, cups);
+  studyWall(g, t);
   const hb = hans ? seated(g, B, 'hans', hans.e || 'neutral', t, { x: 4, z: 9.3, lift: 3.1 + (hans.dy || 0), tilt: hans.tilt || 0, reach: hans.reach || null, side: hans.side ?? 1, alpha: hans.a ?? 1 }) : null;
   if (hans && md && B.E[2] < 9.3) medal(g, t, md);
   table(g, B, STUDY, { x0: -3.0, x1: 10.6 });
+  box(g, B, [-3.7, -0.75, -14], [11.3, -0.35, -1.1], { top: STUDY.table[0], side: STUDY.table[2], front: STUDY.table[2] });  // the desk runs on toward the viewer: no front edge under a high camera
   deskThings(g);
   if (extra) extra(g, 'table');
   B.drawSlab(g, WOODB);
@@ -722,21 +714,29 @@ function heroCard(g, a = 1) {
   g.restore();
 }
 
-// ======================= THE SPONSOR: Chessigma on a phone, on the table in the wood. The screen shows their own pages
-// as they are (photos/chessigma_woodpecker.jpg and chessigma_supercoach.jpg, taken from chessigma.com on 10 Nov 2026);
-// the woodpecker clings to the phone's edge and points with its beak =======================
+// ======================= THE SPONSOR: Chessigma on a phone, on the table in the wood. The screen shows their own
+// product as it is: the site's Woodpecker page and its Board Memory page (photos/chessigma_woodpecker.jpg and
+// chessigma_memory.jpg, taken from chessigma.com on 11 Nov 2026), a round of Board Memory as it runs there and the
+// author's screen recordings of the app (photos/rec/); the woodpecker clings to the phone's edge and points with its beak =======================
 const PH = { c: [4, 2.22, 4.2], w: 2.4, h: 2.4 * 1600 / 780, tilt: 0.08 };
 const SCREEN = makeCanvas(780, 1600), scx = SCREEN.getContext('2d');
-// scroll: of the Woodpecker page, in its pixels; swipe 0..1 slides it out and the Supercoach dashboard in (scroll2);
+// what the screen shows. An item is {page: scroll}, the site's Woodpecker page scrolled by that many of its pixels,
+// {still: name}, another screen of the site as one picture, or {rec: name, sec}, a frame of one of the recordings.
+// `to` slides in from the right over `from` (slide 0..1).
 // hi: {x0, y0, x1, y1, a} a frame in screen pixels; tap: {x, y, u} a ring spreading from a touch
-function screenTex({ scroll = 0, scroll2 = 800, swipe = 0, hi = null, tap = null } = {}) {
+function screenTex({ from = null, to = { page: 0 }, slide = 1, hi = null, tap = null } = {}) {
   const x = scx; x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, 780, 1600);
   x.save(); x.beginPath(); x.roundRect(0, 0, 780, 1600, 64); x.clip();
   x.fillStyle = SIG.bg; x.fillRect(0, 0, 780, 1600);
-  const page = (img, sc, dx) => { const hh = Math.min(1600, img.height - sc); x.drawImage(img, 0, sc, 780, hh, dx, 0, 780, hh); };
-  const e = ease.inOut(clamp(swipe));
-  if (e < 1) page(IMG.woodpecker_jpg, scroll, -780 * e);
-  if (e > 0) page(IMG.supercoach_jpg, scroll2, 780 * (1 - e));
+  const item = (it, dx) => {
+    if (it.rec) { x.drawImage(recFrame(it.rec, it.sec), dx, 0, 780, 1600); return; }
+    if (it.still) { x.drawImage(IMG[it.still], dx, 0, 780, 1600); return; }
+    const img = IMG.woodpecker_jpg, k = img.width / 780;  // the page was captured at twice the screen's pixels
+    x.drawImage(img, 0, clamp(it.page, 0, img.height / k - 1600) * k, img.width, 1600 * k, dx, 0, 780, 1600);
+  };
+  const e = from ? ease.inOut(clamp(slide)) : 1;
+  if (e < 1) item(from, -780 * e);
+  item(to, 780 * (1 - e));
   if (hi && hi.a > 0) { x.save(); x.globalAlpha = hi.a; x.strokeStyle = SIG.yel; x.lineWidth = 9; x.shadowColor = SIG.yel; x.shadowBlur = 26; x.beginPath(); x.roundRect(hi.x0, hi.y0, hi.x1 - hi.x0, hi.y1 - hi.y0, 26); x.stroke(); x.restore(); }
   if (tap && tap.u > 0 && tap.u < 1) {
     x.save(); x.globalAlpha = 1 - tap.u; x.strokeStyle = '#FFFFFF'; x.lineWidth = 10; x.beginPath(); x.arc(tap.x, tap.y, 30 + 130 * ease.out(tap.u), 0, 7); x.stroke();
@@ -841,6 +841,78 @@ function plaques(g, t, ys, at) {
   });
 }
 
+// ======================= MAGNUS: the hall of his memory. Dark, a board under a lamp; the positions he is shown hang in
+// the air. The back wall is cards floor to ceiling, every position he has ever seen: unlit until the line that says so,
+// then gold from behind his head outward =======================
+const HALLT = '#6A4728';
+const NIGHT = ['#131933', '#1A2142', '#20284E'];  // the hall unlit: its air, the two tones of its floor
+const PUZZLED = { ...EXPR.worried, sweat: 0, brow: -0.55, browTilt: 0.5, lid: 0.06, look: [0, -0.7], curve: -0.25 };
+const LAUGH = { ...EXPR.happy, look: [0, -0.3], lid: 0.2 };
+const KNOW = { ...EXPR.smug, lid: 0.22, look: [0, 0], curve: 0.55 };
+const CARDZ = 10.4;
+// lit 0..1: the wall of cards takes light, from behind his head outward
+function memoryHall(g, t, lit = 0) {
+  const { cols, rows, p, z, x0, top } = WG, w = cols * p, y0 = top - rows * p;
+  g.fillStyle = NIGHT[0]; g.fillRect(0, 0, W, H);
+  for (let i = 0, x = -44; x < 52; x += 2, i++) quad(g, [[x, FLOOR_Y, z], [x + 2, FLOOR_Y, z], [x + 2, FLOOR_Y, -30], [x, FLOOR_Y, -30]], NIGHT[1 + i % 2]);
+  const wall = img => { for (const k of [-2, -1, 0, 1, 2]) texQuad(g, img, [x0 + k * w, top, z], [x0 + (k + 1) * w, top, z], [x0 + k * w, y0, z]); };
+  const hp = B.project(4, 3.3, z), R = 40 + 1400 * Math.pow(clamp(lit), 0.8);
+  if (lit < 1) {  // the cards in the dark
+    wall(WALLT[0]);
+    quad(g, [[x0 - 2 * w, top, z - 0.01], [x0 + 3 * w, top, z - 0.01], [x0 + 3 * w, y0, z - 0.01], [x0 - 2 * w, y0, z - 0.01]], rgba(NIGHT[0], 0.87));
+  }
+  if (lit > 0) {
+    g.save(); if (lit < 1) { g.beginPath(); g.arc(hp.x, hp.y, R, 0, 7); g.clip(); } wall(WALLT[2]); g.restore();
+    if (lit < 1) { g.save(); g.globalCompositeOperation = 'screen'; g.strokeStyle = rgba('#FFF6C8', 0.9 * (1 - lit)); g.lineWidth = 54; g.beginPath(); g.arc(hp.x, hp.y, R, 0, 7); g.stroke(); g.restore(); }
+  }
+  quad(g, [[-44, FLOOR_Y, z - 0.04], [52, FLOOR_Y, z - 0.04], [52, FLOOR_Y + 0.4, z - 0.04], [-44, FLOOR_Y + 0.4, z - 0.04]], mix('#0D1226', '#8A5E2A', clamp(lit * 2)));
+  pool(g, B, 4, 4.2, z - 0.1, 7.5, mix('#5468C8', '#FFF6C8', clamp(lit * 2)), 0.24 + 0.36 * lit, true);  // the lamp over his board, on the wall behind him
+  pool(g, B, 4, FLOOR_Y, 6, 9, '#FFF3D6', 0.12 + 0.1 * lit);
+}
+// a card hung in the air: a real position (pieces), or the one that stumped him — a question mark that turns over
+// (flip 0..1) to a wizard's hat. u pops it in; named gives it a gold edge, and a tick in the corner (tick 0..1)
+function gameCard(g, { pieces = null, x, y, z = CARDZ, size = 1.55, u = 1, tilt = 0, named = 0, tick = 1, mystery = false, flip = 0 }) {
+  if (u <= 0 || depth(x, y, z) < 1) return;
+  const q = B.project(x, y, z), sz = q.s * size * ease.back(clamp(u * 1.2)), turn = Math.cos(Math.PI * clamp(flip)), back = turn < 0;
+  g.save(); g.globalAlpha *= clamp(u * 4); g.translate(q.x, q.y); g.rotate(tilt); g.scale(Math.max(0.03, Math.abs(turn)), 1); g.translate(-sz / 2, -sz / 2);
+  g.fillStyle = 'rgba(4,6,16,0.45)'; g.fillRect(sz * 0.03, sz * 0.05, sz, sz);
+  if (named > 0) { g.fillStyle = GOLD; g.fillRect(-sz * 0.035, -sz * 0.035, sz * 1.07, sz * 1.07); }
+  const bs = sz * 0.84, bx = (sz - bs) / 2, by = sz * 0.08, sq = bs / 8;
+  if (mystery && back) {  // the other side: a wizard's hat among stars
+    g.fillStyle = '#3C2466'; g.fillRect(0, 0, sz, sz);
+    g.fillStyle = '#17102B'; g.beginPath(); g.moveTo(sz * 0.56, sz * 0.14); g.quadraticCurveTo(sz * 0.44, sz * 0.4, sz * 0.27, sz * 0.7); g.lineTo(sz * 0.75, sz * 0.7); g.quadraticCurveTo(sz * 0.62, sz * 0.44, sz * 0.56, sz * 0.14); g.fill();
+    g.beginPath(); g.ellipse(sz * 0.5, sz * 0.71, sz * 0.36, sz * 0.075, 0, 0, 7); g.fill();
+    g.fillStyle = GOLD; g.fillRect(sz * 0.3, sz * 0.61, sz * 0.42, sz * 0.045);
+    for (const [sx, sy, r] of [[0.2, 0.25, 0.05], [0.8, 0.3, 0.04], [0.74, 0.88, 0.035], [0.16, 0.86, 0.045], [0.46, 0.5, 0.03]]) {
+      g.beginPath(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, rr = sz * r * (i % 2 ? 0.4 : 1); g.lineTo(sz * sx + Math.cos(a) * rr, sz * sy + Math.sin(a) * rr); } g.closePath(); g.fill();
+    }
+  } else {
+    g.fillStyle = '#FBF7EC'; g.fillRect(0, 0, sz, sz);
+    for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { g.fillStyle = (i + j) % 2 ? (mystery ? '#9A948A' : '#B58A5A') : (mystery ? '#D8D3C8' : '#EAD9B5'); g.fillRect(bx + i * sq, by + j * sq, sq + 0.6, sq + 0.6); }
+    if (pieces) for (const pc of pieces) { const f = pc.sq.charCodeAt(0) - 97, rk = +pc.sq[1] - 1; drawPiece(g, pc.t, pc.c, bx + (f + 0.5) * sq, by + (8 - rk) * sq - sq * 0.06, sq * 0.98); }
+    if (mystery) { g.font = sans(sz * 0.62, 900); g.fillStyle = RED; g.strokeStyle = '#FBF7EC'; g.lineWidth = sz * 0.05; g.lineJoin = 'round'; inkText(g, '?', sz / 2, sz * 0.5, { stroke: true }); }
+    else if (named > 0 && tick > 0) {  // named: a tick in the corner
+      const cx = sz * 0.93, cy = sz * 0.93, rr = sz * 0.1; g.globalAlpha *= clamp(tick);
+      g.fillStyle = '#B9780E'; g.beginPath(); g.arc(cx, cy, rr * 1.12, 0, 7); g.fill(); g.fillStyle = GOLD; g.beginPath(); g.arc(cx, cy, rr, 0, 7); g.fill();
+      g.strokeStyle = '#3A2606'; g.lineWidth = rr * 0.34; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(cx - rr * 0.48, cy); g.lineTo(cx - rr * 0.1, cy + rr * 0.4); g.lineTo(cx + rr * 0.52, cy - rr * 0.38); g.stroke();
+    }
+  }
+  g.restore();
+}
+// the hall with Magnus at his board. cards: gameCard options; lit lights the wall behind him and throws rays. The
+// cameras here are long lenses from far down the table (rule 22: no wall of huge squares under a low camera), so the
+// table runs on toward the viewer
+function hall(g, t, { e = 'neutral', cards = [], pieces = null, lit = 0, focus = null, dof = 0.5, tilt = 0 } = {}) {
+  memoryHall(g, t, lit);
+  if (lit > 0 && depth(4, 3.1, 9.3) > 1) { const hp = B.project(4, 3.3, 9.3); g.save(); g.globalCompositeOperation = 'screen'; rays(g, hp.x, hp.y, t, { n: 18, color: '#FFF1B0', a: 0.26 * lit, len: 1700 }); g.restore(); }
+  for (const c of cards) gameCard(g, c);
+  const mb = seated(g, B, 'magnus', e, t, { x: 4, z: 9.3, tilt, hands: false });
+  ab(g, [-3.5, -0.75, -22], [11.5, -0.35, 9.1], HALLT, { amb: 0.82 });
+  B.drawSlab(g, WOODB);
+  if (pieces) B.drawPieces(g, pieces, { focus: focus ?? B.dist - 2.3, dof });
+  mb();
+}
+
 // a knock written in the air where it lands: TOK on a small tilted plate, for a quarter of a second after each hit
 function toks(g, x, y, t, hits, col, { size = 34 } = {}) {
   hits.forEach((h, i) => {
@@ -868,42 +940,125 @@ export async function build(T) {
   const len = sh => sh.b - sh.a + 0.35;
   const boom = (t, g = 0.85) => cue(t - BOOM_HIT, 'boom_move', g);
   const K = (yaw, pitch, dist, target, o = {}) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.5, target, ...o });
-  const PI = Math.PI;
   const bdg = (g, t, text, t0, { y = 230, x = W / 2, color = CREAM, size = 46, sub = null, ink = null, until = 1e9 } = {}) => { if (t >= t0 && t < until) plate(g, text, x, y, { color, size, sub, ink, rot: -0.018, ...popIn(t, t0) }); };
   const knocks = (hits, gain = 0.42) => hits.forEach((h, i) => cue(h - 0.012, 'knock', gain * (0.85 + 0.15 * ((i * 7) % 3) / 2)));
   const taps = (hits, gain = 0.3) => hits.forEach(h => cue(h - 0.01, 'piece', gain));
-  const p0 = piecesAt(PZ, 0);
+  // the board in the wood holds the puzzle solved (in the close shots the queen of the first position would stand big at
+  // the bottom of the frame: rule 22); his study has it as it is set
+  const p0 = piecesAt(PZ, 0), pF = piecesAt(PZ, 3);
+  // Magnus's board, a prop: the far ranks of the same puzzle, solved. The men that the long lens would bring up big at
+  // the bottom of the frame (White's first two ranks; rules 22 and 47) and the a-pawn, cut by its edge, are not set
+  const pM = piecesAt(PZ, 3).filter(p => +p.sq[1] > 2 && p.sq !== 'a7');
   const SHOULDER = [HANS.x - 1.78, 1.5, HANS.z - 0.06];
 
-  // ======================= HOOK (rule 42): the payoff first — a man in a red hat jabs a knight into a birch in time
-  // with the woodpecker working right above his fist =======================
-  const gmT = w('hook', 'grandmaster'), copyT = w('hook', 'copying'), wpT = w('hook', 'woodpecker'), hookE = T.e('hook');
-  const GAG = fr(hookE + 0.02);
-  const both = [...train(0, 0.7), ...train(1.0, 1.67), ...train(2.0, 2.67), ...train(2.9, 3.25)];
-  const birdH = [...both, fr(GAG + 0.1), fr(GAG + 0.25)], hansH = [...both, fr(GAG + 0.43), fr(GAG + 0.58)];
-  const hookHud = (g, lt, t) => {
-    plate(g, 'HE COPIED', W / 2, 170, { color: CREAM, size: 60, rot: -0.02 });
-    plate(g, 'A WOODPECKER', W / 2, 262, { color: BIRDC.body, ink: '#FFFFFF', size: 60, rot: -0.02 });
-    if (t >= gmT) plate(g, 'AND BECAME A GRANDMASTER', W / 2, 342, { color: GOLD, size: 34, rot: -0.02, ...popIn(t, gmT) });
+  // ---------- the sponsor's phone on a table in the wood: three times in the film (start, middle, end), so one function
+  // builds each. prog: what the screen shows from when, [[start, t => item]]; boxes: frames on the screen, [[x0, y0, x1,
+  // y1, from, to]] in screen pixels; pecks: the bird's pecks, [[time, screen row, reach in screen pixels]]; rings:
+  // touches drawn without the bird, [[time, x, y]]; fly: {t0, dur, from}, the bird arrives from a point of the wood ----------
+  const adHud = (g, lt, t) => adTag(g, 1);
+  const edgeAt = (v, d = 0.12) => phPt(-26, v + 290, d);
+  const PHC = [3.55, 2.2, 4.2], PHK = [K(0.08, 0.02, 6.3, PHC), K(0.02, 0.015, 5.9, PHC)];
+  const PHN = [K(-0.03, 0.01, 5.65, [3.36, 2.4, 4.2]), K(0.02, 0.01, 5.5, [3.36, 2.4, 4.2])];  // nearer: the upper half of the screen is the subject
+  const phoneSeg = ({ prog, boxes = [], pecks = [], rings = [], rest = 560, fly = null }) => {
+    const birdV = t => { let v = rest; for (const [pt, row] of pecks) v = lerp(v, row, seg(t, pt - 0.22, pt - 0.06)); return v; };
+    const screenAt = t => {
+      let i = 0; prog.forEach(([a], k) => { if (t >= a) i = k; });
+      const o = { to: prog[i][1](t), from: i ? prog[i - 1][1](t) : null, slide: i ? (t - prog[i][0]) / 0.26 : 1, hi: null, tap: null };
+      for (const [x0, y0, x1, y1, a, b] of boxes) { const k = seg(t, a, a + 0.12) * (1 - seg(t, b - 0.12, b)); if (k > 0) o.hi = { x0, y0, x1, y1, a: k }; }
+      for (const [pt, row, rc] of pecks) if (t >= pt && t < pt + 0.45) o.tap = { x: rc + 26, y: row, u: (t - pt) / 0.45 };
+      for (const [pt, x, y] of rings) if (t >= pt && t < pt + 0.45) o.tap = { x, y, u: (t - pt) / 0.45 };
+      return o;
+    };
+    return (g, t) => forest(g, t, { hans: null, board: false, brd: null, onTrunk: g2 => birdOnTrunk(g2, t, { a: 0 }), focus: 6, extra: (g2, ph) => {
+      if (ph !== 'top') return;
+      phone(g2, t, screenAt(t));
+      if (fly && t < fly.t0 + fly.dur) { birdFly(g2, t, fly.t0, fly.dur, fly.from, edgeAt(rest), PBIRD, { land: { pose: 'cling', look: [0.7, 0] }, lift: 0.8 }); return; }
+      let rc = 118; for (const [pt, , r] of pecks) if (t >= pt - 0.3) rc = r;
+      phoneBird(g2, t, birdV(t), { hits: pecks.map(p => p[0]), reach: rc, look: [0.7, 0.05] });
+    } });
   };
+
+  // ======================= HOOK (rule 42, the edit bait): Magnus Carlsen in the hall of his memory. A famous position
+  // hangs over his head, he names it, it goes to its place, the next one comes. The three games on the cards are our
+  // own choice (SOURCES.md); the fourth card waits with its question mark from the first frame =======================
+  const BIGC = [4, 6.05, 3.14], SMALLC = 1.3, SLOTS = [[1.75, 5.3], [6.25, 5.3], [1.75, 3.3], [6.25, 3.3]], FLY = 0.26;
+  const CARDS = [{ pieces: GOC[34].pieces, label: 'FISCHER · 1956', pop: -1, named: 0.45, away: 0.95 }, { pieces: BT[42].pieces, label: 'TAL · 1960', pop: 1.0, named: 1.5, away: 2.0 },
+    { pieces: PI[43].pieces, label: 'POLISH IMMORTAL', pop: 2.05, named: 2.55, away: 3.05 }];
+  // a card between its place over his head (k 0) and its slot (k 1)
+  const place = (k, i) => ({ x: lerp(BIGC[0], SLOTS[i][0], k), y: lerp(BIGC[1], SLOTS[i][1], k), size: lerp(BIGC[2], SMALLC, k), tilt: lerp(-0.025, (i % 2 ? 1 : -1) * 0.05, k) });
+  const cardsAt = t => CARDS.map((c, i) => { const k = ease.inOut(clamp((t - c.away) / FLY)); return { pieces: c.pieces, ...place(k, i), u: (t - c.pop) / 0.2, named: t >= c.named ? 1 : 0, tick: k }; });
+  const TELE = { fov: 3000 };
+  const up = l => ({ ...EXPR.smug, lid: 0.14, look: l, curve: 0.5 });
   shot(0, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.05, -0.05, 19.2, [4, 3.25, 9.3], TELE)], [len(sh), K(-0.04, -0.05, 17.8, [4, 3.25, 9.3], TELE)]], { t, e: lin });
+    hall(g, t, { e: exprAt([[0, up([0, -0.8])], [0.5, up([0.25, -0.3])], [1.05, up([0, -0.8])], [1.55, up([-0.25, -0.3])], [2.1, up([0, -0.8])], [2.6, up([0.2, -0.3])], [3.2, KNOW]], t),
+      cards: [...cardsAt(t), { ...place(1, 3), mystery: true, tilt: 0.05 + 0.03 * Math.sin(t * 5) }], pieces: pM });
+  }, { grade: 'gold', hud: (g, lt, t) => {
+    plate(g, 'MAGNUS NAMES THE GAME', W / 2, 170, { color: CREAM, size: 54, rot: -0.02 });
+    plate(g, 'FROM ONE POSITION', W / 2, 258, { color: GOLD, size: 54, rot: -0.02 });
+    CARDS.forEach(c => {  // the name, stamped across the card while it hangs over him
+      if (t < c.named || t >= c.away) return;
+      const q = B.project(BIGC[0], BIGC[1] - BIGC[2] * 0.2, CARDZ);
+      plate(g, c.label + ' ✓', q.x, q.y, { color: GOLD, size: 48, rot: -0.035, ...popIn(t, c.named) });
+    });
+  } });
+  cue(0, 'whoosh_deep', 0.25);
+  CARDS.forEach(c => { if (c.pop > 0) cue(c.pop, 'page_flip', 0.35); cue(c.named, 'stamp', 0.45); cue(c.named + 0.04, 'sparkle_pop', 0.25); cue(c.away, 'whoosh_soft', 0.2); });
+  // IN ONE TEST, ONLY ONE POSITION STUMPED HIM. IT WAS FROM HARRY POTTER: the fourth card comes up; it turns over
+  const potS = s('potter') - 0.05, onlyT = w('potter', 'only'), stumpT = w('potter', 'stumped'), harryT = w('potter', 'harry');
+  const UP4 = potS + 0.08, FLIP = fr(harryT - 0.1);
+  const card4 = t => ({ ...place(1 - ease.inOut(clamp((t - UP4) / 0.3)), 3), mystery: true, flip: (t - FLIP) / 0.26 });
+  const namedCards = CARDS.map((c, i) => ({ pieces: c.pieces, ...place(1, i), named: 1 }));
+  shot(potS, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.06, -0.05, 18.4, [4, 3.3, 9.3], TELE)], [len(sh), K(0.0, -0.05, 17.0, [4, 3.35, 9.3], TELE)]], { t, e: glide });
+    hall(g, t, { e: exprAt([[0, up([0.8, 0.1])], [0.35, up([0, -0.8])], [stumpT - 0.3, PUZZLED], [FLIP + 0.2, LAUGH]], t), cards: [...namedCards, card4(t)], pieces: pM,
+      tilt: 0.05 * seg(t, stumpT - 0.3, stumpT) * (1 - seg(t, FLIP, FLIP + 0.3)) });
+  }, { grade: 'gold', hud: (g, lt, t) => {
+    bdg(g, t, 'ONLY ONE STUMPED HIM', onlyT, { y: 190, color: RED, size: 52, until: FLIP + 0.13 });
+    bdg(g, t, 'IT WAS FROM HARRY POTTER', FLIP + 0.13, { y: 190, color: '#6A3FB8', ink: '#FFE08A', size: 50 });
+  } });
+  cue(UP4, 'whoosh_soft', 0.3); cue(onlyT, 'sparkle_pop', 0.25); cue(stumpT, 'record_scratch', 0.35); cue(FLIP, 'page_flip', 0.4); cue(FLIP + 0.13, 'shimmer', 0.4); cue(FLIP + 0.3, 'laugh', 0.2);
+  // HE ISN'T CALCULATING. HE HAS SEEN YOUR POSITION BEFORE: from below; on "seen" the wall behind him takes light, every
+  // card on it gold
+  const seenS = s('seen') - 0.06, calcT0 = w('seen', 'calculating'), SEEN = fr(w('seen', 'seen'));
+  shot(seenS, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(-0.28, -0.04, 21, [4, 3.0, 9.3], TELE)], [len(sh), K(0.04, -0.04, 15.6, [4, 2.95, 9.3], TELE)]], { t, e: glide, bump: t > SEEN && t < SEEN + 0.3 ? 1 : 0 });
+    hall(g, t, { e: exprAt([[0, { ...EXPR.focus, look: [0, 0.1], lid: 0.2 }], [SEEN - 0.15, KNOW]], t), cards: [...namedCards, { ...place(1, 3), mystery: true, flip: 1, tilt: 0.05 }], pieces: pM,
+      lit: seg(t, SEEN, SEEN + 0.36, lin) });
+    if (t >= SEEN) flashTint(g, '#FFE9B8', 0.35 * (1 - seg(t, SEEN, SEEN + 0.3)));
+  }, { grade: 'gold', hud: (g, lt, t) => {
+    bdg(g, t, 'NOT CALCULATING', calcT0, { y: 190, color: CREAM, size: 48, until: SEEN });
+    if (t >= SEEN) { plate(g, 'HE HAS SEEN', W / 2, 150, { color: INK, ink: CREAM, size: 62, rot: -0.02, ...popIn(t, SEEN) }); if (t >= SEEN + 0.14) plate(g, 'YOUR POSITION BEFORE', W / 2, 248, { color: GOLD, size: 50, rot: -0.02, ...popIn(t, SEEN + 0.14) }); }
+  } });
+  cue(seenS - 0.05, 'whoosh_deep', 0.35); cue(calcT0, 'sparkle_pop', 0.25); cue(SEEN - 0.32, 'revswell', 0.8); cue(SEEN - 0.004, 'boom', 0.85); cue(SEEN, 'reveal_bell', 0.5);
+
+  // ======================= AND ONE MAN BUILT THAT KIND OF MEMORY BY COPYING A WOODPECKER: a man in a red hat jabs a
+  // knight into a birch in time with the woodpecker working right above his fist =======================
+  const brS = s('bridge') - 0.06, manT = w('bridge', 'man'), copyT = w('bridge', 'copying'), wpT = w('bridge', 'woodpecker'), GAG = fr(T.e('bridge') + 0.02);
+  const both = [...train(brS + 0.08, brS + 0.75), ...train(brS + 1.05, brS + 1.72), ...train(brS + 2.05, brS + 2.72), ...train(brS + 3.0, GAG - 0.12)];
+  const birdH = [...both, fr(GAG + 0.1), fr(GAG + 0.25)], hansH = [...both, fr(GAG + 0.43), fr(GAG + 0.58)];
+  const manHud = (g, lt, t) => {
+    bdg(g, t, 'SWEDEN · 2010', manT - 0.05, { y: 170, color: SWE_BLUE, ink: SWE_YEL, size: 44 });  // his name waits for its reveal
+    bdg(g, t, 'HE COPIED A WOODPECKER', copyT, { y: 258, color: BIRDC.body, ink: '#FFFFFF', size: 52 });
+  };
+  shot(brS, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.02, 0.03, 9.0, [2.75, 2.5, 9.9])], [len(sh), K(-0.02, 0.03, 8.3, [2.75, 2.58, 9.9])]], { t, e: lin });
-    forest(g, t, { pieces: p0, hans: { e: AT_BIRD, hits: hansH, tilt: -0.05 }, brd: { hits: birdH, look: [0.6, 0.1] }, focus: 8.5 });
-  }, { hud: hookHud });
+    forest(g, t, { pieces: pF, hans: { e: AT_BIRD, hits: hansH, tilt: -0.05 }, brd: { hits: birdH, look: [0.6, 0.1] }, focus: 8.5 });
+  }, { trans: 'whip', hud: manHud });
   knocks(birdH.filter(h => h < GAG)); taps(hansH.filter(h => h < GAG));
-  cue(0, 'whoosh_deep', 0.25); cue(gmT, 'reveal_bell', 0.3);
+  cue(brS - 0.11, 'whoosh_fast', 0.3); cue(manT - 0.05, 'sparkle_pop', 0.25); cue(copyT, 'reveal_bell', 0.3);
   // wider, from the side: the board with the puzzle on it, the two of them at work
-  const sideS = copyT - 0.07;
+  const sideS = copyT + 0.3;
   shot(sideS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.62, 0.3, 14.5, [3.2, 1.7, 7.6])], [len(sh), K(-0.4, 0.24, 11.6, [3.2, 1.95, 8.0])]], { t, e: glide });
-    forest(g, t, { pieces: p0, hans: { e: exprAt([[0, AT_BOARD], [wpT, AT_BIRD]], t), hits: hansH }, brd: { hits: birdH }, focus: 11 });
-  }, { hud: hookHud });
+    rig(B, lt, [[0, K(-0.62, 0.3, 14.5, [3.2, 1.7, 7.6])], [len(sh), K(-0.44, 0.25, 12.2, [3.2, 1.9, 7.9])]], { t, e: glide });
+    forest(g, t, { pieces: pF, hans: { e: exprAt([[0, AT_BOARD], [wpT, AT_BIRD]], t), hits: hansH }, brd: { hits: birdH }, focus: 11 });
+  }, { hud: manHud });
   cue(sideS - 0.05, 'whoosh_fast', 0.25);
   // the beat after the line: the bird knocks twice, he answers twice
   shot(GAG, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.04, 0.02, 8.3, [2.8, 2.6, 9.9])], [len(sh), K(0.0, 0.02, 7.9, [2.8, 2.62, 9.9])]], { t, e: lin });
     const bl = t < GAG + 0.36 ? [0.6, 0.1] : [-0.9, 0.1];
-    forest(g, t, { pieces: p0, hans: { e: exprAt([[0, AT_BIRD], [GAG + 0.34, { ...AT_BIRD, look: [-0.8, 0.35] }]], t), hits: hansH, tilt: -0.05 }, brd: { hits: birdH, look: bl }, focus: 7.5 });
+    forest(g, t, { pieces: pF, hans: { e: exprAt([[0, AT_BIRD], [GAG + 0.34, { ...AT_BIRD, look: [-0.8, 0.35] }]], t), hits: hansH, tilt: -0.05 }, brd: { hits: birdH, look: bl }, focus: 7.5 });
   }, { hud: (g, lt, t) => {
     const bp = B.project(...perch()), hp = B.project(...perch(KN_Y));
     toks(g, bp.x + 300, bp.y - 440, t, birdH.filter(h => h >= GAG), CREAM);
@@ -911,84 +1066,56 @@ export async function build(T) {
   } });
   knocks(birdH.filter(h => h >= GAG), 0.85); taps(hansH.filter(h => h >= GAG), 0.8);
 
-  // ======================= THREE GM NORMS IN SEVEN WEEKS: the bird nails three gold plates up the birch =======================
-  const nS = s('norms') - 0.04, n3T = w('norms', 'three'), n7T = w('norms', 'seven'), andT = w('norms', 'and'), hearT = w('norms', 'hear'), nameT = w('norms', 'name');
-  const PLY = [3.2, 4.4, 5.6], plT = [fr(n3T + 0.04), fr(n3T + 0.4), fr(n3T + 0.76)];
-  const normH = plT.flatMap(x => [x, fr(x + 0.14)]);
-  const hopY = t => PLY[0] - 1.64 + 1.2 * (seg(t, plT[1] - 0.15, plT[1] - 0.03) + seg(t, plT[2] - 0.15, plT[2] - 0.03));
-  shot(nS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.16, 0.04, 7.6, [0.6, 2.9, 10.4])], [1.2, K(0.1, 0.04, 7.0, [0.6, 3.75, 10.4])], [len(sh), K(0.04, 0.03, 6.6, [0.6, 3.9, 10.4])]], { t, e: glide });
-    forest(g, t, { pieces: p0, hans: { e: GRIN }, brd: { hits: normH, y: hopY(t), hole: false, look: [0.6, 0.1] }, onTrunk: g2 => plaques(g2, t, PLY, plT), focus: 7 });
-  }, { hud: (g, lt, t) => {
-    const n = plT.filter(x => t >= x).length;
-    if (n) counter(g, String(n), 'GM NORMS', { x: 760, y: 290, size: 160, color: GOLD, labelColor: CREAM, at: [t, plT[n - 1]] });
-    bdg(g, t, 'IN 7 WEEKS', n7T, { x: 760, y: 424, color: BIRDC.body, ink: '#FFFFFF', size: 46 });
-  } });
-  cue(nS - 0.05, 'whoosh_fast', 0.3); knocks(normH, 0.55); plT.forEach(x => cue(x, 'sparkle_pop', 0.3)); cue(n7T, 'reveal_bell', 0.35);
-  // AND WAIT TILL YOU HEAR HIS NAME: the bird lands on his shoulder and leans to his ear
-  const teaS = andT - 0.06, landT = andT + 0.5;
-  shot(teaS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.22, 0.0, 9.6, [HANS.x - 0.5, 2.75, 9.3])], [len(sh), K(0.08, -0.01, 7.3, [HANS.x - 0.45, 2.8, 9.3])]], { t, e: glide });
-    const whisper = seg(t, hearT - 0.1, hearT + 0.1) * (1 - seg(t, nameT + 0.25, nameT + 0.45));
-    forest(g, t, { pieces: p0, hans: { e: exprAt([[0, SMUG], [landT - 0.1, { ...EXPR.neutral, look: [-0.95, 0.2], brow: -0.25, browY: -6 }], [nameT, { ...SMUG, look: [0, 0], curve: 0.75 }]], t), tilt: -0.04 * whisper }, focus: 7.5,
-      over: g2 => birdFly(g2, t, andT + 0.12, 0.38, perch(), SHOULDER, 1.75, { land: { rot: 0.32 * whisper, peck: 0.5 * whisper, look: whisper > 0.5 ? [0.8, -0.2] : [0.5, 0.1] } }) });
-  }, { hud: (g, lt, t) => { bdg(g, t, 'WAIT FOR HIS NAME', hearT - 0.25, { y: 215, color: GOLD, size: 48 }); } });
-  cue(teaS - 0.05, 'whoosh_fast', 0.3); cue(andT + 0.12, 'fabric', 0.3); cue(hearT - 0.25, 'sparkle_pop', 0.3);
+  // ======================= THE SPONSOR, THE FIRST TIME. YOU CAN TEST YOURS ON CHESSIGMA, TODAY'S SPONSOR. PAWNS FLASH,
+  // THEN VANISH. TAP WHERE THEY STOOD: the woodpecker flies to a phone on a table in the wood. On its screen, Chessigma's
+  // own Board Memory page and a round of the game as it runs on the site (photos/chessigma_memory.jpg, photos/rec/memory.mp4) =======================
+  const earlyS = s('early') - 0.05, testT = w('early', 'test'), sig0T = w('early', 'chessigma'), sponT = w('early', 'sponsor'), pawnsT = w('early', 'pawns'), vanT = w('early', 'vanish'), tapT = w('early', 'tap');
+  const PLAY = fr(sponT + 0.22), gameS = PLAY + 0.2;
+  // the recorded round (level 8, eight pawns): in the recording they go out at 2.356 s and are tapped back one by one
+  const MEM = { gone: 2.356, taps: [2.818, 3.149, 3.458, 3.8, 4.158, 4.492, 4.803, 5.113], sq: [[4, 2], [7, 2], [4, 3], [6, 3], [3, 5], [7, 5], [4, 6], [6, 6]] };
+  const memT = x => vanT + x - MEM.gone;  // the recording's pawns go out on the word "vanish"
+  const earlyPh = phoneSeg({
+    prog: [[earlyS, t => ({ still: 'memory_jpg' })], [gameS, t => ({ rec: 'memory', sec: MEM.gone + t - vanT })]],
+    boxes: [[60, 180, 720, 430, testT + 0.15, sponT - 0.1], [28, 911, 752, 1077, sponT - 0.1, gameS]],
+    pecks: [[PLAY, 994, 124], [fr(PLAY + 0.16), 994, 124]],
+    rings: MEM.taps.map((x, i) => [memT(x), 24 + (MEM.sq[i][0] + 0.5) * 91.5, 272 + (MEM.sq[i][1] + 0.5) * 91.5]),
+    fly: { t0: earlyS + 0.02, dur: 0.5, from: perch() },
+  });
+  const earlyHud = (g, lt, t) => {
+    adHud(g, lt, t); if (t >= sig0T) sigPlate(g, 150, { chip: false, ...(t < sig0T + 0.4 ? popIn(t, sig0T) : {}) });
+    bdg(g, t, 'TEST YOUR OWN MEMORY', testT, { y: 262, color: CREAM, size: 42, until: sponT - 0.03 });
+    bdg(g, t, "TODAY'S SPONSOR", sponT - 0.03, { y: 262, color: GOLD, size: 42, until: pawnsT - 0.03 });
+    bdg(g, t, 'PAWNS FLASH', pawnsT - 0.03, { y: 262, color: CREAM, size: 44, until: vanT - 0.03 });
+    bdg(g, t, 'THEN VANISH', vanT - 0.03, { y: 262, color: RED, size: 44, until: tapT - 0.03 });
+    bdg(g, t, 'TAP WHERE THEY STOOD', tapT - 0.03, { y: 262, color: LEAFG, size: 42 });
+  };
+  shot(earlyS, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.24, 0.05, 7.6, [3.6, 2.1, 4.2])], [0.7, PHK[0]], [len(sh), PHK[1]]], { t, e: glide });
+    earlyPh(g, t);
+  }, { trans: 'whip', hud: earlyHud, info: true });
+  shot(gameS - 0.02, (g, lt, t, sh) => {
+    rig(B, lt, [[0, PHN[0]], [len(sh), PHN[1]]], { t, e: lin });
+    earlyPh(g, t);
+  }, { hud: earlyHud, info: true });
+  cue(earlyS - 0.11, 'whoosh_fast', 0.3); cue(earlyS + 0.05, 'fabric', 0.3); cue(sig0T, 'reveal_bell', 0.35); knocks([PLAY, fr(PLAY + 0.16)], 0.5); cue(PLAY, 'sparkle_pop', 0.25);
+  cue(gameS, 'swipe_card', 0.35); cue(pawnsT - 0.03, 'shimmer', 0.3); cue(vanT, 'whoosh_soft', 0.4);
+  MEM.taps.forEach(x => { if (memT(x) < s('plan') - 0.12) cue(memT(x), 'piece', 0.35); });
 
-  // ======================= A WOODPECKER HITS THE SAME TREE 12,000 TIMES A DAY: close on the bird at work =======================
-  const bS = s('bird') - 0.04, n12T = w('bird', '12000'), dayT = w('bird', 'day'), heT = T.w('bird', 11).s, thingT = w('bird', 'thing'), pzT = w('bird', 'puzzles');
-  const drumH = [...train(bS + 0.1, bS + 1.0, 2 / 15), ...train(bS + 1.2, bS + 2.0, 2 / 15), ...train(n12T - 0.02, heT - 0.15, 2 / 15)];
-  shot(bS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.3, 0.03, 6.6, [0.75, 4.5, 10.5])], [len(sh), K(0.2, 0.05, 5.3, [0.7, 4.7, 10.5])]], { t, e: glide });
-    forest(g, t, { pieces: p0, hans: null, brd: { hits: drumH, look: [0.6, 0.1] }, focus: 6 });
-  }, { hud: (g, lt, t) => {
-    const done = drumH.filter(h => h <= t).length, u = ease.inOut(seg(t, n12T - 0.05, n12T + 0.85, lin));
-    counter(g, comma(lerp(done, 12000, u)), u > 0 ? 'HITS A DAY' : 'HITS', { x: 690, y: 330, size: 150, color: u >= 1 ? GOLD : CREAM, labelColor: BIRDC.body });
-    bdg(g, t, 'THE SAME TREE', w('bird', 'same'), { x: 690, y: 478, color: CREAM, size: 40, until: n12T + 1.6 });
-  } });
-  cue(bS - 0.05, 'whoosh_fast', 0.3); knocks(drumH, 0.36); cue(n12T - 0.05, 'riser', 0.25); cue(n12T + 0.85, 'reveal_bell', 0.4);
-  // HE DID THE SAME THING WITH CHESS PUZZLES: the same mate on his board three times over, faster each time
-  const runs = [[heT + 0.02, 0.2, 0.06], [heT + 0.84, 0.14, 0.04], [heT + 1.42, 0.1, 0.03]].map(([a, mv, gap]) => ({ a: fr(a), mv, gap, mate: fr(a) + 2 * (mv + gap) + mv }));
-  const runAt = t => { let r = runs[0]; for (const q of runs) if (t >= q.a - 0.04) r = q; return r; };
-  shot(heT - 0.06, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.5, 0.46, 10.4, [5.3, 0.9, 6.9])], [len(sh), K(0.36, 0.4, 8.6, [5.3, 1.1, 7.1])]], { t, e: glide });
-    const r = runAt(t), S = solve(t, r.a, r.mv, r.gap), m = S.k ? moveOf(PZ, S.k) : null;
-    forest(g, t, { pieces: S.pieces, hans: { e: AT_BOARD, reach: m && S.lt < r.mv + r.gap ? { sq: m.to, u: clamp(S.lt / (r.mv + r.gap)) } : null }, brd: { hits: [], look: [-0.8, 0.5] }, focus: 9,
-      under: g2 => { solveUnder(g2, S, 0.5); if (S.done) squareFrame(g2, B, 'h8', HI.bad, 1 - seg(t, r.mate, r.mate + 0.4), { fill: 0.45 }); }, over: g2 => solveOver(g2, S, 0.5, false) });
-  }, { hud: (g, lt, t) => {
-    const n = runs.filter(r => t >= r.mate).length;
-    bdg(g, t, 'THE SAME PUZZLE', heT + 0.1, { y: 215, color: CREAM, size: 46 });
-    if (n) counter(g, '×' + n, 'SOLVED', { x: 890, y: 480, size: 120, color: GOLD, labelColor: BIRDC.body, at: [t, runs[n - 1].mate] });
-  } });
-  cue(heT - 0.11, 'whoosh_fast', 0.3);
-  runs.forEach((r, i) => { for (let k = 0; k < 3; k++) cue(r.a + k * (r.mv + r.gap) + r.mv - MOVE_HIT, k === 1 ? 'move_capture' : 'move', 0.4); cue(r.mate, 'success', 0.3 + i * 0.05); });
-
-  // ======================= SWEDEN, 2010: his study; Hans Tikkanen, twenty-five =======================
-  const whoS = s('who') - 0.05, hansT = w('who', 'hans'), stillT = w('who', 'still'), notT = w('who', 'not');
-  shot(whoS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.5, 0.2, 19.5, [4.4, 3.0, 8.2])], [len(sh), K(-0.24, 0.13, 14.2, [4.3, 3.2, 8.8])]], { t, e: glide });
-    study(g, t, { pieces: p0, hans: { e: AT_BOARD } });
-  }, { grade: 'warm', trans: 'whip', hud: (g, lt, t) => { bdg(g, t, 'SWEDEN · 2010', whoS + 0.12, { y: 196, color: SWE_BLUE, ink: SWE_YEL, size: 46 }); bdg(g, t, 'HANS TIKKANEN', hansT, { y: 318, color: '#1C2330', size: 58, sub: 'AGE 25' }); } });
-  cue(whoS - 0.05, 'whoosh_deep', 0.3); cue(whoS + 0.15, 'sparkle_pop', 0.25); cue(hansT, 'reveal_bell', 0.3);
-  // STILL NOT A GRANDMASTER: close, the place for the title on his chest is empty
-  shot(stillT - 0.1, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.18, 0.14, 10.6, [4.1, 1.25, 9.3])], [len(sh), K(-0.06, 0.13, 9.0, [4.1, 1.2, 9.3])]], { t, e: glide });
-    study(g, t, { pieces: p0, hans: { e: exprAt([[0, AT_BOARD], [notT - 0.15, GLUM]], t) }, md: { ghost: seg(t, stillT, stillT + 0.25) }, focus: 9 });
-  }, { grade: 'warm', hud: (g, lt, t) => { bdg(g, t, 'NOT A GRANDMASTER', notT, { y: 112, color: RED, size: 50, sub: 'HANS TIKKANEN · 25' }); } });
-  cue(notT, 'error', 0.3); cue(notT, 'thud', 0.35);
-
-  // ======================= HIS PLAN SOUNDS TOO SIMPLE =======================
+  // ======================= HIS PLAN SOUNDS TOO SIMPLE: his study; twenty-five, the place for the title on his chest is empty =======================
   const planS = s('plan') - 0.05, tooT = w('plan', 'too'), overT = w('plan', 'over'), thouT = w('plan', 'thousand'), solveT = T.w('plan', 9).s, thenT = T.w('plan', 12).s,
-    sameT = w('plan', 'same'), againT = w('plan', 'again'), halfT = w('plan', 'half'), timeT = w('plan', 'time');
+    sameT = w('plan', 'same'), againT = w('plan', 'again'), halfT = w('plan', 'half');
   shot(planS, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.3, 0.2, 11.6, [4, 1.5, 9.3])], [len(sh), K(-0.14, 0.16, 9.4, [4, 1.3, 9.3])]], { t, e: glide });
     study(g, t, { pieces: p0, hans: { e: exprAt([[0, { ...SMUG, look: [0.2, 0.6] }], [tooT - 0.1, SMUG]], t) }, md: { ghost: 1 }, focus: 8 });
-  }, { grade: 'warm', hud: (g, lt, t) => { bdg(g, t, 'HIS PLAN', planS + 0.12, { y: 100, color: CREAM, size: 52 }); bdg(g, t, 'TOO SIMPLE?', tooT, { y: 186, color: GOLD, size: 46 }); } });
-  cue(planS - 0.05, 'whoosh_fast', 0.3); cue(planS + 0.12, 'sparkle_pop', 0.25); cue(tooT, 'sparkle_pop', 0.3);
+  }, { grade: 'warm', trans: 'whip', hud: (g, lt, t) => {
+    bdg(g, t, 'NOT A GRANDMASTER', planS + 0.1, { y: 108, color: RED, size: 48, sub: 'SWEDEN · 2010 · AGE 25', until: tooT - 0.05 });
+    bdg(g, t, 'HIS PLAN: TOO SIMPLE?', tooT - 0.05, { y: 108, color: GOLD, size: 48 });
+  } });
+  cue(planS - 0.11, 'whoosh_fast', 0.3); cue(planS + 0.1, 'thud', 0.3); cue(tooT - 0.05, 'sparkle_pop', 0.3);
   // OVER A THOUSAND PUZZLES: from one card on the wall back to all 1,128 of them; SOLVE THEM ALL: the first pass
   const wallS = overT - 0.08, [hcx, hcy] = cardXY(...HEROC), WIDE = [4, 5.5, WG.z], pullA = 0.3, pullD = 1.25;
-  const pullKeys = (() => { const k = [[0, K(0, 0, 0.62, [hcx, hcy, WG.z])], [pullA, K(0, 0, 0.66, [hcx, hcy, WG.z])]];
-    for (let i = 1; i <= 14; i++) { const u = i / 14, e = ease.inOut(u); k.push([pullA + pullD * u, K(0, 0, 0.66 * Math.pow(16.4 / 0.66, e), [lerp(hcx, WIDE[0], e), lerp(hcy, WIDE[1], e), WG.z]), lin]); }
+  const pullKeys = (() => { const k = [[0, K(0, 0, 0.62, [hcx, hcy - 0.06, WG.z])], [pullA, K(0, 0, 0.66, [hcx, hcy - 0.06, WG.z])]];
+    for (let i = 1; i <= 14; i++) { const u = i / 14, e = ease.inOut(u); k.push([pullA + pullD * u, K(0, 0, 0.66 * Math.pow(16.4 / 0.66, e), [lerp(hcx, WIDE[0], e), lerp(hcy - 0.06, WIDE[1], e), WG.z]), lin]); }
     return k; })();
   const pass1 = [solveT + 0.02, thenT - 0.1];  // the first pass: every card, once
   const littleHans = (g, t, e) => standing(g, 'hans', 6.9, WG.z - 1.5, { e, t, k: 0.5, fx: 0, fz: -1, col: ['#2B3442', '#1C2330'] });
@@ -1027,7 +1154,7 @@ export async function build(T) {
 
   // ======================= FOUR WEEKS. THEN TWO. THEN ONE. THEN DAYS — ONE SINGLE DAY: one take of the wall, each pass faster =======================
   const cyS = s('cycles') - 0.05, fourT = w('cycles', 'four'), twoT = w('cycles', 'two'), oneT = T.w('cycles', 5).s, daysT = w('cycles', 'days'), untilT = w('cycles', 'until'),
-    one2T = T.w('cycles', 13).s, singleT = w('cycles', 'single'), dayLT = T.w('cycles', 15).s, SLAM = fr(dayLT + 0.02);
+    dayLT = T.w('cycles', 15).s, SLAM = fr(dayLT + 0.02);
   const CY = [[fourT, 0.72, '4', 'WEEKS'], [twoT, 0.5, '2', 'WEEKS'], [oneT, 0.38, '1', 'WEEK'], [daysT, 0.3, '4', 'DAYS'], [daysT + 0.42, 0.24, '2', 'DAYS'], [SLAM - 0.3, 0.3, '1', 'DAY']];
   const cyAt = t => { let i = -1; CY.forEach(([a], k) => { if (t >= a - 0.02) i = k; }); return i; };
   shot(cyS, (g, lt, t, sh) => {
@@ -1056,169 +1183,173 @@ export async function build(T) {
   // ======================= BY THEN HE ISN'T CALCULATING ANYMORE: arrows come and go over the board; then none =======================
   const whyS = s('why') - 0.05, isntT = w('why', 'isnt'), calcT = w('why', 'calculating'), he2T = T.w('why', 6).s, seesT = w('why', 'sees');
   const GUESS = [['d5', 'd8'], ['h6', 'g4'], ['d5', 'f7'], ['h6', 'f5'], ['d5', 'a8'], ['d5', 'e5']];
+  const HIGH = { cy: H * 0.5 - 200 };  // the whole board from above (rule 22), lifted in the frame so the caption sits under it
   shot(whyS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.5, 0.42, 10.2, [5.2, 0.9, 6.6])], [len(sh), K(0.34, 0.36, 8.8, [5.2, 1.0, 6.9])]], { t, e: glide });
+    rig(B, lt, [[0, K(-0.35, 0.5, 15.5, [5.3, 0.6, 5.2], HIGH)], [len(sh), K(-0.27, 0.47, 14.6, [5.2, 0.7, 5.3], HIGH)]], { t, e: glide });
     const out = 1 - seg(t, isntT - 0.05, isntT + 0.12);
     study(g, t, { pieces: p0, hans: { e: exprAt([[0, { ...EXPR.focus, look: [0.3, 0.8], brow: 0.7 }], [isntT, AT_BOARD]], t) }, focus: 9,
-      under: g2 => GUESS.forEach(([a, b], i) => { const a0 = whyS + 0.1 + i * 0.17; boardArrow(g2, B, a, b, 0.75 * out * seg(t, a0, a0 + 0.08) * (1 - seg(t, a0 + 0.42, a0 + 0.55)), seg(t, a0, a0 + 0.14)); }) });
+      under: g2 => GUESS.forEach(([a, b], i) => { const a0 = whyS + 0.04 + i * 0.13; boardArrow(g2, B, a, b, 0.9 * out * seg(t, a0, a0 + 0.06) * (1 - seg(t, a0 + 0.4, a0 + 0.52)), seg(t, a0, a0 + 0.12)); }) });
   }, { grade: 'warm', hud: (g, lt, t) => {
     const u = seg(t, calcT + 0.05, calcT + 0.28, lin);
     const P = plate(g, 'CALCULATING...', W / 2, 118, { color: CREAM, size: 48, rot: -0.018 });
     if (u > 0 && P) { g.save(); g.translate(W / 2, 118); g.rotate(-0.018); g.strokeStyle = RED; g.lineWidth = 10; g.lineCap = 'round'; g.beginPath(); g.moveTo(-P.w / 2 - 14, 4); g.lineTo(-P.w / 2 - 14 + (P.w + 28) * u, -4); g.stroke(); g.restore(); }
   } });
-  cue(whyS - 0.05, 'whoosh_deep', 0.3); GUESS.forEach((_, i) => cue(whyS + 0.1 + i * 0.17, 'tick', 0.25)); cue(calcT + 0.05, 'swipe_card', 0.4);
+  cue(whyS - 0.05, 'whoosh_deep', 0.3); GUESS.forEach((_, i) => cue(whyS + 0.04 + i * 0.13, 'tick', 0.25)); cue(calcT + 0.05, 'swipe_card', 0.4);
   // HE JUST SEES IT: the whole mate at once
   const seeS = he2T - 0.08, GO = fr(seesT - 0.02), SEE = { mv: 0.15, gap: 0.05 }, mateT = GO + 2 * (SEE.mv + SEE.gap) + SEE.mv;
   shot(seeS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.3, 0.3, 8.6, [5.6, 1.1, 7.2])], [len(sh), K(0.2, 0.26, 7.4, [5.6, 1.25, 7.3])]], { t, e: glide, bump: t > mateT && t < mateT + 0.25 ? 1 : 0 });
+    rig(B, lt, [[0, K(-0.3, 0.48, 11.6, [5.75, 0.7, 5.6], HIGH)], [len(sh), K(-0.22, 0.44, 10.6, [5.85, 0.8, 5.9], HIGH)]], { t, e: glide, bump: t > mateT && t < mateT + 0.25 ? 1 : 0 });
     const S = solve(t, GO, SEE.mv, SEE.gap), pre = seg(t, seeS + 0.1, seeS + 0.3) * (t < GO ? 1 : 0);
     study(g, t, { pieces: S.pieces, hans: { e: exprAt([[0, SEES], [mateT, GRIN]], t) }, focus: 7.5,
       under: g2 => { squareFrame(g2, B, 'g8', GOLD, pre, { fill: 0.3 }); squareFrame(g2, B, 'f7', GOLD, pre, { fill: 0.3 }); boardArrow(g2, B, 'd5', 'g8', pre, 1); boardArrow(g2, B, 'h6', 'f7', pre, 1);
         solveUnder(g2, S); if (S.done) squareFrame(g2, B, 'h8', HI.bad, 1, { fill: 0.5 }); },
       over: g2 => solveOver(g2, S) });
     if (t >= mateT) flashTint(g, '#FFE9B8', 0.35 * (1 - seg(t, mateT, mateT + 0.25)));
-  }, { grade: 'warm', hud: (g, lt, t) => { bdg(g, t, 'HE JUST SEES IT', seesT, { y: 112, color: BIRDC.body, ink: '#FFFFFF', size: 52 }); } });
+  }, { grade: 'warm', hud: (g, lt, t) => { bdg(g, t, 'HE JUST SEES IT', seesT, { x: 660, y: 112, color: BIRDC.body, ink: '#FFFFFF', size: 52 }); } });
   cue(seeS + 0.1, 'shimmer', 0.3);
   for (let k = 0; k < 3; k++) cue(GO + k * (SEE.mv + SEE.gap) + SEE.mv - MOVE_HIT, k === 1 ? 'move_capture' : 'move', 0.5);
   boom(mateT, 0.7); cue(seesT, 'reveal_bell', 0.4);
 
-  // ======================= THAT YEAR HANS TIKKANEN BECOMES A GRANDMASTER: the gold GM lands on his chest =======================
-  const titS = s('title') - 0.05, gm2T = w('title', 'grandmaster'), GMT = fr(gm2T + 0.04);
-  shot(titS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.24, 0.1, 11.4, [4, 1.2, 9.3])], [len(sh), K(-0.06, 0.08, 9.4, [4, 1.1, 9.3])]], { t, e: glide, bump: t > GMT && t < GMT + 0.3 ? 1 : 0 });
-    const fp = B.project(4, 3.1, 9.3);
-    study(g, t, { pieces: piecesAt(PZ, 3), hans: { e: exprAt([[0, { ...EXPR.happy, look: [0.4, -0.9], open: 0.3 }], [GMT, { ...EXPR.triumph, look: [0, 0], lid: 0.15 }]], t), dy: t >= GMT ? 0.12 * Math.exp(-(t - GMT) * 6) : 0 },
-      md: { gold: clamp((t - (GMT - 0.22)) / 0.36), ghost: 1 }, focus: 9 });
-    if (t >= GMT) { g.save(); g.globalCompositeOperation = 'screen'; rays(g, fp.x, fp.y + 40, t, { n: 16, color: '#FFE9A8', a: 0.2 * seg(t, GMT, GMT + 0.3), len: 1500 }); g.restore(); flashTint(g, '#FFE9B8', 0.45 * (1 - seg(t, GMT, GMT + 0.3))); }
-  }, { grade: 'warm', hud: (g, lt, t) => { bdg(g, t, 'GRANDMASTER', GMT, { y: 110, color: GOLD, size: 58, sub: 'HANS TIKKANEN · 2010' }); if (t >= GMT) confetti(g, t, GMT, { n: 140, seed: 5 }); } });
-  cue(titS - 0.05, 'whoosh_fast', 0.3); cue(GMT - 0.32, 'revswell', 0.8); cue(GMT - 0.004, 'boom', 0.8); cue(GMT, 'reveal_bell', 0.5); cue(GMT + 0.1, 'applause', 0.3); cue(GMT + 0.05, 'confetti', 0.4);
+  // ======================= THE SPONSOR, THE SECOND TIME. CHESSIGMA'S SUPERCOACH RUNS THIS METHOD FOR YOU. IT TIMES EVERY
+  // CYCLE, AND ONLY LETS YOU MOVE ON WHEN YOU'RE FASTER AND CLEANER: the phone again. The site's Woodpecker page (the sets
+  // by level, its own line "Pass faster and cleaner each time") and the author's recording of a puzzle of the set, with
+  // its timer =======================
+  const midS = s('mid') - 0.05, sigT = w('mid', 'chessigmas'), runsT = w('mid', 'runs'), youT = w('mid', 'you'), timesT = w('mid', 'times'), onT = w('mid', 'on'), fasterT = w('mid', 'faster'), cleanT = w('mid', 'cleaner');
+  const TAP = fr(youT + 0.12), solveS = TAP + 0.22, gateS = onT - 0.12;
+  const midPh = phoneSeg({
+    prog: [[midS, t => ({ page: 0 })],
+      [runsT - 0.12, t => ({ page: 400 - 110 * (1 - ease.out(seg(t, runsT - 0.12, runsT + 0.4, lin))) })],
+      [solveS, t => ({ rec: 'solve', sec: 0.2 + Math.max(0, t - (solveS + 0.26)) })],  // the recording opens on a loading screen (0.2 s), then runs 2.3 s
+      [gateS, t => ({ page: 0 })]],  // back to the top of the site's page, for its own line: "Pass faster and cleaner each time"
+    boxes: [[30, 166, 694, 306, runsT + 0.3, TAP - 0.04], [72, 792, 292, 912, TAP - 0.04, solveS], [606, 92, 774, 184, timesT + 0.05, gateS - 0.04], [26, 282, 754, 384, fasterT - 0.22, s('result') - 0.13]],
+    pecks: [[TAP, 852, 118], [fr(TAP + 0.16), 852, 118], [fr(fasterT - 0.02), 333, 70], [fr(cleanT - 0.02), 333, 70]],
+  });
+  const midHud = (g, lt, t) => {
+    adHud(g, lt, t); if (t >= sigT) sigPlate(g, 150, t < sigT + 0.4 ? popIn(t, sigT) : {});
+    bdg(g, t, 'IT RUNS THE METHOD FOR YOU', runsT, { y: 262, color: CREAM, size: 38, until: timesT - 0.03 });
+    bdg(g, t, 'EVERY CYCLE TIMED', timesT - 0.03, { y: 262, color: CREAM, size: 40, until: fasterT - 0.1 });  // the gate, in our own plates
+    bdg(g, t, 'FASTER ✓', fasterT, { x: 370, y: 262, color: LEAFG, size: 42 });
+    bdg(g, t, 'CLEANER ✓', cleanT, { x: 700, y: 262, color: LEAFG, size: 42 });
+  };
+  shot(midS, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.2, 0.04, 7.0, [3.6, 2.15, 4.2])], [0.6, PHK[0]], [len(sh), PHK[1]]], { t, e: glide });
+    midPh(g, t);
+  }, { trans: 'whip', hud: midHud, info: true });
+  shot(solveS - 0.02, (g, lt, t, sh) => {
+    rig(B, lt, [[0, PHN[0]], [len(sh), PHN[1]]], { t, e: lin });
+    midPh(g, t);
+  }, { hud: midHud, info: true });
+  cue(midS - 0.11, 'whoosh_fast', 0.3); cue(sigT, 'reveal_bell', 0.4); cue(runsT - 0.12, 'swipe_card', 0.35); knocks([TAP, fr(TAP + 0.16), fr(fasterT - 0.02), fr(cleanT - 0.02)], 0.5); cue(TAP, 'sparkle_pop', 0.22);
+  cue(solveS, 'notify', 0.3); cue(timesT, 'clock_press', 0.35); for (let x = timesT + 0.45; x < gateS - 0.1; x += 0.5) cue(x, 'clock_tick', 0.2);
+  cue(gateS, 'swipe_card', 0.35); cue(fasterT, 'success', 0.3); cue(cleanT, 'success', 0.35);
 
-  // ======================= THEN CHAMPION OF SWEDEN. FIVE TIMES: five cups on his shelf =======================
-  const chS = s('champ') - 0.05, champT = w('champ', 'champion'), fiveT = w('champ', 'five');
-  const cupT = CUPS.map((_, i) => i ? fr(fiveT + (i - 1) * 0.12) : fr(champT + 0.05));
-  shot(chS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.3, 0.0, 14.0, [-0.2, 6.7, 12.5])], [len(sh), K(-0.12, 0.0, 12.0, [0, 6.7, 12.5])]], { t, e: glide });
-    study(g, t, { hans: null, cups: cupT.map(c => (t - c) / 0.25) });
-  }, { grade: 'warm', hud: (g, lt, t) => {
-    bdg(g, t, 'CHAMPION OF SWEDEN', champT, { y: 215, color: SWE_BLUE, ink: SWE_YEL, size: 48 });
-    const n = cupT.filter(c => t >= c).length;
-    if (n > 1) counter(g, '×' + n, 'TIMES', { y: 470, size: 150, color: GOLD, labelColor: SWE_YEL, at: [t, cupT[n - 1]] });
-    cupT.forEach((c, i) => { if (t < c + 0.08) return; const p = B.project(CUPS[i], SHELF.y - 0.36, SHELF.z0); plate(g, YEARS[i], p.x, p.y, { color: CREAM, size: 27, rot: 0, ...popIn(t, c + 0.08) }); });
-  } });
-  cue(chS - 0.05, 'whoosh_fast', 0.3); cue(champT, 'reveal_bell', 0.35); cupT.forEach((c, i) => { cue(c, 'sparkle_pop', 0.3); cue(c + 0.02, 'thud', 0.2); }); cue(cupT[4] + 0.15, 'success', 0.35);
-
-  // ======================= AND HIS NAME? =======================
-  const namS = s('name') - 0.05, nameQ = w('name', 'name'), inT = w('name', 'in'), finT = w('name', 'finnish'), tikT = w('name', 'tikkanen'), litT = w('name', 'little'), wp2T = w('name', 'woodpecker');
-  const softH = [...train(namS + 0.1, namS + 0.6), ...train(inT + 0.1, inT + 0.6)];
-  shot(namS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.3, 0.0, 9.4, [HANS.x - 0.1, 2.95, 9.3])], [len(sh), K(0.2, -0.01, 8.0, [HANS.x - 0.1, 2.95, 9.3])]], { t, e: glide });
-    forest(g, t, { pieces: p0, hans: { e: exprAt([[0, { ...EXPR.neutral, look: [0, 0] }], [nameQ - 0.1, { ...SMUG, look: [0, 0], curve: 0.8 }]], t) }, brd: { hits: softH }, focus: 8 });
-  }, { trans: 'whip', hud: (g, lt, t) => { bdg(g, t, 'AND HIS NAME?', nameQ - 0.25, { y: 215, color: GOLD, size: 54 }); } });
-  cue(namS - 0.05, 'whoosh_deep', 0.3); knocks(softH, 0.22); cue(nameQ - 0.25, 'sparkle_pop', 0.3);
-  // IN FINNISH, TIKKANEN MEANS LITTLE WOODPECKER: the bird flies over and lands on his shoulder
-  const flyT = wp2T - 0.12;
-  shot(inT - 0.06, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.07, 0.02, 11.6, [2.6, 3.55, 9.9], { cy: H * 0.46 })], [len(sh), K(-0.03, 0.02, 10.0, [2.6, 3.6, 9.9], { cy: H * 0.46 })]], { t, e: glide });
-    const on = t >= flyT;
-    forest(g, t, { pieces: p0, hans: { e: exprAt([[0, { ...SMUG, look: [0, 0] }], [flyT + 0.1, { ...EXPR.happy, look: [-0.9, 0.3] }], [flyT + 0.75, GRIN]], t) }, brd: on ? null : { hits: softH, look: [-0.8, 0.2] }, focus: 10,
-      onTrunk: on ? g2 => birdOnTrunk(g2, t, { a: 0 }) : null,
-      over: g2 => { if (on) birdFly(g2, t, flyT, 0.34, perch(), SHOULDER, 1.75, { land: { look: t > flyT + 0.75 ? [0.2, 0] : [0.7, -0.1] } }); } });
+  // ======================= AS FOR THE MAN IN THE RED HAT: him, close =======================
+  const resS = s('result') - 0.05, n3T = w('result', 'three'), n7T = w('result', 'seven'), andT = w('result', 'and'), hisT = w('result', 'his'), hansT = w('result', 'hans'),
+    finT = w('result', 'finnish'), litT = w('result', 'little');
+  shot(resS, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(-0.26, 0.03, 8.6, [HANS.x + 0.35, 3.05, 9.3])], [len(sh), K(-0.14, 0.03, 7.5, [HANS.x + 0.3, 3.1, 9.3])]], { t, e: glide });
+    forest(g, t, { pieces: pF, hans: { e: exprAt([[0, { ...SMUG, look: [0.3, 0.5] }], [resS + 0.55, { ...SMUG, look: [0, 0], curve: 0.7 }]], t) }, brd: null, onTrunk: g2 => birdOnTrunk(g2, t, { a: 0 }), focus: 7.5 });  // the bird would stand half out of the frame's left edge: not drawn here
+  }, { trans: 'whip', hud: (g, lt, t) => { bdg(g, t, 'THE MAN IN THE RED HAT', w('result', 'man') - 0.05, { y: 215, color: HAT, ink: '#FFFFFF', size: 48 }); } });
+  cue(resS - 0.11, 'whoosh_fast', 0.3); cue(w('result', 'man') - 0.05, 'sparkle_pop', 0.3);
+  // THREE GRANDMASTER NORMS IN SEVEN WEEKS: the bird nails three gold plates up the birch
+  const plqS = n3T - 0.14, PLY = [3.2, 4.4, 5.6], plT = [fr(n3T + 0.04), fr(n3T + 0.38), fr(n3T + 0.72)];
+  const normH = plT.flatMap(x => [x, fr(x + 0.14)]);
+  const hopY = t => PLY[0] - 1.64 + 1.2 * (seg(t, plT[1] - 0.15, plT[1] - 0.03) + seg(t, plT[2] - 0.15, plT[2] - 0.03));
+  shot(plqS, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.16, 0.04, 7.6, [0.6, 3.3, 10.4])], [1.2, K(0.1, 0.04, 7.0, [0.6, 3.75, 10.4])], [len(sh), K(0.04, 0.03, 6.6, [0.6, 3.9, 10.4])]], { t, e: glide });
+    forest(g, t, { pieces: pF, hans: { e: GRIN }, brd: { hits: normH, y: hopY(t), hole: false, look: [0.6, 0.1] }, onTrunk: g2 => plaques(g2, t, PLY, plT), focus: 7 });
   }, { hud: (g, lt, t) => {
-    bdg(g, t, 'IN FINNISH', finT - 0.05, { y: 120, color: CREAM, size: 34, until: litT });
-    bdg(g, t, 'TIKKANEN', tikT, { y: 205, color: CREAM, size: 66 });
+    const n = plT.filter(x => t >= x).length;
+    if (n) counter(g, String(n), n > 1 ? 'GM NORMS' : 'GM NORM', { x: 760, y: 290, size: 160, color: GOLD, labelColor: CREAM, at: [t, plT[n - 1]] });
+    bdg(g, t, 'IN 7 WEEKS', n7T, { x: 760, y: 424, color: BIRDC.body, ink: '#FFFFFF', size: 46 });
+  } });
+  cue(plqS - 0.05, 'whoosh_fast', 0.3); knocks(normH, 0.55); plT.forEach(x => cue(x, 'sparkle_pop', 0.3)); cue(n7T, 'reveal_bell', 0.35);
+  // AND HIS NAME? HANS TIKKANEN: the bird lands on his shoulder and leans to his ear
+  const teaS = andT - 0.06;
+  shot(teaS, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.22, 0.0, 9.6, [HANS.x - 0.5, 2.75, 9.3])], [len(sh), K(0.08, -0.01, 7.6, [HANS.x - 0.45, 2.8, 9.3])]], { t, e: glide });
+    const whisper = seg(t, hansT - 0.3, hansT - 0.1);
+    forest(g, t, { pieces: pF, hans: { e: exprAt([[0, SMUG], [andT + 0.4, { ...EXPR.neutral, look: [-0.95, 0.2], brow: -0.25, browY: -6 }], [hansT + 0.35, { ...SMUG, look: [0, 0], curve: 0.75 }]], t), tilt: -0.04 * whisper }, focus: 7.5,
+      onTrunk: g2 => birdOnTrunk(g2, t, { a: 0 }),
+      over: g2 => birdFly(g2, t, andT + 0.06, 0.36, perch(), SHOULDER, 1.75, { land: { rot: 0.32 * whisper, peck: 0.5 * whisper, look: whisper > 0.5 ? [0.8, -0.2] : [0.5, 0.1] } }) });
+  }, { hud: (g, lt, t) => {
+    bdg(g, t, 'AND HIS NAME?', hisT - 0.1, { y: 215, color: GOLD, size: 52, until: hansT });
+    bdg(g, t, 'HANS TIKKANEN', hansT, { y: 215, color: '#1C2330', size: 56 });
+  } });
+  cue(teaS - 0.05, 'whoosh_fast', 0.3); cue(andT + 0.06, 'fabric', 0.3); cue(hisT - 0.1, 'sparkle_pop', 0.3); cue(hansT, 'reveal_bell', 0.3);
+  // IN FINNISH, IT MEANS LITTLE WOODPECKER: the two of them, the bird on his shoulder
+  const namS = finT - 0.14;
+  shot(namS, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.07, 0.02, 11.6, [2.6, 3.55, 9.9], { cy: H * 0.46 })], [len(sh), K(-0.03, 0.02, 10.0, [2.6, 3.6, 9.9], { cy: H * 0.46 })]], { t, e: glide });
+    forest(g, t, { pieces: pF, hans: { e: exprAt([[0, { ...SMUG, look: [0, 0] }], [litT + 0.25, GRIN]], t) }, brd: null, onTrunk: g2 => birdOnTrunk(g2, t, { a: 0 }), focus: 10,
+      over: g2 => bird(g2, ...SHOULDER, 1.75, t, { dir: 1, pose: 'stand', look: t > litT + 0.4 ? [0.2, 0] : [0.7, -0.1] }) });
+  }, { hud: (g, lt, t) => {
+    bdg(g, t, 'IN FINNISH', namS + 0.05, { y: 120, color: CREAM, size: 34, until: litT });
+    bdg(g, t, 'TIKKANEN', namS + 0.05, { y: 205, color: CREAM, size: 66 });
     bdg(g, t, '= LITTLE WOODPECKER', litT, { y: 300, color: BIRDC.body, ink: '#FFFFFF', size: 46 });
   } });
-  cue(inT - 0.11, 'whoosh_fast', 0.3); cue(tikT, 'reveal_bell', 0.35); cue(litT, 'sparkle_pop', 0.35); cue(flyT, 'fabric', 0.35); cue(flyT + 0.36, 'knock', 0.3);
+  cue(namS - 0.05, 'whoosh_fast', 0.3); cue(namS + 0.05, 'sparkle_pop', 0.3); cue(litT, 'reveal_bell', 0.4); cue(litT + 0.1, 'knock', 0.3);
   // THAT'S WHY IT'S CALLED THE WOODPECKER METHOD: the book on the table
   const metS = s('method') - 0.05, wmT = w('method', 'woodpecker'), bookT = metS + 0.15;
   shot(metS, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.3, 0.1, 12.4, [3.0, 2.3, 8.8])], [len(sh), K(-0.1, 0.06, 10.2, [3.0, 2.45, 8.9])]], { t, e: glide });
     const drop = ease.out(seg(t, bookT, bookT + 0.22, lin));
-    forest(g, t, { pieces: p0, hans: { e: GRIN }, brd: null, onTrunk: g2 => birdOnTrunk(g2, t, { a: 0 }), focus: 10,
+    forest(g, t, { pieces: pF, hans: { e: GRIN }, brd: null, onTrunk: g2 => birdOnTrunk(g2, t, { a: 0 }), focus: 10,
       over: g2 => { book(g2, { c: [0.75, 1.25 + (1 - drop) * 6, 7.9], a: clamp((t - bookT) * 8) }); bird(g2, ...SHOULDER, 1.75, t, { dir: 1, pose: 'stand', look: [0.2, 0] }); } });
   }, { hud: (g, lt, t) => { bdg(g, t, 'THE WOODPECKER METHOD', wmT, { y: 215, color: BIRDC.body, ink: '#FFFFFF', size: 44, sub: 'AXEL SMITH & HANS TIKKANEN · 2018' }); } });
   cue(metS - 0.05, 'whoosh_fast', 0.3); cue(bookT + 0.2, 'thud', 0.4); cue(wmT, 'reveal_bell', 0.4);
 
-  // ======================= THE SPONSOR. TODAY YOU DON'T NEED A THOUSAND PRINTED PUZZLES: the pile blows off the table,
-  // the phone stays =======================
-  const a1S = s('ad1') - 0.05, dontT = w('ad1', 'dont'), sigT = w('ad1', 'chessigmas'), supT = w('ad1', 'supercoach'), runsT = w('ad1', 'runs');
-  const BLOW = fr(dontT + 0.02), stackTop = [STACK.x + 0.2, -0.35 + STACK.h, STACK.z - 0.2], peckS = [fr(BLOW - 0.3), fr(BLOW - 0.14), BLOW];
-  const adHud = (g, lt, t) => adTag(g, 1);
-  const edgeAt = (v, d = 0.12) => phPt(-26, v + 290, d);
+  // ======================= THE SPONSOR, THE THIRD TIME. TODAY YOU DON'T NEED A THOUSAND PRINTED PUZZLES: the pile blows off
+  // the table, the phone stays. THE SETS ARE IN CHESSIGMA =======================
+  const a1S = s('ad1') - 0.05, dontT = w('ad1', 'dont'), setsT = w('ad1', 'sets'), sig2T = w('ad1', 'chessigma');
+  const a3S = s('ad3') - 0.04, coachT = w('ad3', 'coach'), findsT = w('ad3', 'finds'), mistT = w('ad3', 'mistakes'), buildsT = w('ad3', 'builds'), plan3T = w('ad3', 'plan'), linkT = w('ad3', 'link'), ctaS = s('cta') - 0.05;
+  const BLOW = fr(dontT + 0.02), stackTop = [STACK.x + 0.2, -0.35 + STACK.h, STACK.z - 0.2], peckS = [fr(BLOW - 0.3), fr(BLOW - 0.14), BLOW], trainS = setsT - 0.14;
   shot(a1S, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.24, 0.2, 12.2, [2.5, 1.9, 4.2])], [len(sh), K(-0.06, 0.14, 10.4, [2.9, 2.0, 4.2])]], { t, e: glide });
     forest(g, t, { hans: null, board: false, focus: 10, extra: (g2, ph) => {
       if (ph !== 'top') return;
-      paperStack(g2, t, BLOW); phone(g2, t, {});
+      paperStack(g2, t, BLOW); phone(g2, t, { to: { page: 0 } });
       const v = strikeAt(t, peckS), drop = seg(t, BLOW, BLOW + 0.3);
       if (t < BLOW + 0.1) bird(g2, stackTop[0], stackTop[1] - drop * 2.6, stackTop[2], PBIRD * 1.25, t, { dir: 1, pose: 'stand', rot: 0.5 + 0.55 * v, peck: v, look: [0.5, 0.7] });
       else birdFly(g2, t, BLOW + 0.1, 0.45, [stackTop[0], stackTop[1] - 0.8, stackTop[2]], edgeAt(560), PBIRD, { land: { pose: 'cling', look: [0.7, 0] }, lift: 0.8 });
     } });
   }, { trans: 'whip', hud: (g, lt, t) => { adHud(g, lt, t); bdg(g, t, '1,128 PRINTED PUZZLES', a1S + 0.2, { y: 215, color: CREAM, size: 46, until: BLOW }); if (t >= BLOW) plate(g, 'NOT NEEDED', W / 2, 215, { color: RED, size: 50, rot: -0.018, ...popIn(t, BLOW) }); } });
   cue(a1S - 0.11, 'whoosh_fast', 0.3); knocks(peckS, 0.5); cue(BLOW, 'paper', 0.6); cue(BLOW + 0.05, 'whoosh_soft', 0.5); cue(BLOW + 0.25, 'page_flip', 0.4); cue(BLOW + 0.1, 'fabric', 0.3);
-  // CHESSIGMA'S SUPERCOACH RUNS THE WOODPECKER METHOD FOR YOU — and the rest of the block on the phone: their Woodpecker
-  // trainer, then the Supercoach dashboard; the bird points
-  const a2S = s('ad2') - 0.04, pickT = w('ad2', 'pick'), levelT = w('ad2', 'level'), itT = w('ad2', 'it'), timesT = w('ad2', 'times'), fasterT = w('ad2', 'faster'), cleanT = w('ad2', 'cleaner');
-  const a3S = s('ad3') - 0.04, readsT = w('ad3', 'reads'), ownT = w('ad3', 'own'), findsT = w('ad3', 'finds'), mistT = w('ad3', 'mistakes'), buildsT = w('ad3', 'builds'), plan3T = w('ad3', 'plan'), everyT = w('ad3', 'every');
-  const bioS = s('bio') - 0.04, ctaS = s('cta') - 0.05;
-  const phS = sigT - 0.3, TAP = fr(itT - 0.18), tapH = [TAP, fr(TAP + 0.17)];
-  const P3 = [[fr(readsT), 390, 70], [fr(findsT), 750, 90], [fr(buildsT), 230, 60], [fr(everyT), 230, 60]];   // [time, screen row, reach] of the bird's pecks on the dashboard
-  const bioH = [fr(bioS + 0.12), fr(bioS + 0.29)];
-  const birdV = t => t < levelT - 0.1 ? 560 : t < a3S ? lerp(560, 852, seg(t, levelT - 0.1, levelT + 0.05)) - 300 * seg(t, TAP + 0.6, TAP + 0.78) : t < P3[1][0] - 0.2 ? lerp(552, 390, seg(t, a3S, a3S + 0.2)) : t < P3[2][0] - 0.25 ? lerp(390, 750, seg(t, P3[1][0] - 0.2, P3[1][0] - 0.06))
-    : lerp(750, 230, seg(t, P3[2][0] - 0.25, P3[2][0] - 0.06));
-  const screenAt = t => {
-    const o = { scroll: 400 * ease.inOut(seg(t, pickT - 0.05, pickT + 0.45, lin)) + 640 * ease.inOut(seg(t, timesT + 0.25, fasterT - 0.3, lin)), swipe: seg(t, a3S - 0.1, a3S + 0.32, lin), hi: null, tap: null };
-    const fr2 = (x0, y0, x1, y1, a, b) => { const k = seg(t, a, a + 0.12) * (1 - seg(t, b - 0.12, b)); if (k > 0) o.hi = { x0, y0, x1, y1, a: k }; };
-    fr2(30, 166, 694, 306, levelT - 0.15, TAP - 0.02); fr2(72, 792, 292, 912, TAP - 0.02, TAP + 0.6);
-    fr2(54, 306, 730, 664, P3[0][0], P3[1][0] - 0.05); fr2(50, 672, 730, 994, P3[1][0], P3[2][0] - 0.05); fr2(44, 164, 736, 296, P3[2][0], bioS - 0.05);
-    if (t >= TAP && t < TAP + 0.5) o.tap = { x: 182, y: 852, u: (t - TAP) / 0.5 };
-    for (const [pt, v, rc] of P3) if (t >= pt && t < pt + 0.45) o.tap = { x: rc + 26, y: v, u: (t - pt) / 0.45 };
-    return o;
-  };
-  const phoneScene = (g, t, birdOn = true) => {
-    forest(g, t, { hans: null, board: false, brd: null, onTrunk: g2 => birdOnTrunk(g2, t, { a: 0 }), focus: 6, extra: (g2, ph) => {
-      if (ph !== 'top') return;
-      phone(g2, t, screenAt(t));
-      if (!birdOn) return;
-      const hits = [...tapH, ...P3.map(p => p[0]), ...bioH], reach = t < a3S ? 118 : t < P3[1][0] - 0.2 ? 70 : t < P3[2][0] - 0.25 ? 90 : 60;
-      phoneBird(g2, t, birdV(t), { hits, reach, look: t > ctaS - 0.6 ? [-0.2, 0] : [0.7, 0.05] });
-    } });
-  };
-  const phHud = (g, lt, t) => {
-    adHud(g, lt, t); if (t >= sigT) sigPlate(g, 150, t < sigT + 0.4 ? popIn(t, sigT) : {});
-    // the trainer's gate, in our own plates
-    bdg(g, t, 'EVERY CYCLE TIMED', timesT, { x: 452, y: 262, color: CREAM, size: 38, until: fasterT - 0.1 });
-    if (t >= timesT && t < fasterT - 0.1) { const sec = (t - timesT) * 37; plate(g, `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`, 838, 262, { color: SIG.bg, ink: SIG.yel, size: 38, rot: -0.018, minW: 150, ...popIn(t, timesT + 0.06) }); }
-    bdg(g, t, 'FASTER ✓', fasterT, { x: 370, y: 262, color: LEAFG, size: 42, until: a3S - 0.05 });
-    bdg(g, t, 'CLEANER ✓', cleanT, { x: 700, y: 262, color: LEAFG, size: 42, until: a3S - 0.05 });
-    // the coach
-    bdg(g, t, 'YOUR OWN GAMES', ownT - 0.05, { y: 262, color: CREAM, size: 42, until: mistT - 0.05 });
+  // AND ITS COACH READS YOUR OWN GAMES, FINDS THE MISTAKES YOU KEEP MAKING, AND BUILDS YOUR TRAINING PLAN EVERY MORNING.
+  // LINK IN BIO: the author's own recordings of the app. The Train tab with its trainers and the row of his set; the
+  // coach asked about his games, its answer with the moves he missed; the day's plan on the home screen
+  const endPh = phoneSeg({
+    prog: [[a1S, t => ({ page: 0 })],
+      [trainS, t => ({ rec: 'train', sec: 0.8 + t - trainS })],
+      [a3S, t => ({ rec: 'think', sec: t - a3S - 0.05 })],
+      [findsT - 0.08, t => ({ rec: 'answer', sec: Math.min(2.45, t - (findsT - 0.08)) })],  // its last frames are the next screen loading
+      [buildsT - 0.2, t => ({ rec: 'home', sec: t - (buildsT - 0.2) })]],
+    boxes: [[16, 96, 764, 292, a3S + 0.3, findsT - 0.1], [22, 362, 758, 546, buildsT - 0.02, plan3T - 0.04], [22, 566, 758, 1156, plan3T - 0.04, linkT + 0.6]],
+    pecks: [[fr(trainS + 0.6), 380, 90], [fr(a3S + 0.1), 250, 70], [fr(findsT), 250, 60], [fr(buildsT), 455, 60], [fr(plan3T), 640, 80]],
+  });
+  const endHud = (g, lt, t) => {
+    adHud(g, lt, t); if (t >= sig2T - 0.25) sigPlate(g, 150, t < sig2T + 0.15 ? popIn(t, sig2T - 0.25) : {});
+    bdg(g, t, 'THE SETS ARE IN THE APP', setsT, { y: 262, color: CREAM, size: 40, until: coachT - 0.07 });
+    bdg(g, t, 'THE COACH READS YOUR GAMES', coachT - 0.05, { y: 262, color: CREAM, size: 38, until: mistT - 0.05 });
     bdg(g, t, 'YOUR MISTAKES', mistT, { y: 262, color: RED, size: 42, until: plan3T - 0.05 });
-    bdg(g, t, 'A NEW PLAN EVERY MORNING', plan3T, { y: 262, color: GOLD, size: 40, until: bioS - 0.02 });
-    bdg(g, t, 'LINK IN BIO', bioS + 0.08, { y: 262, color: GOLD, size: 56 });
+    bdg(g, t, 'A NEW PLAN EVERY MORNING', plan3T, { y: 262, color: GOLD, size: 40, until: linkT - 0.05 });
+    bdg(g, t, 'LINK IN BIO', linkT - 0.05, { y: 262, color: GOLD, size: 56 });
   };
-  const PHC = [3.55, 2.2, 4.2], PHK = [K(0.08, 0.02, 6.3, PHC), K(0.02, 0.015, 5.9, PHC)];
-  shot(phS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.24, 0.05, 7.6, [3.6, 2.1, 4.2])], [0.7, PHK[0]], [len(sh), PHK[1]]], { t, e: glide });
-    phoneScene(g, t);
-  }, { hud: phHud, info: true });
-  cue(phS - 0.05, 'whoosh_fast', 0.3); cue(sigT, 'reveal_bell', 0.4); cue(supT, 'notify', 0.3);
-  shot(a2S, (g, lt, t, sh) => {
-    rig(B, lt, [[0, PHK[1]], [len(sh), K(-0.04, 0.015, 5.8, PHC)]], { t, e: lin });
-    phoneScene(g, t);
-  }, { hud: phHud, info: true });
-  cue(pickT - 0.05, 'swipe_card', 0.35); knocks(tapH, 0.5); cue(TAP, 'sparkle_pop', 0.35); cue(timesT, 'clock_press', 0.35); for (let x = timesT + 0.4; x < fasterT - 0.3; x += 0.4) cue(x, 'clock_tick', 0.2);
-  cue(fasterT, 'success', 0.3); cue(cleanT, 'success', 0.35);
+  shot(trainS, (g, lt, t, sh) => {
+    rig(B, lt, [[0, PHK[0]], [len(sh), PHK[1]]], { t, e: lin });
+    endPh(g, t);
+  }, { hud: endHud, info: true });
   shot(a3S, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.04, 0.015, 5.8, PHC)], [len(sh), K(0.05, 0.015, 5.8, PHC)]], { t, e: lin });
-    phoneScene(g, t);
-  }, { hud: phHud, info: true });
-  cue(a3S - 0.1, 'swipe_card', 0.45); knocks(P3.map(p => p[0]), 0.5); P3.forEach(p => cue(p[0], 'sparkle_pop', 0.28)); cue(plan3T, 'reveal_bell', 0.35);
-  shot(bioS, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.05, 0.015, 5.8, PHC)], [len(sh), K(0.07, 0.015, 5.6, PHC)]], { t, e: lin });
-    phoneScene(g, t);
-  }, { hud: phHud, info: true });
-  knocks(bioH, 0.5); cue(bioS + 0.08, 'reveal_bell', 0.4);
+    rig(B, lt, [[0, PHN[0]], [len(sh), PHN[1]]], { t, e: lin });
+    endPh(g, t);
+  }, { hud: endHud, info: true });
+  shot(buildsT - 0.22, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.07, 0.015, 5.75, PHC)], [len(sh), K(0.0, 0.015, 5.5, PHC)]], { t, e: lin });
+    endPh(g, t);
+  }, { hud: endHud, info: true });
+  cue(trainS, 'swipe_card', 0.35); cue(sig2T - 0.25, 'reveal_bell', 0.4); cue(a3S, 'swipe_card', 0.4); cue(findsT - 0.08, 'swipe_card', 0.35); cue(buildsT - 0.2, 'swipe_card', 0.35);
+  cue(plan3T, 'reveal_bell', 0.35); cue(linkT - 0.05, 'reveal_bell', 0.4);
+  knocks([fr(trainS + 0.6), fr(a3S + 0.1), fr(findsT), fr(buildsT), fr(plan3T)], 0.5); [fr(trainS + 0.6), fr(a3S + 0.1), fr(findsT), fr(buildsT), fr(plan3T)].forEach(x => cue(x, 'sparkle_pop', 0.22));
 
   // ======================= CTA: the two of them at the birch again; how many puzzles did you solve today? =======================
   const howT = w('cta', 'how'), slvT = w('cta', 'solve'), todayT = w('cta', 'today'), STOP = fr(todayT + 0.25);
@@ -1226,7 +1357,7 @@ export async function build(T) {
   shot(ctaS, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.03, 0.03, 10.8, [2.75, 2.95, 9.9])], [len(sh), K(-0.03, 0.03, 9.6, [2.75, 3.0, 9.9])]], { t, e: glide });
     const at = t >= STOP + 0.1;
-    forest(g, t, { pieces: p0, hans: { e: at ? GRIN : AT_BIRD, hits: ctaH, tilt: at ? 0 : -0.05 }, brd: { hits: ctaH, look: at ? [-0.6, 0] : [0.6, 0.1] }, focus: 9.5 });
+    forest(g, t, { pieces: pF, hans: { e: at ? GRIN : AT_BIRD, hits: ctaH, tilt: at ? 0 : -0.05 }, brd: { hits: ctaH, look: at ? [-0.6, 0] : [0.6, 0.1] }, focus: 9.5 });
   }, { trans: 'whip', hud: (g, lt, t) => {
     adHud(g, lt, t); sigPlate(g, 150, { lh: 40 });
     bdg(g, t, 'HOW MANY PUZZLES TODAY?', howT, { y: 256, color: GOLD, size: 48 });
@@ -1238,14 +1369,13 @@ export async function build(T) {
   const tvOff = T.duration - 0.5;
   cue(tvOff, 'tvoff', 0.5);
   const music = [
-    { t: 0, m: 'hook' }, { t: nS, m: 'build' }, { t: bS, m: 'clockwork' }, { t: whoS, m: 'intrigue' }, { t: wallS, m: 'tension' }, { t: cyS, m: 'build' },
-    { t: SLAM - 0.004, m: 'slam' }, { t: whyS, m: 'void' }, { t: GMT - 0.004, m: 'victory' }, { t: chS, m: 'glory' }, { t: namS, m: 'intrigue' }, { t: metS, m: 'glory' },
-    { t: a1S, m: 'digital' }, { t: ctaS, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: 0, m: 'intrigue' }, { t: SEEN - 0.004, m: 'slam' }, { t: brS, m: 'hook' }, { t: earlyS, m: 'digital' }, { t: planS, m: 'intrigue' }, { t: wallS, m: 'tension' }, { t: cyS, m: 'build' },
+    { t: SLAM - 0.004, m: 'slam' }, { t: whyS, m: 'void' }, { t: midS, m: 'digital' }, { t: resS, m: 'victory' }, { t: metS, m: 'glory' }, { t: a1S, m: 'digital' }, { t: ctaS, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
-    { t0: GAG - 0.03, t1: nS - 0.03, kind: 'mute' },  // the knocks answer each other in silence
+    { t0: SEEN - 0.3, t1: SEEN - 0.01, kind: 'mute' }, { t0: SEEN, t1: SEEN + 1.2, kind: 'boost', db: 4 },
+    { t0: GAG - 0.03, t1: earlyS - 0.03, kind: 'mute' },  // the knocks answer each other in silence
     { t0: SLAM - 0.3, t1: SLAM - 0.01, kind: 'mute' }, { t0: SLAM, t1: SLAM + 1.0, kind: 'boost', db: 4 },
-    { t0: GMT - 0.3, t1: GMT - 0.01, kind: 'mute' }, { t0: GMT, t1: GMT + 1.2, kind: 'boost', db: 3 },
     { t0: ctaS, t1: T.duration, kind: 'lp', f: 900 },
   ];
   shots.sort((a, b) => a.a - b.a);

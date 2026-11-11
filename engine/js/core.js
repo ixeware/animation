@@ -86,10 +86,71 @@ export function track(keys, t, e = smooth) {
   return keys[keys.length - 1][1];
 }
 
-export function makeCanvas(w = W, h = H) {
-  const c = document.createElement('canvas');
+// ---------- supersampling (render.mjs --scale 2, the page's ?ss=2): every canvas of the engine gets a backing store SS
+// times larger and its 2D context a base scale of SS, so all drawing code keeps working in 1080 × 1920 units and the
+// frame comes out SS times sharper (SS = 2: 2160 × 3840). The canvas reports its size in those units too. What the
+// canvas API measures in device pixels whatever the transform — blur and shadow sizes, the source rectangle of
+// drawImage, getImageData and putImageData — is scaled here, in one place ----------
+export const SS = Math.max(1, Math.min(4, Math.round(+new URLSearchParams(globalThis.location?.search || '').get('ss') || 1)));
+const SCALED = new WeakSet(), RAW = {};
+export function sizeCanvas(c, w, h) {
+  if (SS === 1) { c.width = w; c.height = h; return c; }
+  SCALED.add(c);
+  const base = () => { if (c.__g2d) RAW.setTransform.call(c.__g2d, SS, 0, 0, SS, 0, 0); };  // a resize resets the context
+  Object.defineProperty(c, 'width', { configurable: true, get: () => RAW.w.get.call(c) / SS, set: v => { RAW.w.set.call(c, Math.round(v * SS)); base(); } });
+  Object.defineProperty(c, 'height', { configurable: true, get: () => RAW.h.get.call(c) / SS, set: v => { RAW.h.set.call(c, Math.round(v * SS)); base(); } });
   c.width = w; c.height = h;
   return c;
+}
+export function makeCanvas(w = W, h = H) { return sizeCanvas(document.createElement('canvas'), w, h); }
+if (SS > 1) {
+  const CP = HTMLCanvasElement.prototype, XP = CanvasRenderingContext2D.prototype, on = g => SCALED.has(g.canvas);
+  RAW.w = Object.getOwnPropertyDescriptor(CP, 'width'); RAW.h = Object.getOwnPropertyDescriptor(CP, 'height');
+  for (const k of ['setTransform', 'resetTransform', 'getTransform', 'drawImage', 'getImageData', 'putImageData']) RAW[k] = XP[k];
+  const getContext = CP.getContext;
+  CP.getContext = function (type, ...rest) {
+    const g = getContext.call(this, type, ...rest);
+    if (g && type === '2d' && SCALED.has(this) && this.__g2d !== g) { this.__g2d = g; RAW.setTransform.call(g, SS, 0, 0, SS, 0, 0); }
+    return g;
+  };
+  XP.setTransform = function (a, b, c, d, e, f) {
+    if (!on(this)) return RAW.setTransform.apply(this, arguments);
+    if (a && typeof a === 'object') ({ a, b, c, d, e, f } = a);
+    if (a === undefined) return RAW.setTransform.call(this, SS, 0, 0, SS, 0, 0);
+    return RAW.setTransform.call(this, a * SS, b * SS, c * SS, d * SS, e * SS, f * SS);
+  };
+  XP.resetTransform = function () { return on(this) ? RAW.setTransform.call(this, SS, 0, 0, SS, 0, 0) : RAW.resetTransform.call(this); };
+  XP.getTransform = function () { const m = RAW.getTransform.call(this); return on(this) ? new DOMMatrix([m.a / SS, m.b / SS, m.c / SS, m.d / SS, m.e / SS, m.f / SS]) : m; };
+  // a supersampled canvas as a source: its pixels are SS times finer than the units the caller counts in
+  XP.drawImage = function (img, ...a) {
+    if (!(img instanceof HTMLCanvasElement && SCALED.has(img))) return RAW.drawImage.call(this, img, ...a);
+    if (a.length === 2) return RAW.drawImage.call(this, img, a[0], a[1], img.width, img.height);
+    if (a.length === 4) return RAW.drawImage.call(this, img, ...a);
+    return RAW.drawImage.call(this, img, a[0] * SS, a[1] * SS, a[2] * SS, a[3] * SS, a[4], a[5], a[6], a[7]);
+  };
+  // pixel data in the caller's units: read through a plain canvas of that size, written back through one
+  const plain = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  XP.getImageData = function (sx, sy, sw, sh, ...rest) {
+    if (!on(this)) return RAW.getImageData.call(this, sx, sy, sw, sh, ...rest);
+    const g = plain(sw, sh).getContext('2d'); RAW.drawImage.call(g, this.canvas, sx * SS, sy * SS, sw * SS, sh * SS, 0, 0, sw, sh);
+    return RAW.getImageData.call(g, 0, 0, sw, sh, ...rest);
+  };
+  XP.putImageData = function (im, dx, dy, ...rest) {
+    if (!on(this)) return RAW.putImageData.call(this, im, dx, dy, ...rest);
+    const c = plain(im.width, im.height); RAW.putImageData.call(c.getContext('2d'), im, 0, 0);
+    this.save(); RAW.setTransform.call(this, SS, 0, 0, SS, 0, 0); this.globalAlpha = 1; this.globalCompositeOperation = 'source-over'; this.filter = 'none'; this.shadowColor = 'transparent';
+    this.imageSmoothingEnabled = false; this.clearRect(dx, dy, im.width, im.height); RAW.drawImage.call(this, c, dx, dy, im.width, im.height); this.restore();
+  };
+  // lengths the canvas takes in device pixels: filter blurs and drop shadows, shadow blur and offsets
+  const px = (v, k) => typeof v !== 'string' || v === 'none' ? v : v
+    .replace(/blur\(\s*([\d.]+)px\s*\)/g, (m, n) => `blur(${+(n * k).toFixed(3)}px)`)
+    .replace(/drop-shadow\(([^)]*)\)/g, (m, body) => 'drop-shadow(' + body.replace(/(-?[\d.]+)px/g, (mm, n) => `${+(n * k).toFixed(3)}px`) + ')');
+  const fd = Object.getOwnPropertyDescriptor(XP, 'filter');
+  Object.defineProperty(XP, 'filter', { configurable: true, enumerable: true, get() { const v = fd.get.call(this); return on(this) ? px(v, 1 / SS) : v; }, set(v) { fd.set.call(this, on(this) ? px(v, SS) : v); } });
+  for (const p of ['shadowBlur', 'shadowOffsetX', 'shadowOffsetY']) {
+    const d = Object.getOwnPropertyDescriptor(XP, p);
+    Object.defineProperty(XP, p, { configurable: true, enumerable: true, get() { const v = d.get.call(this); return on(this) ? v / SS : v; }, set(v) { d.set.call(this, on(this) ? v * SS : v); } });
+  }
 }
 
 // QA mode (render.mjs --qa): drawing helpers log screen rectangles of faces, on-screen text and captions here,

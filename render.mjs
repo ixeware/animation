@@ -4,6 +4,8 @@
 //   node render.mjs fischer --cues                       -> build/cues.json only (sound edits: then audio/mix.py)
 //   node render.mjs fischer --qa [--step 0.1]       -> build/qa.json: text over faces / captions, text off frame, faces cut
 //   any of these with --motion 1|2: the text motion profile (LOOK.motion) for an A/B; --out name.mp4: the video's file name
+//   --scale 2 with a render or --stills: every frame at twice the size, 2160 × 3840 (4K); the engine draws it that
+//   sharp itself (core.js: supersampling), it is not an upscale. About four times the render time
 import { chromium } from 'playwright';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -16,6 +18,7 @@ const ep = args[0];
 const opt = k => { const i = args.indexOf('--' + k); return i >= 0 ? args[i + 1] : null; };
 const BUILD = path.join(ROOT, 'episodes', ep, 'build');
 const FPS = 30;
+const SCALE = Math.max(1, Math.round(+(opt('scale') || 1)));  // 2: a 4K render
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.jpg': 'image/jpeg' };
 const server = http.createServer((req, res) => {
@@ -27,10 +30,10 @@ const server = http.createServer((req, res) => {
 const PORT = server.address().port;
 
 async function openPage(browser, extra = '') {
-  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: SCALE });
   page.on('console', m => { if (m.type() === 'error') console.error('[page]', m.text()); });
   page.on('pageerror', e => console.error('[pageerror]', e.message));
-  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}${opt('motion') ? '&motion=' + opt('motion') : ''}`);
+  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}${opt('motion') ? '&motion=' + opt('motion') : ''}${SCALE > 1 ? '&ss=' + SCALE : ''}`);
   await page.waitForFunction('window.READY === true', null, { timeout: 120000 });
   return page;
 }

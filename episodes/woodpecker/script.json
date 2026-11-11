@@ -1,7 +1,7 @@
 {
-  "title": "He copied a woodpecker (Hans Tikkanen and the Woodpecker Method) x Chessigma Supercoach",
+  "title": "He has seen your position before (Magnus Carlsen's memory, Hans Tikkanen and the Woodpecker Method) x Chessigma Supercoach",
   "channel": "THE 64 FILES",
-  "post": "He copied a woodpecker and became a grandmaster. How many puzzles did you solve today? #ad #chessigma #chess #woodpeckermethod #chesstok #story",
+  "post": "Magnus has seen your position before. One man built that kind of memory by copying a woodpecker. Test yours: Board Memory on Chessigma, link in bio. How many puzzles did you solve today? #ad #chessigma #chess #magnuscarlsen #woodpeckermethod #chesstok",
   "lead_in": 0.05,
   "tail": 1.8,
   "voice": {
@@ -35,47 +35,66 @@
   "phrases": [
     {
       "id": "hook",
-      "text": "He became a grandmaster by copying a woodpecker.",
-      "say": "[amused] He became a grandmaster... by copying a woodpecker.",
+      "text": "Magnus Carlsen can name a famous chess game from a single position.",
+      "say": "[impressed] Magnus Carlsen can name a famous chess game... from a single position.",
+      "tail_db": -45,
+      "pause": 0.2,
+      "colors": {
+        "Magnus": "blue",
+        "Carlsen": "blue",
+        "single": "gold",
+        "position.": "gold"
+      }
+    },
+    {
+      "id": "potter",
+      "text": "In one test, only one position stumped him. It was from Harry Potter.",
+      "say": "In one test, only one position stumped him. [amused] It was from Harry Potter.",
+      "tail_db": -45,
+      "pause": 0.3,
+      "colors": {
+        "one": "gold",
+        "stumped": "red",
+        "Harry": "lime",
+        "Potter.": "lime"
+      }
+    },
+    {
+      "id": "seen",
+      "text": "He isn't calculating. He has seen your position before.",
+      "say": "[dramatic] He isn't calculating. He has seen your position... before.",
+      "tail_db": -45,
+      "pause": 0.35,
+      "colors": {
+        "calculating.": "red",
+        "seen": "gold",
+        "before.": "gold"
+      }
+    },
+    {
+      "id": "bridge",
+      "text": "And one man built that kind of memory by copying a woodpecker.",
+      "say": "And one man built that kind of memory... [amused] by copying a woodpecker.",
       "tail_db": -45,
       "pause": 0.8,
       "colors": {
-        "grandmaster": "gold",
+        "one": "gold",
+        "memory": "gold",
         "woodpecker.": "lime"
       }
     },
     {
-      "id": "norms",
-      "text": "Three grandmaster norms in seven weeks. And wait till you hear his name.",
-      "say": "Three grandmaster norms... in seven weeks. [mischievously] And wait till you hear his name.",
+      "id": "early",
+      "text": "You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish. Tap where they stood.",
+      "say": "[curious] You can test yours on Chess-Sigma, today's sponsor. Pawns flash... then vanish. Tap where they stood.",
+      "tail_db": -45,
       "pause": 0.3,
       "colors": {
-        "Three": "gold",
-        "seven": "gold",
-        "name.": "lime"
-      }
-    },
-    {
-      "id": "bird",
-      "text": "A woodpecker can hit the same tree 12,000 times a day. He did the same thing with chess puzzles.",
-      "say": "A woodpecker can hit the same tree... twelve thousand times a day. [curious] He did the same thing... with chess puzzles.",
-      "pause": 0.3,
-      "colors": {
-        "12,000": "gold",
-        "puzzles.": "lime"
-      }
-    },
-    {
-      "id": "who",
-      "text": "Sweden, 2010. Hans Tikkanen is twenty-five, and still not a grandmaster.",
-      "say": "Sweden, twenty ten. Hans Tikkanen is twenty-five... and still not a grandmaster.",
-      "pause": 0.3,
-      "colors": {
-        "Sweden,": "blue",
-        "2010.": "gold",
-        "Hans": "blue",
-        "Tikkanen": "blue",
-        "not": "red"
+        "Chessigma,": "gold",
+        "sponsor.": "gold",
+        "flash,": "lime",
+        "vanish.": "red",
+        "stood.": "lime"
       }
     },
     {
@@ -114,35 +133,32 @@
       }
     },
     {
-      "id": "title",
-      "text": "That year, Hans Tikkanen becomes a grandmaster.",
-      "say": "[excited] That year, Hans Tikkanen becomes a grandmaster!",
+      "id": "mid",
+      "text": "Chessigma's Supercoach runs this method for you. It times every cycle, and only lets you move on when you're faster and cleaner.",
+      "say": "Chess-Sigma's Supercoach runs this method for you. It times every cycle... and only lets you move on when you're faster... and cleaner.",
+      "tail_db": -45,
       "pause": 0.3,
       "colors": {
-        "Hans": "blue",
-        "Tikkanen": "blue",
-        "grandmaster.": "gold"
+        "Chessigma's": "gold",
+        "Supercoach": "gold",
+        "faster": "lime",
+        "cleaner.": "lime"
       }
     },
     {
-      "id": "champ",
-      "text": "Then champion of Sweden. Five times.",
-      "say": "Then champion of Sweden. [proud] Five times.",
+      "id": "result",
+      "text": "As for the man in the red hat: three grandmaster norms in seven weeks. And his name? Hans Tikkanen. In Finnish, it means little woodpecker.",
+      "say": "As for the man in the red hat... three grandmaster norms, in seven weeks. [mischievously] And his name? Hans Tikkanen. In Finnish, it means... little woodpecker.",
+      "tail_db": -45,
       "pause": 0.3,
       "colors": {
-        "champion": "lime",
-        "Sweden.": "blue",
-        "Five": "gold"
-      }
-    },
-    {
-      "id": "name",
-      "text": "And his name? In Finnish, Tikkanen means little woodpecker.",
-      "say": "[amused] And his name? In Finnish, Tikkanen means... little woodpecker.",
-      "pause": 0.3,
-      "colors": {
+        "red": "red",
+        "hat:": "red",
+        "three": "gold",
+        "seven": "gold",
         "name?": "lime",
-        "Tikkanen": "blue",
+        "Hans": "blue",
+        "Tikkanen.": "blue",
         "little": "gold",
         "woodpecker.": "gold"
       }
@@ -159,43 +175,25 @@
     },
     {
       "id": "ad1",
-      "text": "Today, you don't need a thousand printed puzzles. Chessigma's Supercoach runs the Woodpecker Method for you.",
-      "say": "Today, you don't need a thousand printed puzzles. Chess-Sigma's Supercoach runs the Woodpecker Method for you.",
+      "text": "Today, you don't need a thousand printed puzzles. The sets are in Chessigma.",
+      "say": "Today, you don't need a thousand printed puzzles. The sets are in Chess-Sigma.",
+      "tail_db": -45,
       "pause": 0.25,
       "colors": {
         "don't": "red",
-        "Chessigma's": "gold",
-        "Supercoach": "gold"
-      }
-    },
-    {
-      "id": "ad2",
-      "text": "Pick a set at your level. It times every cycle, and only lets you move on when you're faster and cleaner.",
-      "say": "Pick a set at your level. It times every cycle... and only lets you move on when you're faster... and cleaner.",
-      "pause": 0.25,
-      "colors": {
-        "level.": "lime",
-        "faster": "lime",
-        "cleaner.": "lime"
+        "Chessigma.": "gold"
       }
     },
     {
       "id": "ad3",
-      "text": "Then the coach reads your own games, finds the mistakes you keep making, and builds your training plan every morning.",
-      "say": "Then the coach reads your own games, finds the mistakes you keep making... and builds your training plan, every morning.",
-      "pause": 0.3,
+      "text": "And its coach reads your own games, finds the mistakes you keep making, and builds your training plan every morning. Link in bio.",
+      "say": "And its coach reads your own games, finds the mistakes you keep making... and builds your training plan, every morning. Link in bio.",
+      "tail_db": -45,
+      "pause": 0.4,
       "colors": {
         "coach": "gold",
         "mistakes": "red",
-        "plan": "lime"
-      }
-    },
-    {
-      "id": "bio",
-      "text": "Link in bio.",
-      "say": "Link in bio.",
-      "pause": 0.4,
-      "colors": {
+        "plan": "lime",
         "bio.": "gold"
       }
     },

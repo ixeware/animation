@@ -1,66 +1,96 @@
-# He copied a woodpecker: Hans Tikkanen and the Woodpecker Method (× Chessigma Supercoach) — sources
+# He has seen your position before: Magnus Carlsen's memory, Hans Tikkanen and the Woodpecker Method (× Chessigma Supercoach) — sources
 
-Sponsored pilot for Chessigma (the topic was approved by Eliot Hennebo on 10 November 2026: "The Woodpecker story is a
-great pick, let's go with it"). On TikTok: Content disclosure → Branded content, and #ad in the caption. The sponsor's
-block starts at 53 s; the AD chip is on screen from there to the end. Prices are not mentioned.
+Sponsored pilot for Chessigma (the topic, the Woodpecker story, was approved by Eliot Hennebo on 10 November 2026: "The
+Woodpecker story is a great pick, let's go with it"). On TikTok: Content disclosure → Branded content, and #ad in the
+caption. Prices are not mentioned.
+
+Version 2 (11 November 2026). The author asked for a hook with a figure the audience follows and for Chessigma to be
+named at the start and in the middle as well as at the end, because retention falls toward the end. So the film opens
+on Magnus Carlsen's memory test, and the sponsor has three segments: from 16.5 s (its Board Memory game, "today's
+sponsor"), from 41.2 s (the Woodpecker trainer: timed cycles) and from 60.1 s (the sets, the coach, link in bio). The
+AD chip is on screen in each of them and in the closing shot. Eliot has not seen this script yet.
 
 | Claim in the video | Status | Source |
 |---|---|---|
-| He became a grandmaster by copying a woodpecker | the hook; the method he trained with is named after the bird (below) | — |
-| Three grandmaster norms in seven weeks | the publisher's description of the book: "After training with his method in 2010, Tikkanen achieved three GM norms within a seven-week period". A Lichess blog repeats it; we found no independent record of the three events, so the line stands on the publisher's word | the description at [Simon & Schuster](https://www.simonandschuster.ca/books/Woodpecker-Method/Axel-Smith/9781784830540) and [Chess & Bridge](https://chess.co.uk/products/the-woodpecker-method-smith-tikkanen); the [Lichess blog](https://lichess.org/@/CheckRaiseMate/blog/the-woodpecker-method-revisited/ClV6CvGE) |
-| A woodpecker can hit the same tree 12,000 times a day | Guinness World Records credits the black woodpecker with 12,000 pecks a day (no method given; popular science pages repeat the figure). "The same tree" is ours: a bird cutting a nest hole works one trunk. Drumming runs at 10–16 strikes a second (great spotted woodpecker), about the 7.5 a second we draw between pauses | [Guinness World Records](https://www.guinnessworldrecords.com/world-records/118573-most-rapid-pecking-rate-for-a-bird), [Wikipedia: Great spotted woodpecker](https://en.wikipedia.org/wiki/Great_spotted_woodpecker), [Wikipedia: Woodpecker](https://en.wikipedia.org/wiki/Woodpecker) |
-| He did the same thing with chess puzzles | the method: one set of puzzles, solved again and again, faster each time | the [Lichess blog](https://lichess.org/@/CheckRaiseMate/blog/the-woodpecker-method-revisited/ClV6CvGE), the reviews below |
-| Sweden, 2010. Hans Tikkanen is twenty-five, and still not a grandmaster | born 6 February 1985 in Karlstad; grandmaster title 2010 | [Wikipedia: Hans Tikkanen](https://en.wikipedia.org/wiki/Hans_Tikkanen) |
-| Over a thousand puzzles. Solve them all. Then solve the same ones again, in half the time | "solving over 1,100 tactical positions from the games of Chess World Champions over the course of 1 month, then solving those same tactics this time over only 2 weeks"; the time halves with every cycle. The count: Chessigma's guide says 1,128 (the book's exercises); other pages say "over 1,100" | [Chess.com blog review](https://chess.com/blog/AdityaPikach/improve-your-chess-with-the-woodpecker-method), [ChessTempo, the book's page](https://chesstempo.com/chess-books/the-woodpecker-method-2/book/3951), Chessigma's [guide](https://www.chessigma.com/blog/woodpecker-method) |
+| Magnus Carlsen can name a famous chess game from a single position | chess24's video of 30 April 2021, "Magnus Carlsen's Mind-Blowing Memory! World Chess Champion tested": David Howell shows him positions from famous games, he names the players and the occasion. The session could not open the video; this is how the write-ups tell it | [kottke.org](https://kottke.org/21/04/magnus-carlsens-remarkable-memory), [Lichess blog: Memory, the key to chess](https://lichess.org/@/CheckRaiseMate/blog/memory-the-key-to-chess/xQFKOv6o), [Zwischenzug](https://zwischenzug.substack.com/p/memory-the-key-to-chess) |
+| In one test, only one position stumped him. It was from Harry Potter | in that video the one position he cannot place is the chess game from the first Harry Potter film; he gets it after a hint that it comes from entertainment. "Stumped" is ours for that | same |
+| He isn't calculating. He has seen your position before | a figure of speech for his memory of positions, not a quote and not a fact about any game | — |
+| And one man built that kind of memory by copying a woodpecker | the bridge: the method he trained with is named after the bird (below). "That kind of memory" is the memory of patterns, which the method trains; nobody says Tikkanen has Carlsen's memory | — |
+| You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish. Tap where they stood | Chessigma's Board Memory: "Free visual memory test on a chessboard: pawns flash, then vanish. Tap every square they stood on, one more each level. See how you rank. No signup." | [chessigma.com/brain/board-memory](https://www.chessigma.com/brain/board-memory) |
+| His plan sounds too simple. Over a thousand puzzles. Solve them all. Then solve the same ones again, in half the time | "solving over 1,100 tactical positions from the games of Chess World Champions over the course of 1 month, then solving those same tactics this time over only 2 weeks"; the time halves with every cycle. The count: Chessigma's guide says 1,128 (the book's exercises); other pages say "over 1,100" | [Chess.com blog review](https://chess.com/blog/AdityaPikach/improve-your-chess-with-the-woodpecker-method), [ChessTempo, the book's page](https://chesstempo.com/chess-books/the-woodpecker-method-2/book/3951), Chessigma's [guide](https://www.chessigma.com/blog/woodpecker-method) |
 | Four weeks. Then two. Then one. Then days, until the whole set takes one single day | "The Woodpecker Method has been completed when the full set of exercises has been solved in a single day, or after seven cycles if one day proves unattainable". The labels 4 weeks, 2 weeks, 1 week, 4 days, 2 days, 1 day are that halving written out | same |
 | By then, he isn't calculating anymore. He just sees it | the idea of the method: patterns met many times are recognised at once | the reviews above |
-| That year, Hans Tikkanen becomes a grandmaster | GM title 2010 | [Wikipedia: Hans Tikkanen](https://en.wikipedia.org/wiki/Hans_Tikkanen) |
-| Then champion of Sweden. Five times | Swedish champion 2011, 2012, 2013, 2017, 2018 (the years on the shelf) | [Wikipedia: Swedish Chess Championship](https://en.wikipedia.org/wiki/Swedish_Chess_Championship) |
-| In Finnish, Tikkanen means little woodpecker | "named after Tikkanen, whose name apparently translates as 'little woodpecker'" (ChessBase); the publisher's description: "roughly translates as 'Little Woodpecker'". Finnish *tikka* is a woodpecker, *-nen* a diminutive ending common in surnames; his father was born in Finland | [ChessBase](https://en.chessbase.com/newsroom/post/the-woodpecker-method-how-to-get-the-best-of-both-worlds), the description at [Simon & Schuster](https://www.simonandschuster.ca/books/Woodpecker-Method/Axel-Smith/9781784830540), [Wikipedia: Hans Tikkanen](https://en.wikipedia.org/wiki/Hans_Tikkanen) |
+| Chessigma's Supercoach runs this method for you. It times every cycle, and only lets you move on when you're faster and cleaner | Chessigma: "Chessigma runs the Woodpecker Method for you: fixed sets, timed cycles, and a gate that only lets you advance when you're faster and cleaner"; the trainer's page: "Curated puzzle sets, repeated in cycles. Pass faster and cleaner each time." (this line is on the phone in the video). In the app the Woodpecker trainer stands under SUPERCOACH on the Train tab (the author's recording). The base sets are free, the Extended sets carry the Supercoach lock | [chessigma.com/blog/woodpecker-method](https://www.chessigma.com/blog/woodpecker-method), [the Woodpecker trainer](https://www.chessigma.com/puzzles/woodpecker/mixed) |
+| As for the man in the red hat: three grandmaster norms in seven weeks | the red hat is how we draw him (below). The publisher's description of the book: "After training with his method in 2010, Tikkanen achieved three GM norms within a seven-week period". A Lichess blog repeats it; we found no independent record of the three events, so the line stands on the publisher's word | the description at [Simon & Schuster](https://www.simonandschuster.ca/books/Woodpecker-Method/Axel-Smith/9781784830540) and [Chess & Bridge](https://chess.co.uk/products/the-woodpecker-method-smith-tikkanen); the [Lichess blog](https://lichess.org/@/CheckRaiseMate/blog/the-woodpecker-method-revisited/ClV6CvGE) |
+| And his name? Hans Tikkanen. In Finnish, it means little woodpecker | "named after Tikkanen, whose name apparently translates as 'little woodpecker'" (ChessBase); the publisher's description: "roughly translates as 'Little Woodpecker'". Finnish *tikka* is a woodpecker, *-nen* a diminutive ending common in surnames; his father was born in Finland | [ChessBase](https://en.chessbase.com/newsroom/post/the-woodpecker-method-how-to-get-the-best-of-both-worlds), the description at [Simon & Schuster](https://www.simonandschuster.ca/books/Woodpecker-Method/Axel-Smith/9781784830540), [Wikipedia: Hans Tikkanen](https://en.wikipedia.org/wiki/Hans_Tikkanen) |
 | That's why it's called the Woodpecker Method | "First mentioned in his book 'Pump Up Your Rating' (2013), Axel coined the term 'Woodpecker Method' after Hans Tikkanen"; the book *The Woodpecker Method* by Axel Smith and Hans Tikkanen, Quality Chess, 2018 | the description at [Simon & Schuster](https://www.simonandschuster.ca/books/Woodpecker-Method/Axel-Smith/9781784830540), [Wikipedia: Hans Tikkanen](https://en.wikipedia.org/wiki/Hans_Tikkanen) |
-| Today, you don't need a thousand printed puzzles | a bridge to the sponsor; the pile on the table stands for the book's 1,128 exercises | — |
-| Chessigma's Supercoach runs the Woodpecker Method for you | Chessigma: "Chessigma runs the Woodpecker Method for you: fixed sets, timed cycles, and a gate that only lets you advance when you're faster and cleaner". The base sets of the trainer are free, the Extended sets carry the Supercoach lock (both are on the screen as they are on the site) | [chessigma.com/blog/woodpecker-method](https://www.chessigma.com/blog/woodpecker-method), [the Woodpecker trainer](https://www.chessigma.com/puzzles/woodpecker) |
-| Pick a set at your level | the trainer's sets by level, Beginner (400–800) to Master (2000–2600) | [the Woodpecker trainer](https://www.chessigma.com/puzzles/woodpecker/mixed) |
-| It times every cycle, and only lets you move on when you're faster and cleaner | "timed cycles, and a gate that only lets you advance when you're faster and cleaner"; "Pass faster and cleaner each time" | same pages |
-| The coach reads your own games, finds the mistakes you keep making | "AI chess coach that analyzes 12 months of your Chess.com games. Spots your patterns, drills your real mistakes, writes your training plan"; on the dashboard: "Blunder Shield — Positions where you were about to hang something, cut from your own games" | [chessigma.com/supercoach](https://www.chessigma.com/supercoach) |
-| and builds your training plan every morning | "A new plan is built every morning from your recent games" | [chessigma.com/supercoach](https://www.chessigma.com/supercoach) |
+| Today, you don't need a thousand printed puzzles. The sets are in Chessigma | a bridge to the sponsor; the pile on the table stands for the book's 1,128 exercises. The trainer's sets by level, Beginner (400–800) to Master (2000–2600) | [the Woodpecker trainer](https://www.chessigma.com/puzzles/woodpecker/mixed) |
+| And its coach reads your own games, finds the mistakes you keep making, and builds your training plan every morning | "AI chess coach that analyzes 12 months of your Chess.com games. Spots your patterns, drills your real mistakes, writes your training plan"; "A new plan is built every morning from your recent games" | [chessigma.com/supercoach](https://www.chessigma.com/supercoach) |
+
+On the plates and not in the voice: SWEDEN · 2010 and NOT A GRANDMASTER · AGE 25 (born 6 February 1985 in Karlstad,
+grandmaster title 2010: [Wikipedia: Hans Tikkanen](https://en.wikipedia.org/wiki/Hans_Tikkanen)); 1,128 PRINTED PUZZLES
+(the count in Chessigma's guide); AXEL SMITH & HANS TIKKANEN · 2018 (the book).
 
 The Chessigma features are the company's own claims. The publisher's own site (qualitychess.co.uk) answers the session
 with a human-verification page, so its pages and the book's excerpt were not read; its description of the book is quoted
-as booksellers carry it. Before the video goes out it is worth one look at the book itself for the count of exercises
-and the length of the first cycle (rule 40).
+as booksellers carry it. Before the video goes out it is worth one look at the chess24 video itself and at the book for
+the count of exercises and the length of the first cycle (rule 40).
 
 ## Chessigma on the screen (rule 56)
 
-The phone shows Chessigma's public pages as they were on 10 November 2026, taken as phone-size screenshots (iPhone 13
-layout) with the pop-ups closed: the Woodpecker trainer (`photos/chessigma_woodpecker.jpg`) and the Supercoach page with
-its dashboard example (`photos/chessigma_supercoach.jpg`; `photos/chessigma_froggy.jpg` is the sign-up window, not used).
-Nothing on the screen is redrawn; our frames and the tap ring are drawn over it. The plate in the block is the logo cut
-from the site's header (`photos/chessigma_logo.png`: the rook and CHESSIGMA) on the site's near-black, with SUPERCOACH on
-its yellow. `photos/chessigma_woodpecker.png` and `chessigma_supercoach.png` are the site's own icons, kept for reference.
+Nothing on the phone's screen is redrawn; our frames and the tap rings are drawn over it. Three kinds of material:
 
-Not shown: the solving screen of the trainer and a real account's dashboard — both are behind the sign-in, and the
-session cannot sign in. The plates EVERY CYCLE TIMED, FASTER ✓, CLEANER ✓ and the running clock next to them are our
-own graphics for what the trainer says it does, not its interface. If Chessigma wants its real solving screen in the
-video, the author records it from the channel's account.
+- **The site's public pages**, taken on 11 November 2026 in a phone-size window (390 × 800 CSS pixels) at four device
+  pixels per CSS pixel, pop-ups closed: the top of the Woodpecker trainer's page (`photos/chessigma_woodpecker.jpg`) and
+  the Board Memory page, scrolled 150 pixels so that its title and the Play button both stand in the upper part of the
+  screen (`photos/chessigma_memory.jpg`).
+- **A round of Board Memory** as it runs on that public page (`photos/rec/memory.mp4`): level 8, eight pawns, cleared.
+  A script played it the way a person would: it looked at the board while the pawns were shown and tapped those
+  squares after they were gone. The frames were taken about six a second, so the clip moves more coarsely than the
+  site does; the top 560 pixels of the screen are those frames, the empty part under the board is one still of the
+  same screen. In the film the round is entered in the middle of the level, after the tap on Play: a cut in time.
+- **The author's own screen recordings of the app**, from his account, 11 November 2026 (`photos/rec/`): the Train tab
+  (`train.mp4`), a puzzle of his Woodpecker set with its timer and hint (`solve.mp4`), the coach asked "Why do i play
+  bad with caro kann" and its answer (`think.mp4`, `answer.mp4`), the home screen with the week and the day's plan
+  (`home.mp4`), the Brain tab (`brain.mp4`, not in this cut). They are cropped to the app (the phone's status bar is
+  off) and scaled to 780 × 1600. An opponent's nickname in the coach's note on the home screen is blurred, and the
+  first frames of the Train tab recording, which showed that note, are cut off. The author's own figures (rank, rating,
+  "53 rapid games") are on screen as recorded. The original recordings are not in the repository.
+
+The plate in the sponsor's segments is the logo cut from the site's header (`photos/chessigma_logo.png`: the rook and
+CHESSIGMA) on the site's near-black, with SUPERCOACH on its yellow; in the first segment, about a free game, it is the
+logo alone. `photos/chessigma_woodpecker.png`, `chessigma_supercoach.png`, `chessigma_supercoach.jpg` and
+`chessigma_froggy.jpg` are the site's own pictures, kept for reference and not used.
+
+Ours, not the interface: the plates TEST YOUR OWN MEMORY, TODAY'S SPONSOR, PAWNS FLASH, THEN VANISH, TAP WHERE THEY
+STOOD, IT RUNS THE METHOD FOR YOU, EVERY CYCLE TIMED, FASTER ✓, CLEANER ✓, THE SETS ARE IN THE APP, THE COACH READS
+YOUR GAMES, YOUR MISTAKES, A NEW PLAN EVERY MORNING, LINK IN BIO. The solving recording is 2.5 seconds long and runs
+once at its own speed.
 
 ## Drawn, not documented
 
+- The hall of Magnus's memory is a set. The three positions he names are our own choice of famous ones, not the list
+  of the test: Fischer's 17...Be6 against Donald Byrne (1956), Tal's 21...Nf4 against Botvinnik (game 6, 1960), the
+  Polish Immortal a move before the pawn mates (no year on its card: the date is disputed). The fourth card, a question
+  mark that turns over to a wizard's hat, stands for the Harry Potter position; the position itself is not shown.
+  Magnus is the engine's stock character. He is in no shot with the sponsor's product: its segments are another set.
+- On his board, and on the board in the wood, stand the far ranks of the solved puzzle below; the men that the camera
+  would bring up big at the bottom of the frame are not set (rules 22 and 47).
 - Hans Tikkanen's look is ours, not a likeness: a red knitted hat and a teal hoodie, the woodpecker's own colours. His
   photo on Wikimedia Commons (HansTikkanen.jpg, Lars OA Hedlund, 2016, CC BY-SA 4.0) could not be downloaded from the
   session; nothing in the video is taken from it.
 - The woodpecker is drawn after Chessigma's own woodpecker icon (teal, a red crest, an orange beak). It is not a real
-  species: a black woodpecker is black with a red crown.
+  species.
 - Hans jabbing a knight into a birch next to the bird, the bird nailing GM NORM plates to the trunk, whispering in his
   ear, sitting on his shoulder and tapping the phone: gags.
-- His study, the Swedish flag on the wall, the shelf with five cups, the medal on his chest: sets and props. The wall
-  of cards has 1,128 of them, as many as the book has exercises; how many puzzles he used in 2010 is not stated in the
+- His study, the Swedish flag on the wall, the empty ring for the title on his chest: sets and props. The wall of
+  cards has 1,128 of them, as many as the book has exercises; how many puzzles he used in 2010 is not stated in the
   sources, so the counter says 1,000+.
 - The puzzle on his board and on the first card is the textbook smothered mate, 1.Qg8+ Rxg8 2.Nf7# (a set position,
   not from his games or from the book). `engine/data/tal_queen.json` keeps Black's rook on d8, where 1.Qxd8 mates at
   once; in this episode the rook stands on f8, so the queen sacrifice is the only mate in two.
 - The book on the table has our own plain cover with the true title and authors, not the publisher's cover.
-- The time on the running clock next to EVERY CYCLE TIMED and the two bars "1st / 2nd" are illustrations.
+- The two bars "1st / 2nd" are an illustration.
 
 ## Voice
 

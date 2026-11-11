@@ -1,6 +1,6 @@
 // Film runner: loads an episode, composes shots with transitions, captions and grain.
 // The page exposes renderFrame(t), DURATION and cues for render.mjs.
-import { W, H, FPS, makeCanvas, clamp, inv, QA } from './core.js';
+import { W, H, FPS, makeCanvas, sizeCanvas, clamp, inv, QA } from './core.js';
 import { grain, vignette, lightLeak, flash, tvOff } from './draw.js';
 import { screenShatter } from './fx.js';
 import { buildChunks, drawCaptions } from './captions.js';
@@ -32,7 +32,7 @@ class Timeline {
 }
 
 const main = document.getElementById('c');
-main.width = W; main.height = H;
+sizeCanvas(main, W, H);  // with ?ss=2 its backing store is 2160 × 3840 (core.js: supersampling)
 const ctx = main.getContext('2d');
 const layer = makeCanvas(), lctx = layer.getContext('2d');
 layer.dataset.qa = '1';

@@ -1,48 +1,67 @@
-# «He copied a woodpecker» — сценарий и раскадровка (× Chessigma Supercoach)
+# «He has seen your position before» — сценарий и раскадровка (× Chessigma Supercoach)
 
-Заказной пилот для Chessigma на канале The 64 Files (@the64files): вертикаль 1080×1920, 77,7 с, английский, аудитория
-США. Тему утвердил Элиот Хеннебо 10 ноября 2026 («The Woodpecker story is a great pick»). Голос — Callum (ElevenLabs,
+Заказной пилот для Chessigma на канале The 64 Files (@the64files): вертикаль, 76,7 с, английский, аудитория США; итоговый
+файл — 4К (2160×3840). Тему (история Woodpecker) утвердил Элиот Хеннебо 10 ноября 2026. Голос — Callum (ElevenLabs,
 `eleven_v3`), темп 1.32. Текст — [script.json](script.json), факты и что нарисовано — [SOURCES.md](SOURCES.md), сцены —
 [scenes.js](scenes.js).
 
-Условия Chessigma, которые сценарий закрывает: 60–90 с; Supercoach в кадре больше 20 с (телефон с их страницами 53,4–73,2 с,
-плашка CHESSIGMA · SUPERCOACH до конца — всего 22 с) и в тексте диктора; #ad в подписи; без цен.
+Версия 2 (11.11.2026), по правке автора: «сделай его поинтереснее, т.к я бы пролистал, нужно както упомянуть магнуса …
+желательно с эдит байтом» и «упомяни чессигме не только в конце, а то retention к концу падает … нужно еще в начале
+как то упомянуть, и в середине». Что изменилось:
 
-Палитра (правило 48): белые берёзы и зелень шведского лета под голубым небом, бирюзовый и красный дятла (цвета
-дятла самой Chessigma), шведские синий и жёлтый, чёрный и жёлтый Chessigma в рекламном блоке.
+- Хук — Магнус Карлсен и тест на память (chess24, 2021): он называет партии по одной позиции, а не узнал только
+  позицию из «Гарри Поттера». Эдит-байт — фраза «He isn't calculating. He has seen your position before».
+- Chessigma в ролике три раза: на 16,5 с (игра Board Memory, «today's sponsor»), на 41,2 с (тренажёр Woodpecker:
+  таймер на каждый цикл, «faster and cleaner») и с 60,1 с (наборы, тренер, link in bio).
+- На телефоне — настоящий продукт: страницы сайта, раунд Board Memory и записи экрана, которые снял автор.
+- Имя Ханса не показывается до развязки «And his name?».
+
+Условия Chessigma, которые сценарий закрывает: 60–90 с; Supercoach в кадре больше 20 с (телефон с плашкой CHESSIGMA ·
+SUPERCOACH 41,2–48,0 и 62,9–72,2 с, плашка остаётся до конца — около 23 с; ещё 6 с — Board Memory в начале) и в тексте
+диктора; #ad в подписи; без цен. Этот сценарий Элиот ещё не видел: он ждёт текст на утверждение.
+
+Палитра (правило 48): тёмно-синий зал с золотой стеной карточек; белые берёзы и зелень шведского лета под голубым
+небом, бирюзовый и красный дятла (цвета дятла самой Chessigma), чёрный и жёлтый Chessigma в блоках спонсора.
 
 ## Раскадровка
 
 | Время | Диктор | На экране |
 |---|---|---|
-| 0,0–3,4 | He became a grandmaster by copying a woodpecker. | Хук-развязка с первого кадра: берёзовый лес, дятел долбит ствол, рядом парень в красной шапке долбит ту же берёзу шахматным конём — в такт. Плашки HE COPIED / A WOODPECKER / AND BECAME A GRANDMASTER. Второй план — сбоку, с доской. |
-| 3,4–4,1 | (пауза) | Гэг: дятел стучит два раза — «TOK TOK», Ханс отвечает двумя ударами коня. |
-| 4,1–7,3 | Three grandmaster norms in seven weeks. | Дятел прыжками поднимается по стволу и прибивает три золотые таблички GM NORM 1, 2, 3; счётчик 3 GM NORMS, плашка IN 7 WEEKS. |
-| 7,3–9,3 | And wait till you hear his name. | Открытый вопрос: дятел перелетает Хансу на плечо и шепчет на ухо, Ханс ухмыляется. WAIT FOR HIS NAME. |
-| 9,3–13,6 | A woodpecker can hit the same tree 12,000 times a day. | Крупно дятел за работой, летят щепки, камера облетает; счётчик ударов разгоняется до 12,000 HITS A DAY. |
-| 13,6–16,2 | He did the same thing with chess puzzles. | Ханс за доской: один и тот же мат (1.Qg8+ Rxg8 2.Nf7#) три раза подряд, каждый раз быстрее; ×1, ×2, ×3 SOLVED. |
-| 16,2–19,5 | Sweden, 2010. Hans Tikkanen is twenty-five, | Его кабинет: светлая шведская комната, флаг, окно на берёзы. Плашки SWEDEN · 2010 и HANS TIKKANEN / AGE 25. |
-| 19,5–21,5 | and still not a grandmaster. | Крупно: грустит, на груди пустой пунктирный кружок «GM». NOT A GRANDMASTER. |
-| 21,5–23,6 | His plan sounds too simple. | Ухмылка. HIS PLAN / TOO SIMPLE? |
-| 23,6–26,2 | Over a thousand puzzles. Solve them all. | С одной карточки с задачей камера отлетает на всю стену — 1 128 карточек от пола до потолка, маленький Ханс внизу. Счётчик 1,000+ PUZZLES; первый проход — стена зеленеет. |
-| 26,2–29,4 | Then solve the same ones again, in half the time. | Крупно карточки: галочки исчезают и возвращаются вдвое быстрее. Две полосы: 1ST и вдвое короче 2ND. |
-| 29,4–36,1 | Four weeks. Then two. Then one. Then days, until the whole set takes one single day. | Один непрерывный план стены (правило 54): каждый проход быстрее, крупные цифры 4 WEEKS → 2 WEEKS → 1 WEEK → 4 DAYS → 2 DAYS; пауза в музыке — и на «day» вся стена золотая: 1 DAY, удар, конфетти. |
-| 36,1–38,2 | By then, he isn't calculating anymore. | За доской: над позицией мелькают стрелки-варианты; CALCULATING... перечёркнуто. |
-| 38,2–40,0 | He just sees it. | Стрелки пропали, мат в два хода проходит мгновенно. HE JUST SEES IT. |
-| 40,0–43,1 | That year, Hans Tikkanen becomes a grandmaster. | Золотая медаль GM падает в пустой кружок на груди: удар, лучи, конфетти. GRANDMASTER / HANS TIKKANEN · 2010. |
-| 43,1–46,1 | Then champion of Sweden. Five times. | Полка: один за другим пять кубков с годами 2011, 2012, 2013, 2017, 2018. CHAMPION OF SWEDEN ×5. |
-| 46,1–50,5 | And his name? In Finnish, Tikkanen means little woodpecker. | Снова лес. AND HIS NAME? → TIKKANEN = LITTLE WOODPECKER; дятел перелетает ему на плечо, оба смотрят в камеру. |
-| 50,5–53,3 | That's why it's called the Woodpecker Method. | На стол падает книга (наша обложка с настоящим названием и авторами). THE WOODPECKER METHOD / AXEL SMITH & HANS TIKKANEN · 2018. |
-| 53,3–55,4 | Today, you don't need a thousand printed puzzles. | Реклама, плашка AD. На столе стопка распечаток и телефон; дятел клюёт стопку — листы улетают. 1,128 PRINTED PUZZLES → NOT NEEDED. |
-| 55,4–59,4 | Chessigma's Supercoach runs the Woodpecker Method for you. | Телефон крупно: настоящая страница Woodpecker с chessigma.com. Плашка с их логотипом и SUPERCOACH. Дятел сидит на ребре телефона. |
-| 59,4–65,6 | Pick a set at your level. It times every cycle, and only lets you move on when you're faster and cleaner. | Страница листается к наборам по уровням, дятел клювом нажимает Start. Наши плашки: EVERY CYCLE TIMED и бегущий таймер, FASTER ✓, CLEANER ✓. |
-| 65,6–72,0 | Then the coach reads your own games, finds the mistakes you keep making, and builds your training plan every morning. | Свайп на дашборд Supercoach (их пример с сайта): дятел по очереди показывает клювом реплику тренера, карточку Blunder Shield и неделю с планом. YOUR OWN GAMES → YOUR MISTAKES → A NEW PLAN EVERY MORNING. |
-| 72,0–73,2 | Link in bio. | LINK IN BIO. |
-| 73,2–77,7 | So, how many puzzles did you solve today? | Кольцо с хуком: дятел и Ханс снова долбят берёзу, потом оба смотрят в камеру. HOW MANY PUZZLES TODAY? / COMMENT YOUR NUMBER / FOLLOW THE 64 FILES; плашка Chessigma остаётся. |
+| 0,0–4,1 | Magnus Carlsen can name a famous chess game from a single position. | Хук с первого кадра: Магнус в тёмном зале, над головой крупная карточка со знаменитой позицией. Он смотрит — штамп FISCHER · 1956 ✓, карточка улетает на место; следующая: TAL · 1960 ✓, POLISH IMMORTAL ✓. Справа с первого кадра ждёт карточка со знаком вопроса. Плашки MAGNUS NAMES THE GAME / FROM ONE POSITION. |
+| 4,1–8,4 | In one test, only one position stumped him. It was from Harry Potter. | Четвёртая карточка встаёт над головой: серая доска и красный «?». Магнус озадачен. ONLY ONE STUMPED HIM. На «Harry» карточка переворачивается: шляпа волшебника, он смеётся. IT WAS FROM HARRY POTTER. |
+| 8,4–12,1 | He isn't calculating. He has seen your position before. | Эдит-байт. Камера снизу наезжает; NOT CALCULATING; пауза в музыке — на «seen» стена за спиной загорается золотом от его головы к краям (каждая позиция, которую он видел), удар. HE HAS SEEN / YOUR POSITION BEFORE. |
+| 12,1–15,8 | And one man built that kind of memory by copying a woodpecker. | Берёзовый лес: дятел долбит ствол, рядом парень в красной шапке долбит ту же берёзу шахматным конём, в такт. SWEDEN · 2010 / HE COPIED A WOODPECKER. Общий план сбоку. |
+| 15,8–16,5 | (пауза) | Гэг в тишине: дятел стучит два раза — «TOK TOK», парень отвечает двумя ударами коня. |
+| 16,5–22,7 | You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish. Tap where they stood. | **Спонсор, раз.** Плашка AD. Дятел перелетает на телефон: страница Board Memory с сайта Chessigma, логотип; TEST YOUR OWN MEMORY → TODAY'S SPONSOR. Дятел клювом нажимает Play. Раунд игры: восемь пешек вспыхивают (PAWNS FLASH), гаснут (THEN VANISH), их открывают по одной (TAP WHERE THEY STOOD). |
+| 22,7–24,8 | His plan sounds too simple. | Кабинет Ханса: флаг, окно на берёзы, на груди пустой пунктирный кружок «GM». NOT A GRANDMASTER / SWEDEN · 2010 · AGE 25 → HIS PLAN: TOO SIMPLE? |
+| 24,8–27,4 | Over a thousand puzzles. Solve them all. | С одной карточки с задачей камера отлетает на всю стену — 1 128 карточек от пола до потолка, маленький Ханс внизу. Счётчик 1,000+ PUZZLES; первый проход — стена зеленеет. |
+| 27,4–30,6 | Then solve the same ones again, in half the time. | Крупно карточки: галочки исчезают и возвращаются вдвое быстрее. Две полосы: 1ST и вдвое короче 2ND. |
+| 30,6–37,2 | Four weeks. Then two. Then one. Then days, until the whole set takes one single day. | Один непрерывный план стены (правило 54): каждый проход быстрее, крупные цифры 4 WEEKS → 2 WEEKS → 1 WEEK → 4 DAYS → 2 DAYS; пауза в музыке — и на «day» вся стена золотая: 1 DAY, удар, конфетти. |
+| 37,2–39,4 | By then, he isn't calculating anymore. | Вся доска сверху: над позицией мелькают стрелки-варианты; CALCULATING... перечёркнуто. |
+| 39,4–41,2 | He just sees it. | Наезд по той же оси: мат в два хода (1.Qg8+ Rxg8 2.Nf7#) проходит мгновенно. HE JUST SEES IT. |
+| 41,2–48,0 | Chessigma's Supercoach runs this method for you. It times every cycle, and only lets you move on when you're faster and cleaner. | **Спонсор, два.** Телефон: страница Woodpecker с сайта, плашка CHESSIGMA · SUPERCOACH; наборы по уровням, дятел нажимает Start (IT RUNS THE METHOD FOR YOU). Запись автора: задача из набора, таймер в рамке (EVERY CYCLE TIMED). Снова страница: их строка «Pass faster and cleaner each time» в рамке, FASTER ✓, CLEANER ✓. |
+| 48,0–49,7 | As for the man in the red hat: | Он крупно, ухмыляется в камеру. THE MAN IN THE RED HAT. |
+| 49,7–52,6 | three grandmaster norms in seven weeks. | Дятел прыжками поднимается по стволу и прибивает три золотые таблички GM NORM 1, 2, 3; счётчик 3 GM NORMS, плашка IN 7 WEEKS. |
+| 52,6–54,7 | And his name? Hans Tikkanen. | Дятел перелетает ему на плечо и шепчет на ухо. AND HIS NAME? → HANS TIKKANEN. |
+| 54,7–57,3 | In Finnish, it means little woodpecker. | Оба в кадре, дятел на плече. IN FINNISH / TIKKANEN / = LITTLE WOODPECKER. |
+| 57,3–60,1 | That's why it's called the Woodpecker Method. | На стол падает книга (наша обложка с настоящим названием и авторами). THE WOODPECKER METHOD / AXEL SMITH & HANS TIKKANEN · 2018. |
+| 60,1–62,9 | Today, you don't need a thousand printed puzzles. | **Спонсор, три.** На столе стопка распечаток и телефон; дятел клюёт стопку — листы улетают. 1,128 PRINTED PUZZLES → NOT NEEDED. |
+| 62,9–64,8 | The sets are in Chessigma. | Запись автора: вкладка Train, тренажёры Supercoach, строка его набора Woodpecker 20/100. THE SETS ARE IN THE APP. |
+| 64,8–68,4 | And its coach reads your own games, finds the mistakes you keep making, | Запись автора: вопрос тренеру («Why do i play bad with caro kann»), он читает партии; ответ с досками и пропущенными ходами. THE COACH READS YOUR GAMES → YOUR MISTAKES. |
+| 68,4–72,2 | and builds your training plan every morning. Link in bio. | Запись автора: главный экран, неделя и план на день в рамках. A NEW PLAN EVERY MORNING → LINK IN BIO. |
+| 72,2–76,7 | So, how many puzzles did you solve today? | Кольцо с лесом: дятел и Ханс снова долбят берёзу, потом оба смотрят в камеру. HOW MANY PUZZLES TODAY? / COMMENT YOUR NUMBER / FOLLOW THE 64 FILES; плашка Chessigma остаётся. |
+
+Подпись к посту (`post` в `script.json`): «Magnus has seen your position before. One man built that kind of memory by
+copying a woodpecker. Test yours: Board Memory on Chessigma, link in bio. How many puzzles did you solve today? #ad
+#chessigma #chess #magnuscarlsen #woodpeckermethod #chesstok».
 
 ## Что решает автор
 
-- Экран решения задач в тренажёре и настоящий дашборд — за входом в аккаунт (Google), из сессии туда не зайти. В ролике
-  стоят публичные страницы; если Chessigma захочет свой экран с решением, его надо записать с аккаунта канала.
-- Внешность Ханса — наша (красная шапка, бирюзовое худи), не портрет: фото из Wikimedia скачать не удалось.
+- Встречное предложение Элиота ($150 + $50 за 500 тыс. просмотров, права на рекламу в Meta на 90 дней) ждёт ответа.
+  Он просил сначала сценарий: этот текст ему ещё не отправлен.
+- В записях экрана скрыт ник соперника в реплике тренера на главном экране. Свои цифры автора (место, рейтинг,
+  «53 rapid games») видны. Если что-то из этого показывать не надо — закрыть так же.
+- Три позиции на карточках Магнуса выбраны нами (Фишер 1956, Таль 1960, «Польская бессмертная»): в самом тесте
+  позиции были свои. Видео chess24 из сессии не открывается, факты — по пересказам; перед публикацией посмотреть его.
+- Внешность Ханса — наша (красная шапка, бирюзовое худи), не портрет.
 - Перед публикацией: переозвучить на платном тарифе ElevenLabs (сейчас бесплатный), отметить Branded content, #ad.
