@@ -1,6 +1,13 @@
 # Спонсоры
 
 ## Chessigma (Eliot Hennebo)
+- **11.11.2026, 16:13 — сценарий утверждён с правками.** Правило Элиота: всё на экране — запись приложения Chessigma на
+  телефоне (одинаковый интерфейс). Бит 5 — его текст («A grandmaster remembers whole positions. How many pawns can
+  you? …»), Board Memory 2–3 уровня до экрана результата; бит 9 — страница Woodpecker, задача с таймером, вкладка
+  Active с карточкой Club (не нажимать); бит 12 — пролистать Mixed и Theme sets; бит 14 — список партий, report партии,
+  разбор нескольких ходов, их финальная карточка. «Game report» — платная функция Supercoach, говорить «game reviews».
+  Ссылка в био: `https://www.chessigma.com/go/app/the64files`. Оплата — **не PayPal**: счёт (invoice) на каждые 50 % с
+  банковскими реквизитами. Что снять автору — `episodes/woodpecker/RECORDING.md`.
 - **Самое важное, по словам автора (11.11.2026): бесплатные отчёты по партиям.** Сайт: «Free Unlimited Chess Game
   Analysis & Reports» — каждый ход с оценкой, точность, лучший ход, без лимита и без регистрации. В ролике: намёк в
   начале («its game reviews are free: more on that at the end»; до v4 было «reports» — по брифу нельзя), объяснение в конце.

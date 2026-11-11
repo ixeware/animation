@@ -1071,24 +1071,25 @@ export async function build(T) {
   // ======================= THE SPONSOR, THE FIRST TIME. YOU CAN TEST YOURS ON CHESSIGMA, TODAY'S SPONSOR. PAWNS FLASH,
   // THEN VANISH. TAP WHERE THEY STOOD: the woodpecker flies to a phone on a table in the wood. On its screen, Chessigma's
   // own Board Memory page and a round of the game as it runs on the site (photos/chessigma_memory.jpg, photos/rec/memory.mp4) =======================
-  const earlyS = s('early') - 0.05, testT = w('early', 'test'), sig0T = w('early', 'chessigma'), sponT = w('early', 'sponsor'), pawnsT = w('early', 'pawns'), vanT = w('early', 'vanish'), repT = w('early', 'game'), moreT = w('early', 'more');
+  const earlyS = s('early') - 0.05, testT = w('early', 'test'), sig0T = w('early', 'chessigma'), sponT = w('early', 'sponsor'), pawnsT = T.w('early', 16).s, vanT = w('early', 'vanish'), how5T = w('early', 'how'), putT = w('early', 'put'), repT = w('early', 'game'), moreT = w('early', 'more');
   const PLAY = fr(sponT + 0.22), gameS = PLAY + 0.2;
   // the recorded round (level 8, eight pawns): in the recording they go out at 2.356 s and are tapped back one by one
   const MEM = { gone: 2.356, taps: [2.818, 3.149, 3.458, 3.8, 4.158, 4.492, 4.803, 5.113], sq: [[4, 2], [7, 2], [4, 3], [6, 3], [3, 5], [7, 5], [4, 6], [6, 6]] };
   const memT = x => vanT + x - MEM.gone;  // the recording's pawns go out on the word "vanish"
   const earlyPh = phoneSeg({
     prog: [[earlyS, t => ({ still: 'memory_jpg' })], [gameS, t => ({ rec: 'memory', sec: MEM.gone + t - vanT })]],
-    boxes: [[60, 180, 720, 430, testT + 0.15, sponT - 0.1], [28, 911, 752, 1077, sponT - 0.1, gameS]],
+    boxes: [[60, 180, 720, 430, how5T + 0.15, sponT - 0.1], [28, 911, 752, 1077, sponT - 0.1, gameS]],
     pecks: [[PLAY, 994, 124], [fr(PLAY + 0.16), 994, 124]],
     rings: MEM.taps.map((x, i) => [memT(x), 24 + (MEM.sq[i][0] + 0.5) * 91.5, 272 + (MEM.sq[i][1] + 0.5) * 91.5]),
     fly: { t0: earlyS + 0.02, dur: 0.5, from: perch() },
   });
   const earlyHud = (g, lt, t) => {
     adHud(g, lt, t); if (t >= sig0T) sigPlate(g, 150, { chip: false, ...(t < sig0T + 0.4 ? popIn(t, sig0T) : {}) });
-    bdg(g, t, 'TEST YOUR OWN MEMORY', testT, { y: 262, color: CREAM, size: 42, until: sponT - 0.03 });
+    bdg(g, t, 'HOW MANY PAWNS CAN YOU?', how5T - 0.03, { y: 262, color: CREAM, size: 42, until: sponT - 0.03 });  // the sponsor's own line (beat 5)
     bdg(g, t, "TODAY'S SPONSOR", sponT - 0.03, { y: 262, color: GOLD, size: 42, until: pawnsT - 0.03 });
     bdg(g, t, 'PAWNS FLASH', pawnsT - 0.03, { y: 262, color: CREAM, size: 44, until: vanT - 0.03 });
-    bdg(g, t, 'THEN VANISH', vanT - 0.03, { y: 262, color: RED, size: 44, until: repT - 0.03 });
+    bdg(g, t, 'THEN VANISH', vanT - 0.03, { y: 262, color: RED, size: 44, until: putT - 0.03 });
+    bdg(g, t, 'PUT THEM BACK', putT - 0.03, { y: 262, color: LEAFG, size: 44, until: repT - 0.03 });
     bdg(g, t, 'GAME REVIEWS: FREE', repT - 0.03, { y: 262, color: LEAFG, size: 46, until: moreT - 0.03 });  // the hint; the end explains
     bdg(g, t, 'MORE AT THE END', moreT - 0.03, { y: 262, color: GOLD, size: 46 });
   };
@@ -1369,7 +1370,7 @@ export async function build(T) {
     box(170, 1310, 660, 1790, bestT - 0.1, CLOSE);           // the best move, its arrow on the board
   }, { flat: true, hud: (g, lt, t) => {
     adHud(g, lt, t);
-    bdg(g, t, 'FREE', freeT - 0.03, { x: 270, y: 200, color: LEAFG, size: 64 });
+    bdg(g, t, 'FREE', freeT - 0.03, { x: 300, y: 205, color: LEAFG, size: 64 });
     bdg(g, t, 'UNLIMITED GAME REVIEWS', unlT - 0.03, { x: 700, y: 200, color: CREAM, size: 32, until: gradT - 0.03 });
     bdg(g, t, 'EVERY MOVE GRADED', gradT - 0.03, { x: 700, y: 200, color: CREAM, size: 36, until: accT - 0.03 });
     bdg(g, t, 'YOUR ACCURACY', accT - 0.03, { x: 700, y: 200, color: CREAM, size: 38, until: bestT - 0.03 });

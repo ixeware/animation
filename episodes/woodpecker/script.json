@@ -86,15 +86,18 @@
     },
     {
       "id": "early",
-      "text": "You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish. And its game reviews are free: more on that at the end.",
-      "say": "[curious] You can test yours on Chess-Sigma, today's sponsor. Pawns flash... then vanish. And its game reviews are free. More on that at the end.",
+      "text": "A grandmaster remembers whole positions. How many pawns can you? Test it on Chessigma, today's sponsor: pawns flash, then vanish, and you put them back. And its game reviews are free: more on that at the end.",
+      "say": "A grandmaster remembers whole positions. [curious] How many pawns can you? Test it on Chess-Sigma, today's sponsor: pawns flash... then vanish, and you put them back. And its game reviews are free. More on that at the end.",
       "tail_db": -45,
       "pause": 0.3,
       "colors": {
+        "whole": "gold",
+        "pawns": "gold",
         "Chessigma,": "gold",
-        "sponsor.": "gold",
+        "sponsor:": "gold",
         "flash,": "lime",
-        "vanish.": "red",
+        "vanish,": "red",
+        "back.": "lime",
         "free:": "lime",
         "end.": "gold"
       }
@@ -224,5 +227,6 @@
       }
     }
   ],
-  "bio_link": "https://www.chessigma.com/go/app/the64files?utm_content=woodpecker-video"
+  "bio_link": "https://www.chessigma.com/go/app/the64files",
+  "_sponsor_approval": "Script approved by Eliot Hennebo (Chessigma) on 11 Nov 2026 with edits: beat 5 is his line; all on-screen footage recorded in the Chessigma app on a phone."
 }
