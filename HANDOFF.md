@@ -194,13 +194,18 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
 ### Последний ролик: `woodpecker`, «He has seen your position before» (пилот для Chessigma Supercoach), версия 3
 
 - **Версия 3 (11.11.2026, 85,8 с)** — вторая правка автора: бесплатные отчёты по партиям — главное у Chessigma (намёк в
-  начале «its game reports are free: more on that at the end», объяснение в конце вместе с App Store и Google Play);
+  начале «its game reviews are free: more on that at the end» (в v3 было «reports», в v4 исправлено по брифу), объяснение в конце вместе с App Store и Google Play);
   эдит-байт должен быть метафорой («You can surprise a human. But not a library»); дятел сидит на плече лапами на
   худи (`SHOULDER`, `SBIRD`). Блоки спонсора теперь с 17,9, 44,3 и 63,2 с. Окно со значками сторов —
-  `photos/chessigma_stores.jpg` (с их главной страницы). Экран самого отчёта из сессии не открылся: часть сайта
+  `photos/chessigma_stores.jpg` (с их главной страницы; в v4 убрано, вместо него их финальная карточка). Экран самого отчёта из сессии не открылся: часть сайта
   грузится с `cdn.chessigma.dev`, которого нет в разрешённых адресах окружения, — добавить его или попросить запись у
   автора. На их страницах всплывающие окна появляются через ~8 с после загрузки; закрывать их крестиками, а не удалять
   блок `.csRoot` — это корень всей страницы.
+- **Версия 4 (11.11.2026, 86,2 с)** — по киту Chessigma (Drive «chessigma-creator-kit-v1», бриф в `SOURCES.md`, раздел
+  «Chessigma's creator kit»): «reports» → «reviews»; в конце их скриншот App Store `01-review` и их финальная карточка
+  3 с со значками сторов (`photos/chessigma_store_review.png`, `photos/rec/closer.mp4`); ссылка в био
+  `https://www.chessigma.com/go/app/the64files?utm_content=woodpecker-video`. В движке новый ключ плана `flat: true`:
+  без наезда, тряски, грейда, виньетки и зерна — для материалов спонсора, которые нельзя менять.
 - Память между сессиями — папка `memory/` (предпочтения автора, эдит-байты, референсы, спонсоры, журнал): читать в
   начале, дописывать после каждого пожелания.
 

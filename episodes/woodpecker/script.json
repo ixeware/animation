@@ -1,7 +1,7 @@
 {
   "title": "He has seen your position before (Magnus Carlsen's memory, Hans Tikkanen and the Woodpecker Method) x Chessigma Supercoach",
   "channel": "THE 64 FILES",
-  "post": "You can surprise a human. But not a library: Magnus has seen your position before. One man built that kind of memory by copying a woodpecker. Chessigma's game reports are free (App Store, Google Play, link in bio). How many puzzles did you solve today? #ad #chessigma #chess #magnuscarlsen #woodpeckermethod #chesstok",
+  "post": "You can surprise a human. But not a library: Magnus has seen your position before. One man built that kind of memory by copying a woodpecker. Chessigma's game reviews are free and unlimited, on the App Store and Google Play (link in bio). How many puzzles did you solve today? #ad #chessigma #chess #magnuscarlsen #woodpeckermethod #chesstok",
   "lead_in": 0.05,
   "tail": 1.8,
   "voice": {
@@ -86,8 +86,8 @@
     },
     {
       "id": "early",
-      "text": "You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish. And its game reports are free: more on that at the end.",
-      "say": "[curious] You can test yours on Chess-Sigma, today's sponsor. Pawns flash... then vanish. And its game reports are free. More on that at the end.",
+      "text": "You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish. And its game reviews are free: more on that at the end.",
+      "say": "[curious] You can test yours on Chess-Sigma, today's sponsor. Pawns flash... then vanish. And its game reviews are free. More on that at the end.",
       "tail_db": -45,
       "pause": 0.3,
       "colors": {
@@ -199,8 +199,8 @@
     },
     {
       "id": "free",
-      "text": "And the best part is free: unlimited game reports. Every move graded, your accuracy, the best move. It's on the App Store and Google Play. Link in bio.",
-      "say": "[excited] And the best part is free: unlimited game reports. Every move graded, your accuracy, the best move. It's on the App Store, and Google Play. Link in bio.",
+      "text": "And the best part is free: unlimited game reviews. Every move graded, your accuracy, the best move. It's on the App Store and Google Play. Link in bio.",
+      "say": "[excited] And the best part is free: unlimited game reviews. Every move graded, your accuracy, the best move. It's on the App Store, and Google Play. Link in bio.",
       "tail_db": -45,
       "pause": 0.4,
       "colors": {
@@ -223,5 +223,6 @@
         "today?": "lime"
       }
     }
-  ]
+  ],
+  "bio_link": "https://www.chessigma.com/go/app/the64files?utm_content=woodpecker-video"
 }

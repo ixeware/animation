@@ -23,15 +23,21 @@
 
 - 8,4–13,5 — эдит-байт-метафора: «You can surprise a human. But not a library. He has seen your position before».
   Плашки YOU CAN SURPRISE A HUMAN / BUT NOT A LIBRARY, потом удар и HE HAS SEEN / YOUR POSITION BEFORE.
-- 17,9–25,8 — первый блок спонсора кончается намёком: «And its game reports are free: more on that at the end».
-  Плашки GAME REPORTS: FREE → MORE AT THE END.
+- 17,9–25,8 — первый блок спонсора кончается намёком: «And its game reviews are free: more on that at the end».
+  Плашки GAME REVIEWS: FREE → MORE AT THE END.
 - 67,9–72,4 — тренер короче: «Its coach reads your own games and builds your training plan every morning».
-- 72,4–81,4 — новый блок, главное: «And the best part is free: unlimited game reports. Every move graded, your
+- 72,4–81,4 — новый блок, главное: «And the best part is free: unlimited game reviews. Every move graded, your
   accuracy, the best move. It's on the App Store and Google Play. Link in bio». На телефоне — окно с их сайта со
   значками App Store и Google Play и строкой про «free review»; плашка FREE держится весь блок, рядом меняются
-  UNLIMITED GAME REPORTS → EVERY MOVE GRADED → YOUR ACCURACY → THE BEST MOVE → APP STORE · GOOGLE PLAY → LINK IN BIO.
+  UNLIMITED GAME REVIEWS → EVERY MOVE GRADED → YOUR ACCURACY → THE BEST MOVE → APP STORE · GOOGLE PLAY → LINK IN BIO.
 - Дятел сидит на плече Ханса лапами на худи (а не висит рядом).
 - Вопрос в конце — 81,4–85,8 с.
+
+Версия 4 (11.11.2026, 86,2 с) — по киту и брифу Chessigma: везде «game reviews» вместо «game reports» (полный report
+бесплатным называть нельзя). Блок «free» с 72,6 с — их скриншот App Store с разбором партии (рамки на строке оценок и на
+стрелке лучшего хода), с 78,7 с — их финальная карточка 3 с: лого, 2M+ PLAYERS, 15M+ games analyzed, пять звёзд,
+значки App Store и Google Play; под ней наша плашка LINK IN BIO. Ссылка в био:
+https://www.chessigma.com/go/app/the64files?utm_content=woodpecker-video
 
 Условия Chessigma, которые сценарий закрывает: 60–90 с; Supercoach в кадре больше 20 с (телефон с плашкой CHESSIGMA ·
 SUPERCOACH 41,2–48,0 и 62,9–72,2 с, плашка остаётся до конца — около 23 с; ещё 6 с — Board Memory в начале) и в тексте

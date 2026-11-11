@@ -140,9 +140,10 @@ function compose(t, frame) {
   } else {
     // every shot keeps moving: slow push-in across the shot + impact shake from the sound cues
     // info shots (tables, leaderboards, panels, quotes) stay framed: no jump cuts, barely any push-in
-    const kb = s.info ? 0.01 : s.kb ?? 0.04, a = shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
+    // flat shots (a sponsor's end card or store art, shown as delivered) get none of it, and no grade, vignette or grain
+    const kb = s.flat ? 0 : s.info ? 0.01 : s.kb ?? 0.04, a = s.flat ? 0 : shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
     // dense editing: long shots get hard punch-in jump cuts every `every` seconds (film.jumpCut)
-    const J = film.jumpCut, [jz, jx, jy] = J && !s.noJump && !s.info ? jumpAt(J, lt, s.b - s.a, s.i) : [1, 0, 0];
+    const J = film.jumpCut, [jz, jx, jy] = J && !s.noJump && !s.info && !s.flat ? jumpAt(J, lt, s.b - s.a, s.i) : [1, 0, 0];
     const z = (1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + a * 0.0015) * jz;
     ctx.translate(W / 2 + sx + jx, H / 2 + sy + jy); if (s.roll) ctx.rotate(typeof s.roll === 'function' ? s.roll(lt, t) : s.roll);  // a dutch angle
     ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
@@ -160,16 +161,16 @@ function compose(t, frame) {
   }
   // on-screen text that must not ride the camera (push-in, jump-cut zooms): the shot's hud, drawn on the screen itself
   if (s.hud) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); s.hud(ctx, lt, t, s); ctx.restore(); }
-  finish(ctx, main, s.grade ?? film.grade ?? 'neutral', { amount: film.finish ?? 1 });
+  if (!s.flat) finish(ctx, main, s.grade ?? film.grade ?? 'neutral', { amount: film.finish ?? 1 });
   if (s.post) s.post(ctx, lt, t);
   // light leak straddles the cut into this shot (and into the next one, if it asks)
   const nx = shots[s.i + 1];
   if (tr === 'leak' && lt < 0.14) lightLeak(ctx, 0.5 + lt / 0.28);
   if (nx && nx.trans === 'leak' && nx.a - t < 0.14) lightLeak(ctx, 0.5 - (nx.a - t) / 0.28);
   if (tr === 'flash') flash(ctx, 1 - lt / 0.3);
-  vignette(ctx, s.vig ?? 0.55);
+  if (!s.flat) vignette(ctx, s.vig ?? 0.55);
   drawCaptions(ctx, chunks, t, { hide: s.noCaptions });
-  grain(ctx, frame, 0.06);
+  if (!s.flat) grain(ctx, frame, 0.06);
 }
 
 function renderFrame(t, frame = Math.round(t * FPS)) {
