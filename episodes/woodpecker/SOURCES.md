@@ -4,19 +4,23 @@ Sponsored pilot for Chessigma (the topic, the Woodpecker story, was approved by 
 Woodpecker story is a great pick, let's go with it"). On TikTok: Content disclosure → Branded content, and #ad in the
 caption. Prices are not mentioned.
 
-Version 2 (11 November 2026). The author asked for a hook with a figure the audience follows and for Chessigma to be
-named at the start and in the middle as well as at the end, because retention falls toward the end. So the film opens
-on Magnus Carlsen's memory test, and the sponsor has three segments: from 16.5 s (its Board Memory game, "today's
-sponsor"), from 41.2 s (the Woodpecker trainer: timed cycles) and from 60.1 s (the sets, the coach, link in bio). The
-AD chip is on screen in each of them and in the closing shot. Eliot has not seen this script yet.
+Version 3 (11 November 2026), 85.8 s. The author asked for a hook with a figure the audience follows and a
+metaphorical edit bait, for Chessigma to be named at the start and in the middle as well as at the end (retention falls
+toward the end), and for its free game reports, "the most important thing", to be hinted at early and explained at the
+end, with the App Store and Google Play. So the film opens on Magnus Carlsen's memory test, and the sponsor has three
+segments: from 17.9 s (its Board Memory game, "today's sponsor", "its game reports are free: more on that at the
+end"), from 44.3 s (the Woodpecker trainer: timed cycles) and from 63.2 s (the sets, the coach, the free reports, the
+stores, link in bio). The AD chip is on screen in each of them and in the closing shot. Eliot has not seen this script
+yet.
 
 | Claim in the video | Status | Source |
 |---|---|---|
 | Magnus Carlsen can name a famous chess game from a single position | chess24's video of 30 April 2021, "Magnus Carlsen's Mind-Blowing Memory! World Chess Champion tested": David Howell shows him positions from famous games, he names the players and the occasion. The session could not open the video; this is how the write-ups tell it | [kottke.org](https://kottke.org/21/04/magnus-carlsens-remarkable-memory), [Lichess blog: Memory, the key to chess](https://lichess.org/@/CheckRaiseMate/blog/memory-the-key-to-chess/xQFKOv6o), [Zwischenzug](https://zwischenzug.substack.com/p/memory-the-key-to-chess) |
 | In one test, only one position stumped him. It was from Harry Potter | in that video the one position he cannot place is the chess game from the first Harry Potter film; he gets it after a hint that it comes from entertainment. "Stumped" is ours for that | same |
-| He isn't calculating. He has seen your position before | a figure of speech for his memory of positions, not a quote and not a fact about any game | — |
+| You can surprise a human. But not a library. He has seen your position before | the edit bait: a metaphor for his memory of positions, not a quote and not a fact about any game | — |
 | And one man built that kind of memory by copying a woodpecker | the bridge: the method he trained with is named after the bird (below). "That kind of memory" is the memory of patterns, which the method trains; nobody says Tikkanen has Carlsen's memory | — |
-| You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish. Tap where they stood | Chessigma's Board Memory: "Free visual memory test on a chessboard: pawns flash, then vanish. Tap every square they stood on, one more each level. See how you rank. No signup." | [chessigma.com/brain/board-memory](https://www.chessigma.com/brain/board-memory) |
+| You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish | Chessigma's Board Memory: "Free visual memory test on a chessboard: pawns flash, then vanish. Tap every square they stood on, one more each level. See how you rank. No signup." | [chessigma.com/brain/board-memory](https://www.chessigma.com/brain/board-memory) |
+| And its game reports are free: more on that at the end | the site's title: "Chessigma – Free Unlimited Chess Game Analysis & Reports" (details in the last rows) | [chessigma.com](https://www.chessigma.com/) |
 | His plan sounds too simple. Over a thousand puzzles. Solve them all. Then solve the same ones again, in half the time | "solving over 1,100 tactical positions from the games of Chess World Champions over the course of 1 month, then solving those same tactics this time over only 2 weeks"; the time halves with every cycle. The count: Chessigma's guide says 1,128 (the book's exercises); other pages say "over 1,100" | [Chess.com blog review](https://chess.com/blog/AdityaPikach/improve-your-chess-with-the-woodpecker-method), [ChessTempo, the book's page](https://chesstempo.com/chess-books/the-woodpecker-method-2/book/3951), Chessigma's [guide](https://www.chessigma.com/blog/woodpecker-method) |
 | Four weeks. Then two. Then one. Then days, until the whole set takes one single day | "The Woodpecker Method has been completed when the full set of exercises has been solved in a single day, or after seven cycles if one day proves unattainable". The labels 4 weeks, 2 weeks, 1 week, 4 days, 2 days, 1 day are that halving written out | same |
 | By then, he isn't calculating anymore. He just sees it | the idea of the method: patterns met many times are recognised at once | the reviews above |
@@ -25,7 +29,9 @@ AD chip is on screen in each of them and in the closing shot. Eliot has not seen
 | And his name? Hans Tikkanen. In Finnish, it means little woodpecker | "named after Tikkanen, whose name apparently translates as 'little woodpecker'" (ChessBase); the publisher's description: "roughly translates as 'Little Woodpecker'". Finnish *tikka* is a woodpecker, *-nen* a diminutive ending common in surnames; his father was born in Finland | [ChessBase](https://en.chessbase.com/newsroom/post/the-woodpecker-method-how-to-get-the-best-of-both-worlds), the description at [Simon & Schuster](https://www.simonandschuster.ca/books/Woodpecker-Method/Axel-Smith/9781784830540), [Wikipedia: Hans Tikkanen](https://en.wikipedia.org/wiki/Hans_Tikkanen) |
 | That's why it's called the Woodpecker Method | "First mentioned in his book 'Pump Up Your Rating' (2013), Axel coined the term 'Woodpecker Method' after Hans Tikkanen"; the book *The Woodpecker Method* by Axel Smith and Hans Tikkanen, Quality Chess, 2018 | the description at [Simon & Schuster](https://www.simonandschuster.ca/books/Woodpecker-Method/Axel-Smith/9781784830540), [Wikipedia: Hans Tikkanen](https://en.wikipedia.org/wiki/Hans_Tikkanen) |
 | Today, you don't need a thousand printed puzzles. The sets are in Chessigma | a bridge to the sponsor; the pile on the table stands for the book's 1,128 exercises. The trainer's sets by level, Beginner (400–800) to Master (2000–2600) | [the Woodpecker trainer](https://www.chessigma.com/puzzles/woodpecker/mixed) |
-| And its coach reads your own games, finds the mistakes you keep making, and builds your training plan every morning | "AI chess coach that analyzes 12 months of your Chess.com games. Spots your patterns, drills your real mistakes, writes your training plan"; "A new plan is built every morning from your recent games" | [chessigma.com/supercoach](https://www.chessigma.com/supercoach) |
+| Its coach reads your own games and builds your training plan every morning | "AI chess coach that analyzes 12 months of your Chess.com games. Spots your patterns, drills your real mistakes, writes your training plan"; "A new plan is built every morning from your recent games" | [chessigma.com/supercoach](https://www.chessigma.com/supercoach) |
+| And the best part is free: unlimited game reports. Every move graded, your accuracy, the best move | the home page: "Enter your Chess.com or Lichess username, pick a game, and get a full chess analysis report in seconds. No daily limit, no premium tier, and no signup required to start analyzing"; "You get unlimited game reviews with every move graded, your accuracy, the best move in every position, and a complete report every time". The pricing page lists "unlimited game review" in the free plan. (The "Chess DNA report" is another thing, part of the paid Supercoach; the video does not mean it) | [chessigma.com](https://www.chessigma.com/), [pricing](https://www.chessigma.com/pricing) |
+| It's on the App Store and Google Play | the download page: "Download Chessigma for Mac, Windows, Linux, iOS and Android", with App Store and Google Play badges; "On your phone, a lighter app. Game review and the opening trainer only" — so the free review is what the phone app has; the trainers of the earlier segments are the site | [chessigma.com/download](https://www.chessigma.com/download) |
 
 On the plates and not in the voice: SWEDEN · 2010 and NOT A GRANDMASTER · AGE 25 (born 6 February 1985 in Karlstad,
 grandmaster title 2010: [Wikipedia: Hans Tikkanen](https://en.wikipedia.org/wiki/Hans_Tikkanen)); 1,128 PRINTED PUZZLES
@@ -43,7 +49,11 @@ Nothing on the phone's screen is redrawn; our frames and the tap rings are drawn
 - **The site's public pages**, taken on 11 November 2026 in a phone-size window (390 × 800 CSS pixels) at four device
   pixels per CSS pixel, pop-ups closed: the top of the Woodpecker trainer's page (`photos/chessigma_woodpecker.jpg`) and
   the Board Memory page, scrolled 150 pixels so that its title and the Play button both stand in the upper part of the
-  screen (`photos/chessigma_memory.jpg`).
+  screen (`photos/chessigma_memory.jpg`); and the home page with two of its own pop-ups up: the sheet "Best move from
+  any screenshot" with the App Store and Google Play badges and the note "Chessigma is now on Chrome: one click from a
+  finished Chess.com or Lichess game to its free review" (`photos/chessigma_stores.jpg`). The report of a game itself
+  is not shown: the session could not open one (part of the site loads from a host closed to it). If the author
+  records one, it goes in place of that picture.
 - **A round of Board Memory** as it runs on that public page (`photos/rec/memory.mp4`): level 8, eight pawns, cleared.
   A script played it the way a person would: it looked at the board while the pawns were shown and tapped those
   squares after they were gone. The frames were taken about six a second, so the clip moves more coarsely than the
@@ -62,9 +72,10 @@ CHESSIGMA) on the site's near-black, with SUPERCOACH on its yellow; in the first
 logo alone. `photos/chessigma_woodpecker.png`, `chessigma_supercoach.png`, `chessigma_supercoach.jpg` and
 `chessigma_froggy.jpg` are the site's own pictures, kept for reference and not used.
 
-Ours, not the interface: the plates TEST YOUR OWN MEMORY, TODAY'S SPONSOR, PAWNS FLASH, THEN VANISH, TAP WHERE THEY
-STOOD, IT RUNS THE METHOD FOR YOU, EVERY CYCLE TIMED, FASTER ✓, CLEANER ✓, THE SETS ARE IN THE APP, THE COACH READS
-YOUR GAMES, YOUR MISTAKES, A NEW PLAN EVERY MORNING, LINK IN BIO. The solving recording is 2.5 seconds long and runs
+Ours, not the interface: the plates TEST YOUR OWN MEMORY, TODAY'S SPONSOR, PAWNS FLASH, THEN VANISH, GAME REPORTS: FREE,
+MORE AT THE END, IT RUNS THE METHOD FOR YOU, EVERY CYCLE TIMED, FASTER ✓, CLEANER ✓, THE SETS ARE IN THE APP, THE COACH
+READS YOUR GAMES, A NEW PLAN EVERY MORNING, FREE, UNLIMITED GAME REPORTS, EVERY MOVE GRADED, YOUR ACCURACY, THE BEST
+MOVE, APP STORE · GOOGLE PLAY, LINK IN BIO. The solving recording is 2.5 seconds long and runs
 once at its own speed.
 
 ## Drawn, not documented

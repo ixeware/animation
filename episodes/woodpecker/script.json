@@ -1,7 +1,7 @@
 {
   "title": "He has seen your position before (Magnus Carlsen's memory, Hans Tikkanen and the Woodpecker Method) x Chessigma Supercoach",
   "channel": "THE 64 FILES",
-  "post": "Magnus has seen your position before. One man built that kind of memory by copying a woodpecker. Test yours: Board Memory on Chessigma, link in bio. How many puzzles did you solve today? #ad #chessigma #chess #magnuscarlsen #woodpeckermethod #chesstok",
+  "post": "You can surprise a human. But not a library: Magnus has seen your position before. One man built that kind of memory by copying a woodpecker. Chessigma's game reports are free (App Store, Google Play, link in bio). How many puzzles did you solve today? #ad #chessigma #chess #magnuscarlsen #woodpeckermethod #chesstok",
   "lead_in": 0.05,
   "tail": 1.8,
   "voice": {
@@ -61,12 +61,13 @@
     },
     {
       "id": "seen",
-      "text": "He isn't calculating. He has seen your position before.",
-      "say": "[dramatic] He isn't calculating. He has seen your position... before.",
+      "text": "You can surprise a human. But not a library. He has seen your position before.",
+      "say": "[dramatic] You can surprise a human. But not a library. He has seen your position... before.",
       "tail_db": -45,
       "pause": 0.35,
       "colors": {
-        "calculating.": "red",
+        "human.": "red",
+        "library.": "gold",
         "seen": "gold",
         "before.": "gold"
       }
@@ -85,8 +86,8 @@
     },
     {
       "id": "early",
-      "text": "You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish. Tap where they stood.",
-      "say": "[curious] You can test yours on Chess-Sigma, today's sponsor. Pawns flash... then vanish. Tap where they stood.",
+      "text": "You can test yours on Chessigma, today's sponsor. Pawns flash, then vanish. And its game reports are free: more on that at the end.",
+      "say": "[curious] You can test yours on Chess-Sigma, today's sponsor. Pawns flash... then vanish. And its game reports are free. More on that at the end.",
       "tail_db": -45,
       "pause": 0.3,
       "colors": {
@@ -94,7 +95,8 @@
         "sponsor.": "gold",
         "flash,": "lime",
         "vanish.": "red",
-        "stood.": "lime"
+        "free:": "lime",
+        "end.": "gold"
       }
     },
     {
@@ -186,14 +188,28 @@
     },
     {
       "id": "ad3",
-      "text": "And its coach reads your own games, finds the mistakes you keep making, and builds your training plan every morning. Link in bio.",
-      "say": "And its coach reads your own games, finds the mistakes you keep making... and builds your training plan, every morning. Link in bio.",
+      "text": "Its coach reads your own games and builds your training plan every morning.",
+      "say": "Its coach reads your own games... and builds your training plan, every morning.",
+      "tail_db": -45,
+      "pause": 0.3,
+      "colors": {
+        "coach": "gold",
+        "plan": "lime"
+      }
+    },
+    {
+      "id": "free",
+      "text": "And the best part is free: unlimited game reports. Every move graded, your accuracy, the best move. It's on the App Store and Google Play. Link in bio.",
+      "say": "[excited] And the best part is free: unlimited game reports. Every move graded, your accuracy, the best move. It's on the App Store, and Google Play. Link in bio.",
       "tail_db": -45,
       "pause": 0.4,
       "colors": {
-        "coach": "gold",
-        "mistakes": "red",
-        "plan": "lime",
+        "free:": "lime",
+        "unlimited": "gold",
+        "graded,": "lime",
+        "accuracy,": "lime",
+        "Store": "gold",
+        "Play.": "gold",
         "bio.": "gold"
       }
     },
