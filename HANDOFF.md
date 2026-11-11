@@ -191,8 +191,10 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
 
 ## 8. Состояние на 11.11.2026
 
-### Последний ролик: `woodpecker`, «He has seen your position before» (пилот для Chessigma Supercoach), версия 3
+### Последний ролик: `woodpecker`, «He has seen your position before» (пилот для Chessigma Supercoach), версия 5
 
+- **Вышел 11.11.2026, 23:45 UTC** (версия 5, 89,8 с): https://www.tiktok.com/@the64files/video/7707064184718036232. Письмо Элиоту со счётом INV-2026-002 —
+  черновик `r-2633488783280130046`, ждёт ссылку на 4К v5 на Drive (там пока v4). Бонус $50 — при 500 тыс. за 30 дней.
 - **Версия 3 (11.11.2026, 85,8 с)** — вторая правка автора: бесплатные отчёты по партиям — главное у Chessigma (намёк в
   начале «its game reviews are free: more on that at the end» (в v3 было «reports», в v4 исправлено по брифу), объяснение в конце вместе с App Store и Google Play);
   эдит-байт должен быть метафорой («You can surprise a human. But not a library»); дятел сидит на плече лапами на
