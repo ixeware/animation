@@ -38,7 +38,7 @@ const SIG = { bg: '#171717', card: '#232323', yel: '#FBBF24' };
 // file keeps Black's rook on d8, where 1.Qxd8 mates at once; here it stands on f8, so the queen sacrifice is the only way
 const PZ = (await fetch('../engine/data/tal_queen.json').then(r => r.json())).map((p, k) => ({ ...p, from: k === 2 ? 'f8' : p.from,
   pieces: p.pieces.map(q => q.id === 'r1' && k < 2 ? { ...q, sq: 'f8' } : q) }));
-const IMG = Object.fromEntries(await Promise.all(['chessigma_woodpecker.jpg', 'chessigma_memory.jpg', 'chessigma_store_review.png', 'chessigma_logo.png']
+const IMG = Object.fromEntries(await Promise.all(['chessigma_woodpecker.jpg', 'chessigma_memory.jpg', 'chessigma_logo.png']
   .map(async f => [f.replace('chessigma_', '').replace('.', '_'), await loadImage(`../episodes/woodpecker/photos/${f}`)])));
 // the famous positions on the cards of the hook, our own choice of three (SOURCES.md): Fischer's 17...Be6 of 1956, Tal's
 // 21...Nf4 against Botvinnik in 1960, the Polish Immortal a move before the pawn mates
@@ -964,7 +964,7 @@ export async function build(T) {
     const birdV = t => { let v = rest; for (const [pt, row] of pecks) v = lerp(v, row, seg(t, pt - 0.22, pt - 0.06)); return v; };
     const screenAt = t => {
       let i = 0; prog.forEach(([a], k) => { if (t >= a) i = k; });
-      const o = { to: prog[i][1](t), from: i ? prog[i - 1][1](t) : null, slide: i ? (t - prog[i][0]) / 0.26 : 1, hi: null, tap: null };
+      const o = { to: prog[i][1](t), from: i ? prog[i - 1][1](t) : null, slide: i && prog[i][2] !== 'cut' ? (t - prog[i][0]) / 0.26 : 1, hi: null, tap: null };  // 'cut': the next move of the same screen, no slide
       for (const [x0, y0, x1, y1, a, b] of boxes) { const k = seg(t, a, a + 0.12) * (1 - seg(t, b - 0.12, b)); if (k > 0) o.hi = { x0, y0, x1, y1, a: k }; }
       for (const [pt, row, rc] of pecks) if (t >= pt && t < pt + 0.45) o.tap = { x: rc + 26, y: row, u: (t - pt) / 0.45 };
       for (const [pt, x, y] of rings) if (t >= pt && t < pt + 0.45) o.tap = { x, y, u: (t - pt) / 0.45 };
@@ -1306,7 +1306,7 @@ export async function build(T) {
   // ======================= THE SPONSOR, THE THIRD TIME. TODAY YOU DON'T NEED A THOUSAND PRINTED PUZZLES: the pile blows off
   // the table, the phone stays. THE SETS ARE IN CHESSIGMA =======================
   const a1S = s('ad1') - 0.05, dontT = w('ad1', 'dont'), setsT = w('ad1', 'sets'), sig2T = w('ad1', 'chessigma');
-  const a3S = s('ad3') - 0.04, coachT = w('ad3', 'coach'), ownT = w('ad3', 'own'), buildsT = w('ad3', 'builds'), plan3T = w('ad3', 'plan'), ctaS = s('cta') - 0.05;
+  const a3S = s('ad3') - 0.04, coachT = w('ad3', 'coach'), ownT = w('ad3', 'own'), buildsT = w('ad3', 'builds'), plan3T = w('ad3', 'plan'), ctaS0 = s('cta') - 0.05;
   const freeS = s('free') - 0.05, freeT = w('free', 'free'), unlT = w('free', 'unlimited'), gradT = w('free', 'graded'), accT = w('free', 'accuracy'), bestT = T.w('free', 15).s, appT = w('free', 'app'), linkT = w('free', 'link');
   const BLOW = fr(dontT + 0.02), stackTop = [STACK.x + 0.2, -0.35 + STACK.h, STACK.z - 0.2], peckS = [fr(BLOW - 0.3), fr(BLOW - 0.14), BLOW], trainS = setsT - 0.14;
   shot(a1S, (g, lt, t, sh) => {
@@ -1350,31 +1350,32 @@ export async function build(T) {
     rig(B, lt, [[0, K(0.07, 0.015, 5.75, PHC)], [len(sh), K(0.0, 0.015, 5.5, PHC)]], { t, e: lin });
     endPh(g, t);
   }, { hud: endHud, info: true });
-  // AND THE BEST PART IS FREE: UNLIMITED GAME REVIEWS. EVERY MOVE GRADED, YOUR ACCURACY, THE BEST MOVE: Chessigma's own App
-  // Store screenshot of a game review (their creator kit, photos/chessigma_store_review.png), flat as delivered, its own
-  // headline replaced by our plates (the kit allows it). A window of it: from the phone's top to the strip of graded moves
-  const REVW = { y0: 570, y1: 2640, top: 292, bot: 1620 }, revS = (REVW.bot - REVW.top) / (REVW.y1 - REVW.y0);
-  const revPt = (x, y, z) => [W / 2 + (x - 660) * revS * z, REVW.top + (y - REVW.y0) * revS * z + (REVW.bot - REVW.top) * (1 - z) / 2];
-  const CLOSE = fr(T.w('free', 16).e + 0.12);  // after "the best move": the kit's end card
+  // AND THE BEST PART IS FREE: UNLIMITED GAME REVIEWS. EVERY MOVE GRADED, YOUR ACCURACY, THE BEST MOVE (Eliot's beat 14):
+  // the free review on the phone, as Chessigma asked for it: the games of the Chess.com player yoze_h, the game against
+  // plaaaaaaayyy, its report, then the review from 55. Qc2 to 57. Bxh3, the Sigma, landing on "the best move"
+  // (photos/rec/review.mp4: Chessigma's site in a phone window, its header off; times in it below, REV)
+  const REV = { list: 0, report: 2.95, qc2: 5.85, h3: 6.854, bxh3: 7.858 };
+  const CLOSE = fr(w('free', 'app') + 0.27);  // the kit's end card: its badges come in at "Google Play"
+  const ctaS = Math.max(ctaS0, CLOSE + 3.0);  // the question's shot starts when the end card has played to its end
+  const repS = T.w('free', 8).e + 0.08, sigS = fr(T.w('free', 14).s - 0.12), qcS = sigS - 0.76, h3S = sigS - 0.38;  // Qc2, h3, then the Sigma on "the best move"
+  const freePh = phoneSeg({
+    prog: [[freeS, t => ({ rec: 'review', sec: REV.list + t - freeS })],
+      [repS, t => ({ rec: 'review', sec: REV.report + t - repS })],
+      [qcS, t => ({ rec: 'review', sec: REV.qc2 + t - qcS })],
+      [h3S, t => ({ rec: 'review', sec: REV.h3 + t - h3S }), 'cut'],
+      [sigS, t => ({ rec: 'review', sec: REV.bxh3 + t - sigS }), 'cut']],
+    pecks: [[fr(repS + 0.05), 420, 90]],
+  });
   shot(freeS, (g, lt, t, sh) => {
-    const img = IMG.store_review_png, z = 1 + 0.035 * glide(clamp(lt / (CLOSE - freeS)));
-    g.fillStyle = SIG.bg; g.fillRect(0, 0, W, H);
-    g.save(); g.beginPath(); g.rect(0, REVW.top, W, REVW.bot - REVW.top); g.clip();
-    const [x0, y0] = revPt(0, 0, z); g.drawImage(img, x0, y0, 1320 * revS * z, 2868 * revS * z); g.restore();
-    const box = (bx0, by0, bx1, by1, a, b) => {  // a frame of our own over a part of it
-      const k = seg(t, a, a + 0.12) * (1 - seg(t, b - 0.12, b)); if (k <= 0) return;
-      const [X0, Y0] = revPt(bx0, by0, z), [X1, Y1] = revPt(bx1, by1, z);
-      g.save(); g.globalAlpha = k; g.strokeStyle = SIG.yel; g.lineWidth = 7; g.shadowColor = SIG.yel; g.shadowBlur = 20; g.beginPath(); g.roundRect(X0, Y0, X1 - X0, Y1 - Y0, 18); g.stroke(); g.restore();
-    };
-    box(40, 2310, 1280, 2610, gradT - 0.1, accT - 0.05);   // the strip of graded moves
-    box(170, 1310, 660, 1790, bestT - 0.1, CLOSE);           // the best move, its arrow on the board
-  }, { flat: true, hud: (g, lt, t) => {
-    adHud(g, lt, t);
-    bdg(g, t, 'FREE', freeT - 0.03, { x: 300, y: 205, color: LEAFG, size: 64 });
-    bdg(g, t, 'UNLIMITED GAME REVIEWS', unlT - 0.03, { x: 700, y: 200, color: CREAM, size: 32, until: gradT - 0.03 });
-    bdg(g, t, 'EVERY MOVE GRADED', gradT - 0.03, { x: 700, y: 200, color: CREAM, size: 36, until: accT - 0.03 });
-    bdg(g, t, 'YOUR ACCURACY', accT - 0.03, { x: 700, y: 200, color: CREAM, size: 38, until: bestT - 0.03 });
-    bdg(g, t, 'THE BEST MOVE', bestT - 0.03, { x: 700, y: 200, color: CREAM, size: 38 });
+    rig(B, lt, [[0, K(0.06, 0.015, 5.9, PHC)], [repS - freeS, K(0.02, 0.012, 5.65, [3.4, 2.3, 4.2])], [len(sh), PHN[1]]], { t, e: glide });
+    freePh(g, t);
+  }, { info: true, hud: (g, lt, t) => {
+    adHud(g, lt, t); sigPlate(g, 150, {});
+    bdg(g, t, 'FREE', freeT - 0.03, { x: 250, y: 262, color: LEAFG, size: 58 });
+    bdg(g, t, 'UNLIMITED GAME REVIEWS', unlT - 0.03, { x: 690, y: 262, color: CREAM, size: 30, until: gradT - 0.03 });
+    bdg(g, t, 'EVERY MOVE GRADED', gradT - 0.03, { x: 690, y: 262, color: CREAM, size: 34, until: accT - 0.03 });
+    bdg(g, t, 'YOUR ACCURACY', accT - 0.03, { x: 690, y: 262, color: CREAM, size: 38, until: bestT - 0.03 });
+    bdg(g, t, 'THE BEST MOVE', bestT - 0.03, { x: 690, y: 262, color: CREAM, size: 38 });
   } });
   // IT'S ON THE APP STORE AND GOOGLE PLAY. LINK IN BIO: the kit's own 3-second end card as it is (photos/rec/closer.mp4):
   // logo, 2M+ PLAYERS, 15M+ games analyzed, five stars, then the two store badges fading in. No captions over it (they
@@ -1383,7 +1384,7 @@ export async function build(T) {
     { flat: true, noCaptions: true, hud: (g, lt, t) => { adHud(g, lt, t); bdg(g, t, 'LINK IN BIO', linkT - 0.05, { y: 1462, color: SIG.yel, ink: SIG.bg, size: 50 }); } });
   cue(trainS, 'swipe_card', 0.35); cue(sig2T - 0.25, 'reveal_bell', 0.4); cue(a3S, 'swipe_card', 0.4); cue(ownT + 0.1, 'swipe_card', 0.35); cue(buildsT - 0.2, 'swipe_card', 0.35);
   cue(buildsT, 'reveal_bell', 0.3); cue(freeS - 0.08, 'whoosh_fast', 0.35); cue(freeT - 0.03, 'success', 0.45); cue(freeT, 'reveal_bell', 0.45);
-  [gradT, accT, bestT].forEach(x => cue(x - 0.03, 'sparkle_pop', 0.28)); cue(CLOSE, 'whoosh_soft', 0.4); cue(CLOSE + 1.11, 'notify', 0.3); cue(linkT - 0.05, 'reveal_bell', 0.4);
+  [gradT, accT].forEach(x => cue(x - 0.03, 'sparkle_pop', 0.28)); cue(repS, 'swipe_card', 0.3); cue(qcS, 'swipe_card', 0.3); cue(h3S, 'piece', 0.3); cue(sigS, 'piece', 0.35); cue(sigS + 0.35, 'shimmer', 0.45); cue(sigS + 0.75, 'reveal_bell', 0.45); cue(CLOSE, 'whoosh_soft', 0.4); cue(CLOSE + 1.11, 'notify', 0.3); cue(linkT - 0.05, 'reveal_bell', 0.4);
   { const pk = [fr(trainS + 0.6), fr(a3S + 0.1), fr(buildsT), fr(plan3T)]; knocks(pk, 0.5); pk.forEach(x => cue(x, 'sparkle_pop', 0.22)); }
 
   // ======================= CTA: the two of them at the birch again; how many puzzles did you solve today? =======================

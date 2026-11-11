@@ -105,6 +105,21 @@ Callum (ElevenLabs, `eleven_v3`), tempo 1.32. Voiced on the free tier for the pr
 a sponsor, voice it again on a paid tier (delete `build/tts_cache` and run `audio/tts.py`), then render again — word
 timings move by a few frames.
 
+## Beat 14 as Chessigma asked (version 5, 11 November 2026)
+
+Eliot asked for beat 14 to show the games of the Chess.com player **yoze_h**, the game against **plaaaaaaayyy**, its
+report for a moment, then the review from **55. Qc2** with the Sigma animation. In the review, 55. Qc2 is graded Clown
+and the Sigma is **57...Bxh3**, two moves later ("Bxh3 is sigma — The best move here"; it is also the move the
+site's "Your brilliant moves" card shows). So the phone shows: the games list on "unlimited game reviews", the report
+(accuracy 64.8, one Sigma) on "every move graded, your accuracy", then Qc2, h3 and Bxh3 with the Sigma animation on
+"the best move". The clip (`photos/rec/review.mp4`) is Chessigma's site in a phone window (390 × 856 CSS px at 2
+device px), its header cropped off, recorded as screenshots; while a move animated, the page's animations ran ten times
+slower so the screenshots make a smooth animation at normal speed. It is not the signed-in app: the coach's bubble
+shows "Sign in for free". For the final, the author records the same steps in the app, signed in.
+
+The kit's end card now starts at "App" (83.0 s) and plays its full 3 seconds; the closing question's shot starts after
+it (86.0 s).
+
 ## Chessigma's creator kit (version 4)
 
 On 11 November 2026 Eliot Hennebo shared the folder "chessigma-creator-kit-v1" (Google Drive, view only): logo, store
