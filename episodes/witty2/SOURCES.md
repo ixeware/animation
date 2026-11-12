@@ -1,0 +1,71 @@
+# Witty Alien vs Magnus Carlsen: round two — источники
+
+Ролик для The 64 Files (своего канала), продолжение `witty`. Идея автора, 12.11.2026: «может сделать про то как витти
+снова поиграл с магнусом но проиграл»; «рекламу надо только под конец» (в этом ролике рекламы нет); «добавь визуальные
+элементы референсом что витти это годжо, а магнус сукуна, и в конце витти все таки проиграл» (правила 61, 62).
+
+## Партии
+
+| Партия | Дата (UTC) | Контроль | Итог | Источник |
+|---|---|---|---|---|
+| Witty_Alien — MagnusCarlsen | 7.11.2026, 19:37–19:47 | блиц 5+0, без рейтинга | 0–1, белые сдались на 54-м ходу | [chess.com/game/live/186739331724](https://www.chess.com/game/live/186739331724), PGN — `engine/data/witty_magnus_2026-11-07.pgn` (из API `api.chess.com/pub/player/magnuscarlsen/games/2026/11`), JSON — `witty_magnus_2026-11-07.json` |
+| MagnusCarlsen — Witty_Alien | 30.09.2026 | блиц 5+0, рейтинговая | 0–1 (Магнус сдался) | [chess.com/game/live/184609437048](https://www.chess.com/game/live/184609437048); ролик `witty` |
+
+Рейтинги Chess.com в партии 7.11: Witty_Alien 2538, MagnusCarlsen 3375. Дебют по PGN: B15, Каро-Канн:
+1.e4 c6 2.d4 d5 3.Nd2 dxe4 4.Nxe4 Nf6 5.Ng5 h6 **6.Nxf7 Kxf7** — позиция Alien Gambit (в первом ролике он дан через
+3.Nc3, позиция после 4.Nxe4 та же). ChessBase India назвала партию «Magnus Carlsen takes on the Alien Gambit: the
+Witty Alien rematch» (страница из сессии не открылась — сайт закрыт сетью окружения; заголовок и пересказ — из поиска).
+
+### Все их партии на Chess.com (архивы MagnusCarlsen, январь 2022 — ноябрь 2026, проверено 12.11.2026)
+| Дата | Контроль | Итог |
+|---|---|---|
+| 28.12.2024 | пуля 1+0 | Магнус выиграл |
+| 13.12.2025 | пуля 1+0 | Магнус выиграл |
+| 13.12.2025 | пуля 1+0 | Магнус выиграл |
+| 30.09.2026 | блиц 5+0 | Witty выиграл |
+| 7.11.2026 | блиц 5+0 | Магнус выиграл |
+Итого 4:1 в пользу Магнуса — «On Chess.com, it's now four to one. For Magnus.» Совпадает с ChessBase India («4-1»).
+
+### Оценки Stockfish 16 (глубина 18 по всей партии, ключевые места — 26)
+| После хода | Оценка (за белых) | Что в ролике |
+|---|---|---|
+| 6...Kxf7 | −2,0 | «The engine says Witty is losing.» Магнус взял коня королём — «With his king.» |
+| 16...Kg8 / 17.Bf5 | −1,0 | |
+| **17...Bg6** (ход Магнуса) | **+0,9** | «But Magnus slips. The bar flips. Witty is better.» |
+| 20...Qd7 | лучший ход **21.Re6 +1,3** (21...Nxe6 22.dxe6 Qxe6 23.Qxa8+); 21.Rad1 +0,3 | «Move twenty-one. The engine's move: rook e6.» |
+| **21.Re2** (сыграно) | −0,2 | «He plays rook e2.» |
+| 23.Re6 (сыграно) | −0,1, ответ 23...Nxd5 | «Two moves later, he finds rook e6. Too late.» |
+| 28...Nxe7 | −0,1 … −0,2 | равный эндшпиль |
+| 31.Nd6 → 37.Bxd4 | −1,6 → −3,7 | «And Magnus just walks his pawns.» |
+| 49...d1=Q+ 50.Kxd1, 51...a1=Q | мат | «A queen. Witty takes it. Another queen.» |
+
+### Часы (из `[%clk]`)
+- После 21.Re2: Witty 1:22, Магнус 1:14 (Witty даже впереди по времени).
+- После 37.Bxd4 / 37...cxd4: Witty 0:19, Магнус 0:21 — «Now it's twenty seconds each.»
+- После 54.Ka4 у Witty 0:06,1, у Магнуса 0:12,5; Witty сдался — «Witty resigns with six seconds left.»
+
+## Факты в тексте
+- «He beat Magnus Carlsen» — 30.09.2026, блиц 5+0 (выше). «went wild on stream» — новости о его реакции на стриме
+  ([DAZN](https://www.dazn.com/en-US/news/chess/magnus-carlsen-loses-witty-alien-chess-influencer-gambit-t3r/1qe98mmwuiadl11ekdkk1gor5e),
+  [Chess.com forum](https://www.chess.com/forum/view/general/witty-alien-beats-magnus), YouTube «HE JUST BEAT MAGNUS
+  CARLSEN… AND WENT CRAZY!»). Подробности (футболка, штаны) в источниках расходятся — в тексте их нет.
+- «Five weeks later» — 30.09 → 7.11, 38 дней.
+- «he throws a knight at Magnus. His own weapon. The Alien Gambit.» — 6.Nxf7, гамбит Witty (ролик `witty`).
+- «Then he asked for round two» — фигура речи: кто кого вызвал, неизвестно (партия без рейтинга, вызовом); в тексте
+  только то, что он пришёл на второй раунд.
+
+## Отсылки — не факты (правило 62)
+- «Nah. I'd win.» — мем из манги «Магическая битва» (Jujutsu Kaisen, Гэгэ Акутами): так отвечает Сатору Годжо, глава 221
+  ([Know Your Meme](https://amp.knowyourmeme.com/memes/nah-id-win), [Sportskeeda](https://sportskeeda.com/anime/jujutsu-kaisen-fans-riot-viz-ruins-gojo-s-iconic-dialog-chapter-221)).
+  На экране плашка «WITTY, PROBABLY:» — это шутка-мем, а не его слова.
+- «Stand proud, Witty. You're strong.» — слова диктора, отсылка к фразе Сукуны поверженному Дзёго
+  ([Sportskeeda](https://sportskeeda.com/anime/stand-proud-strong-sukuna-s-famous-quote-jujutsu-kaisen-explained)).
+  Магнусу не приписывается.
+- «WITTY WON.» перечёркнуто — отсылка к мему с панелью «GOJO WON.» (прислал автор).
+- Witty в образе Годжо (белые волосы, повязка на глазах, синий свет), Магнус — Сукуны (метки на лице, красный свет).
+  Только детали образа в нашем стиле; кадры манги и аниме в ролик не входят.
+
+## Как нарисовано
+- Witty — наш персонаж `witty` из первого ролика, для отсылки — белые волосы торчком и чёрная повязка; Магнус — наш
+  `magnus` с чёрными полосами под глазами и красными глазами.
+- Доска партии — зелёная Chess.com (правило 48: онлайн-партия — её доска), ходы — настоящие ходы партии 7.11.
