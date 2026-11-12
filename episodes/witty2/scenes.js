@@ -684,6 +684,77 @@ function orb(g, x, y, r, col, a = 1) {
   const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(0.22, mix(col, '#FFFFFF', 0.5)); gr.addColorStop(0.55, rgba(col, 0.7)); gr.addColorStop(1, rgba(col, 0));
   g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r); g.restore();
 }
+// ======================= THE DOMAIN CLASH (the author's reference: Gojo's void against Sukuna's shrine) =======================
+// our own 2.5D picture, not the anime frame: the blue starry void at the lower left with Witty (Gojo) seen from behind,
+// the red sky at the upper right with a black shrine and Magnus (Sukuna) on its roof, the two meeting on a diagonal
+// where blue and red streaks collide. u: the push-in (0..1); hit: time of the clash flash
+const CLASH = { a: [0, H * 0.16], b: [W, H * 0.74] };  // the clash line: above it the shrine, below it the void
+const clashSide = (x, y) => (CLASH.b[0] - CLASH.a[0]) * (y - CLASH.a[1]) - (CLASH.b[1] - CLASH.a[1]) * (x - CLASH.a[0]);  // < 0: the red side
+function shrineSil(g, cx, by, s) {  // a black two-roofed shrine on a platform, its open hall glowing red
+  g.save(); g.translate(cx, by); g.scale(s, s); g.fillStyle = '#08020A';
+  g.fillRect(-470, -40, 940, 60); g.fillRect(-420, -80, 840, 50);
+  for (const px of [-360, -210, 170, 320]) g.fillRect(px, -330, 40, 260);
+  const hall = g.createLinearGradient(0, -330, 0, -80); hall.addColorStop(0, '#3A0408'); hall.addColorStop(1, '#FF3A2E'); g.fillStyle = hall; g.fillRect(-170, -330, 340, 250);
+  g.fillStyle = '#08020A';
+  for (let i = 0; i < 9; i++) { const x = -150 + i * 37; g.beginPath(); g.moveTo(x, -330); g.lineTo(x + 18, -270); g.lineTo(x + 36, -330); g.fill(); g.beginPath(); g.moveTo(x, -80); g.lineTo(x + 18, -135); g.lineTo(x + 36, -80); g.fill(); }  // teeth round the hall
+  const roof = (y, hw, rise, th) => { g.beginPath(); g.moveTo(-hw, y); g.quadraticCurveTo(-hw * 0.55, y - rise * 0.15, 0, y - rise); g.quadraticCurveTo(hw * 0.55, y - rise * 0.15, hw, y);
+    g.lineTo(hw - 50, y + th); g.quadraticCurveTo(hw * 0.5, y - rise * 0.08 + th, 0, y - rise + th * 1.4); g.quadraticCurveTo(-hw * 0.5, y - rise * 0.08 + th, -hw + 50, y + th); g.closePath(); g.fill(); };
+  roof(-330, 560, 170, 56); g.fillRect(-300, -500, 600, 70); roof(-500, 400, 140, 50);
+  g.beginPath(); g.moveTo(-330, -500); g.quadraticCurveTo(-180, -540, 0, -585); g.quadraticCurveTo(180, -540, 330, -500); g.lineTo(330, -420); g.lineTo(-330, -420); g.closePath(); g.fill();  // the roof's body under the ridge
+  g.restore();
+}
+function gojoBack(g, x, y, s, t) {  // Witty as Gojo from behind: dark top, the back of the white hair, the band's knot and tails in the wind
+  g.save(); g.translate(x, y); g.scale(s, s);
+  g.fillStyle = '#141826'; g.beginPath(); g.moveTo(-330, 900); g.lineTo(-300, 330); g.quadraticCurveTo(-280, 190, -120, 150); g.lineTo(120, 150); g.quadraticCurveTo(280, 190, 300, 330); g.lineTo(330, 900); g.closePath(); g.fill();
+  g.fillStyle = '#0C0F1A'; g.beginPath(); g.ellipse(0, 175, 150, 60, 0, 0, 7); g.fill();  // the collar
+  g.strokeStyle = 'rgba(127,208,255,0.35)'; g.lineWidth = 8; g.beginPath(); g.moveTo(-300, 340); g.quadraticCurveTo(-280, 200, -120, 160); g.stroke();  // blue rim light
+  g.fillStyle = '#E8B898'; g.fillRect(-48, 90, 96, 80); for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(sd * 98, 5, 18, 28, 0, 0, 7); g.fill(); }
+  CAST.wit.hairFx(g, 'back', { fw: 0.92 }); g.fillStyle = '#EEF2F8'; g.beginPath(); g.ellipse(0, -10, 100, 118, 0, 0, 7); g.fill(); CAST.wit.hairFx(g, 'front', { fw: 0.92 });
+  g.fillStyle = '#121218'; g.beginPath(); g.moveTo(-104, -14); g.quadraticCurveTo(0, 2, 104, -14); g.lineTo(104, 40); g.quadraticCurveTo(0, 56, -104, 40); g.closePath(); g.fill();  // the band round the back
+  g.beginPath(); g.ellipse(0, 14, 22, 20, 0, 0, 7); g.fill();  // the knot
+  for (const [k, ph] of [[1, 0], [0.8, 1.7]]) { const wv = Math.sin(t * 9 + ph) * 18; g.beginPath(); g.moveTo(8, 10); g.quadraticCurveTo(110 * k, 30 + wv, 220 * k, 6 + wv * 1.6); g.lineTo(214 * k, 30 + wv * 1.6); g.quadraticCurveTo(100 * k, 50 + wv, 6, 26); g.closePath(); g.fill(); }
+  g.restore();
+}
+function domainClash(g, t, u, hit) {
+  const z = 1 + 0.07 * u, sh = Math.max(0, 1 - (t - hit) / 0.5) * (t >= hit ? 1 : 0);
+  g.save(); g.translate(W / 2 + Math.sin(t * 61) * 10 * sh, H / 2 + Math.cos(t * 53) * 8 * sh); g.scale(z, z); g.translate(-W / 2, -H / 2);
+  // the void: the blue texture, its bright core low and left
+  g.fillStyle = '#04060F'; g.fillRect(-200, -200, W + 400, H + 400);
+  g.drawImage(VOID_T, -900, 260, 2900, 1813);
+  // the shrine's half: above the line
+  g.save(); g.beginPath(); g.moveTo(-300, -300); g.lineTo(W + 300, -300); g.lineTo(W + 300, CLASH.b[1] + (W + 300 - CLASH.b[0]) * (CLASH.b[1] - CLASH.a[1]) / W); g.lineTo(-300, CLASH.a[1] - 300 * (CLASH.b[1] - CLASH.a[1]) / W); g.closePath(); g.clip();
+  const sky = g.createLinearGradient(0, 0, 0, H * 0.8); sky.addColorStop(0, '#16020A'); sky.addColorStop(0.5, '#5A0710'); sky.addColorStop(1, '#C8202A'); g.fillStyle = sky; g.fillRect(-300, -300, W + 600, H + 600);
+  const r0 = rng(21);
+  g.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 70; i++) {  // red flame streaks blowing toward the line
+    const x0 = r0() * W * 1.3, y0 = r0() * H * 0.6 - 100, L = 120 + r0() * 380, a = 2.0 + r0() * 0.4, f = 0.5 + 0.5 * Math.sin(t * (6 + r0() * 8) + i);
+    g.strokeStyle = rgba(r0() < 0.3 ? '#FFB0A0' : '#FF3A2E', 0.15 + 0.35 * f); g.lineWidth = 3 + r0() * 9;
+    g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 + Math.cos(a) * L * 0.5 + 30, y0 + Math.sin(a) * L * 0.5, x0 + Math.cos(a) * L, y0 + Math.sin(a) * L); g.stroke();
+  }
+  g.globalCompositeOperation = 'source-over';
+  drawChar(g, 'mag', { x: W * 0.7, y: 330, s: 0.52, e: { ...EXPR.smug, glow: 1 }, t });  // Magnus standing behind the ridge
+  shrineSil(g, W * 0.7, 1010, 0.86);
+  g.restore();
+  // the clash: blue streaks from the lower left and red from the upper right meet on the line, white sparks along it
+  const nx = -(CLASH.b[1] - CLASH.a[1]), ny = CLASH.b[0] - CLASH.a[0], nl = Math.hypot(nx, ny), Nx = nx / nl, Ny = ny / nl;  // the normal, pointing to the void
+  g.save(); g.globalCompositeOperation = 'lighter'; g.lineCap = 'round';
+  const r1 = rng(9);
+  for (let i = 0; i < 90; i++) {
+    const v = r1(), px = lerp(CLASH.a[0], CLASH.b[0], v), py = lerp(CLASH.a[1], CLASH.b[1], v), blue = i % 2 === 0, d = blue ? 1 : -1;
+    const L = 80 + r1() * 260, jit = (r1() - 0.5) * 0.6, f = 0.5 + 0.5 * Math.sin(t * (10 + r1() * 10) + i * 1.7);
+    const ex = px + (Nx * d + jit * Ny) * L, ey = py + (Ny * d - jit * Nx) * L;
+    g.strokeStyle = rgba(blue ? (r1() < 0.4 ? '#FFFFFF' : '#7FD0FF') : (r1() < 0.4 ? '#FFD0C8' : '#FF4A3D'), 0.25 + 0.5 * f); g.lineWidth = 2 + r1() * 7;
+    g.beginPath(); g.moveTo(px, py); g.lineTo(ex, ey); g.stroke();
+  }
+  g.shadowColor = '#FFFFFF'; g.shadowBlur = 40; g.strokeStyle = '#FFFFFF'; g.lineWidth = 10 + 6 * Math.sin(t * 30);
+  g.beginPath(); for (let i = 0; i <= 24; i++) { const v = i / 24, j = (Math.sin(i * 7.3 + t * 25) * 0.5) * 26; g.lineTo(lerp(CLASH.a[0], CLASH.b[0], v) + Nx * j, lerp(CLASH.a[1], CLASH.b[1], v) + Ny * j); } g.stroke();
+  g.restore();
+  gojoBack(g, W * 0.3, 1060 - 30 * u, 1.05, t);  // Witty from behind, lower left, looking up at the shrine
+  g.restore();
+  if (t >= hit) flashTint(g, '#FFFFFF', 0.6 * (1 - seg(t, hit, hit + 0.4)));
+  lowKey(g, { cy: H * 0.5, a: 0.18 });
+}
+
 // Sukuna's cuts: thin bright lines slicing across the frame, red glow, fading
 function slashes(g, t, t0, { n = 3, seed = 7, life = 0.55 } = {}) {
   const u = (t - t0) / life; if (u < 0 || u > 1) return;
@@ -807,16 +878,15 @@ export async function build(T) {
     domain(g, t, { pieces: start, wPlayer: false, bPlayer: false, flip: seg(t, remA + 0.2, w('rematch', 2) + 0.15) });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= w('rematch', 1)) counter(g, '5', 'WEEKS LATER', { y: 330, size: 170, color: GOLD, at: [t, w('rematch', 1)] }); } });
   cue(remA + 0.2, 'page_flip', 0.45);
+  // ROUND TWO. FIVE-MINUTE BLITZ: the domain clash (the author's reference scene, in our own drawing)
   shot(roundA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, 0.05, 16.3, [4, 5.0, CAMZ])], [len(sh), K(0.0, 0.04, 14.4, [4, 5.0, CAMZ])]], { t, bump: t > round2T && t < round2T + 0.3 ? 1 : 0 });
-    online(g, t, { pieces: start, cams: { wit: { e: WE('smug', { band: 1 }) }, mag: { e: ME('smug', { glow: 0.8 }) } }, clock: clockAt(0) });
-  }, { trans: 'zoom', hud: (g, lt, t) => vsLabel(g, lt, round2T - roundA, W / 2, 1530) });
-  shot(blitzA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.3, 0.2, 6.4, [9.9, 0.25, 3.1])], [len(sh), K(-0.2, 0.17, 5.2, [9.9, 0.2, 3.1])]], { t });
-    online(g, t, { pieces: start, clock: clockAt(0), camA: 0 });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= blitzT - 0.1) badge(g, '5 + 0 BLITZ', W / 2, 230, { color: GOLD, size: 64, ...pop(t, blitzT - 0.1) }); } });
-  cue(remA - 0.04, 'whoosh_deep', 0.35); cue(remA + 0.1, 'riser', 0.3); cue(round2T - 0.004, 'boom_big', 0.6); cue(round2T + 0.02, 'hit_punch', 0.35);
-  cue(blitzA - 0.04, 'whoosh_fast', 0.3); cue(blitzT - 0.1, 'clock_press', 0.5); cue(blitzT + 0.2, 'clock_tick', 0.3);
+    domainClash(g, t, seg(t, roundA, openA, lin), round2T);
+  }, { trans: 'flash', flat: true, hud: (g, lt, t) => {
+    if (t >= round2T) badge(g, 'DOMAIN EXPANSION', W / 2, 1540, { color: CREAM, size: 56, ...pop(t, round2T) });
+    if (t >= blitzT - 0.1) badge(g, '5 + 0 BLITZ', W / 2, 1650, { color: GOLD, size: 56, ...pop(t, blitzT - 0.1) });
+  } });
+  cue(remA - 0.04, 'whoosh_deep', 0.35); cue(remA + 0.1, 'riser', 0.3); cue(round2T - 0.3, 'revswell', 0.5); cue(round2T - 0.004, 'boom_big', 0.75); cue(round2T + 0.02, 'hit_punch', 0.45);
+  cue(round2T + 0.05, 'shimmer', 0.4); cue(blitzT - 0.1, 'clock_press', 0.45);
 
   // ======================= MOVE SIX: THE KNIGHT ON f7 (the main move: Hollow Purple, rule 32 / §8) =======================
   const OPEN = spaced(openA + 0.12, sixT - 0.02, 10);
@@ -1066,13 +1136,13 @@ export async function build(T) {
   const tvOff = T.duration - 0.5;
   cue(tvOff, 'tvoff', 0.5);
   const music = [
-    { t: 0, m: 'hook' }, { t: winT, m: 'slam' }, { t: nameA, m: 'digital' }, { t: remA, m: 'tension' }, { t: openA, m: 'build' },
+    { t: 0, m: 'hook' }, { t: winT, m: 'slam' }, { t: nameA, m: 'digital' }, { t: remA, m: 'tension' }, { t: round2T, m: 'slam' }, { t: openA, m: 'build' },
     { t: LAND, m: 'slam' }, { t: hisA + 0.6, m: 'glory' }, { t: takeA, m: 'intrigue' }, { t: flipA, m: 'build' }, { t: flipsT, m: 'victory' },
     { t: m21A, m: 'tension' }, { t: NXD5, m: 'drop' }, { t: endA, m: 'clockwork' }, { t: q1A, m: 'build' }, { t: Q2, m: 'slam' },
     { t: resA, m: 'void' }, { t: mirA, m: 'tension' }, { t: novA, m: 'hit' }, { t: scoreA, m: 'elegy' }, { t: ad1A, m: 'digital' }, { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
-    { t0: winT - 0.32, t1: winT - 0.01, kind: 'mute' }, { t0: winT, t1: nameA, kind: 'boost', db: 4 },
+    { t0: winT - 0.32, t1: winT - 0.01, kind: 'mute' }, { t0: round2T - 0.3, t1: round2T - 0.01, kind: 'mute' }, { t0: round2T, t1: openA, kind: 'boost', db: 4 }, { t0: winT, t1: nameA, kind: 'boost', db: 4 },
     { t0: LAND - 0.34, t1: LAND - 0.01, kind: 'mute' }, { t0: LAND, t1: hisA + 0.6, kind: 'boost', db: 5 },
     { t0: Q2 - 0.32, t1: Q2 - 0.01, kind: 'mute' }, { t0: Q2, t1: resA, kind: 'boost', db: 4 },
     { t0: proudA, t1: ad1A, kind: 'lp', f: 900 }, { t0: ctaA, t1: T.duration, kind: 'lp', f: 900 },
