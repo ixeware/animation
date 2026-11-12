@@ -93,6 +93,10 @@ function halo(g, a, col) {
 }
 CAST.wit = { face: [0.92, 1.07, 0.84], hair: 'messy', hairC: '#EEF2F8', brow: '#DCE3EC', suit: '#1A1D2B', suitD: '#10121C', shirt: 'hoodie', ears: 1.02, iris: '#59C8FF', hairFx: gojoHair, faceFx: gojoFace };
 CAST.mag = { ...CAST.magnus, iris: '#C8283A', faceFx: sukunaFace };
+// most of the video they are themselves (the author: "не надо чтоб они прям во всех сценах были в этом образе");
+// Gojo and Sukuna show only on the beats: "Nah, I'd win", the second queen, the resignation, "For Magnus", "Stand proud"
+CAST.witN = { ...CAST.witty };
+CAST.magN = { ...CAST.magnus };
 const skinOf = who => ({ ...SKIN2, ...(CAST[who].skin || {}) });
 // the engine's hands take the skin of the last character drawn: an invisible head sets it before a seated() hand
 const useSkin = (g, who) => drawChar(g, who, { alpha: 0, noBody: true });
@@ -529,7 +533,7 @@ function domainBack(g, t, { blue = 1, red = 1 } = {}) {
 function domain(g, t, o = {}) {
   const { blue = 1, red = 1, ...tab } = o;
   domainBack(g, t, { blue, red });
-  tableSet(g, t, { white: 'wit', black: 'mag', tableCol: LACQUER, behind: g2 => {
+  tableSet(g, t, { white: 'witN', black: 'magN', tableCol: LACQUER, behind: g2 => {
     for (const [z, col, a] of [[-1.4, VOID, 0.5 * blue], [9.3, CURSE, 0.55 * red]]) { if (depth(4, 3.2, z) < 0.8) continue; const p = B.project(4, 3.2, z); rim(g2, p.x, p.y, p.s * 3.4, col, a); }
   }, ...tab });
   lowKey(g, { cy: H * 0.45, a: 0.12 });
@@ -537,10 +541,10 @@ function domain(g, t, o = {}) {
 // the webcams on stands behind the board (the online game): Witty's in blue, Magnus's in red
 const CAMC = { wit: makeCanvas(600, 720), mag: makeCanvas(600, 720) };
 const CAMLOOK = { wit: { bg: ['#3A8FE0', '#0B1B4A'], name: 'WITTY_ALIEN', nameColor: VOID, glow: '#7FD0FF' }, mag: { bg: ['#C42A30', '#3A0508'], name: 'MAGNUSCARLSEN', nameColor: '#FF8A80', glow: '#FF6A60' } };
-function camTex(who, e, t, { shake = 0, zoom = 1 } = {}) {
+function camTex(who, e, t, { shake = 0, zoom = 1, anime = false } = {}) {
   const c = CAMC[who], x = c.getContext('2d'), L = CAMLOOK[who];
   x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, 600, 720);
-  webcam(x, 0, 0, 600, 720, who, e, t, { bg: L.bg, name: L.name, nameColor: L.nameColor, zoom: 1.05 * zoom, cy: 0.52, shake });
+  webcam(x, 0, 0, 600, 720, anime ? who : who + 'N', e, t, { bg: L.bg, name: L.name, nameColor: L.nameColor, zoom: 1.05 * zoom, cy: 0.52, shake });
   return c;
 }
 const CAMPOS = { wit: [[1.2, 4.6, 11.4], 0.16], mag: [[6.8, 4.6, 11.4], -0.16] };
@@ -666,8 +670,9 @@ export async function build(T) {
   shot(nahT - 0.06, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI + 0.08, 0.04, 6.6, [4, 3.0, -1.4])], [len(sh), K(PI + 0.02, 0.03, 5.0, [4, 3.05, -1.4])]], { t, e: lin, bump: t > winT && t < winT + 0.3 ? 1.4 : 0 });
     const up = ease.inOut(seg(t, winT - 0.05, winT + 0.28));
-    domain(g, t, { pieces: start, ew: WE('smug', { band: 1 - up, glow: up }), eb: ME('focus'), red: 0.6 + 0.4 * (1 - up) });
+    domain(g, t, { pieces: start, white: 'wit', ew: WE('smug', { band: 1 - up, glow: up }), eb: ME('focus'), red: 0.6 + 0.4 * (1 - up) });
     const p = B.project(4, 3.1, -1.4);
+    flashTint(g, VOID, 0.55 * (1 - seg(lt, 0.0, 0.3)));  // the turn into Gojo: a blue flash on the cut
     if (t >= winT) { flashTint(g, VOID, 0.45 * (1 - seg(t, winT, winT + 0.45))); shockwave(g, p.x, p.y - p.s * 0.1, t, winT, { r0: 60, r1: 700, color: '#BFEAFF', lw: 12 }); speedLines(g, p.x, p.y, t, winT, { life: 0.6 }); }
   }, { trans: 'whip', hud: (g, lt, t) => {
     caption(g, 'WITTY, PROBABLY:', W / 2, 250, { a: seg(t, nahT - 0.05, nahT + 0.1), size: 38 });
@@ -871,7 +876,7 @@ export async function build(T) {
   shot(q2A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.1, 0.4, 14.5, [4, 1.0, 3.4])], [Q2 - q2A, K(0.06, 0.38, 13.2, [4, 1.0, 3.2])], [len(sh), K(0.03, 0.34, 15, [4, 1.6, 4.2])]], { t, bump: t > Q2 && t < Q2 + 0.3 ? 1.6 : 0 });
     const r = runTo(PL, 99, [...PRE, Q2, ...TAIL], t, t < Q2 - 0.3 ? 0.1 : t < Q2 + 0.4 ? 0.22 : 0.08), fx = moveFx(r, 0.1, 0.4);
-    online(g, t, { pieces: r.pieces, camA: 0.9, cams: { wit: { e: WE('shock') }, mag: { e: ME(t >= Q2 ? 'smug' : 'focus', { glow: t >= Q2 ? 1 : 0.3 }) } }, clock: clockAt(r.k),
+    online(g, t, { pieces: r.pieces, camA: 0.9, cams: { wit: { e: WE('shock') }, mag: { e: ME(t >= Q2 ? 'smug' : 'focus', { glow: t >= Q2 ? 1 : 0.3 }), anime: t >= Q2 - 0.05 } }, clock: clockAt(r.k),
       under: g2 => { fx.under(g2); if (t >= Q2) ledGlow(g2, B, 'a1', RED, t, Q2, { reach: 8 }); }, over: fx.over });
     if (t >= Q2) { flashTint(g, CURSE, 0.45 * (1 - seg(t, Q2, Q2 + 0.45))); slashes(g, t, Q2, { n: 3, seed: 7, life: 0.6 }); }
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= Q2) badge(g, 'ANOTHER QUEEN', W / 2, 230, { color: RED, size: 64, ...pop(t, Q2) }); } });
@@ -883,7 +888,7 @@ export async function build(T) {
   shot(resA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI - 0.32, 0.22, 9.4, [3.0, 1.6, 1.0])], [len(sh), K(PI - 0.24, 0.2, 8.4, [3.0, 1.7, 1.0])]], { t, e: lin });
     const fall = ease.inOut(seg(t, resT + 0.1, resT + 0.5)), pcs = piecesAt(PL, 107).filter(p => !(p.t === 'k' && p.c === 'w'));
-    domain(g, t, { pieces: pcs, loose: [{ t: 'k', c: 'w', x: KING[0], y: 0, z: KING[1], rot: fall * 1.45 }], ew: WE('sad', { band: seg(t, resT + 0.3, resT + 0.9) }), eb: ME('neutral', { glow: 0.4 }), blue: 0.6 });
+    domain(g, t, { pieces: pcs, white: 'wit', loose: [{ t: 'k', c: 'w', x: KING[0], y: 0, z: KING[1], rot: fall * 1.45 }], ew: WE('sad', { band: seg(t, resT + 0.3, resT + 0.9) }), eb: ME('neutral', { glow: 0.4 }), blue: 0.6 });
   }, { trans: 'whip', hud: (g, lt, t) => bubble(g, 'WITTY WON.', W / 2, 360, { size: 80, tail: -1, cross: seg(t, resT + 0.62, resT + 0.86), a: seg(t, resA + 0.05, resA + 0.15) }) });
   cue(resA - 0.04, 'whoosh_deep', 0.3); cue(resT + 0.45, 'thud', 0.5); cue(resT + 0.62, 'whoosh_fast', 0.45); cue(resT + 0.66, 'hit_punch', 0.35);
   shot(sixA, (g, lt, t, sh) => {
@@ -900,12 +905,12 @@ export async function build(T) {
   for (let i = 0; i < 5; i++) cue(scoreA + 0.1 + i * 0.16, 'swipe_card', 0.25); cue(fourT, 'boom', 0.45);
   shot(forA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.14, 0.05, 9, [4, 3.1, 9.3])], [len(sh), K(0.08, 0.04, 7.6, [4, 3.15, 9.3])]], { t, e: lin });
-    domain(g, t, { pieces: piecesAt(PL, 107), ew: WE('sad'), eb: ME('smug', { glow: 1 }), blue: 0.6 });
+    domain(g, t, { pieces: piecesAt(PL, 107), black: 'mag', ew: WE('sad'), eb: ME('smug', { glow: 1 }), blue: 0.6 });
   }, { trans: 'whip' });
   cue(forA - 0.04, 'whoosh_fast', 0.3); cue(forA + 0.1, 'dun_dun', 0.35);
   shot(proudA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI - 0.75, 0.1, 10.5, [4, 3.0, -1.4])], [len(sh), K(PI - 0.6, 0.08, 8.6, [4, 3.05, -1.4])]], { t, e: lin });
-    domain(g, t, { pieces: piecesAt(PL, 107), ew: WE('sad', { band: 1 }), eb: ME('neutral', { glow: 0.3 }), blue: 0.8 });
+    domain(g, t, { pieces: piecesAt(PL, 107), white: 'wit', ew: WE('sad', { band: 1 }), eb: ME('neutral', { glow: 0.3 }), blue: 0.8 });
   }, { trans: 'fade', transDur: 0.3, hud: (g, lt, t) => { if (t >= strongT) badge(g, 'STAND PROUD', W / 2, 230, { color: GOLD, size: 56, ...pop(t, strongT) }); } });
   cue(proudA + 0.05, 'shimmer', 0.25);
 
