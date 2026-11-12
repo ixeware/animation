@@ -819,9 +819,11 @@ export async function build(T) {
   landCue(RE2, false, 0.6); cue(RE2 + 0.05, 'error', 0.35);
   const LT = spaced(lateA + 0.1, w('late', 3), 3), RE6 = re6T + 0.06;
   shot(lateA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.25, 0.6, 12, [4.2, 0.2, 4.4])], [len(sh), K(0.15, 0.62, 10.6, [4.2, 0.2, 4.6])]], { t, e: lin });
+    // Witty's own hand puts the rook on e6: seen from Magnus's side of the table, Witty's face over the board
+    rig(B, lt, [[0, K(PI + 0.18, 0.3, 10.4, [4, 2.0, 1.2])], [len(sh), K(PI + 0.08, 0.27, 9.0, [4, 2.1, 1.0])]], { t, e: lin });
     const r = runTo(PL, 41, [...LT, RE6], t, t < RE6 - 0.3 ? 0.1 : 0.26), fx = moveFx(r, r.k === 45 ? 0.26 : 0.1, r.k === 45 ? 0.8 : 0.1);
-    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over });
+    domain(g, t, { pieces: r.pieces, under: fx.under, over: fx.over, bPlayer: false, bChair: false, ew: WE('focus', { glow: 0.5 * seg(t, RE6, RE6 + 0.3) }),
+      wReach: t > RE6 - 0.55 && t < RE6 + 0.45 ? { sq: 'e6', u: (t - RE6 + 0.55) / 1.0 } : null });
   }, { trans: 'whip', hud: (g, lt, t) => evalHud(g, -0.1) });
   LT.forEach(a => cue(a - 0.02, 'piece', 0.18)); landCue(RE6, false, 0.6); cue(RE6, 'ting', 0.3);
   const NXD5 = tooT + 0.08;
