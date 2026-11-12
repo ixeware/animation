@@ -34,7 +34,7 @@ const GOLD = '#F5C451', RED = '#E8413A', LIME = HI.good, CREAM = '#FFF3E0', BONE
 const LEVY_C = VOID, FAN_C = CURSE;  // the names the shared table code below uses for its default colours
 // the board: Chess.com green on a black lacquer slab (the slab, its sides and the engraving stay, rule 46)
 const GREEN = { light: '#EEEED2', dark: '#769656', frame: '#15151C', side: '#0B0B10', th: 0.45, rc: 0.35 };
-const LACQUER = ['#1C1C26', '#0D0D14', '#15151E'];
+const LACQUER = ['#1C1C26', '#0D0D14', '#15151E'], WOODT = ['#C99A68', '#8A6440', '#A87E52'];
 // the real game (SOURCES.md): Witty_Alien (White) – MagnusCarlsen, 7 Nov 2026; and their first blitz game, 30 Sep 2026
 const PL = await fetch('../engine/data/witty_magnus_2026-11-07.json').then(r => r.json());
 const CW = await fetch('../engine/data/carlsen_witty_2026.json').then(r => r.json());
@@ -146,6 +146,21 @@ function bubble(g, text, x, y, { a = 1, size = 70, cross = 0, tail = -1, scale =
   }
   g.restore();
   qaRect(g, x - rx * scale, y - ry * scale, 2 * rx * scale, 2 * ry * scale, 'text', text);
+}
+// a speech bubble as in the Mittens video: a white rounded box with a hard shadow, the speaker's name in small green
+// capitals over the line, a tail under it
+function speech(g, name, text, x, y, { a = 1, size = 66, scale = 1, tail = -0.22 } = {}) {
+  if (a <= 0) return;
+  g.save(); g.globalAlpha *= a; g.translate(x, y); g.scale(scale, scale);
+  g.font = sans(size, 900); const tw = g.measureText(text).width, bw = Math.max(tw + size * 1.2, 420), bh = size * 2.2, r = 26, L = -bw / 2 + size * 0.6;
+  g.fillStyle = 'rgba(10,10,16,0.35)'; g.beginPath(); g.roundRect(-bw / 2 + 8, -bh / 2 + 10, bw, bh, r); g.fill();
+  g.fillStyle = '#FFFFFF'; g.beginPath(); g.roundRect(-bw / 2, -bh / 2, bw, bh, r); g.fill();
+  g.beginPath(); g.moveTo(tail * bw - 28, bh / 2 - 2); g.lineTo(tail * bw - 4, bh / 2 + 44); g.lineTo(tail * bw + 26, bh / 2 - 2); g.closePath(); g.fill();
+  g.textAlign = 'left'; g.textBaseline = 'middle';
+  g.font = sans(Math.round(size * 0.34), 800); g.letterSpacing = '3px'; g.fillStyle = '#2E9E6A'; g.fillText(name, L, -bh / 2 + size * 0.55);
+  g.font = sans(size, 900); g.letterSpacing = '0px'; g.fillStyle = '#16161E'; g.fillText(text, L, size * 0.22);
+  g.restore();
+  qaRect(g, x - bw / 2 * scale, y - bh / 2 * scale, bw * scale, bh * scale, 'text', text);
 }
 // a small dark plate with a light word (WITTY, PROBABLY:)
 function caption(g, text, x, y, { a = 1, size = 40, color = CREAM } = {}) {
@@ -486,6 +501,68 @@ function camPanel(g, img, c, hw, hh, ry = 0, { glow = null, a = 1, frame = '#102
   g.restore();
 }
 
+// ======================= THE DAY ROOM (rule 63: the Mittens look) =======================
+// cream walls, light oak floor, a big window on blue sky, clouds and green trees behind Witty, another one on the back
+// wall beside the TV, a wall calendar (September 30 → November 7). The domain below is only for the anime beats.
+const ROOM = { x0: -10, x1: 18, z0: -12, z1: 13.6, top: 16 };
+const SKY_T = tex(1024, 768, (x, w, h) => {
+  const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#4FAEEB'); gr.addColorStop(1, '#BDE6FF'); x.fillStyle = gr; x.fillRect(0, 0, w, h);
+  x.fillStyle = 'rgba(255,255,255,0.95)';
+  for (const [cx, cy, s] of [[200, 170, 1], [640, 120, 0.8], [880, 300, 0.7], [420, 330, 0.6]]) { x.beginPath(); x.ellipse(cx, cy, 110 * s, 38 * s, 0, 0, 7); x.ellipse(cx + 55 * s, cy - 22 * s, 66 * s, 38 * s, 0, 0, 7); x.ellipse(cx - 50 * s, cy - 10 * s, 50 * s, 30 * s, 0, 0, 7); x.fill(); }
+  const r = rng(5);
+  for (const [col, y0, amp] of [['#78C25A', h * 0.7, 46], ['#4FA246', h * 0.8, 40], ['#3E8E3C', h * 0.9, 30]]) {
+    x.fillStyle = col; x.beginPath(); x.moveTo(0, h);
+    for (let i = 0; i <= 16; i++) { const xx = i * w / 16; x.quadraticCurveTo(xx - w / 32, y0 - amp * (0.6 + 0.6 * r()), xx, y0 - amp * 0.3 * r()); }
+    x.lineTo(w, h); x.closePath(); x.fill();
+  }
+  x.strokeStyle = '#FBF6EC'; x.lineWidth = 26; x.strokeRect(0, 0, w, h); x.lineWidth = 14; x.beginPath(); x.moveTo(w / 2, 0); x.lineTo(w / 2, h); x.moveTo(0, h * 0.5); x.lineTo(w, h * 0.5); x.stroke();
+});
+// a wall calendar page: red header with the month, the days, one day ringed in red
+function calTex(month, first, days, ring) {
+  return tex(420, 540, (x, w, h) => {
+    x.fillStyle = '#FFFDF8'; x.fillRect(0, 0, w, h); x.fillStyle = '#D6403A'; x.fillRect(0, 0, w, 120);
+    x.fillStyle = '#FFFFFF'; x.font = sans(46, 900); x.letterSpacing = '3px'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(month, w / 2, 52);
+    x.font = sans(24, 800); x.letterSpacing = '6px'; x.fillText('2026', w / 2, 96);
+    x.font = sans(28, 800); x.letterSpacing = '0px';
+    for (let d = 1; d <= days; d++) { const k = d - 1 + first, cx = 36 + (k % 7) * 58, cy = 168 + Math.floor(k / 7) * 66;
+      x.fillStyle = d === ring ? '#1E1E24' : '#4A4A52'; x.fillText(String(d), cx, cy);
+      if (d === ring) { x.strokeStyle = '#D6403A'; x.lineWidth = 6; x.beginPath(); x.ellipse(cx, cy, 30, 26, 0, 0, 7); x.stroke(); } }
+  });
+}
+const CAL_SEP = calTex('SEPTEMBER', 2, 30, 30), CAL_NOV = calTex('NOVEMBER', 0, 30, 7);
+const CALP = { x0: -7.4, x1: -4.2, y0: 4.0, y1: 8.2 };
+// the calendar on the back wall; flip 0..1 tears September up and away, November underneath
+function calendar(g, flip = 1) {
+  const { x0, x1, y0, y1 } = CALP, z = ROOM.z1 - 0.04;
+  ab(g, [x0 - 0.1, y1 - 0.05, z - 0.06], [x1 + 0.1, y1 + 0.25, z], '#2A2A30');
+  texQuad(g, CAL_NOV, [x0, y1, z - 0.02], [x1, y1, z - 0.02], [x0, y0, z - 0.02]);
+  if (flip < 1) { const u = ease.inOut(clamp(flip)), yb = lerp(y0, y1 + 1.6, u), zb = z - 0.05 - Math.sin(u * Math.PI) * 1.4;
+    texQuad(g, CAL_SEP, [x0, y1, z - 0.05], [x1, y1, z - 0.05], [x0, yb, zb], { a: 1 - clamp((u - 0.85) / 0.15) }); }
+}
+function dayRoom(g, t, { flip = 1 } = {}) {
+  const E = B.E, { x0, x1, z0, z1, top } = ROOM;
+  g.fillStyle = '#F1E6D2'; g.fillRect(0, 0, W, H);
+  if (E[1] > FLOOR_Y) tiled(g, [x0, FLOOR_Y, z0], [x1 - x0, 0, 0], [0, 0, z1 - z0], { color: '#C99D6C', grout: 'rgba(110,70,35,0.2)', tu: 1.2, tv: z1 - z0,
+    light: g2 => { pool(g2, B, 4, FLOOR_Y + 0.02, -7, 10, '#FFF2D2', 0.3); pool(g2, B, 13, FLOOR_Y + 0.02, 10, 6, '#FFF2D2', 0.18); } });
+  const wall = { color: '#F4E9D7', grout: 'rgba(0,0,0,0.03)', tu: 40, tv: 40 };
+  if (E[2] < z1) {  // the back wall: a window right of the TV, the calendar left of it, a skirting board
+    tiled(g, [x0, FLOOR_Y, z1], [x1 - x0, 0, 0], [0, top - FLOOR_Y, 0], wall);
+    ab(g, [x0, FLOOR_Y, z1 - 0.12], [x1, FLOOR_Y + 0.5, z1], '#E6D7BF');
+    ab(g, [9.3, 3.1, z1 - 0.1], [15.3, 10.8, z1], '#FBF6EC'); texQuad(g, SKY_T, [9.6, 10.5, z1 - 0.12], [15.0, 10.5, z1 - 0.12], [9.6, 3.4, z1 - 0.12]);
+    pool(g, B, 12.3, 7, z1 - 0.2, 8, '#FFF6DA', 0.22, true);
+    calendar(g, flip);
+  }
+  if (E[2] > z0) {  // the front wall, behind Witty: a big window
+    tiled(g, [x1, FLOOR_Y, z0], [x0 - x1, 0, 0], [0, top - FLOOR_Y, 0], wall);
+    ab(g, [x0, FLOOR_Y, z0], [x1, FLOOR_Y + 0.5, z0 + 0.12], '#E6D7BF');
+    ab(g, [-2.0, 2.4, z0], [10.0, 11.4, z0 + 0.1], '#FBF6EC'); texQuad(g, SKY_T, [9.7, 11.1, z0 + 0.12], [-1.7, 11.1, z0 + 0.12], [9.7, 2.7, z0 + 0.12]);
+    pool(g, B, 4, 7, z0 + 0.2, 12, '#FFF6DA', 0.3, true);
+  }
+  const side = { ...wall, color: '#EADCC6' };
+  if (E[0] > x0) tiled(g, [x0, FLOOR_Y, z0], [0, 0, z1 - z0], [0, top - FLOOR_Y, 0], side);
+  if (E[0] < x1) tiled(g, [x1, FLOOR_Y, z1], [0, 0, z0 - z1], [0, top - FLOOR_Y, 0], side);
+}
+
 // ======================= THE DOMAIN (this video's set) =======================
 // the board on a black lacquer table (x 0..8, z 0..8); Witty (White) at z −1.4, Magnus (Black) at z 9.3. Behind
 // Witty, at z −26, a blue starry void; behind Magnus, at z 34, a red sky over a black shrine; side walls blend the two
@@ -542,12 +619,13 @@ function domainBack(g, t, { blue = 1, red = 1 } = {}) {
 }
 // the players at the table. o: tableSet options (pieces, ew/eb expressions, reaches ...); glow under the heads
 function domain(g, t, o = {}) {
-  const { blue = 1, red = 1, ...tab } = o;
-  domainBack(g, t, { blue, red });
-  tableSet(g, t, { white: 'witN', black: 'magN', tableCol: LACQUER, behind: g2 => {
+  const { blue = 1, red = 1, dark = false, flip = 1, ...tab } = o;
+  if (dark) domainBack(g, t, { blue, red }); else dayRoom(g, t, { flip });
+  tableSet(g, t, { white: 'witN', black: 'magN', tableCol: dark ? LACQUER : WOODT, behind: g2 => {
+    if (!dark) return;
     for (const [z, col, a] of [[-1.4, VOID, 0.5 * blue], [9.3, CURSE, 0.55 * red]]) { if (depth(4, 3.2, z) < 0.8) continue; const p = B.project(4, 3.2, z); rim(g2, p.x, p.y, p.s * 3.4, col, a); }
   }, ...tab });
-  lowKey(g, { cy: H * 0.45, a: 0.12 });
+  lowKey(g, { cy: H * 0.45, a: dark ? 0.12 : 0.05 });
 }
 // the webcams on stands behind the board (the online game): Witty's in blue, Magnus's in red
 const CAMC = { wit: makeCanvas(600, 720), mag: makeCanvas(600, 720) };
@@ -558,26 +636,25 @@ function camTex(who, e, t, { shake = 0, zoom = 1, anime = false } = {}) {
   webcam(x, 0, 0, 600, 720, anime ? who : who + 'N', e, t, { bg: L.bg, name: L.name, nameColor: L.nameColor, zoom: 1.05 * zoom, cy: 0.52, shake });
   return c;
 }
-const CAMPOS = { wit: [[1.2, 4.6, 11.4], 0.16], mag: [[6.8, 4.6, 11.4], -0.16] };
+const CAMZ = 13.2, CAMPOS = { wit: [[1.2, 5.0, CAMZ], 0.1], mag: [[6.8, 5.0, CAMZ], -0.1] };  // two screens on the back wall
 // the online game: no players at the table, their webcams behind it, the clock beside the board
-const TV = { c: [4, 3.9, 11.8], hw: 4.7, hh: 2.64 };
+const TV = { c: [4, 5.1, 13.3], hw: 4.7, hh: 2.64 };  // on the back wall
 const TVC_ = new Map();  // the frames as canvases (texQuad samples a canvas), made when first needed
 function tvCanvas(k) { k = clamp(k, 0, 107); if (!TVC_.has(k)) { const im = TVF[k], c = makeCanvas(im.width, im.height); c.getContext('2d').drawImage(im, 0, 0); TVC_.set(k, c); } return TVC_.get(k); }
 function tvSet(g, k, t) {  // a big flat screen on two legs behind the board, showing the review at ply k
   const { c, hw, hh } = TV;
-  for (const sd of [-1, 1]) ab(g, [c[0] + sd * (hw - 1.2) - 0.12, FLOOR_Y, c[2] - 0.1], [c[0] + sd * (hw - 1.2) + 0.12, c[1] - hh, c[2] + 0.1], '#15151C');
   ab(g, [c[0] - hw - 0.16, c[1] - hh - 0.16, c[2]], [c[0] + hw + 0.16, c[1] + hh + 0.16, c[2] + 0.3], '#0B0B10', { spec: 0.4 });
   if (B.E[2] < c[2]) texQuad(g, tvCanvas(k), [c[0] - hw, c[1] + hh, c[2] - 0.02], [c[0] + hw, c[1] + hh, c[2] - 0.02], [c[0] - hw, c[1] - hh, c[2] - 0.02]);
   pool(g, B, c[0], c[1], c[2] - 0.3, 9, '#BFD8FF', 0.1, true); pool(g, B, c[0], -0.36, 9.2, 5, '#BFD8FF', 0.08);
 }
-function online(g, t, { pieces, under = null, over = null, cams = {}, clock = null, camA = 1, blue = 1, red = 1, tv = null } = {}) {
-  domainBack(g, t, { blue, red });
+function online(g, t, { pieces, under = null, over = null, cams = {}, clock = null, camA = 1, blue = 1, red = 1, tv = null, dark = false, flip = 1 } = {}) {
+  if (dark) domainBack(g, t, { blue, red }); else dayRoom(g, t, { flip });
   if (tv !== null) { camA = 0; if (B.E[2] < TV.c[2]) tvSet(g, tv, t); }
   const back = () => { if (camA <= 0) return; for (const who of ['wit', 'mag']) { const [c, ry2] = CAMPOS[who], o = cams[who] || {}; camPanel(g, camTex(who, o.e || 'focus', t, o), c, 2.5, 3.0, ry2, { glow: CAMLOOK[who].glow, a: camA, frame: '#101018' }); } };
-  if (B.E[2] < 11.4) back();
-  tableSet(g, t, { pieces, under, over, clock, wPlayer: false, bPlayer: false, wChair: false, bChair: false, tableCol: LACQUER });
-  if (B.E[2] >= 11.4) back();
-  lowKey(g, { cy: H * 0.46, a: 0.16 });
+  if (B.E[2] < CAMZ) back();
+  tableSet(g, t, { pieces, under, over, clock, wPlayer: false, bPlayer: false, wChair: false, bChair: false, tableCol: dark ? LACQUER : WOODT });
+  if (B.E[2] >= CAMZ) back();
+  lowKey(g, { cy: H * 0.46, a: dark ? 0.16 : 0.05 });
 }
 // five standing cards on the table: every game of theirs on Chess.com (SOURCES.md), the winner's colour
 const GAMES = [['DEC 28, 2024', 'BULLET', 'mag'], ['DEC 13, 2025', 'BULLET', 'mag'], ['DEC 13, 2025', 'BULLET', 'mag'], ['SEP 30, 2026', 'BLITZ', 'wit'], ['NOV 7, 2026', 'BLITZ', 'mag']];
@@ -675,7 +752,7 @@ export async function build(T) {
   const ctaA = s('cta') - 0.06, movesT = w('cta', 3), lastT = w('cta', 6);
 
   // ======================= HOOK (rules 1, 28, 42): the domain, Witty vs Magnus; "round two" =======================
-  const VS = [K(0.0, 0.1, 16.8, [4, 4.0, 11.4]), K(0.0, 0.08, 15.4, [4, 4.1, 11.4])];
+  const VS = [K(0.0, 0.1, 16.6, [4, 4.6, CAMZ]), K(0.0, 0.08, 15.4, [4, 4.7, CAMZ])];
   const start = piecesAt(PL, 0);
   const vsCams = (t, o = {}) => ({ wit: { e: WE('smug', { band: 1 }) }, mag: { e: ME('smug', { glow: 0.7 }) }, ...o });
   shot(0, (g, lt, t, sh) => {
@@ -693,14 +770,13 @@ export async function build(T) {
   shot(nahT - 0.06, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI + 0.08, 0.04, 6.6, [4, 3.0, -1.4])], [len(sh), K(PI + 0.02, 0.03, 5.0, [4, 3.05, -1.4])]], { t, e: lin, bump: t > winT && t < winT + 0.3 ? 1.4 : 0 });
     const up = ease.inOut(seg(t, winT - 0.05, winT + 0.28));
-    domain(g, t, { pieces: start, white: 'wit', ew: WE('smug', { band: 1 - up, glow: up }), eb: ME('focus'), red: 0.6 + 0.4 * (1 - up) });
+    domain(g, t, { pieces: start, white: 'wit', dark: true, ew: WE('smug', { band: 1 - up, glow: up }), eb: ME('focus'), red: 0.6 + 0.4 * (1 - up) });
     const p = B.project(4, 3.1, -1.4);
     flashTint(g, VOID, 0.55 * (1 - seg(lt, 0.0, 0.3)));  // the turn into Gojo: a blue flash on the cut
     if (t >= winT) { flashTint(g, VOID, 0.45 * (1 - seg(t, winT, winT + 0.45))); shockwave(g, p.x, p.y - p.s * 0.1, t, winT, { r0: 60, r1: 700, color: '#BFEAFF', lw: 12 }); speedLines(g, p.x, p.y, t, winT, { life: 0.6 }); }
   }, { trans: 'whip', hud: (g, lt, t) => {
-    caption(g, 'WITTY, PROBABLY:', W / 2, 250, { a: seg(t, nahT - 0.05, nahT + 0.1), size: 38 });
-    if (t < winT) bubble(g, 'NAH,', W / 2, 430, { size: 76, tail: 1, ...pop(t, nahT) });
-    else bubble(g, "NAH, I'D WIN.", W / 2, 430, { size: 76, tail: 1, ...pop(t, winT) });
+    if (t < winT) speech(g, 'WITTY, PROBABLY', 'Nah,', W / 2, 360, { ...pop(t, nahT) });
+    else speech(g, 'WITTY, PROBABLY', "Nah, I'd win.", W / 2, 360, { ...pop(t, winT) });
   } });
   cue(nahT - 0.06, 'whoosh_deep', 0.3); cue(nahT, 'pluck', 0.4); cue(winT - 0.3, 'revswell', 0.5); cue(winT - 0.004, 'boom_big', 0.75); cue(winT + 0.02, 'shimmer', 0.45);
 
@@ -708,7 +784,7 @@ export async function build(T) {
   shot(nameA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI - 0.55, 0.08, 8.6, [4, 3.2, -1.4])], [len(sh), K(PI - 0.42, 0.06, 7.4, [4, 3.25, -1.4])]], { t, e: lin });
     domain(g, t, { pieces: start, ew: WE('triumph', { glow: 0.5 }), eb: ME('focus') });
-  }, { trans: 'whip', hud: (g, lt, t) => nameTitle(g, lt, 'Witty Alien', 'HE BEAT MAGNUS IN SEPTEMBER', { y: 220, size: 74, subColor: VOID, t0: 0.05 }) });
+  }, { trans: 'whip', hud: (g, lt, t) => { scrim(g, 0.9); nameTitle(g, lt, 'Witty Alien', 'HE BEAT MAGNUS IN SEPTEMBER', { y: 220, size: 74, subColor: VOID, t0: 0.05 }); } });
   cue(nameA - 0.04, 'whoosh_fast', 0.3); cue(nameA + 0.1, 'ting', 0.3);
   const SEPT = piecesAt(CW, CW.length - 1);
   shot(sepA, (g, lt, t, sh) => {
@@ -726,11 +802,13 @@ export async function build(T) {
 
   // ======================= FIVE WEEKS LATER: ROUND TWO, FIVE-MINUTE BLITZ =======================
   shot(remA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI / 2 - 0.2, 0.95, 24, [4, 0, 4])], [len(sh), K(PI / 2 - 0.35, 0.5, 18, [4, 1.2, 4])]], { t, e: ease.out });
-    domain(g, t, { pieces: start, wPlayer: false, bPlayer: false });
-  }, { trans: 'whip', hud: (g, lt, t) => { scrim(g); placeStamp(g, lt, 'Chess.com · round two', 'NOV 7, 2026', { y: 200, t0: 0.1 }); } });
+    const cc = [(CALP.x0 + CALP.x1) / 2, (CALP.y0 + CALP.y1) / 2, ROOM.z1];
+    rig(B, lt, [[0, K(0.14, 0.04, 9.6, cc)], [len(sh), K(0.06, 0.03, 8.0, cc)]], { t, e: lin });
+    domain(g, t, { pieces: start, wPlayer: false, bPlayer: false, flip: seg(t, remA + 0.2, w('rematch', 2) + 0.15) });
+  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= w('rematch', 1)) counter(g, '5', 'WEEKS LATER', { y: 330, size: 170, color: GOLD, at: [t, w('rematch', 1)] }); } });
+  cue(remA + 0.2, 'page_flip', 0.45);
   shot(roundA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, 0.05, 14.5, [4, 4.6, 11.4])], [len(sh), K(0.0, 0.04, 12.6, [4, 4.6, 11.4])]], { t, bump: t > round2T && t < round2T + 0.3 ? 1 : 0 });
+    rig(B, lt, [[0, K(0.0, 0.05, 16.3, [4, 5.0, CAMZ])], [len(sh), K(0.0, 0.04, 14.4, [4, 5.0, CAMZ])]], { t, bump: t > round2T && t < round2T + 0.3 ? 1 : 0 });
     online(g, t, { pieces: start, cams: { wit: { e: WE('smug', { band: 1 }) }, mag: { e: ME('smug', { glow: 0.8 }) } }, clock: clockAt(0) });
   }, { trans: 'zoom', hud: (g, lt, t) => vsLabel(g, lt, round2T - roundA, W / 2, 1530) });
   shot(blitzA, (g, lt, t, sh) => {
@@ -752,7 +830,7 @@ export async function build(T) {
   shot(throwA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.42, 0.3, 9.2, [5.6, 0.6, 5.4])], [LAND - throwA, K(-0.3, 0.27, 7.6, [5.7, 0.6, 5.8])], [len(sh), K(-0.22, 0.25, 7.0, [5.6, 0.6, 6.2])]], { t, bump: t > LAND && t < LAND + 0.3 ? 1.6 : 0 });
     const r = runTo(PL, 10, [LAND], t, 0.32), landed = t >= LAND;
-    online(g, t, { pieces: r.pieces, camA: 0, red: 1, blue: 1, tv: tvOf(r, 0.32),
+    online(g, t, { pieces: r.pieces, camA: 0, red: 1, blue: 1, dark: t >= knightT - 0.1, tv: t >= knightT - 0.1 ? null : tvOf(r, 0.32),
       under: g2 => { if (landed) { ledGlow(g2, B, 'f7', HOLLOW, t, LAND, { reach: 8 }); spread(g2, B, 'f7', t, LAND, HOLLOW); } else squareFrame(g2, B, 'f7', HOLLOW, 0.8 * seg(t, knightT, knightT + 0.2)); moveFx(r, 0.32, 0.6).under(g2); },
       over: g2 => {
         moveFx(r, 0.32, 0.6).over(g2);
@@ -899,7 +977,7 @@ export async function build(T) {
   shot(q2A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.1, 0.4, 14.5, [4, 1.0, 3.4])], [Q2 - q2A, K(0.06, 0.38, 13.2, [4, 1.0, 3.2])], [len(sh), K(0.03, 0.34, 15, [4, 1.6, 4.2])]], { t, bump: t > Q2 && t < Q2 + 0.3 ? 1.6 : 0 });
     const r = runTo(PL, 99, [...PRE, Q2, ...TAIL], t, t < Q2 - 0.3 ? 0.1 : t < Q2 + 0.4 ? 0.22 : 0.08), fx = moveFx(r, 0.1, 0.4);
-    online(g, t, { pieces: r.pieces, camA: 0.9, cams: { wit: { e: WE('shock') }, mag: { e: ME(t >= Q2 ? 'smug' : 'focus', { glow: t >= Q2 ? 1 : 0.3 }), anime: t >= Q2 - 0.05 } }, clock: clockAt(r.k),
+    online(g, t, { pieces: r.pieces, camA: 0.9, dark: t >= Q2 - 0.05, cams: { wit: { e: WE('shock') }, mag: { e: ME(t >= Q2 ? 'smug' : 'focus', { glow: t >= Q2 ? 1 : 0.3 }), anime: t >= Q2 - 0.05 } }, clock: clockAt(r.k),
       under: g2 => { fx.under(g2); if (t >= Q2) ledGlow(g2, B, 'a1', RED, t, Q2, { reach: 8 }); }, over: fx.over });
     if (t >= Q2) { flashTint(g, CURSE, 0.45 * (1 - seg(t, Q2, Q2 + 0.45))); slashes(g, t, Q2, { n: 3, seed: 7, life: 0.6 }); }
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= Q2) badge(g, 'ANOTHER QUEEN', W / 2, 230, { color: RED, size: 64, ...pop(t, Q2) }); } });
@@ -911,7 +989,7 @@ export async function build(T) {
   shot(resA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI - 0.32, 0.22, 9.4, [3.0, 1.6, 1.0])], [len(sh), K(PI - 0.24, 0.2, 8.4, [3.0, 1.7, 1.0])]], { t, e: lin });
     const fall = ease.inOut(seg(t, resT + 0.1, resT + 0.5)), pcs = piecesAt(PL, 107).filter(p => !(p.t === 'k' && p.c === 'w'));
-    domain(g, t, { pieces: pcs, white: 'wit', loose: [{ t: 'k', c: 'w', x: KING[0], y: 0, z: KING[1], rot: fall * 1.45 }], ew: WE('sad', { band: seg(t, resT + 0.3, resT + 0.9) }), eb: ME('neutral', { glow: 0.4 }), blue: 0.6 });
+    domain(g, t, { pieces: pcs, white: 'wit', dark: true, loose: [{ t: 'k', c: 'w', x: KING[0], y: 0, z: KING[1], rot: fall * 1.45 }], ew: WE('sad', { band: seg(t, resT + 0.3, resT + 0.9) }), eb: ME('neutral', { glow: 0.4 }), blue: 0.6 });
   }, { trans: 'whip', hud: (g, lt, t) => bubble(g, 'WITTY WON.', W / 2, 360, { size: 80, tail: -1, cross: seg(t, resT + 0.62, resT + 0.86), a: seg(t, resA + 0.05, resA + 0.15) }) });
   cue(resA - 0.04, 'whoosh_deep', 0.3); cue(resT + 0.45, 'thud', 0.5); cue(resT + 0.62, 'whoosh_fast', 0.45); cue(resT + 0.66, 'hit_punch', 0.35);
   shot(sixA, (g, lt, t, sh) => {
@@ -922,7 +1000,7 @@ export async function build(T) {
 
   // ======================= THE EDIT-BAIT: the alien beat a human; the human beat the alien (one framing, mirrored) =======================
   const mirA = s('mirror') - 0.06, mHuT = w('mirror', 6), novA = w('mirror', 7) - 0.06, mAlT = w('mirror', 13);
-  const MIRK = [K(0.0, 0.08, 16.2, [4, 4.0, 11.4]), K(0.0, 0.07, 15.0, [4, 4.05, 11.4])];
+  const MIRK = [K(0.0, 0.08, 18.0, [4, 4.4, CAMZ]), K(0.0, 0.07, 16.8, [4, 4.45, CAMZ])];
   shot(mirA, (g, lt, t, sh) => {
     rig(B, lt, [[0, MIRK[0]], [len(sh), MIRK[1]]], { t, e: lin });
     online(g, t, { pieces: SEPT, cams: { wit: { e: WE('triumph', { open: 0.8 }) }, mag: { e: 'sad' } }, clock: { names: ['MAGNUS', 'WITTY'], cols: [CURSE, VOID], l: 252, r: 141, run: 0, result: '0 – 1' } });
@@ -941,12 +1019,12 @@ export async function build(T) {
   for (let i = 0; i < 5; i++) cue(scoreA + 0.1 + i * 0.16, 'swipe_card', 0.25); cue(fourT, 'boom', 0.45);
   shot(forA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.14, 0.05, 9, [4, 3.1, 9.3])], [len(sh), K(0.08, 0.04, 7.6, [4, 3.15, 9.3])]], { t, e: lin });
-    domain(g, t, { pieces: piecesAt(PL, 107), black: 'mag', ew: WE('sad'), eb: ME('smug', { glow: 1 }), blue: 0.6 });
+    domain(g, t, { pieces: piecesAt(PL, 107), black: 'mag', dark: true, ew: WE('sad'), eb: ME('smug', { glow: 1 }), blue: 0.6 });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= forA + 0.12) badge(g, 'THE KING OF CURSES', W / 2, 230, { color: CURSE, size: 56, ...pop(t, forA + 0.12) }); } });
   cue(forA - 0.04, 'whoosh_fast', 0.3); cue(forA + 0.1, 'dun_dun', 0.35);
   shot(proudA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI - 0.75, 0.1, 10.5, [4, 3.0, -1.4])], [len(sh), K(PI - 0.6, 0.08, 8.6, [4, 3.05, -1.4])]], { t, e: lin });
-    domain(g, t, { pieces: piecesAt(PL, 107), white: 'wit', ew: WE('sad', { band: 1 }), eb: ME('neutral', { glow: 0.3 }), blue: 0.8 });
+    domain(g, t, { pieces: piecesAt(PL, 107), white: 'wit', dark: true, ew: WE('sad', { band: 1 }), eb: ME('neutral', { glow: 0.3 }), blue: 0.8 });
   }, { trans: 'fade', transDur: 0.3, hud: (g, lt, t) => { if (t >= strongT) badge(g, 'STAND PROUD', W / 2, 230, { color: GOLD, size: 56, ...pop(t, strongT) }); } });
   cue(proudA + 0.05, 'shimmer', 0.25);
 
