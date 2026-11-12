@@ -1,5 +1,10 @@
 # Спонсоры
 
+> **Публикация спонсорского ролика (урок 12.11.2026):** при выкладке включать **Content disclosure → Branded
+> content** и ставить **#ad** в подпись. Без этого TikTok сам распознаёт рекламу, вешает в профиле метку «Undisclosed»
+> и баннер «Video may require content disclosure» и может урезать показ: `woodpecker` так набрал 5,2 тыс. за первые
+> часы. Это же — условие спонсоров (#ad + Branded content обещаны в нашем предложении).
+
 ## Chessigma (Eliot Hennebo)
 - **11.11.2026, 16:13 — сценарий утверждён с правками.** Правило Элиота: всё на экране — запись приложения Chessigma на
   телефоне (одинаковый интерфейс). Бит 5 — его текст («A grandmaster remembers whole positions. How many pawns can
