@@ -1076,11 +1076,16 @@ export async function build(T) {
   // the recorded round (level 8, eight pawns): in the recording they go out at 2.356 s and are tapped back one by one
   const MEM = { gone: 2.356, taps: [2.818, 3.149, 3.458, 3.8, 4.158, 4.492, 4.803, 5.113], sq: [[4, 2], [7, 2], [4, 3], [6, 3], [3, 5], [7, 5], [4, 6], [6, 6]] };
   const memT = x => vanT + x - MEM.gone;  // the recording's pawns go out on the word "vanish"
+  // v6, Eliot's edit (12 Nov): the author's recording of the app (photos/rec/bm.mp4): the Brain tab, Board Memory's own
+  // screen, the first levels of his run (at double speed, so that three levels fit the line), then the results screen
+  // with the score and his rank (#1422 of 7368)
+  const BM = { intro: 1.5, play: 2.0, res: 11.62 }, RESS = repT - 0.05;
   const earlyPh = phoneSeg({
-    prog: [[earlyS, t => ({ still: 'memory_jpg' })], [gameS, t => ({ rec: 'memory', sec: MEM.gone + t - vanT })]],
-    boxes: [[60, 180, 720, 430, how5T + 0.15, sponT - 0.1], [28, 911, 752, 1077, sponT - 0.1, gameS]],
-    pecks: [[PLAY, 994, 124], [fr(PLAY + 0.16), 994, 124]],
-    rings: MEM.taps.map((x, i) => [memT(x), 24 + (MEM.sq[i][0] + 0.5) * 91.5, 272 + (MEM.sq[i][1] + 0.5) * 91.5]),
+    prog: [[earlyS, t => ({ rec: 'bm', sec: Math.min(BM.intro, 0.1 + (t - earlyS)) })],
+      [gameS, t => ({ rec: 'bm', sec: Math.min(BM.res - 0.05, BM.play + 2 * (t - gameS)) }), 'cut'],
+      [RESS, t => ({ rec: 'bm', sec: BM.res + (t - RESS) })]],
+    boxes: [[40, 170, 740, 600, RESS + 0.5, moreT], [24, 1310, 756, 1450, moreT, s('plan') - 0.1]],
+    pecks: [[PLAY, 1180, 300], [fr(PLAY + 0.16), 1180, 300]],
     fly: { t0: earlyS + 0.02, dur: 0.5, from: perch() },
   });
   const earlyHud = (g, lt, t) => {
@@ -1103,7 +1108,8 @@ export async function build(T) {
   }, { hud: earlyHud, info: true });
   cue(earlyS - 0.11, 'whoosh_fast', 0.3); cue(earlyS + 0.05, 'fabric', 0.3); cue(sig0T, 'reveal_bell', 0.35); knocks([PLAY, fr(PLAY + 0.16)], 0.5); cue(PLAY, 'sparkle_pop', 0.25);
   cue(gameS, 'swipe_card', 0.35); cue(pawnsT - 0.03, 'shimmer', 0.3); cue(vanT, 'whoosh_soft', 0.4); cue(repT - 0.03, 'success', 0.3); cue(moreT - 0.03, 'sparkle_pop', 0.3);
-  MEM.taps.forEach(x => { if (memT(x) < s('plan') - 0.12) cue(memT(x), 'piece', 0.35); });
+  for (let x = gameS + 0.5; x < RESS - 0.2; x += 0.55) cue(x, 'piece', 0.25);  // taps of the run
+  cue(RESS, 'success', 0.35);
 
   // ======================= HIS PLAN SOUNDS TOO SIMPLE: his study; twenty-five, the place for the title on his chest is empty =======================
   const planS = s('plan') - 0.05, tooT = w('plan', 'too'), overT = w('plan', 'over'), thouT = w('plan', 'thousand'), solveT = T.w('plan', 9).s, thenT = T.w('plan', 12).s,
@@ -1221,12 +1227,15 @@ export async function build(T) {
   const midS = s('mid') - 0.05, sigT = w('mid', 'chessigmas'), runsT = w('mid', 'runs'), youT = w('mid', 'you'), timesT = w('mid', 'times'), onT = w('mid', 'on'), fasterT = w('mid', 'faster'), cleanT = w('mid', 'cleaner');
   const TAP = fr(youT + 0.12), solveS = TAP + 0.22, gateS = onT - 0.12;
   const midPh = phoneSeg({
-    prog: [[midS, t => ({ page: 0 })],
-      [runsT - 0.12, t => ({ page: 400 - 110 * (1 - ease.out(seg(t, runsT - 0.12, runsT + 0.4, lin))) })],
-      [solveS, t => ({ rec: 'solve', sec: 0.2 + Math.max(0, t - (solveS + 0.26)) })],  // the recording opens on a loading screen (0.2 s), then runs 2.3 s
-      [gateS, t => ({ page: 0 })]],  // back to the top of the site's page, for its own line: "Pass faster and cleaner each time"
-    boxes: [[30, 166, 694, 306, runsT + 0.3, TAP - 0.04], [72, 792, 292, 912, TAP - 0.04, solveS], [606, 92, 774, 184, timesT + 0.05, gateS - 0.04], [26, 282, 754, 384, fasterT - 0.22, s('result') - 0.13]],
-    pecks: [[TAP, 852, 118], [fr(TAP + 0.16), 852, 118], [fr(fasterT - 0.02), 333, 70], [fr(cleanT - 0.02), 333, 70]],
+    // v6, Eliot's edit (12 Nov): the author's recording of the app (photos/rec/wp.mp4): Train → the Woodpecker page, the
+    // sets by level (Mixed), a puzzle of his set with its timer, then the Active tab with his Club card (cycle 4, 96 %
+    // accuracy, 8.6 s, 2.4 s faster); the card holds still for "faster and cleaner"
+    prog: [[midS, t => ({ rec: 'wp', sec: Math.min(2.45, 0.1 + (t - midS)) })],
+      [runsT - 0.12, t => ({ rec: 'wp', sec: Math.min(3.8, 2.62 + (t - (runsT - 0.12))) })],
+      [solveS, t => ({ rec: 'wp', sec: 4.62 + (t - solveS) })],
+      [gateS, t => ({ rec: 'wp', sec: 9.7 + Math.min(1.3, 2 * (t - gateS)) })]],  // the card scrolls in at double speed and holds
+    boxes: [[20, 230, 760, 1090, runsT + 0.3, solveS], [598, 96, 774, 182, timesT + 0.05, gateS - 0.04], [14, 625, 766, 1005, fasterT - 0.22, s('result') - 0.13]],
+    pecks: [[TAP, 700, 118], [fr(TAP + 0.16), 700, 118], [fr(fasterT - 0.02), 900, 90], [fr(cleanT - 0.02), 850, 90]],
   });
   const midHud = (g, lt, t) => {
     adHud(g, lt, t); if (t >= sigT) sigPlate(g, 150, t < sigT + 0.4 ? popIn(t, sigT) : {});
@@ -1313,7 +1322,7 @@ export async function build(T) {
     rig(B, lt, [[0, K(-0.24, 0.2, 12.2, [2.5, 1.9, 4.2])], [len(sh), K(-0.06, 0.14, 10.4, [2.9, 2.0, 4.2])]], { t, e: glide });
     forest(g, t, { hans: null, board: false, focus: 10, extra: (g2, ph) => {
       if (ph !== 'top') return;
-      paperStack(g2, t, BLOW); phone(g2, t, { to: { page: 0 } });
+      paperStack(g2, t, BLOW); phone(g2, t, { to: { rec: 'wp', sec: 2.7 } });
       const v = strikeAt(t, peckS), drop = seg(t, BLOW, BLOW + 0.3);
       if (t < BLOW + 0.1) bird(g2, stackTop[0], stackTop[1] - drop * 2.6, stackTop[2], PBIRD * 1.25, t, { dir: 1, pose: 'stand', rot: 0.5 + 0.55 * v, peck: v, look: [0.5, 0.7] });
       else birdFly(g2, t, BLOW + 0.1, 0.45, [stackTop[0], stackTop[1] - 0.8, stackTop[2]], edgeAt(560), PBIRD, { land: { pose: 'cling', look: [0.7, 0] }, lift: 0.8 });
@@ -1324,13 +1333,15 @@ export async function build(T) {
   // The Train tab with its trainers and the row of his set; the coach asked about his games and its answer; the day's
   // plan on the home screen
   const endPh = phoneSeg({
-    prog: [[a1S, t => ({ page: 0 })],
-      [trainS, t => ({ rec: 'train', sec: 0.8 + t - trainS })],
+    // v6, Eliot's edit (12 Nov): the mixed sets by level, then a scroll through the theme sets (photos/rec/wp.mp4)
+    prog: [[a1S, t => ({ rec: 'wp', sec: 2.7 })],
+      [trainS, t => ({ rec: 'wp', sec: Math.min(4.5, 3.0 + (t - trainS)) })],
+      [trainS + 0.8, t => ({ rec: 'wp', sec: 12.6 + 1.5 * (t - (trainS + 0.8)) }), 'cut'],
       [a3S, t => ({ rec: 'think', sec: t - a3S - 0.05 })],
       [ownT + 0.1, t => ({ rec: 'answer', sec: Math.min(2.45, t - (ownT + 0.1)) })],  // its last frames are the next screen loading
       [buildsT - 0.2, t => ({ rec: 'home', sec: t - (buildsT - 0.2) })]],
     boxes: [[16, 96, 764, 292, a3S + 0.3, ownT], [22, 362, 758, 546, buildsT - 0.02, plan3T - 0.04], [22, 566, 758, 1156, plan3T - 0.04, freeS]],
-    pecks: [[fr(trainS + 0.6), 380, 90], [fr(a3S + 0.1), 250, 70], [fr(buildsT), 455, 60], [fr(plan3T), 640, 80]],
+    pecks: [[fr(a3S + 0.1), 250, 70], [fr(buildsT), 455, 60], [fr(plan3T), 640, 80]],
   });
   const endHud = (g, lt, t) => {
     adHud(g, lt, t); if (t >= sig2T - 0.25) sigPlate(g, 150, t < sig2T + 0.15 ? popIn(t, sig2T - 0.25) : {});

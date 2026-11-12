@@ -146,3 +146,17 @@ badges, move-grade and feature icons, the mascot, the Baloo 2 font, the ten App 
   not cropped.
 - The end card sits at the end of the sponsor's block, right before the closing question, not after it: the kit says
   "at the very end of a vertical video". If Chessigma wants it last, it can move there (the video would be 89 s).
+
+## Version 6 (12 Nov 2026): Eliot's edits for beats 5, 9 and 12, from the author's app recordings
+Eliot (12 Nov, 08:08) asked for the edits confirmed for beats 5, 9 and 12, recorded in the app. The author recorded them
+on his phone the same evening (three screen recordings, 1080 × 2340); cut, cropped to the app (the status bar off) and
+scaled to 780 × 1600 in `photos/rec/`:
+- `bm.mp4` (beat 5): the Brain tab, Board Memory's own screen with Play, the first levels of his run (shown at double
+  speed so that three levels fit the line), then the results screen: 11, better than 85 % of players, "Saved. You are
+  #1422 of 7368". The rest of the run (levels 3–11) is cut.
+- `wp.mp4` (beats 9 and 12): Train → the Woodpecker page; the Mixed tab with the sets by level; a puzzle of a set
+  ("Checkmate · Beginner") with its timer; the Active tab with his Club card (cycle 4, 96 % accuracy, 8.6 s, 2.4 s
+  faster); the Themes tab scrolled. His second recording is not used: a Telegram notification with a message showed over
+  the top of the screen there.
+The site's pages (Board Memory, the Woodpecker page) are no longer on the phone in these beats; beat 14 is still the
+site's review page in a phone window (Eliot did not ask to change it again).
