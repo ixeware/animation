@@ -709,6 +709,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   }
   g.restore();
   g.save(); g.translate(turn * 9, 0); hairFront(g, c, fw, fh); g.restore();
+  g.save(); g.translate(turn * 20 * fw, 0); fx('top', { ee }); g.restore();  // over the hair (a band pushed up into it, a crown)
   if (!silhouette) {
     if (e.sweat) sweatDrop(g, 92, -70 + Math.sin(t * 2) * 4 + ((t * 30) % 30), 0.9, e.sweat);
     if (e.tear) { g.fillStyle = rgba('#7cc4f2', 0.9 * e.tear); g.beginPath(); g.ellipse(34, 24 + ((t * 40) % 60), 7, 11, 0, 0, 7); g.fill(); }
