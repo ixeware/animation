@@ -1010,18 +1010,18 @@ export async function build(T) {
       plate(g, c.label + ' ✓', q.x, q.y, { color: GOLD, size: 48, rot: -0.035, ...popIn(t, c.named) });
     });
   };
-  // A: close on the card and his eyes, pushing in
+  // A: closer than v6 on the card and his face, pushing in (his face stays above the captions)
   shot(0, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, -0.02, 12.6, [4, 5.0, 9.6], TELE)], [len(sh), K(0.03, -0.02, 11.4, [4, 5.05, 9.6], TELE)]], { t, e: lin });
+    rig(B, lt, [[0, K(0.0, -0.02, 17.2, [4, 3.1, 9.4], TELE)], [len(sh), K(0.03, -0.02, 16.0, [4, 3.15, 9.4], TELE)]], { t, e: lin });
     hall(g, t, { e: hallE(t), cards: hallCards(t), pieces: pM });
   }, { grade: 'gold', roll: lt => -0.03 + 0.02 * lt, hud: hookHud });
   // B and C: from his left, then from his right, the next card each time
   shot(CARDS[0].away, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.3, -0.06, 16.4, [4, 4.4, 9.4], TELE)], [len(sh), K(-0.24, -0.06, 15.2, [4, 4.5, 9.4], TELE)]], { t, e: glide });
+    rig(B, lt, [[0, K(-0.3, -0.06, 18.6, [4, 3.1, 9.4], TELE)], [len(sh), K(-0.24, -0.06, 17.4, [4, 3.15, 9.4], TELE)]], { t, e: glide });
     hall(g, t, { e: hallE(t), cards: hallCards(t), pieces: pM });
   }, { grade: 'gold', trans: 'whip', hud: hookHud });
   shot(CARDS[1].away, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.3, -0.06, 16.4, [4, 4.4, 9.4], TELE)], [len(sh), K(0.24, -0.06, 15.2, [4, 4.5, 9.4], TELE)]], { t, e: glide });
+    rig(B, lt, [[0, K(0.3, -0.06, 18.6, [4, 3.1, 9.4], TELE)], [len(sh), K(0.24, -0.06, 17.4, [4, 3.15, 9.4], TELE)]], { t, e: glide });
     hall(g, t, { e: hallE(t), cards: hallCards(t), pieces: pM });
   }, { grade: 'gold', trans: 'whip', hud: hookHud });
   // D: pull back, the three named cards on the wall and the fourth with its question mark
@@ -1288,7 +1288,7 @@ export async function build(T) {
   shot(resS, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.26, 0.03, 8.6, [HANS.x + 0.35, 3.05, 9.3])], [len(sh), K(-0.14, 0.03, 7.5, [HANS.x + 0.3, 3.1, 9.3])]], { t, e: glide });
     forest(g, t, { pieces: pF, hans: { e: exprAt([[0, { ...SMUG, look: [0.3, 0.5] }], [resS + 0.55, { ...SMUG, look: [0, 0], curve: 0.7 }]], t) }, brd: null, onTrunk: g2 => birdOnTrunk(g2, t, { a: 0 }), focus: 7.5 });  // the bird would stand half out of the frame's left edge: not drawn here
-  }, { trans: 'whip', hud: (g, lt, t) => { bdg(g, t, 'THE MAN IN THE RED HAT', w('result', 'man') - 0.05, { y: 215, color: HAT, ink: '#FFFFFF', size: 48 }); } });
+  }, { trans: 'whip', noJump: true, hud: (g, lt, t) => { bdg(g, t, 'THE MAN IN THE RED HAT', w('result', 'man') - 0.05, { y: 215, color: HAT, ink: '#FFFFFF', size: 48 }); } });
   cue(resS - 0.11, 'whoosh_fast', 0.3); cue(w('result', 'man') - 0.05, 'sparkle_pop', 0.3);
   // THREE GRANDMASTER NORMS IN SEVEN WEEKS: the bird nails three gold plates up the birch
   const plqS = n3T - 0.14, PLY = [3.2, 4.4, 5.6], plT = [fr(n3T + 0.04), fr(n3T + 0.38), fr(n3T + 0.72)];
