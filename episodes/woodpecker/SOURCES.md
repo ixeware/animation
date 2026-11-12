@@ -160,3 +160,14 @@ scaled to 780 × 1600 in `photos/rec/`:
   the top of the screen there.
 The site's pages (Board Memory, the Woodpecker page) are no longer on the phone in these beats; beat 14 is still the
 site's review page in a phone window (Eliot did not ask to change it again).
+
+## Version 7 (12 Nov 2026): the re-upload
+The pilot is to go up again with Eliot's edits. The author asked to change it a little so that TikTok does not take it
+for the old video ("может слегка поменять видео чтобы алгоритмы не распознали старое"). Only the picture, the pace and the
+music changed; the words of the approved script did not:
+- The voice runs a little faster (tempo 1.36 instead of 1.32, pauses up to 0.12 s): 86.6 s instead of 89.8 s.
+- The hook (0–4 s) is four fast shots instead of one still frame: a close shot pushing in on the first card and his
+  eyes, then from his left, then from his right, then a pull back to the wall. Frame 0 asks the viewer "CAN YOU NAME THIS
+  GAME?", "can" answers "MAGNUS CAN.", a counter ticks with each game he names. Same three games as before.
+- The long story shots punch in every 1.4 s (jump cuts); the phone and sponsor shots stay framed.
+- The score: a driving open ("hook" instead of "intrigue"), and a ticking clock under the plan ("clockwork").

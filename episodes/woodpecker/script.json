@@ -18,10 +18,7 @@
       "pitch_semitones": -1.0
     }
   },
-  "voice_fx": {
-    "tempo": 1.32,
-    "max_gap": 0.14
-  },
+  "voice_fx": {"tempo": 1.36, "max_gap": 0.12},
   "mix": {
     "engine": "v2",
     "music_gap": 11,

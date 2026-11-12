@@ -936,7 +936,8 @@ export async function build(T) {
   const cues = [];
   const cue = (t, id, gain = 1) => cues.push({ t: +Math.max(0, t).toFixed(3), id, gain });
   const shots = [];
-  const shot = (a, draw, o = {}) => shots.push({ a, draw, grade: 'village', trans: 'cut', noJump: true, ...o });
+  // v7: long story shots punch in every 1.4 s (film.jumpCut); the phone and sponsor shots stay framed (info, flat)
+  const shot = (a, draw, o = {}) => shots.push({ a, draw, grade: 'village', trans: 'cut', noJump: false, ...o });
   const len = sh => sh.b - sh.a + 0.35;
   const boom = (t, g = 0.85) => cue(t - BOOM_HIT, 'boom_move', g);
   const K = (yaw, pitch, dist, target, o = {}) => ({ yaw, pitch, dist, fov: 1500, cy: H * 0.5, target, ...o });
@@ -983,28 +984,53 @@ export async function build(T) {
   // hangs over his head, he names it, it goes to its place, the next one comes. The three games on the cards are our
   // own choice (SOURCES.md); the fourth card waits with its question mark from the first frame =======================
   const BIGC = [4, 6.05, 3.14], SMALLC = 1.3, SLOTS = [[1.75, 5.3], [6.25, 5.3], [1.75, 3.3], [6.25, 3.3]], FLY = 0.26;
-  const CARDS = [{ pieces: GOC[34].pieces, label: 'FISCHER · 1956', pop: -1, named: 0.45, away: 0.95 }, { pieces: BT[42].pieces, label: 'TAL · 1960', pop: 1.0, named: 1.5, away: 2.0 },
-    { pieces: PI[43].pieces, label: 'POLISH IMMORTAL', pop: 2.05, named: 2.55, away: 3.05 }];
+  // v7 (the re-upload): the card times follow the voice, the first card slams in on frame 0
+  const H0 = w('hook', 'carlsen'), H1 = w('hook', 'famous'), H2 = w('hook', 'from'), H3 = w('hook', 'position.');
+  const CARDS = [{ pieces: GOC[34].pieces, label: 'FISCHER · 1956', pop: -0.12, named: H0 - 0.08, away: H0 + 0.38 }, { pieces: BT[42].pieces, label: 'TAL · 1960', pop: H0 + 0.43, named: H1 - 0.05, away: H1 + 0.42 },
+    { pieces: PI[43].pieces, label: 'POLISH IMMORTAL', pop: H1 + 0.47, named: H2 + 0.08, away: H3 - 0.12 }];
   // a card between its place over his head (k 0) and its slot (k 1)
   const place = (k, i) => ({ x: lerp(BIGC[0], SLOTS[i][0], k), y: lerp(BIGC[1], SLOTS[i][1], k), size: lerp(BIGC[2], SMALLC, k), tilt: lerp(-0.025, (i % 2 ? 1 : -1) * 0.05, k) });
   const cardsAt = t => CARDS.map((c, i) => { const k = ease.inOut(clamp((t - c.away) / FLY)); return { pieces: c.pieces, ...place(k, i), u: (t - c.pop) / 0.2, named: t >= c.named ? 1 : 0, tick: k }; });
   const TELE = { fov: 3000 };
   const up = l => ({ ...EXPR.smug, lid: 0.14, look: l, curve: 0.5 });
-  shot(0, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.05, -0.05, 19.2, [4, 3.25, 9.3], TELE)], [len(sh), K(-0.04, -0.05, 17.8, [4, 3.25, 9.3], TELE)]], { t, e: lin });
-    hall(g, t, { e: exprAt([[0, up([0, -0.8])], [0.5, up([0.25, -0.3])], [1.05, up([0, -0.8])], [1.55, up([-0.25, -0.3])], [2.1, up([0, -0.8])], [2.6, up([0.2, -0.3])], [3.2, KNOW]], t),
-      cards: [...cardsAt(t), { ...place(1, 3), mystery: true, tilt: 0.05 + 0.03 * Math.sin(t * 5) }], pieces: pM });
-  }, { grade: 'gold', hud: (g, lt, t) => {
-    plate(g, 'MAGNUS NAMES THE GAME', W / 2, 170, { color: CREAM, size: 54, rot: -0.02 });
-    plate(g, 'FROM ONE POSITION', W / 2, 258, { color: GOLD, size: 54, rot: -0.02 });
+  // v7: four fast shots instead of one still frame (most viewers of v6 left in the first second). Frame 0 asks the
+  // viewer the question; "can" answers it for Magnus; a counter ticks with every game he names
+  const hallE = t => exprAt([[0, up([0, -0.8])], [CARDS[0].named + 0.05, up([0.25, -0.3])], [CARDS[1].pop, up([0, -0.8])], [CARDS[1].named + 0.05, up([-0.25, -0.3])], [CARDS[2].pop, up([0, -0.8])], [CARDS[2].named + 0.05, up([0.2, -0.3])], [H3, KNOW]], t);
+  const hallCards = t => [...cardsAt(t), { ...place(1, 3), mystery: true, tilt: 0.05 + 0.03 * Math.sin(t * 5) }];
+  const canT = w('hook', 'can'), singT = w('hook', 'single');
+  const hookHud = (g, lt, t) => {
+    bdg(g, t, 'CAN YOU NAME THIS GAME?', -0.25, { y: 170, color: RED, ink: '#FFFFFF', size: 54, until: canT });
+    bdg(g, t, 'MAGNUS CAN.', canT, { y: 170, color: GOLD, size: 64, until: singT });
+    bdg(g, t, 'FROM ONE POSITION', singT, { y: 170, color: CREAM, size: 56 });
+    const n = CARDS.filter(c => t >= c.named).length;
+    if (n) plate(g, '✓ ' + n, W - 120, 300, { color: GOLD, size: 60, rot: 0.04, ...popIn(t, CARDS[n - 1].named) });
     CARDS.forEach(c => {  // the name, stamped across the card while it hangs over him
       if (t < c.named || t >= c.away) return;
       const q = B.project(BIGC[0], BIGC[1] - BIGC[2] * 0.2, CARDZ);
       plate(g, c.label + ' ✓', q.x, q.y, { color: GOLD, size: 48, rot: -0.035, ...popIn(t, c.named) });
     });
-  } });
-  cue(0, 'whoosh_deep', 0.25);
-  CARDS.forEach(c => { if (c.pop > 0) cue(c.pop, 'page_flip', 0.35); cue(c.named, 'stamp', 0.45); cue(c.named + 0.04, 'sparkle_pop', 0.25); cue(c.away, 'whoosh_soft', 0.2); });
+  };
+  // A: close on the card and his eyes, pushing in
+  shot(0, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.0, -0.02, 12.6, [4, 5.0, 9.6], TELE)], [len(sh), K(0.03, -0.02, 11.4, [4, 5.05, 9.6], TELE)]], { t, e: lin });
+    hall(g, t, { e: hallE(t), cards: hallCards(t), pieces: pM });
+  }, { grade: 'gold', roll: lt => -0.03 + 0.02 * lt, hud: hookHud });
+  // B and C: from his left, then from his right, the next card each time
+  shot(CARDS[0].away, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(-0.3, -0.06, 16.4, [4, 4.4, 9.4], TELE)], [len(sh), K(-0.24, -0.06, 15.2, [4, 4.5, 9.4], TELE)]], { t, e: glide });
+    hall(g, t, { e: hallE(t), cards: hallCards(t), pieces: pM });
+  }, { grade: 'gold', trans: 'whip', hud: hookHud });
+  shot(CARDS[1].away, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.3, -0.06, 16.4, [4, 4.4, 9.4], TELE)], [len(sh), K(0.24, -0.06, 15.2, [4, 4.5, 9.4], TELE)]], { t, e: glide });
+    hall(g, t, { e: hallE(t), cards: hallCards(t), pieces: pM });
+  }, { grade: 'gold', trans: 'whip', hud: hookHud });
+  // D: pull back, the three named cards on the wall and the fourth with its question mark
+  shot(CARDS[2].away, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.02, -0.05, 16.8, [4, 3.6, 9.3], TELE)], [len(sh), K(-0.03, -0.05, 19.6, [4, 3.3, 9.3], TELE)]], { t, e: glide });
+    hall(g, t, { e: hallE(t), cards: hallCards(t), pieces: pM });
+  }, { grade: 'gold', hud: hookHud });
+  cue(0, 'whoosh_deep', 0.3); cue(0.01, 'thud', 0.35); cue(canT, 'reveal_bell', 0.3);
+  CARDS.forEach((c, i) => { if (c.pop > 0) cue(c.pop, 'page_flip', 0.35); cue(c.named, 'stamp', 0.45); cue(c.named + 0.04, 'sparkle_pop', 0.25); cue(c.away - 0.05, i < 2 ? 'whoosh_fast' : 'whoosh_soft', 0.25); });
   // IN ONE TEST, ONLY ONE POSITION STUMPED HIM. IT WAS FROM HARRY POTTER: the fourth card comes up; it turns over
   const potS = s('potter') - 0.05, onlyT = w('potter', 'only'), stumpT = w('potter', 'stumped'), harryT = w('potter', 'harry');
   const UP4 = potS + 0.08, FLIP = fr(harryT - 0.1);
@@ -1415,8 +1441,9 @@ export async function build(T) {
 
   const tvOff = T.duration - 0.5;
   cue(tvOff, 'tvoff', 0.5);
+  // v7 (the re-upload): a driving open and a ticking clock under the plan, so the score is not the one of v6
   const music = [
-    { t: 0, m: 'intrigue' }, { t: SEEN - 0.004, m: 'slam' }, { t: brS, m: 'hook' }, { t: earlyS, m: 'digital' }, { t: planS, m: 'intrigue' }, { t: wallS, m: 'tension' }, { t: cyS, m: 'build' },
+    { t: 0, m: 'hook' }, { t: SEEN - 0.004, m: 'slam' }, { t: brS, m: 'intrigue' }, { t: earlyS, m: 'digital' }, { t: planS, m: 'clockwork' }, { t: wallS, m: 'tension' }, { t: cyS, m: 'build' },
     { t: SLAM - 0.004, m: 'slam' }, { t: whyS, m: 'void' }, { t: midS, m: 'digital' }, { t: resS, m: 'victory' }, { t: metS, m: 'glory' }, { t: a1S, m: 'digital' }, { t: ctaS, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
