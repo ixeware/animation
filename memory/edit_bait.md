@@ -25,6 +25,7 @@
 | `woodpecker` v3 | You can surprise a human. But not a library. He has seen your position before. | метафора | ждём статистику |
 
 ## Заготовки
+- Witty против Магнуса (`witty2`): «Nah, I'd win» → «WITTY WON.» перечёркнуто; Witty — Годжо, Магнус — Сукуна (правило 62).
 - Магнус: The Library; «you're not playing a man, you're playing every game he has ever seen».
 - Хикару: The Speedrunner, The Machine with a webcam.
 - Таль: The Magician from Riga (известное прозвище; перед роликом найти источник).

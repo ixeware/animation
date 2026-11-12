@@ -8,6 +8,7 @@
 | Emil Kowalski, motion | [заметка](../reference/motion_emil_kowalski.md) | движение надписей |
 | «The Grandmaster Hunter» (Леви) | `episodes/gmhunter` | прозвище героя как байт |
 | Тест памяти Магнуса, chess24, 30.04.2021 | [SOURCES](../episodes/woodpecker/SOURCES.md) | факт для хука: называет партии по одной позиции |
+| Годжо против Сукуны («Jujutsu Kaisen», мем «Nah, I'd win», панель «GOJO WON.» перечёркнута) | прислал автор 12.11.2026 | Witty = Годжо, Магнус = Сукуна в `witty2`; только детали образа в нашем стиле (правило 62) |
 
 Что работает на канале (со слов автора): современные фигуры — GothamChess, Mittens, Хикару, Магнус, — а не история
 ради истории. Свежие цифры: `python3 tools/tiktok.py stats the64files`.
