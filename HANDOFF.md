@@ -191,7 +191,17 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
 
 ## 8. Состояние на 11.11.2026
 
-### Последний ролик: `woodpecker`, «He has seen your position before» (пилот для Chessigma Supercoach), версия 5
+### Последний ролик: `witty2`, Witty Alien vs Magnus, round two (The 64 Files)
+
+- 62,7 с, 15 фраз, Callum `eleven_v3`. Факты и оценки движка — `episodes/witty2/SOURCES.md`, партия — `engine/data/witty_magnus_2026-11-07.*`.
+- Код — `episodes/witty2/scenes.js`: инструменты из `gmhunter` (3D-примитивы, `tableSet`, часы) + свой набор `domain()` (стол на
+  чёрном лаке между текстурами `VOID_T` и `SHRINE_T`) и `online()` (вебки за доской). Образы — `CAST.wit` (`hairFx: gojoHair`,
+  `faceFx: gojoFace`, выражение `band` 0..1 — повязка, `glow` — синие глаза) и `CAST.mag` (`sukunaFace`: метки, красное свечение).
+  В движке добавлена фаза `faceFx('top')` поверх волос (`engine/js/characters.js`).
+- Сборка: `node render.mjs witty2 --workers 4 --scale 2 && python3 audio/mix.py episodes/witty2`, кодирование —
+  `scratchpad/scripts/encode_w2.sh` (не в репозитории; строки — как в шаге 8 CLAUDE.md).
+
+### Предыдущий ролик: `woodpecker`, «He has seen your position before» (пилот для Chessigma Supercoach), версия 5
 
 - **Вышел 11.11.2026, 23:45 UTC** (версия 5, 89,8 с): https://www.tiktok.com/@the64files/video/7707064184718036232. Письмо Элиоту со счётом INV-2026-002 —
   отправлено 12.11 в 00:01 UTC, ссылка на 4К v5 (Drive) — следом в 00:10. Переоформленный INV-2026-001 на ARCHE LABS LTD отправлен 12.11. Бонус $50 — при 500 тыс. за 30 дней.
