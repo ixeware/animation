@@ -70,3 +70,24 @@ Witty Alien rematch» (страница из сессии не открылас�
   волосы торчком, чёрная повязка, синие глаза) и Сукуны (полосы под глазами, красные глаза) — только на битах «Nah, I'd
   win», второй ферзь, сдача, «For Magnus», «Stand proud» (просьба автора: не во всех сценах).
 - Доска партии — зелёная Chess.com (правило 48: онлайн-партия — её доска), ходы — настоящие ходы партии 7.11.
+
+## Телевизор с разбором Chessigma (версия 2, по просьбе автора 12.11.2026)
+- На телевизоре за доской — настоящая публичная страница разбора этой партии на Chessigma:
+  https://www.chessigma.com/games/36fc7bb3-b70e-4781-bfe4-d91cf7cd7c65 (партию импортировали из Chess.com через «Import
+  more games» для ника witty_alien, без входа в аккаунт; видно «Sign in for free»). Доска перевёрнута белыми вниз
+  («Review settings → Flip board»), снимок после каждого полухода (108 кадров, 12.11.2026) — `photos/tv/ply_000…107.jpg`;
+  на экране всегда та позиция, что на доске на столе. Скрипты съёмки — в рабочей папке сессии (`w2_capture2.cjs`).
+- Оценки Chessigma на этих кадрах: 6.Nxf7 — «clown» («That knight move loses a lot», −1,05), 17...Bg6 — «bad»,
+  51...a1=Q — «best» («Clean and accurate»). Совпадают с нашей оценкой Stockfish.
+
+## Блок спонсора в конце (правило 61; предложение Chessigma, пока не согласовано)
+- Текст по брифу кита Chessigma (см. `episodes/woodpecker/SOURCES.md`, «Chessigma's creator kit»): «game reviews are
+  free and unlimited» (не «report»), «on the App Store and Google Play», «Link in bio»; «every move graded» Элиот
+  утвердил в сценарии `woodpecker`. Финальная карточка — их файл из кита (`photos/rec/closer.mp4`, 3 с), без изменений
+  (`flat: true`, без субтитров поверх). Плашка AD — на всём блоке. Ссылка в био — по брифу:
+  `https://www.chessigma.com/go/app/the64files?utm_content=<ролик>`.
+
+## Эдит-байты (фигуры речи, не факты)
+- «In September, the alien beat a human. In November, the human beat the alien.» — игра слов на нике Witty Alien;
+  факты под ней: 30.09.2026 Witty выиграл у Магнуса, 7.11.2026 Магнус выиграл у Witty.
+- Плашка «THE KING OF CURSES» на «For Magnus» — титул Сукуны из «Магической битвы», прозвище-отсылка, не факт.

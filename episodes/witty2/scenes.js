@@ -11,7 +11,8 @@
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect } from '../../engine/js/core.js';
 import { Board, sqXZ, piecesAt } from '../../engine/js/board.js';
 import { EXPR, CAST, drawChar } from '../../engine/js/characters.js';
-import { badge, nameTitle, placeStamp, stamp, counter, score, vsLabel, sans, mono, popIn } from '../../engine/js/hud.js';
+import { badge, nameTitle, placeStamp, stamp, counter, score, vsLabel, plate, sans, mono, popIn } from '../../engine/js/hud.js';
+import { loadImage } from '../../engine/js/photo.js';
 import { rig, seated, CAM } from '../../engine/js/stage.js';
 import { table, chair, FLOOR_Y, texTri, pool } from '../../engine/js/env.js';
 import { useLookV2, SKIN2 } from '../../engine/js/look.js';
@@ -37,6 +38,16 @@ const LACQUER = ['#1C1C26', '#0D0D14', '#15151E'];
 // the real game (SOURCES.md): Witty_Alien (White) – MagnusCarlsen, 7 Nov 2026; and their first blitz game, 30 Sep 2026
 const PL = await fetch('../engine/data/witty_magnus_2026-11-07.json').then(r => r.json());
 const CW = await fetch('../engine/data/carlsen_witty_2026.json').then(r => r.json());
+// the TV: Chessigma's public review page of this very game, one screenshot per ply (photos/tv/ply_000 = the start;
+// chessigma.com/games/36fc7bb3-b70e-4781-bfe4-d91cf7cd7c65, board flipped to White, 12 Nov 2026; SOURCES.md)
+const TVF = await Promise.all([...Array(108)].map((_, k) => loadImage(`../episodes/witty2/photos/tv/ply_${String(k).padStart(3, '0')}.jpg`)));
+// the sponsor's own 3-second end card from their creator kit (photos/rec/closer.mp4; frames by tools/frames.py into build/rec)
+const RECI = await fetch('../episodes/witty2/build/rec/index.json').then(r => r.ok ? r.json() : null).catch(() => null);
+if (!RECI) throw new Error('no frames of the end card: run python3 tools/frames.py episodes/witty2');
+const REC = Object.fromEntries(await Promise.all(Object.entries(RECI).map(async ([name, { n }]) =>
+  [name, await Promise.all(Array.from({ length: n }, (_, k) => loadImage(`../episodes/witty2/build/rec/${name}/${String(k + 1).padStart(3, '0')}.jpg`)))])));
+const recFrame = (name, sec) => REC[name][clamp(Math.floor(sec * RECI[name].fps), 0, RECI[name].n - 1)];
+function adTag(g, a = 1) { plate(g, 'AD', 96, 146, { color: '#16161E', size: 26, a: a * 0.92, rot: 0 }); }
 
 // ---------- the cast: Witty with Gojo's white hair standing up and his black band, Magnus with Sukuna's marks ----------
 // hairFx 'back' / 'front' (head units: the face is 100·fw wide and 125·fh tall from its centre)
@@ -549,8 +560,19 @@ function camTex(who, e, t, { shake = 0, zoom = 1, anime = false } = {}) {
 }
 const CAMPOS = { wit: [[1.2, 4.6, 11.4], 0.16], mag: [[6.8, 4.6, 11.4], -0.16] };
 // the online game: no players at the table, their webcams behind it, the clock beside the board
-function online(g, t, { pieces, under = null, over = null, cams = {}, clock = null, camA = 1, blue = 1, red = 1 } = {}) {
+const TV = { c: [4, 3.9, 11.8], hw: 4.7, hh: 2.64 };
+const TVC_ = new Map();  // the frames as canvases (texQuad samples a canvas), made when first needed
+function tvCanvas(k) { k = clamp(k, 0, 107); if (!TVC_.has(k)) { const im = TVF[k], c = makeCanvas(im.width, im.height); c.getContext('2d').drawImage(im, 0, 0); TVC_.set(k, c); } return TVC_.get(k); }
+function tvSet(g, k, t) {  // a big flat screen on two legs behind the board, showing the review at ply k
+  const { c, hw, hh } = TV;
+  for (const sd of [-1, 1]) ab(g, [c[0] + sd * (hw - 1.2) - 0.12, FLOOR_Y, c[2] - 0.1], [c[0] + sd * (hw - 1.2) + 0.12, c[1] - hh, c[2] + 0.1], '#15151C');
+  ab(g, [c[0] - hw - 0.16, c[1] - hh - 0.16, c[2]], [c[0] + hw + 0.16, c[1] + hh + 0.16, c[2] + 0.3], '#0B0B10', { spec: 0.4 });
+  if (B.E[2] < c[2]) texQuad(g, tvCanvas(k), [c[0] - hw, c[1] + hh, c[2] - 0.02], [c[0] + hw, c[1] + hh, c[2] - 0.02], [c[0] - hw, c[1] - hh, c[2] - 0.02]);
+  pool(g, B, c[0], c[1], c[2] - 0.3, 9, '#BFD8FF', 0.1, true); pool(g, B, c[0], -0.36, 9.2, 5, '#BFD8FF', 0.08);
+}
+function online(g, t, { pieces, under = null, over = null, cams = {}, clock = null, camA = 1, blue = 1, red = 1, tv = null } = {}) {
   domainBack(g, t, { blue, red });
+  if (tv !== null) { camA = 0; if (B.E[2] < TV.c[2]) tvSet(g, tv, t); }
   const back = () => { if (camA <= 0) return; for (const who of ['wit', 'mag']) { const [c, ry2] = CAMPOS[who], o = cams[who] || {}; camPanel(g, camTex(who, o.e || 'focus', t, o), c, 2.5, 3.0, ry2, { glow: CAMLOOK[who].glow, a: camA, frame: '#101018' }); } };
   if (B.E[2] < 11.4) back();
   tableSet(g, t, { pieces, under, over, clock, wPlayer: false, bPlayer: false, wChair: false, bChair: false, tableCol: LACQUER });
@@ -625,6 +647,7 @@ export async function build(T) {
     under: g => { if (r.m) moveUnder(g, B, r.m, r.lt, { dur: d, hold }); },
     over: g => { if (r.m) moveOver(g, B, r.m, r.lt, { dur: d, hold }); },
   });
+  const tvOf = (r, d) => (r.m && slide(r.lt, d) < 0.6 ? r.k - 1 : r.k);
   const spaced = (a, b, n) => [...Array(n)].map((_, i) => lerp(a, b, n === 1 ? 1 : i / (n - 1)));
   const clockAt = (k, run = 0, o = {}) => ({ names: ['WITTY', 'MAGNUS'], cols: [VOID, CURSE], l: CLKS[k][0], r: CLKS[k][1], run, ...o });
   const at3 = (sq, y = 0.6) => { const [x, z] = sqXZ(sq); return [x, y, z]; };
@@ -720,16 +743,16 @@ export async function build(T) {
   // ======================= MOVE SIX: THE KNIGHT ON f7 (the main move: Hollow Purple, rule 32 / §8) =======================
   const OPEN = spaced(openA + 0.12, sixT - 0.02, 10);
   shot(openA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.1, 0.62, 15, [4, 0, 3.8])], [len(sh), K(0.04, 0.68, 13.5, [4, 0, 3.9])]], { t, e: lin });
+    rig(B, lt, [[0, K(0.06, 0.42, 18, [4, 2.0, 6.6])], [len(sh), K(0.02, 0.4, 16.4, [4, 2.1, 6.8])]], { t, e: lin });
     const r = runTo(PL, 0, OPEN, t, 0.08), fx = moveFx(r, 0.08, 0.1);
-    online(g, t, { pieces: r.pieces, under: fx.under, over: fx.over, camA: 0, clock: clockAt(r.k) });
+    online(g, t, { pieces: r.pieces, under: fx.under, over: fx.over, camA: 0, clock: clockAt(r.k), tv: tvOf(r, 0.08) });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= sixT) counter(g, 'MOVE 6', null, { y: 330, size: 130, color: GOLD, at: [t, sixT] }); } });
   OPEN.forEach((a, i) => cue(a - 0.02, 'piece', i % 2 ? 0.16 : 0.22)); cue(sixT, 'hit', 0.5);
   const KN = at3('g5', 1.0), F7 = at3('f7', 1.0);
   shot(throwA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.42, 0.3, 9.2, [5.6, 0.6, 5.4])], [LAND - throwA, K(-0.3, 0.27, 7.6, [5.7, 0.6, 5.8])], [len(sh), K(-0.22, 0.25, 7.0, [5.6, 0.6, 6.2])]], { t, bump: t > LAND && t < LAND + 0.3 ? 1.6 : 0 });
     const r = runTo(PL, 10, [LAND], t, 0.32), landed = t >= LAND;
-    online(g, t, { pieces: r.pieces, camA: 0, red: 1, blue: 1,
+    online(g, t, { pieces: r.pieces, camA: 0, red: 1, blue: 1, tv: tvOf(r, 0.32),
       under: g2 => { if (landed) { ledGlow(g2, B, 'f7', HOLLOW, t, LAND, { reach: 8 }); spread(g2, B, 'f7', t, LAND, HOLLOW); } else squareFrame(g2, B, 'f7', HOLLOW, 0.8 * seg(t, knightT, knightT + 0.2)); moveFx(r, 0.32, 0.6).under(g2); },
       over: g2 => {
         moveFx(r, 0.32, 0.6).over(g2);
@@ -748,9 +771,9 @@ export async function build(T) {
     domain(g, t, { pieces: piecesAt(PL, 11), ew: WE('smug', { glow: 0.8 }), eb: ME('focus') });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= weaponT) badge(g, 'HIS OWN WEAPON', W / 2, 230, { color: VOID, size: 56, ...pop(t, weaponT) }); } });
   shot(titleA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.55, 0.55, 12.5, [5.4, 0.4, 5.6])], [len(sh), K(0.32, 0.6, 11.2, [5.4, 0.4, 5.8])]], { t, e: lin });
+    rig(B, lt, [[0, K(0.32, 0.4, 15.5, [4.6, 1.8, 6.6])], [len(sh), K(0.18, 0.4, 14.2, [4.6, 1.9, 6.8])]], { t, e: lin });
     const pcs = piecesAt(PL, 11).map(p => p.sq === 'f7' ? { ...p, halo: HOLLOW, haloA: 0.9 } : p);
-    online(g, t, { pieces: pcs, camA: 0, under: g2 => ledGlow(g2, B, 'f7', HOLLOW, t, titleA, { reach: 2.5, a: 0.6 }) });
+    online(g, t, { pieces: pcs, camA: 0, tv: 11, under: g2 => ledGlow(g2, B, 'f7', HOLLOW, t, titleA, { reach: 2.5, a: 0.6 }) });
   }, { trans: 'whip', hud: (g, lt, t) => { scrim(g); if (t >= alienT - 0.1) nameTitle(g, t - alienT + 0.1, 'The Alien Gambit', '…5.Ng5 h6 6.Nxf7!?', { y: 200, size: 70, subColor: HOLLOW }); } });
   cue(hisA - 0.04, 'whoosh_fast', 0.3); cue(weaponT, 'sparkle_pop', 0.3); cue(titleA - 0.04, 'whoosh_fast', 0.3); cue(alienT, 'reveal_bell', 0.4);
 
@@ -777,9 +800,9 @@ export async function build(T) {
   // ======================= BUT MAGNUS SLIPS (17...Bg6): THE BAR FLIPS, WITTY IS BETTER =======================
   const FF = spaced(flipA + 0.08, slipsT - 0.3, 21), BG6 = slipsT + 0.08;
   shot(flipA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.08, 0.66, 14, [4, 0, 4.2])], [len(sh), K(-0.02, 0.7, 12.6, [4, 0, 4.4])]], { t, e: lin });
+    rig(B, lt, [[0, K(0.06, 0.42, 18, [4, 2.0, 6.6])], [len(sh), K(0.02, 0.4, 16.4, [4, 2.1, 6.8])]], { t, e: lin });
     const r = t < BG6 - 0.3 ? runTo(PL, 12, FF, t, 0.03) : runTo(PL, 33, [BG6], t, 0.3), fx = moveFx(r, r.k === 34 ? 0.3 : 0.03, r.k === 34 ? 0.8 : 0.05);
-    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over, clock: clockAt(r.k) });
+    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over, clock: clockAt(r.k), tv: tvOf(r, r.k === 34 ? 0.3 : 0.03) });
     if (r.k === 34 && t >= BG6) flashTint(g, RED, 0.25 * (1 - seg(t, BG6, BG6 + 0.35)));
   }, { trans: 'whip', hud: (g, lt, t) => { evalHud(g, -1.0); if (t >= BG6) badge(g, 'MOVE 17: A SLIP', W / 2, 230, { color: RED, size: 52, ...pop(t, BG6) }); } });
   FF.forEach((a, i) => { if (i % 3 === 0) cue(a, 'piece', 0.12); }); cue(flipA, 'whoosh_fast', 0.25); landCue(BG6, false, 0.6); cue(BG6, 'sting', 0.35);
@@ -797,11 +820,11 @@ export async function build(T) {
 
   // ======================= MOVE 21: THE ENGINE'S MOVE IS ROOK e6; HE PLAYS ROOK e2 =======================
   const M21 = spaced(m21A + 0.1, m21T + 0.15, 6);
-  const EK = [K(-0.28, 0.6, 11.5, [4.0, 0.2, 3.6]), K(-0.2, 0.64, 10.4, [4.0, 0.2, 3.8])];
+  const EK = [K(-0.24, 0.44, 14, [4.2, 1.4, 5.6]), K(-0.16, 0.44, 12.8, [4.2, 1.5, 5.8])];
   shot(m21A, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, 0.7, 14.5, [4, 0, 4.2])], [len(sh), K(-0.1, 0.66, 13, [4, 0, 4])]], { t, e: lin });
+    rig(B, lt, [[0, K(0.06, 0.42, 18, [4, 2.0, 6.6])], [len(sh), K(0.02, 0.4, 16.4, [4, 2.1, 6.8])]], { t, e: lin });
     const r = runTo(PL, 34, M21, t, 0.08), fx = moveFx(r, 0.08, 0.1);
-    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over });
+    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over, tv: tvOf(r, 0.08) });
   }, { trans: 'whip', hud: (g, lt, t) => { evalHud(g, 1.0); if (t >= m21T) counter(g, 'MOVE 21', null, { y: 330, size: 130, color: GOLD, at: [t, m21T] }); } });
   M21.forEach((a, i) => cue(a - 0.02, 'piece', 0.16)); cue(m21T, 'hit', 0.45);
   const ghost = (g2, t, a) => {  // the engine's move as a ghost: an arrow e1–e6 and a pale rook on e6
@@ -812,14 +835,14 @@ export async function build(T) {
   };
   shot(engMA, (g, lt, t, sh) => {
     rig(B, lt, [[0, EK[0]], [len(sh), EK[1]]], { t, e: lin });
-    online(g, t, { pieces: piecesAt(PL, 40), camA: 0, over: g2 => ghost(g2, t, 1) });
+    online(g, t, { pieces: piecesAt(PL, 40), camA: 0, tv: 40, over: g2 => ghost(g2, t, 1) });
   }, { trans: 'whip', hud: (g, lt, t) => { evalHud(g, 1.0); if (t >= e6T) badge(g, 'ENGINE: ROOK e6  +1.3', W / 2, 230, { color: LIME, size: 50, ...pop(t, e6T) }); } });
   cue(engMA - 0.04, 'whoosh_soft', 0.3); cue(engMA + 0.3, 'pen', 0.3); cue(e6T, 'sparkle_pop', 0.35);
   const RE2 = e2T + 0.06;
   shot(playsA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, EK[1]], [len(sh), K(-0.14, 0.66, 9.6, [4.0, 0.2, 3.6])]], { t, e: lin });
+    rig(B, lt, [[0, EK[1]], [len(sh), K(-0.1, 0.44, 11.8, [4.2, 1.5, 5.8])]], { t, e: lin });
     const r = runTo(PL, 40, [RE2], t, 0.26), fx = moveFx(r, 0.26, 0.8);
-    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: g2 => { ghost(g2, t, 1 - seg(t, RE2, RE2 + 0.4)); fx.over(g2); } });
+    online(g, t, { pieces: r.pieces, camA: 0, tv: tvOf(r, 0.26), under: fx.under, over: g2 => { ghost(g2, t, 1 - seg(t, RE2, RE2 + 0.4)); fx.over(g2); } });
   }, { trans: 'cut', hud: (g, lt, t) => evalHud(g, lerp(1.0, -0.2, ease.inOut(seg(t, RE2, RE2 + 0.5)))) });
   landCue(RE2, false, 0.6); cue(RE2 + 0.05, 'error', 0.35);
   const LT = spaced(lateA + 0.1, w('late', 3), 3), RE6 = re6T + 0.06;
@@ -834,9 +857,9 @@ export async function build(T) {
   const NXD5 = tooT + 0.08;
   shot(tooA, (g, lt, t, sh) => {
     const d5 = at3('d5', 0.4);
-    rig(B, lt, [[0, K(0.1, 0.5, 8, d5)], [len(sh), K(0.02, 0.46, 6.8, d5)]], { t, e: lin, bump: t > NXD5 && t < NXD5 + 0.3 ? 1.2 : 0 });
+    rig(B, lt, [[0, K(0.1, 0.38, 11, [d5[0], 1.5, d5[2] + 2.4])], [len(sh), K(0.04, 0.38, 9.8, [d5[0], 1.6, d5[2] + 2.4])]], { t, e: lin, bump: t > NXD5 && t < NXD5 + 0.3 ? 1.2 : 0 });
     const r = runTo(PL, 45, [NXD5], t, 0.22), fx = moveFx(r, 0.22, 0.8);
-    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over });
+    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over, tv: tvOf(r, 0.22) });
     slashes(g, t, NXD5, { n: 1, seed: 3, life: 0.4 });
   }, { trans: 'zoom', hud: (g, lt, t) => { evalHud(g, -0.1); if (t >= lateT) stamp(g, 'TOO LATE', W / 2, 330, t, lateT, { color: RED, size: 110 }); } });
   landCue(NXD5, true, 0.7); cue(NXD5, 'whoosh_fast', 0.35); cue(lateT, 'stamp', 0.5); cue(lateT - 0.004, 'boom', 0.45);
@@ -851,26 +874,26 @@ export async function build(T) {
   cue(endA - 0.04, 'whoosh_fast', 0.3); cue(endA + 0.05, 'heartbeat', 0.45); cue(twT, 'clock_press', 0.4); cue(twT + 0.5, 'clock_press', 0.4); cue(twT + 1.0, 'clock_press', 0.4);
   const PW = spaced(pawnsA + 0.12, q1A - 0.1, 25);  // plies 73..97
   shot(pawnsA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.02, 1.08, 14.5, [4, 0, 4])], [len(sh), K(0.14, 0.98, 12.8, [4, 0, 3.8])]], { t, e: lin });
+    rig(B, lt, [[0, K(0.06, 0.42, 18, [4, 2.0, 6.6])], [len(sh), K(0.02, 0.4, 16.4, [4, 2.1, 6.8])]], { t, e: lin });
     const r = runTo(PL, 72, PW, t, 0.07), fx = moveFx(r, 0.07, 0.12);
-    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over, clock: clockAt(r.k) });
+    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over, clock: clockAt(r.k), tv: tvOf(r, 0.07) });
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= pawnsT) badge(g, 'PAWNS MARCHING', W / 2, 230, { color: RED, size: 52, ...pop(t, pawnsT) }); } });
   PW.forEach((a, i) => cue(a - 0.02, 'piece', 0.12 + (i % 2) * 0.05));
 
   // ======================= A QUEEN. WITTY TAKES IT. ANOTHER QUEEN (Sukuna's cuts) =======================
   const Q1 = q1T + 0.1, KD1 = wtT + 0.06, Q2 = q2T + 0.06, PRE = [q2A + 0.1, q2A + 0.28], TAIL = spaced(Q2 + 0.5, resA - 0.1, 5);
-  const QK = [K(-0.25, 0.42, 9, [3.6, 0.3, 1.6]), K(-0.15, 0.4, 7.8, [3.6, 0.3, 1.6])];
+  const QK = [K(-0.2, 0.38, 11.5, [3.8, 1.2, 3.4]), K(-0.12, 0.36, 10.2, [3.8, 1.3, 3.6])];
   shot(q1A, (g, lt, t, sh) => {
     rig(B, lt, [[0, QK[0]], [len(sh), QK[1]]], { t, e: lin, bump: t > Q1 && t < Q1 + 0.3 ? 1.2 : 0 });
     const r = runTo(PL, 97, [Q1], t, 0.24), fx = moveFx(r, 0.24, 0.8);
-    online(g, t, { pieces: r.pieces, camA: 0, under: g2 => { fx.under(g2); if (t >= Q1) ledGlow(g2, B, 'd1', RED, t, Q1, { reach: 3 }); }, over: fx.over, clock: clockAt(r.k) });
+    online(g, t, { pieces: r.pieces, camA: 0, tv: tvOf(r, 0.24), under: g2 => { fx.under(g2); if (t >= Q1) ledGlow(g2, B, 'd1', RED, t, Q1, { reach: 3 }); }, over: fx.over, clock: clockAt(r.k) });
     if (t >= Q1) flashTint(g, RED, 0.3 * (1 - seg(t, Q1, Q1 + 0.4)));
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= Q1) badge(g, 'A QUEEN', W / 2, 230, { color: RED, size: 64, ...pop(t, Q1) }); } });
   boom(Q1, 0.7); landCue(Q1, false, 0.6); cue(Q1, 'shimmer', 0.3);
   shot(wtA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, QK[1]], [len(sh), K(-0.05, 0.42, 7.2, [3.6, 0.3, 1.4])]], { t, e: lin });
+    rig(B, lt, [[0, QK[1]], [len(sh), K(-0.06, 0.36, 9.4, [3.8, 1.3, 3.6])]], { t, e: lin });
     const r = runTo(PL, 98, [KD1], t, 0.22), fx = moveFx(r, 0.22, 0.6);
-    online(g, t, { pieces: r.pieces, camA: 0, under: fx.under, over: fx.over, clock: clockAt(r.k) });
+    online(g, t, { pieces: r.pieces, camA: 0, tv: tvOf(r, 0.22), under: fx.under, over: fx.over, clock: clockAt(r.k) });
   }, { trans: 'cut', hud: (g, lt, t) => { if (t >= KD1) badge(g, 'TAKEN', W / 2, 230, { color: VOID, size: 60, ...pop(t, KD1) }); } });
   landCue(KD1, true, 0.7); cue(KD1, 'glass', 0.35);
   shot(q2A, (g, lt, t, sh) => {
@@ -897,6 +920,19 @@ export async function build(T) {
   }, { trans: 'whip', hud: (g, lt, t) => { if (t >= sixRT) badge(g, '6 SECONDS LEFT', W / 2, 230, { color: RED, size: 60, ...pop(t, sixRT) }); } });
   cue(sixA - 0.04, 'whoosh_fast', 0.3); cue(sixRT, 'tick', 0.4); cue(sixRT + 0.7, 'gavel', 0.4);
 
+  // ======================= THE EDIT-BAIT: the alien beat a human; the human beat the alien (one framing, mirrored) =======================
+  const mirA = s('mirror') - 0.06, mHuT = w('mirror', 6), novA = w('mirror', 7) - 0.06, mAlT = w('mirror', 13);
+  const MIRK = [K(0.0, 0.08, 16.2, [4, 4.0, 11.4]), K(0.0, 0.07, 15.0, [4, 4.05, 11.4])];
+  shot(mirA, (g, lt, t, sh) => {
+    rig(B, lt, [[0, MIRK[0]], [len(sh), MIRK[1]]], { t, e: lin });
+    online(g, t, { pieces: SEPT, cams: { wit: { e: WE('triumph', { open: 0.8 }) }, mag: { e: 'sad' } }, clock: { names: ['MAGNUS', 'WITTY'], cols: [CURSE, VOID], l: 252, r: 141, run: 0, result: '0 – 1' } });
+  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= mHuT - 0.15) score(g, 'ALIEN', 'HUMAN', '1', '0', { y: 270, lc: VOID, rc: CURSE, label: 'SEPTEMBER 30', a: seg(t, mHuT - 0.15, mHuT) }); } });
+  shot(novA, (g, lt, t, sh) => {
+    rig(B, lt, [[0, MIRK[0]], [len(sh), MIRK[1]]], { t, e: lin });
+    online(g, t, { pieces: piecesAt(PL, 107), cams: { wit: { e: WE('sad') }, mag: { e: ME('smug') } }, clock: { ...clockAt(107), result: '0 – 1' } });
+  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= mAlT - 0.15) score(g, 'HUMAN', 'ALIEN', '1', '0', { y: 270, lc: CURSE, rc: VOID, label: 'NOVEMBER 7', a: seg(t, mAlT - 0.15, mAlT) }); } });
+  cue(mirA - 0.04, 'whoosh_fast', 0.3); cue(mHuT - 0.15, 'boom', 0.45); cue(novA - 0.04, 'whoosh_fast', 0.3); cue(mAlT - 0.15, 'boom', 0.5); cue(mAlT, 'dun_dun', 0.3);
+
   // ======================= 4–1 FOR MAGNUS; STAND PROUD =======================
   shot(scoreA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.0, 0.16, 11.6, [4, 0.9, 3.6])], [len(sh), K(0.0, 0.14, 10.4, [4, 0.9, 3.6])]], { t, e: lin });
@@ -906,13 +942,37 @@ export async function build(T) {
   shot(forA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.14, 0.05, 9, [4, 3.1, 9.3])], [len(sh), K(0.08, 0.04, 7.6, [4, 3.15, 9.3])]], { t, e: lin });
     domain(g, t, { pieces: piecesAt(PL, 107), black: 'mag', ew: WE('sad'), eb: ME('smug', { glow: 1 }), blue: 0.6 });
-  }, { trans: 'whip' });
+  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= forA + 0.12) badge(g, 'THE KING OF CURSES', W / 2, 230, { color: CURSE, size: 56, ...pop(t, forA + 0.12) }); } });
   cue(forA - 0.04, 'whoosh_fast', 0.3); cue(forA + 0.1, 'dun_dun', 0.35);
   shot(proudA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI - 0.75, 0.1, 10.5, [4, 3.0, -1.4])], [len(sh), K(PI - 0.6, 0.08, 8.6, [4, 3.05, -1.4])]], { t, e: lin });
     domain(g, t, { pieces: piecesAt(PL, 107), white: 'wit', ew: WE('sad', { band: 1 }), eb: ME('neutral', { glow: 0.3 }), blue: 0.8 });
   }, { trans: 'fade', transDur: 0.3, hud: (g, lt, t) => { if (t >= strongT) badge(g, 'STAND PROUD', W / 2, 230, { color: GOLD, size: 56, ...pop(t, strongT) }); } });
   cue(proudA + 0.05, 'shimmer', 0.25);
+
+  // ======================= THE SPONSOR, AT THE END (rule 61): this game on Chessigma's review; free; their end card =======================
+  const ad1A = s('ad1') - 0.06, gradedT = w('ad1', 6), thisT = w('ad1', 8);
+  const ad2A = s('ad2') - 0.06, freeT = w('ad2', 4), unlT = w('ad2', 6), CLOSE = w('ad2', 7) - 0.05, linkT = w('ad2', 15);
+  const TVC = [TV.c[0] + 0.97, TV.c[1], TV.c[2]];  // the board and the coach's panel of the page
+  const TVK = [K(0.0, 0.3, 17, [4, 2.6, 8.0]), K(0.0, 0.02, 9.4, TVC, { cy: H * 0.42 })];
+  shot(ad1A, (g, lt, t, sh) => {
+    rig(B, lt, [[0, TVK[0]], [Math.min(1.0, len(sh)), TVK[1], ease.inOut], [len(sh), K(0.0, 0.02, 9.1, TVC, { cy: H * 0.42 })]], { t });
+    const k = t < gradedT ? 11 : t < thisT ? 34 : 102;
+    online(g, t, { pieces: piecesAt(PL, k), tv: k });
+  }, { trans: 'whip', hud: (g, lt, t) => adTag(g) });
+  shot(ad2A, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.0, 0.02, 9.1, TVC, { cy: H * 0.42 })], [len(sh), K(0.0, 0.02, 8.6, TVC, { cy: H * 0.42 })]], { t, e: lin });
+    online(g, t, { pieces: piecesAt(PL, 102), tv: 102 });
+  }, { trans: 'cut', hud: (g, lt, t) => {
+    adTag(g);
+    if (t >= freeT - 0.03) badge(g, 'FREE', 250, 262, { color: LIME, size: 58, ...pop(t, freeT - 0.03) });
+    if (t >= unlT - 0.03) badge(g, 'UNLIMITED GAME REVIEWS', 670, 262, { color: CREAM, size: 30, ...pop(t, unlT - 0.03) });
+  } });
+  // their 3-second end card as it is (logo, 2M+ players, the store badges): flat, no captions over it
+  shot(CLOSE, (g, lt) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
+    { flat: true, noCaptions: true, hud: (g, lt, t) => { adTag(g); if (t >= linkT - 0.05) badge(g, 'LINK IN BIO', W / 2, 1462, { color: GOLD, size: 50, ...pop(t, linkT - 0.05) }); } });
+  cue(ad1A - 0.04, 'whoosh_deep', 0.35); cue(gradedT, 'swipe_card', 0.35); cue(thisT, 'swipe_card', 0.35); cue(thisT + 0.1, 'reveal_bell', 0.3);
+  cue(freeT - 0.03, 'success', 0.4); cue(unlT, 'sparkle_pop', 0.3); cue(CLOSE, 'whoosh_soft', 0.3); cue(CLOSE + 0.2, 'reveal_bell', 0.35); cue(linkT, 'sparkle_pop', 0.3);
 
   // ======================= CTA: back to the hook (rule 10) =======================
   shot(ctaA, (g, lt, t, sh) => {
@@ -931,13 +991,13 @@ export async function build(T) {
     { t: 0, m: 'hook' }, { t: winT, m: 'slam' }, { t: nameA, m: 'digital' }, { t: remA, m: 'tension' }, { t: openA, m: 'build' },
     { t: LAND, m: 'slam' }, { t: hisA + 0.6, m: 'glory' }, { t: takeA, m: 'intrigue' }, { t: flipA, m: 'build' }, { t: flipsT, m: 'victory' },
     { t: m21A, m: 'tension' }, { t: NXD5, m: 'drop' }, { t: endA, m: 'clockwork' }, { t: q1A, m: 'build' }, { t: Q2, m: 'slam' },
-    { t: resA, m: 'void' }, { t: scoreA, m: 'elegy' }, { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: resA, m: 'void' }, { t: mirA, m: 'tension' }, { t: novA, m: 'hit' }, { t: scoreA, m: 'elegy' }, { t: ad1A, m: 'digital' }, { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: winT - 0.32, t1: winT - 0.01, kind: 'mute' }, { t0: winT, t1: nameA, kind: 'boost', db: 4 },
     { t0: LAND - 0.34, t1: LAND - 0.01, kind: 'mute' }, { t0: LAND, t1: hisA + 0.6, kind: 'boost', db: 5 },
     { t0: Q2 - 0.32, t1: Q2 - 0.01, kind: 'mute' }, { t0: Q2, t1: resA, kind: 'boost', db: 4 },
-    { t0: proudA, t1: ctaA, kind: 'lp', f: 900 }, { t0: ctaA, t1: T.duration, kind: 'lp', f: 900 },
+    { t0: proudA, t1: ad1A, kind: 'lp', f: 900 }, { t0: ctaA, t1: T.duration, kind: 'lp', f: 900 },
   ];
   shots.sort((a, b) => a.a - b.a);
   return { shots, cues, music, musicFx, tvOff, duration: T.duration, autoWhoosh: false, jumpCut: { every: 1.4, zooms: [1, 1.1, 1.04], shift: 30 } };

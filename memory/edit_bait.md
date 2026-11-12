@@ -22,6 +22,7 @@
 | Миттенс (ролик автора) | he was able to beat a human, but not an alien | метафора | эталон автора |
 | `gmhunter` (Леви) | The Grandmaster Hunter | прозвище | автор приводит как пример |
 | `biggerfish` | Alien / Hunter / The Fisherman | прозвища | — |
+| `witty2` | Nah, I'd win → «WITTY WON.» зачёркнуто; the alien beat a human / the human beat the alien; THE KING OF CURSES | мем + зеркальная метафора + прозвище | ждём статистику |
 | `woodpecker` v3 | You can surprise a human. But not a library. He has seen your position before. | метафора | ждём статистику |
 
 ## Заготовки

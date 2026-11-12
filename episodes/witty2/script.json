@@ -1,7 +1,7 @@
 {
  "title": "Witty Alien vs Magnus Carlsen: round two",
  "channel": "THE 64 FILES",
- "post": "Witty Alien vs Magnus, round two: Nah, I'd win 🤞♟️ He threw his own Alien Gambit at Magnus Carlsen. How many moves would you last against Magnus? 👇 #chess #wittyalien #magnuscarlsen #aliengambit #jujutsukaisen #gojo #sukuna #chesscom",
+ "post": "Witty Alien vs Magnus, round two: Nah, I'd win 🤞♟️ He threw his own Alien Gambit at Magnus Carlsen. Every move graded on Chessigma: free and unlimited game reviews, on the App Store and Google Play. Link in bio. How many moves would you last against Magnus? 👇 #ad #chessigma #chess #wittyalien #magnuscarlsen #aliengambit #jujutsukaisen #gojo",
  "lead_in": 0.05,
  "tail": 1.6,
  "voice": {
@@ -197,6 +197,20 @@
    }
   },
   {
+   "id": "mirror",
+   "text": "In September, the alien beat a human. In November, the human beat the alien.",
+   "say": "In September, the alien beat a human. [pause] In November... the human beat the alien.",
+   "pause": 0.3,
+   "colors": {
+    "September,": "gold",
+    "alien": "blue",
+    "human.": "red",
+    "November,": "gold",
+    "human": "red",
+    "alien.": "blue"
+   }
+  },
+  {
    "id": "score",
    "text": "On Chess.com, it's now four to one. For Magnus.",
    "say": "On Chess.com, it's now four to one. [pause] For Magnus.",
@@ -215,6 +229,33 @@
    "colors": {
     "proud,": "gold",
     "strong.": "gold"
+   }
+  },
+  {
+   "id": "ad1",
+   "text": "Want every move of your games graded like this?",
+   "say": "Want every move of your games graded... like this?",
+   "pause": 0.15,
+   "colors": {
+    "every": "gold",
+    "move": "gold",
+    "graded": "lime"
+   }
+  },
+  {
+   "id": "ad2",
+   "text": "Chessigma's game reviews are free and unlimited. It's on the App Store and Google Play. Link in bio.",
+   "say": "Chessigma's game reviews are free and unlimited. It's on the App Store and Google Play. Link in bio.",
+   "pause": 0.3,
+   "colors": {
+    "Chessigma's": "gold",
+    "free": "lime",
+    "unlimited.": "lime",
+    "App": "blue",
+    "Store": "blue",
+    "Google": "blue",
+    "Play.": "blue",
+    "bio.": "gold"
    }
   },
   {
