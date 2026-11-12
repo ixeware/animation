@@ -297,6 +297,14 @@ Branded content и #ad, ссылка в био на 7 дней.
      - [GMA](https://gmanetwork.com/news/sports/othersports/714007/wesley-so-upsets-no-1-carlsen-claims-world-title/story);
      - [Wikipedia](https://en.wikipedia.org/wiki/Wesley_So).
 5. **Witty Alien, часть 2.** Самое частое имя в комментариях (117), второй ролик канала.
+   - **Реванш был (проверено 12.11.2026 по API Chess.com):** 7.11.2026, 19:37–19:47 UTC, блиц 5+0, без рейтинга,
+     Witty_Alien (белые, 2538) — MagnusCarlsen (чёрные, 3375), 0–1, https://www.chess.com/game/live/186739331724,
+     PGN — `engine/data/witty_magnus_2026-11-07.pgn`. Witty сыграл **свой Alien Gambit** против Магнуса: Каро-Канн,
+     5.Ng5 h6 **6.Nxf7 Kxf7** — Магнус взял коня, король ушёл f7–g8. 23.Re6 — давление, 23...Nxd5! 24.Rxd6, размен
+     ферзей, эндшпиль с конями. В конце Магнус провёл двух ферзей (49...d1=Q+, 51...a1=Q); Witty сдался на 54-м ходу,
+     у него 6 с, у Магнуса 12,5 с. Счёт их партий на Chess.com — 4:1 Магнусу (по ChessBase India, сайт закрыт
+     сетью сессии). Первая партия (победа Witty) — 30.09.2026, https://www.chess.com/game/live/184609437048.
+   - Автор 12.11.2026: «может сделать про то как витти снова поиграл с магнусом но проиграл».
    - Повод — топ-комментарий «witty alien has 21k+ no?» (4634♥): обновить счёт бриллиантов. Проверить на его профиле
      Chess.com в день записи.
    - Хук: «You said I got his number wrong. You were right.» — зрители любят, когда им отвечают.
