@@ -193,7 +193,11 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
 
 ### Последний ролик: `witty2`, Witty Alien vs Magnus, round two (The 64 Files)
 
-- 62,7 с, 15 фраз, Callum `eleven_v3`. Факты и оценки движка — `episodes/witty2/SOURCES.md`, партия — `engine/data/witty_magnus_2026-11-07.*`.
+- Версия 3 (12.11.2026): 76,8 с, 18 фраз, Callum `eleven_v3`, −16,3 LUFS. Светлая дневная комната (`dayRoom`, правило 63)
+  по умолчанию, тёмная «территория» только на превращениях; сцена `domainClash` на «round two»; телевизор с разбором
+  Chessigma (`photos/tv`, по полуходу); блок Chessigma в конце (их карточка `photos/rec/closer.mp4`, кадры — `tools/frames.py`).
+  Предложено Chessigma как второй спонсорский ролик — ждём ответа автора про цену и самого Элиота.
+- Было: 62,7 с, 15 фраз. Факты и оценки движка — `episodes/witty2/SOURCES.md`, партия — `engine/data/witty_magnus_2026-11-07.*`.
 - Код — `episodes/witty2/scenes.js`: инструменты из `gmhunter` (3D-примитивы, `tableSet`, часы) + свой набор `domain()` (стол на
   чёрном лаке между текстурами `VOID_T` и `SHRINE_T`) и `online()` (вебки за доской). Образы — `CAST.wit` (`hairFx: gojoHair`,
   `faceFx: gojoFace`, выражение `band` 0..1 — повязка, `glow` — синие глаза) и `CAST.mag` (`sukunaFace`: метки, красное свечение).
