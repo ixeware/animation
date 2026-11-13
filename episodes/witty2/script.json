@@ -1,272 +1,268 @@
 {
- "title": "Witty Alien vs Magnus Carlsen: round two",
- "channel": "THE 64 FILES",
- "post": "Witty Alien vs Magnus, round two: Nah, I'd win 🤞♟️ He threw his own Alien Gambit at Magnus Carlsen. Every move graded on Chessigma: free and unlimited game reviews, on the App Store and Google Play. Link in bio. How many moves would you last against Magnus? 👇 #ad #chessigma #chess #wittyalien #magnuscarlsen #aliengambit #jujutsukaisen #gojo",
- "lead_in": 0.05,
- "tail": 1.6,
- "voice": {
-  "provider": "elevenlabs",
-  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
-  "model": "eleven_v3",
-  "stability": 0.5,
-  "similarity": 0.8,
-  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
-  "fallback": {
-   "provider": "kokoro",
-   "name": "am_michael",
-   "speed": 0.84,
-   "pitch_semitones": -1.0
-  }
- },
- "voice_fx": {
-  "tempo": 1.28,
-  "max_gap": 0.16
- },
- "mix": {
-  "engine": "v2",
-  "music_gap": 11,
-  "music_air": -1,
-  "music_lp": 7500,
-  "sfx_gap": 5.0,
-  "reverb": 0.4,
-  "reverb_sec": 2.3,
-  "duck": 0.5
- },
- "phrases": [
-  {
-   "id": "hook",
-   "text": "He beat Magnus Carlsen. Then he asked for round two.",
-   "say": "[confident] He beat Magnus Carlsen. [pause] Then he asked for round two.",
-   "pause": 0.2,
-   "colors": {
-    "beat": "lime",
-    "Magnus": "red",
-    "Carlsen.": "red",
-    "round": "gold",
-    "two.": "gold"
-   }
+  "title": "Witty Alien vs Magnus Carlsen: round two",
+  "channel": "THE 64 FILES",
+  "post": "Nah, I'd win 🤞 Witty Alien vs Magnus Carlsen, round two ♟️\nEvery move graded on Chessigma. Link in bio.\n#ad #chessigma #chess #wittyalien #magnuscarlsen #jujutsukaisen",
+  "lead_in": 0.05,
+  "tail": 1.6,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.84,
+      "pitch_semitones": -1.0
+    }
   },
-  {
-   "id": "meme",
-   "text": "Nah. I'd win.",
-   "say": "[smug] Nah. [pause] I'd win.",
-   "pause": 0.3,
-   "colors": {
-    "Nah.": "blue",
-    "win.": "blue"
-   },
-   "hold": {
-    "after": "Nah.",
-    "sec": 0.35
-   }
+  "voice_fx": {
+    "tempo": 1.28,
+    "max_gap": 0.16
   },
-  {
-   "id": "name",
-   "text": "Witty Alien. In September, he beat Magnus in blitz, and went wild on stream.",
-   "say": "Witty Alien. In September, he beat Magnus in blitz, [excited] and went wild on stream.",
-   "pause": 0.25,
-   "colors": {
-    "Witty": "blue",
-    "Alien.": "blue",
-    "September,": "gold",
-    "beat": "lime",
-    "wild": "lime"
-   }
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5.0,
+    "reverb": 0.4,
+    "reverb_sec": 2.3,
+    "duck": 0.5
   },
-  {
-   "id": "rematch",
-   "text": "Five weeks later: round two. Five-minute blitz.",
-   "say": "Five weeks later: [intense] round two. Five-minute blitz.",
-   "pause": 0.25,
-   "colors": {
-    "Five": "gold",
-    "weeks": "gold",
-    "round": "gold",
-    "two.": "gold"
-   }
-  },
-  {
-   "id": "gambit",
-   "text": "And on move six, he throws a knight at Magnus. His own weapon. The Alien Gambit.",
-   "say": "And on move six... he throws a knight at Magnus. His own weapon. [dramatic] The Alien Gambit.",
-   "pause": 0.25,
-   "colors": {
-    "six,": "gold",
-    "knight": "blue",
-    "own": "blue",
-    "weapon.": "blue",
-    "Alien": "blue",
-    "Gambit.": "blue"
-   },
-   "hold": {
-    "after": "Magnus.",
-    "sec": 0.7
-   }
-  },
-  {
-   "id": "take",
-   "text": "Magnus takes it. With his king. The engine says Witty is losing.",
-   "say": "Magnus takes it. [pause] With his king. The engine says Witty is losing.",
-   "pause": 0.25,
-   "colors": {
-    "takes": "red",
-    "king.": "red",
-    "engine": "blue",
-    "losing.": "red"
-   },
-   "hold": {
-    "after": "it.",
-    "sec": 0.45
-   }
-  },
-  {
-   "id": "flip",
-   "text": "But Magnus slips. The bar flips. Witty is better.",
-   "say": "But Magnus slips. [excited] The bar flips. Witty is better.",
-   "pause": 0.25,
-   "colors": {
-    "slips.": "red",
-    "flips.": "lime",
-    "better.": "lime"
-   },
-   "hold": {
-    "after": "slips.",
-    "sec": 0.4
-   }
-  },
-  {
-   "id": "miss",
-   "text": "Move twenty-one. The engine's move: rook e6. He plays rook e2.",
-   "say": "Move twenty-one. The engine's move: rook e6. [pause] He plays rook e2.",
-   "pause": 0.25,
-   "colors": {
-    "twenty-one.": "gold",
-    "e6.": "lime",
-    "e2.": "red"
-   }
-  },
-  {
-   "id": "late",
-   "text": "Two moves later, he finds rook e6. Too late.",
-   "say": "Two moves later, he finds rook e6. [sighs] Too late.",
-   "pause": 0.3,
-   "colors": {
-    "e6.": "lime",
-    "Too": "red",
-    "late.": "red"
-   }
-  },
-  {
-   "id": "endgame",
-   "text": "Now it's twenty seconds each. And Magnus just walks his pawns.",
-   "say": "Now it's twenty seconds each. And Magnus just walks his pawns.",
-   "pause": 0.25,
-   "colors": {
-    "twenty": "gold",
-    "seconds": "gold",
-    "pawns.": "red"
-   }
-  },
-  {
-   "id": "queens",
-   "text": "A queen. Witty takes it. Another queen.",
-   "say": "A queen. [pause] Witty takes it. [pause] [dramatic] Another queen.",
-   "pause": 0.25,
-   "colors": {
-    "queen.": "red",
-    "takes": "lime"
-   },
-   "hold": {
-    "after": "queen.",
-    "sec": 0.35
-   }
-  },
-  {
-   "id": "resign",
-   "text": "Witty resigns with six seconds left.",
-   "say": "Witty resigns... with six seconds left.",
-   "pause": 0.35,
-   "colors": {
-    "resigns": "red",
-    "six": "gold",
-    "seconds": "gold"
-   },
-   "hold": {
-    "after": "resigns",
-    "sec": 0.45
-   }
-  },
-  {
-   "id": "mirror",
-   "text": "In September, the alien beat a human. In November, the human beat the alien.",
-   "say": "In September, the alien beat a human. [pause] In November... the human beat the alien.",
-   "pause": 0.3,
-   "colors": {
-    "September,": "gold",
-    "alien": "blue",
-    "human.": "red",
-    "November,": "gold",
-    "human": "red",
-    "alien.": "blue"
-   }
-  },
-  {
-   "id": "score",
-   "text": "On Chess.com, it's now four to one. For Magnus.",
-   "say": "On Chess.com, it's now four to one. [pause] For Magnus.",
-   "pause": 0.25,
-   "colors": {
-    "four": "red",
-    "one.": "red",
-    "Magnus.": "red"
-   }
-  },
-  {
-   "id": "proud",
-   "text": "Stand proud, Witty. You're strong.",
-   "say": "[softly] Stand proud, Witty. [pause] You're strong.",
-   "pause": 0.45,
-   "colors": {
-    "proud,": "gold",
-    "strong.": "gold"
-   }
-  },
-  {
-   "id": "ad1",
-   "text": "Want every move of your games graded like this?",
-   "say": "Want every move of your games graded... like this?",
-   "pause": 0.15,
-   "colors": {
-    "every": "gold",
-    "move": "gold",
-    "graded": "lime"
-   }
-  },
-  {
-   "id": "ad2",
-   "text": "Chessigma's game reviews are free and unlimited. It's on the App Store and Google Play. Link in bio.",
-   "say": "Chessigma's game reviews are free and unlimited. It's on the App Store and Google Play. Link in bio.",
-   "pause": 0.3,
-   "colors": {
-    "Chessigma's": "gold",
-    "free": "lime",
-    "unlimited.": "lime",
-    "App": "blue",
-    "Store": "blue",
-    "Google": "blue",
-    "Play.": "blue",
-    "bio.": "gold"
-   }
-  },
-  {
-   "id": "cta",
-   "text": "So how many moves would you last against Magnus?",
-   "say": "So how many moves would you last against Magnus?",
-   "pause": 0.1,
-   "colors": {
-    "moves": "gold",
-    "Magnus?": "red"
-   }
-  }
- ]
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "He beat Magnus Carlsen. Then he asked for round two.",
+      "say": "[confident] He beat Magnus Carlsen. [pause] Then he asked for round two.",
+      "pause": 0.2,
+      "colors": {
+        "beat": "lime",
+        "Magnus": "red",
+        "Carlsen.": "red",
+        "round": "gold",
+        "two.": "gold"
+      }
+    },
+    {
+      "id": "meme",
+      "text": "Nah. I'd win.",
+      "say": "[smug] Nah. [pause] I'd win.",
+      "pause": 0.3,
+      "colors": {
+        "Nah.": "blue",
+        "win.": "blue"
+      },
+      "hold": {
+        "after": "Nah.",
+        "sec": 0.35
+      }
+    },
+    {
+      "id": "name",
+      "text": "Witty Alien. In September, he beat Magnus in blitz, and went wild on stream.",
+      "say": "Witty Alien. In September, he beat Magnus in blitz, [excited] and went wild on stream.",
+      "pause": 0.25,
+      "colors": {
+        "Witty": "blue",
+        "Alien.": "blue",
+        "September,": "gold",
+        "beat": "lime",
+        "wild": "lime"
+      }
+    },
+    {
+      "id": "rematch",
+      "text": "Five weeks later: round two. Five-minute blitz.",
+      "say": "Five weeks later: [intense] round two. Five-minute blitz.",
+      "pause": 0.25,
+      "colors": {
+        "Five": "gold",
+        "weeks": "gold",
+        "round": "gold",
+        "two.": "gold"
+      }
+    },
+    {
+      "id": "gambit",
+      "text": "And on move six, he throws a knight at Magnus. His own weapon. The Alien Gambit.",
+      "say": "And on move six... he throws a knight at Magnus. His own weapon. [dramatic] The Alien Gambit.",
+      "pause": 0.25,
+      "colors": {
+        "six,": "gold",
+        "knight": "blue",
+        "own": "blue",
+        "weapon.": "blue",
+        "Alien": "blue",
+        "Gambit.": "blue"
+      },
+      "hold": {
+        "after": "Magnus.",
+        "sec": 0.7
+      }
+    },
+    {
+      "id": "take",
+      "text": "Magnus takes it. With his king. The engine says Witty is losing.",
+      "say": "Magnus takes it. [pause] With his king. The engine says Witty is losing.",
+      "pause": 0.25,
+      "colors": {
+        "takes": "red",
+        "king.": "red",
+        "engine": "blue",
+        "losing.": "red"
+      },
+      "hold": {
+        "after": "it.",
+        "sec": 0.45
+      }
+    },
+    {
+      "id": "flip",
+      "text": "But Magnus slips. The bar flips. Witty is better.",
+      "say": "But Magnus slips. [excited] The bar flips. Witty is better.",
+      "pause": 0.25,
+      "colors": {
+        "slips.": "red",
+        "flips.": "lime",
+        "better.": "lime"
+      },
+      "hold": {
+        "after": "slips.",
+        "sec": 0.4
+      }
+    },
+    {
+      "id": "miss",
+      "text": "Move twenty-one. The engine's move: rook e6. He plays rook e2.",
+      "say": "Move twenty-one. The engine's move: rook e6. [pause] He plays rook e2.",
+      "pause": 0.25,
+      "colors": {
+        "twenty-one.": "gold",
+        "e6.": "lime",
+        "e2.": "red"
+      }
+    },
+    {
+      "id": "late",
+      "text": "Two moves later, he finds rook e6. Too late.",
+      "say": "Two moves later, he finds rook e6. [sighs] Too late.",
+      "pause": 0.3,
+      "colors": {
+        "e6.": "lime",
+        "Too": "red",
+        "late.": "red"
+      }
+    },
+    {
+      "id": "endgame",
+      "text": "Now it's twenty seconds each. And Magnus just walks his pawns.",
+      "say": "Now it's twenty seconds each. And Magnus just walks his pawns.",
+      "pause": 0.25,
+      "colors": {
+        "twenty": "gold",
+        "seconds": "gold",
+        "pawns.": "red"
+      }
+    },
+    {
+      "id": "queens",
+      "text": "A queen. Witty takes it. Another queen.",
+      "say": "A queen. [pause] Witty takes it. [pause] [dramatic] Another queen.",
+      "pause": 0.25,
+      "colors": {
+        "queen.": "red",
+        "takes": "lime"
+      },
+      "hold": {
+        "after": "queen.",
+        "sec": 0.35
+      }
+    },
+    {
+      "id": "resign",
+      "text": "And... Witty lost.",
+      "say": "[dramatic] And... Witty lost.",
+      "pause": 0.3,
+      "colors": {
+        "lost.": "red"
+      },
+      "hold": {
+        "after": "And...",
+        "sec": 0.55
+      }
+    },
+    {
+      "id": "mirror",
+      "text": "The alien can beat humans. But not the GOAT. Not twice.",
+      "say": "The alien can beat humans. [pause] [serious] But not the goat. [pause] Not twice.",
+      "pause": 0.3,
+      "colors": {
+        "alien": "blue",
+        "humans.": "lime",
+        "GOAT.": "gold",
+        "twice.": "red"
+      }
+    },
+    {
+      "id": "score",
+      "text": "On Chess.com, it's now four to one. For Magnus.",
+      "say": "On Chess.com, it's now four to one. [pause] For Magnus.",
+      "pause": 0.25,
+      "colors": {
+        "four": "red",
+        "one.": "red",
+        "Magnus.": "red"
+      }
+    },
+    {
+      "id": "proud",
+      "text": "Stand proud, Witty. You're strong.",
+      "say": "[softly] Stand proud, Witty. [pause] You're strong.",
+      "pause": 0.45,
+      "colors": {
+        "proud,": "gold",
+        "strong.": "gold"
+      }
+    },
+    {
+      "id": "ad1",
+      "text": "Want every move of your games graded like this?",
+      "say": "Want every move of your games graded... like this?",
+      "pause": 0.15,
+      "colors": {
+        "every": "gold",
+        "move": "gold",
+        "graded": "lime"
+      }
+    },
+    {
+      "id": "ad2",
+      "text": "Chessigma's game reviews are free and unlimited. It's on the App Store and Google Play. Link in bio.",
+      "say": "Chessigma's game reviews are free and unlimited. It's on the App Store and Google Play. Link in bio.",
+      "pause": 0.3,
+      "colors": {
+        "Chessigma's": "gold",
+        "free": "lime",
+        "unlimited.": "lime",
+        "App": "blue",
+        "Store": "blue",
+        "Google": "blue",
+        "Play.": "blue",
+        "bio.": "gold"
+      }
+    },
+    {
+      "id": "cta",
+      "text": "So how many moves would you last against Magnus?",
+      "say": "So how many moves would you last against Magnus?",
+      "pause": 0.1,
+      "colors": {
+        "moves": "gold",
+        "Magnus?": "red"
+      }
+    }
+  ]
 }

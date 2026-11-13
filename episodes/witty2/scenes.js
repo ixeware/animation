@@ -647,6 +647,65 @@ function tvSet(g, k, t) {  // a big flat screen on two legs behind the board, sh
   if (B.E[2] < c[2]) texQuad(g, tvCanvas(k), [c[0] - hw, c[1] + hh, c[2] - 0.02], [c[0] + hw, c[1] + hh, c[2] - 0.02], [c[0] - hw, c[1] - hh, c[2] - 0.02]);
   pool(g, B, c[0], c[1], c[2] - 0.3, 9, '#BFD8FF', 0.1, true); pool(g, B, c[0], -0.36, 9.2, 5, '#BFD8FF', 0.08);
 }
+// "And... Witty lost." (version 4): Witty on his back on cracked ground among the rubble, seen from above, in black and
+// white like the manga panel the author sent (Gojo lying after the cut); our own drawing, whole and without blood. z is
+// the camera's zoom around c (it pulls away), the world drawn in screen pixels around the middle of the frame
+const LIE = (() => {
+  const r = rng(236), rocks = [], cracks = [], specks = [];
+  for (let i = 0; i < 70; i++) {
+    const a = r() * 7, d = 260 + Math.pow(r(), 0.7) * 1250, sz = 14 + Math.pow(r(), 2) * 90, n = 5 + Math.floor(r() * 4), pts = [];
+    for (let k = 0; k < n; k++) { const b = k / n * 7 + r() * 0.5; pts.push([Math.cos(b) * sz * (0.6 + 0.5 * r()), Math.sin(b) * sz * (0.6 + 0.5 * r())]); }
+    rocks.push({ x: Math.cos(a) * d * 1.05, y: Math.sin(a) * d * 1.3, pts, shade: r() < 0.5 ? '#D8D5CF' : '#BEBAB3', rot: r() * 7 });
+  }
+  for (let i = 0; i < 18; i++) {
+    let a = i / 18 * 7 + r() * 0.3, x = Math.cos(a) * 200, y = Math.sin(a) * 240; const pts = [[x, y]];
+    for (let k = 0; k < 7; k++) { a += (r() - 0.5) * 0.7; const st = 70 + r() * 110; x += Math.cos(a) * st; y += Math.sin(a) * st * 1.2; pts.push([x, y]); }
+    cracks.push(pts);
+  }
+  for (let i = 0; i < 160; i++) { const a = r() * 7, d = 200 + r() * 1500; specks.push([Math.cos(a) * d, Math.sin(a) * d * 1.3, 2 + r() * 5]); }
+  return { rocks, cracks, specks };
+})();
+function lying(g, t, z, c) {
+  g.save(); g.fillStyle = '#E8E6E1'; g.fillRect(0, 0, W, H);
+  g.translate(c[0], c[1]); g.scale(z, z);
+  const cr = g.createRadialGradient(0, 0, 60, 0, 0, 620); cr.addColorStop(0, 'rgba(60,58,55,0.55)'); cr.addColorStop(0.6, 'rgba(90,88,84,0.25)'); cr.addColorStop(1, 'rgba(90,88,84,0)');
+  g.fillStyle = cr; g.beginPath(); g.ellipse(0, 0, 640, 760, -0.5, 0, 7); g.fill();
+  g.strokeStyle = 'rgba(20,20,20,0.18)'; g.lineWidth = 3;  // hatching in the crater
+  for (let i = -16; i <= 16; i++) { g.beginPath(); g.moveTo(-560 + i * 34, -620); g.lineTo(-160 + i * 34, 620); g.stroke(); }
+  g.strokeStyle = '#141414'; g.lineCap = 'round'; g.lineJoin = 'round';
+  for (const pts of LIE.cracks) for (let k = 1; k < pts.length; k++) { g.lineWidth = Math.max(1.5, 7 - k); g.beginPath(); g.moveTo(...pts[k - 1]); g.lineTo(...pts[k]); g.stroke(); }
+  g.fillStyle = '#1A1A1A'; for (const [x, y, rr] of LIE.specks) { g.beginPath(); g.arc(x, y, rr, 0, 7); g.fill(); }
+  for (const rk of LIE.rocks) {
+    g.save(); g.translate(rk.x, rk.y); g.rotate(rk.rot);
+    g.fillStyle = 'rgba(20,20,20,0.25)'; g.beginPath(); rk.pts.forEach(([x, y], k) => (k ? g.lineTo : g.moveTo).call(g, x + 6, y + 8)); g.closePath(); g.fill();
+    g.fillStyle = rk.shade; g.strokeStyle = '#141414'; g.lineWidth = 4; g.beginPath(); rk.pts.forEach(([x, y], k) => (k ? g.lineTo : g.moveTo).call(g, x, y)); g.closePath(); g.fill(); g.stroke();
+    g.restore();
+  }
+  // Witty: the head up and to the right, the body down to the left; a hoodie, his arms out, eyes closed. Ink outlines and
+  // a few light folds, as in the manga panel
+  const S = 1.6, INK = '#050507', FOLD = 'rgba(255,255,255,0.22)';
+  const limb = (x, y, rot, w, l, fill, end, endFill) => {
+    g.save(); g.translate(x * S, y * S); g.rotate(rot);
+    g.fillStyle = fill; g.strokeStyle = INK; g.lineWidth = 6; g.beginPath(); g.roundRect(-w / 2 * S, 0, w * S, l * S, w / 2 * S); g.fill(); g.stroke();
+    g.strokeStyle = FOLD; g.lineWidth = 4; for (const f of [0.35, 0.62]) { g.beginPath(); g.moveTo(-w * 0.3 * S, l * f * S); g.quadraticCurveTo(0, (l * f + 14) * S, w * 0.3 * S, l * f * S); g.stroke(); }
+    g.fillStyle = endFill; g.strokeStyle = INK; g.lineWidth = 5; g.beginPath(); g.ellipse(0, (l + end * 0.6) * S, w * 0.48 * S, end * S, 0, 0, 7); g.fill(); g.stroke();
+    g.restore();
+  };
+  g.save(); g.fillStyle = 'rgba(20,20,20,0.28)'; g.beginPath(); g.ellipse(-330, 300, 520, 760, 0.95 + Math.PI / 2 - 0.95 + 0.62, 0, 7); g.fill(); g.restore();
+  g.save(); g.rotate(0.95);
+  for (const sd of [-1, 1]) limb(sd * 62, 480, sd * 0.07, 96, 420, '#2A2B32', 34, '#0E0E12');   // legs, shoes
+  for (const sd of [-1, 1]) limb(sd * 132, 175, sd * -0.62, 82, 300, '#3A3C46', 36, '#D2D2D2');  // arms out, hands
+  g.fillStyle = '#33353F'; g.strokeStyle = INK; g.lineWidth = 7; g.beginPath(); g.roundRect(-145 * S, 130 * S, 290 * S, 390 * S, 70 * S); g.fill(); g.stroke();
+  g.strokeStyle = FOLD; g.lineWidth = 5;
+  for (const [x0, y0, x1, y1] of [[-90, 260, -20, 330], [40, 300, 110, 250], [-70, 420, 60, 450]]) { g.beginPath(); g.moveTo(x0 * S, y0 * S); g.quadraticCurveTo((x0 + x1) / 2 * S, (Math.max(y0, y1) + 30) * S, x1 * S, y1 * S); g.stroke(); }
+  g.fillStyle = '#26272E'; g.strokeStyle = INK; g.lineWidth = 5; g.beginPath(); g.roundRect(-80 * S, 340 * S, 160 * S, 90 * S, 22 * S); g.fill(); g.stroke();  // the pocket
+  g.restore();
+  g.save(); g.filter = 'grayscale(1) contrast(1.3) brightness(0.84)';
+  g.fillStyle = 'rgba(20,20,20,0.25)'; g.beginPath(); g.ellipse(14, 20, 150 * S, 175 * S, 0.95, 0, 7); g.fill();
+  drawChar(g, 'wit', { x: 0, y: 0, s: S, e: { ...EXPR.blind, band: 0, glow: 0, curve: -0.2, mouth: 'line' }, t: 0, tilt: 0.95, noBody: true });
+  g.restore();
+  g.restore();
+}
 function online(g, t, { pieces, under = null, over = null, cams = {}, clock = null, camA = 1, blue = 1, red = 1, tv = null, dark = false, flip = 1 } = {}) {
   if (dark) domainBack(g, t, { blue, red }); else dayRoom(g, t, { flip });
   if (tv !== null) { camA = 0; if (B.E[2] < TV.c[2]) tvSet(g, tv, t); }
@@ -817,7 +876,7 @@ export async function build(T) {
   const lateA = s('late') - 0.06, re6T = w('late', 6), tooA = w('late', 7) - 0.06, tooT = w('late', 7), lateT = w('late', 8);
   const endA = s('endgame') - 0.06, twT = w('endgame', 2), pawnsA = w('endgame', 5) - 0.06, pawnsT = w('endgame', 10);
   const q1A = s('queens') - 0.06, q1T = w('queens', 1), wtA = w('queens', 2) - 0.06, wtT = w('queens', 3), q2A = w('queens', 5) - 0.06, q2T = w('queens', 6);
-  const resA = s('resign') - 0.06, resT = w('resign', 1), sixA = w('resign', 2) - 0.06, sixRT = w('resign', 3);
+  const resA = s('resign') - 0.06, CUT = w('resign', 1) - 0.1, lostT = w('resign', 2);
   const scoreA = s('score') - 0.06, fourT = w('score', 4), forA = w('score', 7) - 0.06;
   const proudA = s('proud') - 0.06, strongT = w('proud', 4);
   const ctaA = s('cta') - 0.06, movesT = w('cta', 3), lastT = w('cta', 6);
@@ -1054,32 +1113,65 @@ export async function build(T) {
   PRE.forEach(a => cue(a - 0.02, 'piece', 0.2)); cue(Q2 - 0.3, 'revswell', 0.55); boom(Q2, 0.95); cue(Q2, 'whoosh_fast', 0.5); cue(Q2 + 0.08, 'whoosh_fast', 0.4); cue(Q2 + 0.16, 'hit_punch', 0.4);
   TAIL.forEach(a => cue(a - 0.02, 'piece', 0.14));
 
-  // ======================= WITTY RESIGNS ("WITTY WON." struck out), SIX SECONDS LEFT =======================
-  const KING = sqXZ('a4');
-  shot(resA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(PI - 0.32, 0.22, 9.4, [3.0, 1.6, 1.0])], [len(sh), K(PI - 0.24, 0.2, 8.4, [3.0, 1.7, 1.0])]], { t, e: lin });
-    const fall = ease.inOut(seg(t, resT + 0.1, resT + 0.5)), pcs = piecesAt(PL, 107).filter(p => !(p.t === 'k' && p.c === 'w'));
-    domain(g, t, { pieces: pcs, white: 'wit', dark: true, loose: [{ t: 'k', c: 'w', x: KING[0], y: 0, z: KING[1], rot: fall * 1.45 }], ew: WE('sad', { band: seg(t, resT + 0.3, resT + 0.9) }), eb: ME('neutral', { glow: 0.4 }), blue: 0.6 });
-  }, { trans: 'whip', hud: (g, lt, t) => bubble(g, 'WITTY WON.', W / 2, 360, { size: 80, tail: -1, cross: seg(t, resT + 0.62, resT + 0.86), a: seg(t, resA + 0.05, resA + 0.15) }) });
-  cue(resA - 0.04, 'whoosh_deep', 0.3); cue(resT + 0.45, 'thud', 0.5); cue(resT + 0.62, 'whoosh_fast', 0.45); cue(resT + 0.66, 'hit_punch', 0.35);
-  shot(sixA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.3, 0.2, 6.4, [9.9, 0.25, 3.1])], [len(sh), K(-0.22, 0.17, 5.4, [9.9, 0.2, 3.1])]], { t });
-    online(g, t, { pieces: piecesAt(PL, 107), camA: 0, clock: t >= sixRT + 0.7 ? { ...clockAt(107), result: '0 – 1' } : clockAt(107) });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= sixRT) badge(g, '6 SECONDS LEFT', W / 2, 230, { color: RED, size: 60, ...pop(t, sixRT) }); } });
-  cue(sixA - 0.04, 'whoosh_fast', 0.3); cue(sixRT, 'tick', 0.4); cue(sixRT + 0.7, 'gavel', 0.4);
-
-  // ======================= THE EDIT-BAIT: the alien beat a human; the human beat the alien (one framing, mirrored) =======================
-  const mirA = s('mirror') - 0.06, mHuT = w('mirror', 6), novA = w('mirror', 7) - 0.06, mAlT = w('mirror', 13);
-  const MIRK = [K(0.0, 0.08, 18.0, [4, 4.4, CAMZ]), K(0.0, 0.07, 16.8, [4, 4.45, CAMZ])];
-  shot(mirA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, MIRK[0]], [len(sh), MIRK[1]]], { t, e: lin });
-    online(g, t, { pieces: SEPT, cams: { wit: { e: WE('triumph', { open: 0.8 }) }, mag: { e: 'sad' } }, clock: { names: ['MAGNUS', 'WITTY'], cols: [CURSE, VOID], l: 252, r: 141, run: 0, result: '0 – 1' } });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= mHuT - 0.15) score(g, 'ALIEN', 'HUMAN', '1', '0', { y: 270, lc: VOID, rc: CURSE, label: 'SEPTEMBER 30', a: seg(t, mHuT - 0.15, mHuT) }); } });
-  shot(novA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, MIRK[0]], [len(sh), MIRK[1]]], { t, e: lin });
-    online(g, t, { pieces: piecesAt(PL, 107), cams: { wit: { e: WE('sad') }, mag: { e: ME('smug') } }, clock: { ...clockAt(107), result: '0 – 1' } });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= mAlT - 0.15) score(g, 'HUMAN', 'ALIEN', '1', '0', { y: 270, lc: CURSE, rc: VOID, label: 'NOVEMBER 7', a: seg(t, mAlT - 0.15, mAlT) }); } });
-  cue(mirA - 0.04, 'whoosh_fast', 0.3); cue(mHuT - 0.15, 'boom', 0.45); cue(novA - 0.04, 'whoosh_fast', 0.3); cue(mAlT - 0.15, 'boom', 0.5); cue(mAlT, 'dun_dun', 0.3);
+  // ======================= AND... WITTY LOST (version 4, the author's idea after the manga: Gojo cut down after
+  // "Nah, I'd win"). "And...": Witty as Gojo, the bubble "WITTY WON."; at the end of the held breath a white slash cuts
+  // the picture itself in two and the halves fall apart (the frame is cut, not the man: no blood, no body cut). Under it,
+  // "Witty lost.": he lies on cracked ground among the rubble, in black and white like a manga panel, eyes closed, and
+  // the camera pulls away up through "The alien can beat humans." =======================
+  const mirA = s('mirror') - 0.06, humT = w('mirror', 1), butA = w('mirror', 5) - 0.06, goatT = w('mirror', 8), twiceT = w('mirror', 10);
+  const novA = butA;
+  const r1Draw = (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(PI + 0.1, 0.05, 7.4, [4, 3.0, -1.4])], [len(sh), K(PI + 0.03, 0.04, 5.6, [4, 3.05, -1.4])]], { t, e: lin });
+    domain(g, t, { pieces: piecesAt(PL, 99), white: 'wit', dark: true, ew: WE('triumph', { glow: 0.9 }), eb: ME('focus'), red: 0.5 });
+  };
+  const wonB = (g, t) => bubble(g, 'WITTY WON.', W / 2, 360, { size: 84, tail: -1, a: seg(t, resA + 0.05, resA + 0.15) });
+  shot(resA, r1Draw, { trans: 'whip', hud: (g, lt, t) => wonB(g, t) });
+  let FZ = null;  // the last frame of "WITTY WON.", bubble and all, for the halves of the cut
+  const frozen = () => {
+    if (FZ) return FZ;
+    const c = makeCanvas(W, H), g2 = c.getContext('2d'), sh = { a: resA, b: CUT };
+    r1Draw(g2, CUT - 0.001 - resA, CUT - 0.001, sh); wonB(g2, CUT - 0.001);
+    CAM.px = 0; FZ = c; return c;
+  };
+  const P0 = [-80, H * 0.66], P1 = [W + 80, H * 0.34], SLD = 0.75;
+  const LIEC = [W * 0.64, H * 0.4];
+  shot(CUT, (g, lt, t) => {
+    const z = lerp(1.25, 0.5, ease.inOut(seg(t, CUT + 0.1, butA)));
+    lying(g, t, z, LIEC);
+    if (lt < SLD) {  // the cut: the frozen frame in two halves, sliding apart along and across the line
+      const fz = frozen(), dx = P1[0] - P0[0], dy = P1[1] - P0[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, nx = uy, ny = -ux;
+      const u = ease.out(seg(lt, 0.05, 0.6)), fade = 1 - seg(lt, 0.4, SLD);
+      for (const sd of [1, -1]) {  // sd 1: the upper half (it goes up and left), -1: the lower half
+        g.save(); g.beginPath(); g.moveTo(P0[0] - ux * 2000, P0[1] - uy * 2000); g.lineTo(P1[0] + ux * 2000, P1[1] + uy * 2000);
+        g.lineTo(P1[0] + ux * 2000 + nx * 4000 * sd, P1[1] + uy * 2000 + ny * 4000 * sd); g.lineTo(P0[0] - ux * 2000 + nx * 4000 * sd, P0[1] - uy * 2000 + ny * 4000 * sd); g.closePath(); g.clip();
+        g.globalAlpha = fade; g.translate((nx * 300 - ux * 140) * u * sd, (ny * 300 - uy * 140) * u * sd);
+        g.drawImage(fz, 0, 0, W, H); g.restore();
+      }
+      if (lt < 0.2) {  // the slash itself: a white line with a glow, then the white of the cut
+        const a = 1 - seg(lt, 0.04, 0.2);
+        g.save(); g.globalCompositeOperation = 'screen'; g.lineCap = 'round';
+        for (const [lw, al] of [[140, 0.3], [56, 0.7], [20, 1]]) { g.strokeStyle = rgba('#FFFFFF', al * a); g.lineWidth = lw; g.beginPath(); g.moveTo(...P0); g.lineTo(P0[0] + dx * clamp(lt / 0.05), P0[1] + dy * clamp(lt / 0.05)); g.stroke(); }
+        g.restore();
+        flashTint(g, '#FFFFFF', 0.55 * seg(lt, 0.05, 0.08) * (1 - seg(lt, 0.08, 0.22)));
+      }
+    }
+  }, { trans: 'cut', grade: 'neutral', vig: 0.4, hud: (g, lt, t) => {
+    if (t >= lostT && t < humT - 0.1) { badge(g, 'WITTY LOST.', W / 2, 230, { color: RED, size: 72, ...pop(t, lostT) }); if (t >= lostT + 0.45) badge(g, 'RESIGNED · 6 SECONDS LEFT', W / 2, 340, { color: '#16161E', size: 40, ...pop(t, lostT + 0.45) }); }
+    if (t >= humT - 0.1) badge(g, 'THE ALIEN CAN BEAT HUMANS', W / 2, 230, { color: VOID, size: 54, ...pop(t, humT - 0.1) });
+  } });
+  cue(resA - 0.04, 'whoosh_deep', 0.3); cue(resA + 0.08, 'pluck', 0.35); cue(CUT - 0.32, 'revswell', 0.6);
+  cue(CUT - 0.004, 'whoosh_fast', 0.65); cue(CUT, 'glass', 0.4); cue(CUT + 0.02, 'boom_big', 0.85); cue(CUT + 0.05, 'hit_punch', 0.5);
+  cue(lostT, 'thud', 0.45); cue(lostT + 0.45, 'stamp', 0.3); cue(humT - 0.1, 'sparkle_pop', 0.25);
+  // BUT NOT THE GOAT. NOT TWICE: Magnus on his webcam, himself, in the day room
+  shot(butA, (g, lt, t, sh) => {
+    const [c] = CAMPOS.mag;
+    rig(B, lt, [[0, K(0.26, 0.05, 10.5, [c[0] - 0.3, c[1], c[2]])], [len(sh), K(0.14, 0.03, 7.6, [c[0] - 0.25, c[1] + 0.1, c[2]])]], { t, bump: t > goatT && t < goatT + 0.3 ? 1.2 : 0 });
+    online(g, t, { pieces: piecesAt(PL, 107), cams: { wit: { e: 'sad' }, mag: { e: ME('smug') } }, clock: { ...clockAt(107), result: '0 – 1' } });
+  }, { trans: 'whip', hud: (g, lt, t) => {
+    if (t >= goatT - 0.05) badge(g, 'BUT NOT THE GOAT', W / 2, 230, { color: GOLD, size: 60, ...pop(t, goatT - 0.05) });
+    if (t >= twiceT) badge(g, 'NOT TWICE', W / 2, 340, { color: RED, size: 54, ...pop(t, twiceT) });
+  } });
+  cue(butA - 0.04, 'whoosh_fast', 0.35); cue(goatT - 0.05, 'boom', 0.5); cue(twiceT, 'stamp', 0.45);
 
   // ======================= 4–1 FOR MAGNUS; STAND PROUD =======================
   shot(scoreA, (g, lt, t, sh) => {
@@ -1114,7 +1206,7 @@ export async function build(T) {
   }, { trans: 'cut', hud: (g, lt, t) => {
     adTag(g);
     if (t >= freeT - 0.03) badge(g, 'FREE', 250, 262, { color: LIME, size: 58, ...pop(t, freeT - 0.03) });
-    if (t >= unlT - 0.03) badge(g, 'UNLIMITED GAME REVIEWS', 670, 262, { color: CREAM, size: 30, ...pop(t, unlT - 0.03) });
+    if (t >= unlT - 0.03) badge(g, 'UNLIMITED GAME REVIEWS', 700, 262, { color: CREAM, size: 30, ...pop(t, unlT - 0.03) });
   } });
   // their 3-second end card as it is (logo, 2M+ players, the store badges): flat, no captions over it
   shot(CLOSE, (g, lt) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
@@ -1139,12 +1231,12 @@ export async function build(T) {
     { t: 0, m: 'hook' }, { t: winT, m: 'slam' }, { t: nameA, m: 'digital' }, { t: remA, m: 'tension' }, { t: round2T, m: 'slam' }, { t: openA, m: 'build' },
     { t: LAND, m: 'slam' }, { t: hisA + 0.6, m: 'glory' }, { t: takeA, m: 'intrigue' }, { t: flipA, m: 'build' }, { t: flipsT, m: 'victory' },
     { t: m21A, m: 'tension' }, { t: NXD5, m: 'drop' }, { t: endA, m: 'clockwork' }, { t: q1A, m: 'build' }, { t: Q2, m: 'slam' },
-    { t: resA, m: 'void' }, { t: mirA, m: 'tension' }, { t: novA, m: 'hit' }, { t: scoreA, m: 'elegy' }, { t: ad1A, m: 'digital' }, { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: resA, m: 'victory' }, { t: CUT, m: 'void' }, { t: novA, m: 'hit' }, { t: scoreA, m: 'elegy' }, { t: ad1A, m: 'digital' }, { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: winT - 0.32, t1: winT - 0.01, kind: 'mute' }, { t0: round2T - 0.3, t1: round2T - 0.01, kind: 'mute' }, { t0: round2T, t1: openA, kind: 'boost', db: 4 }, { t0: winT, t1: nameA, kind: 'boost', db: 4 },
     { t0: LAND - 0.34, t1: LAND - 0.01, kind: 'mute' }, { t0: LAND, t1: hisA + 0.6, kind: 'boost', db: 5 },
-    { t0: Q2 - 0.32, t1: Q2 - 0.01, kind: 'mute' }, { t0: Q2, t1: resA, kind: 'boost', db: 4 },
+    { t0: Q2 - 0.32, t1: Q2 - 0.01, kind: 'mute' }, { t0: Q2, t1: resA, kind: 'boost', db: 4 }, { t0: CUT - 0.36, t1: CUT - 0.01, kind: 'mute' }, { t0: CUT, t1: CUT + 1.1, kind: 'boost', db: 4 },
     { t0: proudA, t1: ad1A, kind: 'lp', f: 900 }, { t0: ctaA, t1: T.duration, kind: 'lp', f: 900 },
   ];
   shots.sort((a, b) => a.a - b.a);
