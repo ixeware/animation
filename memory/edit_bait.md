@@ -15,6 +15,8 @@
 - Пауза в музыке → удар → две плашки: сначала образ, потом вывод. Кадр меняется (свет, камера), чтобы момент можно
   было вырезать отдельно.
 - Что в байте фигура речи, а не факт, — строкой в `SOURCES.md`.
+- Обманка (со слов автора, 13.11.2026): ложная победа («WITTY WON.») → разрез по центру кадра со звуком → чёрный →
+  крупный план проигравшего → камера медленно отъезжает → голос «Witty lost.». Музыка молчит от удара до голоса.
 
 ## Что уже было
 | Ролик | Байт | Тип | Как сработало |
@@ -22,11 +24,11 @@
 | Миттенс (ролик автора) | he was able to beat a human, but not an alien | метафора | эталон автора |
 | `gmhunter` (Леви) | The Grandmaster Hunter | прозвище | автор приводит как пример |
 | `biggerfish` | Alien / Hunter / The Fisherman | прозвища | — |
-| `witty2` | Nah, I'd win → «WITTY WON.» зачёркнуто; the alien beat a human / the human beat the alien; THE KING OF CURSES | мем + зеркальная метафора + прозвище | ждём статистику |
+| `witty2` | Nah, I'd win → «WITTY WON.» → разрез → «Witty lost.»; The alien can beat humans. But not the GOAT. Not twice.; THE KING OF CURSES | мем + обманка (правило 66) + метафора-противопоставление + прозвище | ждём статистику |
 | `woodpecker` v3 | You can surprise a human. But not a library. He has seen your position before. | метафора | ждём статистику |
 
 ## Заготовки
-- Witty против Магнуса (`witty2`): «Nah, I'd win» → «WITTY WON.» перечёркнуто; Witty — Годжо, Магнус — Сукуна (правило 62).
+- Witty против Магнуса (`witty2`): сделано — «Nah, I'd win» → «WITTY WON.» → разрез; Witty — Годжо, Магнус — Сукуна (правило 62).
 - Магнус: The Library; «you're not playing a man, you're playing every game he has ever seen».
 - Хикару: The Speedrunner, The Machine with a webcam.
 - Таль: The Magician from Riga (известное прозвище; перед роликом найти источник).

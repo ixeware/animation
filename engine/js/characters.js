@@ -123,7 +123,8 @@ function headPath(fw, fh, jaw) {
   return p;
 }
 
-function body(g, c, open) {
+function body(g, c, e = null) {
+  if (c.bodyFx && c.bodyFx(g, 'under', { e, S }) === true) return;  // a cast that draws its own clothes (true: nothing of ours)
   // neck
   g.fillStyle = S.shade; g.fillRect(-24, 90, 48, 70);
   // torso
@@ -247,11 +248,12 @@ function body(g, c, open) {
     g.beginPath(); g.moveTo(-60, 150); g.lineTo(-10, 300); g.lineTo(-20, 520); g.lineTo(-150, 520); g.lineTo(-130, 190); g.closePath(); g.fill();
     g.beginPath(); g.moveTo(60, 150); g.lineTo(10, 300); g.lineTo(20, 520); g.lineTo(150, 520); g.lineTo(130, 190); g.closePath(); g.fill(); g.restore();
   }
+  if (c.bodyFx) c.bodyFx(g, 'over', { e, S });  // a cast's own details over the clothes (a collar, a kimono's fold)
 }
 
-function hairBack(g, c, fw) {
+function hairBack(g, c, fw, e = null) {
   g.fillStyle = c.hairC;
-  if (c.hairFx) { c.hairFx(g, 'back', { fw, S }); return; }  // a cast that draws its own hair
+  if (c.hairFx) { c.hairFx(g, 'back', { fw, S, e }); return; }  // a cast that draws its own hair
   if (c.hair === 'messy') { g.beginPath(); g.ellipse(0, -20, 118 * fw, 125, 0, 0, 7); g.fill(); }
   if (c.hair === 'wavy') { g.beginPath(); g.ellipse(0, -40, 112 * fw, 105, 0, 0, 7); g.fill(); }
   if (c.hair === 'wig' || c.hair === 'tied') { g.beginPath(); g.ellipse(0, -30, 112 * fw, 112, 0, 0, 7); g.fill(); }
@@ -277,10 +279,10 @@ function hairBack(g, c, fw) {
   if (c.hair === 'updo') { g.beginPath(); g.ellipse(0, -150, 80, 62, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(0, -40, 118 * fw, 110, 0, 0, 7); g.fill(); }
 }
 
-function hairFront(g, c, fw, fh) {
+function hairFront(g, c, fw, fh, e = null) {
   const w = 100 * fw, h = 125 * fh;
   g.fillStyle = c.hairC;
-  if (c.hairFx) { c.hairFx(g, 'front', { fw, fh, S }); return; }
+  if (c.hairFx) { c.hairFx(g, 'front', { fw, fh, S, e }); return; }
   const p = new Path2D();
   switch (c.hair) {
     case 'swept':
@@ -546,9 +548,9 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   g.save(); g.globalAlpha *= alpha; g.translate(x, y); g.scale(s, s); g.rotate(tilt);
   if (silhouette) g.filter = shade;
   if (!silhouette) qaRect(g, -118 * fw, -165, 236 * fw, 300, 'face', who);
-  if (!noBody) { if (c.bodyScale) { g.save(); g.translate(0, 96); g.scale(c.bodyScale, c.bodyScale); g.translate(0, -96); body(g, c); g.restore(); } else body(g, c); }
+  if (!noBody) { if (c.bodyScale) { g.save(); g.translate(0, 96); g.scale(c.bodyScale, c.bodyScale); g.translate(0, -96); body(g, c, e); g.restore(); } else body(g, c, e); }
   if (V2 && !noBody) { g.fillStyle = 'rgba(40,20,10,0.22)'; g.beginPath(); g.ellipse(0, 114 * fh, 52 * fw, 18, 0, 0, 7); g.fill(); }
-  hairBack(g, c, fw);
+  hairBack(g, c, fw, e);
   // ears
   g.fillStyle = V2 ? S.base : S.shade;
   for (const sd of [-1, 1]) { const k = 1 - clamp(sd * turn, 0, 1) * 0.75; g.beginPath(); g.ellipse(sd * 98 * fw - turn * 10, 8, 18 * c.ears * k, 28 * c.ears, 0, 0, 7); g.fill();
@@ -596,6 +598,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
     if (V2) for (const sd of [-1, 1]) { const eg = g.createRadialGradient(sd * 38, -4, 12, sd * 38, -4, 42); eg.addColorStop(0, rgba(S.deep, 0.24)); eg.addColorStop(1, rgba(S.deep, 0)); g.fillStyle = eg; g.beginPath(); g.ellipse(sd * 38, -4, 44, 40, 0, 0, 7); g.fill(); }
     fx('eyes', { ee });
     for (const sd of [-1, 1]) eye(g, sd * 38, -2, ee, sd, t, e.pupil ?? 1, c.iris ?? (V2 ? '#6A4A34' : null));
+    fx('iris', { ee });  // over the drawn eyes, under the brows (a cast's own irises and lashes)
     // brows
     g.fillStyle = c.brow;
     for (const sd of [-1, 1]) {
@@ -708,7 +711,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
     }
   }
   g.restore();
-  g.save(); g.translate(turn * 9, 0); hairFront(g, c, fw, fh); g.restore();
+  g.save(); g.translate(turn * 9, 0); hairFront(g, c, fw, fh, e); g.restore();
   g.save(); g.translate(turn * 20 * fw, 0); fx('top', { ee }); g.restore();  // over the hair (a band pushed up into it, a crown)
   if (!silhouette) {
     if (e.sweat) sweatDrop(g, 92, -70 + Math.sin(t * 2) * 4 + ((t * 30) % 30), 0.9, e.sweat);

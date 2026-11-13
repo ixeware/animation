@@ -19,6 +19,7 @@
     }
   },
   "voice_fx": {
+    "engine": 2,
     "tempo": 1.28,
     "max_gap": 0.16
   },
@@ -44,7 +45,8 @@
         "Carlsen.": "red",
         "round": "gold",
         "two.": "gold"
-      }
+      },
+      "take": 1
     },
     {
       "id": "meme",
@@ -58,7 +60,8 @@
       "hold": {
         "after": "Nah.",
         "sec": 0.35
-      }
+      },
+      "take": 5
     },
     {
       "id": "name",
@@ -182,16 +185,24 @@
       }
     },
     {
+      "id": "and",
+      "text": "And...",
+      "say": "[excited] And...",
+      "take": 1,
+      "pause": 1.6,
+      "colors": {
+        "And...": "gold"
+      }
+    },
+    {
       "id": "resign",
-      "text": "And... Witty lost.",
-      "say": "[dramatic] And... Witty lost.",
-      "pause": 0.3,
+      "text": "Witty lost.",
+      "say": "[somber] Witty lost...",
+      "take": 1,
+      "tempo": 1.0,
+      "pause": 0.5,
       "colors": {
         "lost.": "red"
-      },
-      "hold": {
-        "after": "And...",
-        "sec": 0.55
       }
     },
     {
@@ -225,7 +236,8 @@
       "colors": {
         "proud,": "gold",
         "strong.": "gold"
-      }
+      },
+      "take": 3
     },
     {
       "id": "ad1",
@@ -262,7 +274,9 @@
       "colors": {
         "moves": "gold",
         "Magnus?": "red"
-      }
+      },
+      "take": 1
     }
-  ]
+  ],
+  "_voice_notes": "v5: voice_fx engine 2 (audio/tts.py). Takes chosen with the session's voice_takes.py: a reading must end in silence (eleven_v3 often stops a take while the last word still sounds), be heard word for word by whisper, and keep the pace and pitch of the first reading."
 }

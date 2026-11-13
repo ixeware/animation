@@ -189,21 +189,26 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
   - `build/` в git не попадает;
   - в коммитах и файлах не упоминать идентификаторы моделей.
 
-## 8. Состояние на 11.11.2026
+## 8. Состояние на 13.11.2026
 
 ### Последний ролик: `witty2`, Witty Alien vs Magnus, round two (The 64 Files)
 
-- Версия 3 (12.11.2026): 76,8 с, 18 фраз, Callum `eleven_v3`, −16,3 LUFS. Светлая дневная комната (`dayRoom`, правило 63)
-  по умолчанию, тёмная «территория» только на превращениях; сцена `domainClash` на «round two»; телевизор с разбором
-  Chessigma (`photos/tv`, по полуходу); блок Chessigma в конце (их карточка `photos/rec/closer.mp4`, кадры — `tools/frames.py`).
-  Предложено Chessigma как второй спонсорский ролик — ждём ответа автора про цену и самого Элиота.
-- Было: 62,7 с, 15 фраз. Факты и оценки движка — `episodes/witty2/SOURCES.md`, партия — `engine/data/witty_magnus_2026-11-07.*`.
-- Код — `episodes/witty2/scenes.js`: инструменты из `gmhunter` (3D-примитивы, `tableSet`, часы) + свой набор `domain()` (стол на
-  чёрном лаке между текстурами `VOID_T` и `SHRINE_T`) и `online()` (вебки за доской). Образы — `CAST.wit` (`hairFx: gojoHair`,
-  `faceFx: gojoFace`, выражение `band` 0..1 — повязка, `glow` — синие глаза) и `CAST.mag` (`sukunaFace`: метки, красное свечение).
-  В движке добавлена фаза `faceFx('top')` поверх волос (`engine/js/characters.js`).
-- Сборка: `node render.mjs witty2 --workers 4 --scale 2 && python3 audio/mix.py episodes/witty2`, кодирование —
-  `scratchpad/scripts/encode_w2.sh` (не в репозитории; строки — как в шаге 8 CLAUDE.md).
+- **Версия 5 (13.11.2026): 77,3 с, 19 фраз**, Callum `eleven_v3`, `voice_fx.engine 2`. Переделка по замечаниям автора
+  (голос с обрезками, «в целом лучше и без ошибок», дизайн образов, новая развязка, сцены) — что именно и почему, в
+  `episodes/witty2/SOURCES.md` («Версия 5») и правилах 64–66.
+- Код: `episodes/witty2/scenes.js` — инструменты из `gmhunter` (3D-примитивы, `tableSet`, часы), комната `dayRoom`
+  (окна в торцах, шторы, ковёр, `bookcase`, `wallPrint`), «территории» `voidSky` / `shrineSky` (считаются от направления
+  камеры), монитор `monitorSet` (`splitTex` — две вебки, или кадр разбора `tvCanvas(k)`), `online()` и `domain()`,
+  страница манги `lying()` с камерой `lieCam`, плашки для светлого фона `titleDay`, `scoreDay`, `evalHud`.
+  `episodes/witty2/cast.js` — образы: `CAST.wit` (`hairFx`, `faceFx`, `bodyFx`; выражение `band` 0..1 — повязка,
+  `glow` — свечение глаз) и `CAST.mag`. В движке (`engine/js/characters.js`) — фазы `faceFx('iris')`, `faceFx('top')`,
+  крючок одежды `bodyFx`, выражение передаётся в `hairFx`.
+- Развязка: фразы `and` («And...», пауза 1,6 с) и `resign` («Witty lost.», `tempo: 1.0`); время разреза `CUT`, звук
+  `slash` из `audio/samples` (сделан `tools/sfxgen.py`).
+- Блок Chessigma в конце (их карточка `photos/rec/closer.mp4`, кадры — `tools/frames.py`): предложен Элиоту письмом
+  13.11 вместе с исправленным `woodpecker` v7 — ждём ответа; если откажутся, блок вырезать.
+- Сборка: `python3 tools/frames.py episodes/witty2 && node render.mjs witty2 --workers 4 --scale 2 && python3 audio/mix.py
+  episodes/witty2`, кодирование — два прохода x264, как в шаге 8 `CLAUDE.md`.
 
 ### Предыдущий ролик: `woodpecker`, «He has seen your position before» (пилот для Chessigma Supercoach), версия 5
 
