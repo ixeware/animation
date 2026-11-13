@@ -1126,42 +1126,36 @@ export async function build(T) {
   };
   const wonB = (g, t) => bubble(g, 'WITTY WON.', W / 2, 360, { size: 84, tail: -1, a: seg(t, resA + 0.05, resA + 0.15) });
   shot(resA, r1Draw, { trans: 'whip', hud: (g, lt, t) => wonB(g, t) });
-  let FZ = null;  // the last frame of "WITTY WON.", bubble and all, for the halves of the cut
-  const frozen = () => {
-    if (FZ) return FZ;
-    const c = makeCanvas(W, H), g2 = c.getContext('2d'), sh = { a: resA, b: CUT };
-    r1Draw(g2, CUT - 0.001 - resA, CUT - 0.001, sh); wonB(g2, CUT - 0.001);
-    CAM.px = 0; FZ = c; return c;
-  };
-  const P0 = [-80, H * 0.66], P1 = [W + 80, H * 0.34], SLD = 0.75;
+  // "Witty lost." (the author: "мне не нужно прям показывать его разрезанным ... а просто как на фото"; "добавь для
+  // этого момента еще виньетку, камеру с легкой тряской и эффекты, будто прям тяжелая сцена"): no cut through the
+  // picture. A white flash and a heavy hit on the cut, then he lies as in the panel he sent: black and white, a hand-held
+  // camera with a small tremor (harder right after the hit) pulling slowly away, dust settling, a pale beam from above,
+  // dark edges; the score muffled under a heartbeat
   const LIEC = [W * 0.64, H * 0.4];
+  const DUST = (() => { const r = rng(91), d = []; for (let i = 0; i < 70; i++) d.push([r() * W, r() * H, 1.5 + r() * 4.5, 12 + r() * 40, r() * 7, 0.15 + r() * 0.4]); return d; })();
   shot(CUT, (g, lt, t) => {
     const z = lerp(1.25, 0.5, ease.inOut(seg(t, CUT + 0.1, butA)));
+    const hit = 1 - seg(lt, 0, 0.7), sx = Math.sin(t * 2.1) * 7 + Math.sin(t * 13.7) * (2.5 + 16 * hit), sy = Math.cos(t * 1.7) * 6 + Math.cos(t * 11.3) * (2.5 + 13 * hit);
+    g.fillStyle = '#E8E6E1'; g.fillRect(0, 0, W, H);
+    g.save(); g.translate(W / 2 + sx, H / 2 + sy); g.rotate(Math.sin(t * 1.3) * 0.007 + Math.sin(t * 9.1) * 0.004 * hit); g.translate(-W / 2, -H / 2);
     lying(g, t, z, LIEC);
-    if (lt < SLD) {  // the cut: the frozen frame in two halves, sliding apart along and across the line
-      const fz = frozen(), dx = P1[0] - P0[0], dy = P1[1] - P0[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, nx = uy, ny = -ux;
-      const u = ease.out(seg(lt, 0.05, 0.6)), fade = 1 - seg(lt, 0.4, SLD);
-      for (const sd of [1, -1]) {  // sd 1: the upper half (it goes up and left), -1: the lower half
-        g.save(); g.beginPath(); g.moveTo(P0[0] - ux * 2000, P0[1] - uy * 2000); g.lineTo(P1[0] + ux * 2000, P1[1] + uy * 2000);
-        g.lineTo(P1[0] + ux * 2000 + nx * 4000 * sd, P1[1] + uy * 2000 + ny * 4000 * sd); g.lineTo(P0[0] - ux * 2000 + nx * 4000 * sd, P0[1] - uy * 2000 + ny * 4000 * sd); g.closePath(); g.clip();
-        g.globalAlpha = fade; g.translate((nx * 300 - ux * 140) * u * sd, (ny * 300 - uy * 140) * u * sd);
-        g.drawImage(fz, 0, 0, W, H); g.restore();
-      }
-      if (lt < 0.2) {  // the slash itself: a white line with a glow, then the white of the cut
-        const a = 1 - seg(lt, 0.04, 0.2);
-        g.save(); g.globalCompositeOperation = 'screen'; g.lineCap = 'round';
-        for (const [lw, al] of [[140, 0.3], [56, 0.7], [20, 1]]) { g.strokeStyle = rgba('#FFFFFF', al * a); g.lineWidth = lw; g.beginPath(); g.moveTo(...P0); g.lineTo(P0[0] + dx * clamp(lt / 0.05), P0[1] + dy * clamp(lt / 0.05)); g.stroke(); }
-        g.restore();
-        flashTint(g, '#FFFFFF', 0.55 * seg(lt, 0.05, 0.08) * (1 - seg(lt, 0.08, 0.22)));
-      }
-    }
-  }, { trans: 'cut', grade: 'neutral', vig: 0.4, hud: (g, lt, t) => {
+    g.restore();
+    g.save(); g.globalCompositeOperation = 'screen';  // a pale beam from the upper right, slowly breathing
+    const bm = g.createLinearGradient(W * 0.9, 0, W * 0.35, H * 0.75); bm.addColorStop(0, `rgba(255,255,255,${(0.32 + 0.06 * Math.sin(t * 1.4)).toFixed(3)})`); bm.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = bm; g.beginPath(); g.moveTo(W * 0.62, -40); g.lineTo(W * 1.1, -40); g.lineTo(W * 0.62, H * 0.9); g.lineTo(W * 0.18, H * 0.7); g.closePath(); g.fill(); g.restore();
+    g.fillStyle = '#2A2A2A';  // dust settling through the light
+    for (const [x0, y0, r, v, ph, al] of DUST) { const y = (y0 + v * (t - CUT)) % H, x = x0 + Math.sin(t * 0.7 + ph) * 18; g.globalAlpha = al * (0.6 + 0.4 * Math.sin(t * 2 + ph)); g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+    g.globalAlpha = 1;
+    const vg = g.createRadialGradient(W / 2, H * 0.45, H * 0.18, W / 2, H * 0.45, H * 0.72); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.62)');
+    g.fillStyle = vg; g.fillRect(0, 0, W, H);  // the heavy dark edges, on top of the engine's own vignette
+    flashTint(g, '#FFFFFF', 0.95 * (1 - seg(lt, 0.02, 0.32)));  // the hit
+  }, { trans: 'cut', grade: 'neutral', vig: 0.9, kb: 0, hud: (g, lt, t) => {
     if (t >= lostT && t < humT - 0.1) { badge(g, 'WITTY LOST.', W / 2, 230, { color: RED, size: 72, ...pop(t, lostT) }); if (t >= lostT + 0.45) badge(g, 'RESIGNED · 6 SECONDS LEFT', W / 2, 340, { color: '#16161E', size: 40, ...pop(t, lostT + 0.45) }); }
-    if (t >= humT - 0.1) badge(g, 'THE ALIEN CAN BEAT HUMANS', W / 2, 230, { color: VOID, size: 54, ...pop(t, humT - 0.1) });
+    if (t >= humT - 0.1) badge(g, 'THE ALIEN CAN BEAT HUMANS', W / 2, 230, { color: VOID, size: 46, ...pop(t, humT - 0.1) });
   } });
   cue(resA - 0.04, 'whoosh_deep', 0.3); cue(resA + 0.08, 'pluck', 0.35); cue(CUT - 0.32, 'revswell', 0.6);
-  cue(CUT - 0.004, 'whoosh_fast', 0.65); cue(CUT, 'glass', 0.4); cue(CUT + 0.02, 'boom_big', 0.85); cue(CUT + 0.05, 'hit_punch', 0.5);
-  cue(lostT, 'thud', 0.45); cue(lostT + 0.45, 'stamp', 0.3); cue(humT - 0.1, 'sparkle_pop', 0.25);
+  cue(CUT - 0.004, 'boom_big', 0.9); cue(CUT + 0.02, 'hit_punch', 0.45); cue(CUT + 0.45, 'heartbeat', 0.5); cue(CUT + 1.75, 'heartbeat', 0.4);
+  cue(lostT, 'thud', 0.4); cue(lostT + 0.45, 'stamp', 0.25); cue(humT - 0.1, 'sparkle_pop', 0.2);
   // BUT NOT THE GOAT. NOT TWICE: Magnus on his webcam, himself, in the day room
   shot(butA, (g, lt, t, sh) => {
     const [c] = CAMPOS.mag;
@@ -1236,7 +1230,7 @@ export async function build(T) {
   const musicFx = [
     { t0: winT - 0.32, t1: winT - 0.01, kind: 'mute' }, { t0: round2T - 0.3, t1: round2T - 0.01, kind: 'mute' }, { t0: round2T, t1: openA, kind: 'boost', db: 4 }, { t0: winT, t1: nameA, kind: 'boost', db: 4 },
     { t0: LAND - 0.34, t1: LAND - 0.01, kind: 'mute' }, { t0: LAND, t1: hisA + 0.6, kind: 'boost', db: 5 },
-    { t0: Q2 - 0.32, t1: Q2 - 0.01, kind: 'mute' }, { t0: Q2, t1: resA, kind: 'boost', db: 4 }, { t0: CUT - 0.36, t1: CUT - 0.01, kind: 'mute' }, { t0: CUT, t1: CUT + 1.1, kind: 'boost', db: 4 },
+    { t0: Q2 - 0.32, t1: Q2 - 0.01, kind: 'mute' }, { t0: Q2, t1: resA, kind: 'boost', db: 4 }, { t0: CUT - 0.36, t1: CUT - 0.01, kind: 'mute' }, { t0: CUT, t1: butA, kind: 'lp', f: 650 },
     { t0: proudA, t1: ad1A, kind: 'lp', f: 900 }, { t0: ctaA, t1: T.duration, kind: 'lp', f: 900 },
   ];
   shots.sort((a, b) => a.a - b.a);
