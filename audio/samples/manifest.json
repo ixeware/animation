@@ -6,12 +6,30 @@
   "prompt": "Audience applause and cheering in a big hall",
   "source": "ElevenLabs sound generation"
  },
+ "boom_big": {
+  "files": [
+   "boom_big_0.flac",
+   "boom_big_1.flac"
+  ],
+  "prompt": "own design: falling sub boom with a swell, driven 2nd harmonic, low thump, hall tail (long, for mate and the biggest reveals)",
+  "source": "synthesized by audio/sfx_boom.py"
+ },
  "boom_cine": {
   "files": [
    "boom_cine_0.flac"
   ],
   "prompt": "Deep cinematic boom impact with a long reverb tail, movie trailer hit, no music",
   "source": "ElevenLabs sound generation"
+ },
+ "boom_move": {
+  "files": [
+   "boom_move_0.flac",
+   "boom_move_1.flac",
+   "boom_move_2.flac",
+   "boom_move_3.flac"
+  ],
+  "prompt": "own design: falling sub boom with a swell, driven 2nd harmonic, low thump, hall tail (shown moves, fly-arounds, stamps)",
+  "source": "synthesized by audio/sfx_boom.py"
  },
  "camera": {
   "files": [
@@ -133,6 +151,24 @@
   "prompt": "Small audience laughing warmly",
   "source": "ElevenLabs sound generation"
  },
+ "move": {
+  "files": [
+   "move_0.flac",
+   "move_1.flac",
+   "move_2.flac",
+   "move_3.flac"
+  ],
+  "prompt": "own layered design: swish into a wooden knock, a sub thump, a high glint",
+  "source": "synthesized by audio/sfx_move.py"
+ },
+ "move_capture": {
+  "files": [
+   "move_capture_0.flac",
+   "move_capture_1.flac"
+  ],
+  "prompt": "own layered design: swish into a wooden knock, a sub thump, a high glint, heavier with a crunch (capture)",
+  "source": "synthesized by audio/sfx_move.py"
+ },
  "murmur": {
   "files": [
    "murmur_0.flac"
@@ -213,6 +249,14 @@
   "prompt": "Magical sparkle shimmer, bright twinkling chimes rising, short",
   "source": "ElevenLabs sound generation"
  },
+ "slash": {
+  "files": [
+   "slash_0.flac",
+   "slash_1.flac"
+  ],
+  "prompt": "A single fast katana sword slash, a sharp metallic blade cutting through the air with a short ringing shing, anime sword cut, close and dry, no music, no voice",
+  "source": "ElevenLabs sound generation"
+ },
  "sparkle_pop": {
   "files": [
    "sparkle_pop_0.flac"
@@ -284,41 +328,5 @@
   ],
   "prompt": "Soft airy swoosh transition, gentle and smooth, clean, no music",
   "source": "ElevenLabs sound generation"
- },
- "move": {
-  "files": [
-   "move_0.flac",
-   "move_1.flac",
-   "move_2.flac",
-   "move_3.flac"
-  ],
-  "prompt": "own layered design: swish into a wooden knock, a sub thump, a high glint",
-  "source": "synthesized by audio/sfx_move.py"
- },
- "move_capture": {
-  "files": [
-   "move_capture_0.flac",
-   "move_capture_1.flac"
-  ],
-  "prompt": "own layered design: swish into a wooden knock, a sub thump, a high glint, heavier with a crunch (capture)",
-  "source": "synthesized by audio/sfx_move.py"
- },
- "boom_move": {
-  "files": [
-   "boom_move_0.flac",
-   "boom_move_1.flac",
-   "boom_move_2.flac",
-   "boom_move_3.flac"
-  ],
-  "prompt": "own design: falling sub boom with a swell, driven 2nd harmonic, low thump, hall tail (shown moves, fly-arounds, stamps)",
-  "source": "synthesized by audio/sfx_boom.py"
- },
- "boom_big": {
-  "files": [
-   "boom_big_0.flac",
-   "boom_big_1.flac"
-  ],
-  "prompt": "own design: falling sub boom with a swell, driven 2nd harmonic, low thump, hall tail (long, for mate and the biggest reveals)",
-  "source": "synthesized by audio/sfx_boom.py"
  }
 }

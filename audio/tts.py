@@ -14,7 +14,12 @@ API responses are cached in build/tts_cache/, so re-runs cost no credits.
 
 Optional post-processing of every phrase (script.json -> "voice_fx"):
   {"tempo": 1.1}                                   faster delivery, pitch kept (ffmpeg atempo)
-A phrase can hold its breath: "hold": {"after": "it,", "sec": 1.0} puts a second of silence after that word.
+A phrase can hold its breath: "hold": {"after": "it,", "sec": 1.0} puts a second of silence after that word
+(a list of them for several). A phrase can have its own "tempo" and "max_gap", and "take": n asks ElevenLabs v3 for
+another reading of the same line.
+  {"engine": 2}                                    pauses are cut only in true silence and cross-faded, a hold goes into
+                                                   the silence between the two words, a take that stops while the voice
+                                                   still sounds is faded out, every take is checked against the script
 A take that ends in a long tail of hiss or a stray click (trim() keeps it): "tail_db": -45 cuts the phrase after its last
 30 ms that is louder than that many dB under the take's peak.
   {"sts": {"voice_id": "...", "model": "eleven_multilingual_sts_v2", "stability": 0.5, "similarity_boost": 0.85}}
@@ -121,6 +126,107 @@ def squeeze(a, max_gap=0.25, thr_db=-32, fade=0.02):
     return np.concatenate(out)
 
 
+# ---------- voice_fx "engine": 2 (witty2 v5). The first engine cut words: squeeze() called anything 32 dB under the
+# loudest frame a pause (a soft "s", a breath) and butt-joined its two ends through zero, a hold was spliced half-way
+# between two whisper word times (inside a drawn-out word as often as not), and eleven_v3 takes that stop while the
+# voice still sounds were left with a hard edge ----------
+def level(a, hop=0.005, win=0.02):
+    """Short-time level in dB under the take's loudest frame, one value per hop; (levels, hop in samples, window)."""
+    h, w = int(hop * SR), int(win * SR)
+    n = max(1, (len(a) - w) // h + 1)
+    idx = np.minimum(np.arange(n)[:, None] * h + np.arange(w)[None, :], len(a) - 1)
+    r = np.sqrt(np.mean(a[idx] ** 2, axis=1) + 1e-12)
+    return 20 * np.log10(r / (r.max() + 1e-12)), h, w
+
+
+def xjoin(parts, fade=0.015):
+    """Concatenate with short cross-fades (no dip to zero at a joint)."""
+    out = parts[0].copy()
+    for p in parts[1:]:
+        f = min(int(fade * SR), len(out), len(p))
+        if f > 0:
+            w = np.linspace(0, 1, f)
+            out[-f:] = out[-f:] * (1 - w) + p[:f] * w
+        out = np.concatenate([out, p[f:]])
+    return out
+
+
+def tail_fix(a):
+    """Repair the end of a take that stops while the voice still sounds: if the level dips (not to silence) and climbs
+    again into the cut, the next sound had begun, so stop at the dip; then fade what is left of the last word out.
+    A plosive's burst after its closure (a dip to silence) is kept. Also a 5 ms fade-in."""
+    a = a.copy(); f = min(len(a), int(0.005 * SR)); a[:f] *= np.linspace(0, 1, f)
+    L, h, w = level(a)
+    if len(L) < 60 or L[-4:].max() < -50:
+        return a  # it ends in silence
+    q = np.where(L < -50)[0]
+    if len(q) and len(L) - 1 - q[-1] <= 24:  # the last silence is within 120 ms of the end: what follows it is cut short
+        e = int(q[-1]); b = e
+        while b > 0 and L[b - 1] < -50: b -= 1
+        if (e - b + 1) * h >= 0.15 * SR:  # too long a silence for a plosive's closure: a new sound (a breath) had begun
+            a = a[:b * h + w // 2 + int(0.03 * SR)].copy()
+            return a
+    tail = L[-50:]  # the last 250 ms
+    m = int(np.argmin(tail))
+    if tail[m] > -50 and tail[-4:].max() - tail[m] >= 6 and m >= 10:
+        a = a[:(len(L) - 50 + m) * h + w // 2].copy()
+        L, h, w = level(a)
+    f = min(len(a), int((0.07 if L[-20:].min() > -38 else 0.025) * SR))  # a held vowel or "s": a longer release
+    a[-f:] *= np.linspace(1, 0, f) ** 1.5
+    return a
+
+
+def squeeze2(a, max_gap=0.16):
+    """Shorten the pauses inside a take to max_gap of true silence. The word before keeps its whole decay (to -50 dB,
+    0.25 s at most), the word after its soft onset (0.12 s at most); a breath between them goes with the silence.
+    The two ends are cross-faded."""
+    L, h, w = level(a)
+    n = len(L)
+    if n < 20:
+        return a
+    quiet = L < -32
+    g = max(1, int(max_gap * SR / h / 2))
+    keep, pos, i = [], 0, 0
+    while i < n:
+        j = i
+        while j < n and quiet[j] == quiet[i]:
+            j += 1
+        if quiet[i] and 0 < i and j < n and (j - i) * h > max_gap * SR:
+            sil = np.where(L[i:j] < -50)[0]
+            if len(sil):
+                a0 = i + min(int(sil[0]), int(0.25 * SR / h))               # the word before has died away
+                b0 = i + max(int(sil[-1]) + 1, (j - i) - int(0.12 * SR / h))  # the word after begins
+            else:  # no true silence: a breath or a long soft tail; keep 0.12 s after and 0.08 s before
+                a0, b0 = i + int(0.12 * SR / h) - g, j - int(0.08 * SR / h) + g
+            ka, kb = a0 + g, b0 - g
+            if kb - ka >= 4:
+                keep.append(a[pos:ka * h + w // 2]); pos = kb * h + w // 2
+        i = j
+    keep.append(a[pos:])
+    return xjoin(keep)
+
+
+def hold_point(a, t_next, lo, hi):
+    """Where a held breath goes: the middle of the silence that best separates the word before from the word after.
+    t_next is whisper's start of the next word (its starts are better than its ends); lo..hi bound the search (s)."""
+    L, h, w = level(a)
+    sil = L < -45
+    runs, i = [], 0
+    while i < len(L):
+        j = i
+        while j < len(L) and sil[j] == sil[i]:
+            j += 1
+        if sil[i] and (j - i) * h >= 0.02 * SR:
+            c = ((i + j) / 2 * h + w / 2) / SR
+            if lo <= c <= hi:
+                runs.append(((j - i) * h / SR - 0.6 * abs(c - (t_next - 0.05)), c))
+        i = j
+    if runs:
+        return int(max(runs)[1] * SR)
+    k0, k1 = max(0, int((t_next - 0.2) * SR / h)), min(len(L), int((t_next + 0.1) * SR / h) + 1)
+    return int((k0 + int(np.argmin(L[k0:k1]))) * h + w // 2)  # no silence there: the quietest instant before the next word
+
+
 def tempo(a, k):
     """Change speed without changing pitch."""
     if abs(k - 1) < 1e-3:
@@ -192,11 +298,12 @@ class Cached:
 
 
 class ElevenLabs(Cached):
-    def __call__(self, text, prev, nxt):
+    def __call__(self, text, prev, nxt, take=0):
         f = self.cache / f"el_{self.key(text, prev, nxt)}.json"
         if self.v.get('model', '').startswith('eleven_v3'):  # v3 ignores the neighbours: key on the text alone
             legacy, f = f, self.cache / f"el_{self.key(text)}.json"
             if not f.exists() and legacy.exists(): shutil.copyfile(legacy, f)
+            if take: f = self.cache / f"el_{self.key(text, 'take', take)}.json"  # another reading: its own seed and file
         if not f.exists():
             key = os.environ.get('ELEVENLABS_API_KEY') or sys.exit('ELEVENLABS_API_KEY is not set')
             v = self.v
@@ -207,6 +314,7 @@ class ElevenLabs(Cached):
             if model.startswith('eleven_v3'):  # v3 reads [audio tags] in the text; no request stitching, stability is 0 / 0.5 / 1
                 body['voice_settings'] = {'stability': v.get('stability', 0.5), 'similarity_boost': v.get('similarity', 0.8)}
                 if v.get('seed') is not None: body['seed'] = v['seed']
+                if take: body['seed'] = 1000 + take
             else:
                 body.update(previous_text=prev, next_text=nxt)
             r = requests.post(f"https://api.elevenlabs.io/v1/text-to-speech/{v['voice_id']}/with-timestamps",
@@ -340,6 +448,7 @@ def main(ep):
     tts = {'kokoro': lambda: Kokoro(v), 'fish': lambda: Fish(v, build / 'tts_cache'),
            'elevenlabs': lambda: ElevenLabs(v, build / 'tts_cache'), 'chatterbox': lambda: Chatterbox(v, build / 'tts_cache', ep)}[prov]()
     fx = script.get('voice_fx', {})
+    eng2 = fx.get('engine') == 2  # see level(): pauses cut only in true silence, holds in the gap, take ends repaired
     sts = VoiceChanger(fx['sts'], build / 'tts_cache') if fx.get('sts') else None
     ph = script['phrases']
     out, phrases = [], []
@@ -347,12 +456,18 @@ def main(ep):
     out.append(np.zeros(int(t * SR)))
     for i, p in enumerate(ph):
         say = p.get('say', p['text'])
-        audio, heard = tts(say, ph[i - 1].get('say', ph[i - 1]['text']) if i else '', ph[i + 1].get('say', ph[i + 1]['text']) if i + 1 < len(ph) else '')
-        if fx.get('tempo', 1) != 1 or sts or fx.get('max_gap'):
-            audio = tempo(trim(audio)[0], fx.get('tempo', 1))
-            if fx.get('max_gap'): audio = squeeze(audio, fx['max_gap'])
+        kw = {'take': p['take']} if p.get('take') and prov == 'elevenlabs' else {}  # "take": n -> another reading of the line
+        audio, heard = tts(say, ph[i - 1].get('say', ph[i - 1]['text']) if i else '', ph[i + 1].get('say', ph[i + 1]['text']) if i + 1 < len(ph) else '', **kw)
+        k_tempo, gap = p.get('tempo', fx.get('tempo', 1)), p.get('max_gap', fx.get('max_gap'))  # a phrase can have its own
+        if eng2: audio = tail_fix(trim(audio)[0])
+        if k_tempo != 1 or sts or gap:
+            audio = tempo(trim(audio)[0], k_tempo)
+            if gap: audio = (squeeze2 if eng2 else squeeze)(audio, gap)
             if sts: audio = sts(audio)
             audio, heard = recognize(audio, untag(say))  # timings change with tempo and voice: measure again
+        if eng2:  # every take is checked by ear, so to speak: an unprompted transcription against the script
+            sc = similar(untag(say), blind(audio))
+            if sc < 0.9: print(f"  [{p['id']}] CHECK THE TAKE: heard {sc:.2f} of the line: {blind(audio)!r}")
         audio, cut = trim(audio)
         if p.get('tail_db') is not None:  # a tail of hiss or a click after the last word: cut after the last loud 30 ms
             n = int(0.03 * SR); k = len(audio) // n
@@ -374,12 +489,18 @@ def main(ep):
         else:
             print(f"  [{p['id']}] {len(heard)} heard vs {len(caps)} words -> aligned")
             spans = align(caps, heard, dur)
-        if p.get('hold'):  # {"after": word, "sec": s}: a held breath inside the line, for a big move to land in
-            k = caps.index(p['hold']['after']); hs = p['hold']['sec']
-            n0, f = int(((spans[k][1] + spans[k + 1][0]) / 2 if k + 1 < len(spans) else spans[k][1]) * SR), int(0.01 * SR)
+        holds = p.get('hold') or []  # {"after": word, "sec": s}: a held breath inside the line, for a big move to land in
+        for hd in sorted([holds] if isinstance(holds, dict) else holds, key=lambda hd: -caps.index(hd['after'])):
+            k = caps.index(hd['after']); hs = hd['sec']
+            if eng2 and k + 1 < len(spans):  # in the silence between the two words, wherever whisper put their edges
+                n0 = hold_point(audio, spans[k + 1][0], spans[k][0] + 0.05, spans[k + 1][1] - 0.03)
+                spans = [(max(s, n0 / SR) + hs, max(e, n0 / SR) + hs) if i > k else (min(s, n0 / SR), min(e, n0 / SR)) for i, (s, e) in enumerate(spans)]
+            else:
+                n0 = int(((spans[k][1] + spans[k + 1][0]) / 2 if k + 1 < len(spans) else spans[k][1]) * SR)
+                spans = [(s + hs, e + hs) if i > k else (s, e) for i, (s, e) in enumerate(spans)]
+            f = int(0.01 * SR)
             audio = audio.copy(); audio[max(0, n0 - f):n0] *= np.linspace(1, 0, n0 - max(0, n0 - f)); audio[n0:n0 + f] *= np.linspace(0, 1, len(audio[n0:n0 + f]))
             audio = np.concatenate([audio[:n0], np.zeros(int(hs * SR)), audio[n0:]])
-            spans = [(s + hs, e + hs) if i > k else (s, e) for i, (s, e) in enumerate(spans)]
             dur = len(audio) / SR
         words = [{'w': c, 's': round(t + s, 3), 'e': round(t + e, 3), 'c': p.get('colors', {}).get(c, 'lime')}
                  for c, (s, e) in zip(caps, spans)]

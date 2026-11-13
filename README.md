@@ -105,7 +105,7 @@ npm i                      # playwright (браузер берётся сист�
 | `render.mjs` | Рендер в headless Chromium: стоп-кадры (`--stills 1,2,3`) или видео в несколько потоков; `--motion 1\|2` — движение надписей (правило 41), `--out имя.mp4` — куда писать видео, чтобы сравнить два варианта; `--shots` — где начинается и кончается каждый план; `--qa --from 61 --to 64` — проверка куска; `--scale 2` — кадры и видео в 4К (2160×3840): движок рисует вдвое подробнее сам (`engine/js/core.js`, supersampling), это не растяжение |
 | `audio/tts.py` | Озвучка: Fish Audio, ElevenLabs или локальный Kokoro; тайминги каждого слова; кэш ответов API в `build/tts_cache/` |
 | `audio/music.py`, `audio/sfx.py`, `audio/mix.py` | Процедурная партитура (ре минор, 120 BPM), 45 синтезированных эффектов, сведение (голос сверху, подложка на 7–8 LU ниже, мастер −16 LUFS) |
-| `tools/` | Анализ TikTok-профиля (`analyze_tiktok.sh`, `analyze_audio.py`), PGN → позиции по ходам (`pgn_to_json.py`), карты глубины для 2.5D (`depth.py`, Depth Anything V2), контакт-листы кадров из готового видео с подписью времени (`sheet.py`), кадры из записей экрана для экрана устройства в сцене (`frames.py`: `photos/rec/*.mp4` → `build/rec/`) |
+| `tools/` | Анализ TikTok-профиля (`analyze_tiktok.sh`, `analyze_audio.py`), PGN → позиции по ходам (`pgn_to_json.py`), карты глубины для 2.5D (`depth.py`, Depth Anything V2), контакт-листы кадров из готового видео с подписью времени (`sheet.py`), кадры из записей экрана для экрана устройства в сцене (`frames.py`: `photos/rec/*.mp4` → `build/rec/`), новый звук в библиотеку `audio/samples` по текстовому описанию (`sfxgen.py <id> "<prompt>"`, ElevenLabs sound generation) |
 
 ## Оформление
 
