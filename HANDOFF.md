@@ -203,9 +203,10 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
   `episodes/witty2/cast.js` — образы: `CAST.wit` (`hairFx`, `faceFx`, `bodyFx`; выражение `band` 0..1 — повязка,
   `glow` — свечение глаз) и `CAST.mag`. В движке (`engine/js/characters.js`) — фазы `faceFx('iris')`, `faceFx('top')`,
   крючок одежды `bodyFx`, выражение передаётся в `hairFx`.
-- **Кредиты ElevenLabs кончились** (бесплатный тариф, 9 999 из 10 000; сброс 5.12.2026 19:18 UTC): новый текст до этого
-  дня не озвучить, если автор не сменит тариф. Остаток — `python3 tools/voice_check.py --quota`. Дубли `witty2` версии 5
-  сохранены в `episodes/witty2/voice/` (как восстановить кэш — в его `README.md`).
+- **ElevenLabs:** на бесплатном тарифе кредиты кончились 13.11.2026; в тот же день автор сохранил в окружении новый ключ
+  (тариф Starter, 40 000 кредитов в месяц, сброс 13.12.2026). Остаток — `python3 tools/voice_check.py --quota`. Дубли
+  `witty2` версии 5 записаны ещё на бесплатном тарифе и сохранены в `episodes/witty2/voice/` (как восстановить кэш — в
+  его `README.md`).
 - Развязка: фразы `and` («And...», пауза 1,6 с) и `resign` («Witty lost.», `tempo: 1.0`); время разреза `CUT`, звук
   `slash` из `audio/samples` (сделан `tools/sfxgen.py`).
 - Блок Chessigma в конце (их карточка `photos/rec/closer.mp4`, кадры — `tools/frames.py`): предложен Элиоту письмом
