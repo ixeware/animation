@@ -10,6 +10,14 @@
 > часы. Это же — условие спонсоров (#ad + Branded content обещаны в нашем предложении).
 
 ## Chessigma (Eliot Hennebo)
+- **13.11.2026, 15:43 UTC — Элиот одобрил `woodpecker` v7 и принял `witty2`.** «The video is following what I had in
+  mind and is approved! I just wired the rest of the bill.» — вторые 50 % оплачены. Про второй ролик: «I'm happy to
+  accept your offer about posting Witty Alien's rematch with a $100 bonus at 1M views!» Пожелание к экрану с разбором:
+  «make sure to be signed in to see the normal comments and arrows on the board, don't hesitate to crop the navbar to
+  see more of the board too». Следующие шаги — «in ~1-2 days based on the performances». `woodpecker` v7 вышел 13.11 в
+  18:14 UTC: https://www.tiktok.com/@the64files/video/7707721038896893202 (первая версия из профиля убрана).
+- 13.11.2026: разбор для `witty2` переснят из-под аккаунта автора и без боковой панели
+  (`episodes/witty2/SOURCES.md`, «Телевизор с разбором»). Вход — только с разрешения автора, по ссылке из письма.
 - **12.11.2026, 08:08 — письмо Элиота:** ролик опубликован до их ответа и без подтверждённых правок: бит 5 — одна
   партия Board Memory на 2–3 уровня до экрана результата со счётом и местом; бит 9 — страница Woodpecker, наборы по
   уровням, задача с таймером, вкладка Active с карточкой Club и пройденными циклами; бит 12 — пролистать Mixed и Theme

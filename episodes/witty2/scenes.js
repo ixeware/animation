@@ -40,9 +40,13 @@ const LACQUER = ['#1C1C26', '#0D0D14', '#15151E'], WOODT = ['#C99A68', '#8A6440'
 // the real game (SOURCES.md): Witty_Alien (White) – MagnusCarlsen, 7 Nov 2026; and their first blitz game, 30 Sep 2026
 const PL = await fetch('../engine/data/witty_magnus_2026-11-07.json').then(r => r.json());
 const CW = await fetch('../engine/data/carlsen_witty_2026.json').then(r => r.json());
-// the TV: Chessigma's public review page of this very game, one screenshot per ply (photos/tv/ply_000 = the start;
-// chessigma.com/games/36fc7bb3-b70e-4781-bfe4-d91cf7cd7c65, board flipped to White, 12 Nov 2026; SOURCES.md)
+// the TV: Chessigma's review page of this very game, one screenshot per ply (photos/tv/ply_000 = the start;
+// chessigma.com/games/36fc7bb3-b70e-4781-bfe4-d91cf7cd7c65, board flipped to White). Taken signed in on 13 Nov 2026, as
+// the sponsor asked: the coach's comments are whole and the arrows are on; the left navigation is cut off, so the board
+// and the coach's panel sit in the middle of the screen (capture/tv_frames.py; SOURCES.md). photos/tv/hd holds the
+// plies the sponsor block shows in close-up at full size.
 const TVF = await Promise.all([...Array(108)].map((_, k) => loadImage(`../episodes/witty2/photos/tv/ply_${String(k).padStart(3, '0')}.jpg`)));
+const TVHD = new Map(await Promise.all([11, 34, 102].map(async k => [k, await loadImage(`../episodes/witty2/photos/tv/hd/ply_${String(k).padStart(3, '0')}.jpg`)])));
 // the sponsor's own 3-second end card from their creator kit (photos/rec/closer.mp4; frames by tools/frames.py into build/rec)
 const RECI = await fetch('../episodes/witty2/build/rec/index.json').then(r => r.ok ? r.json() : null).catch(() => null);
 if (!RECI) throw new Error('no frames of the end card: run python3 tools/frames.py episodes/witty2');
@@ -622,7 +626,7 @@ function splitTex(cams, t) {
 const CAMPOS = { wit: [MON.c[0] - MON.hw / 2, MON.c[1], MON.c[2]], mag: [MON.c[0] + MON.hw / 2, MON.c[1], MON.c[2]] };
 const OFF_T = tex(64, 36, (x, w, h) => { const gr = x.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#16171D'); gr.addColorStop(1, '#0A0A0E'); x.fillStyle = gr; x.fillRect(0, 0, w, h); });
 const TVC_ = new Map();  // the review's frames as canvases (texQuad samples a canvas), made when first needed
-function tvCanvas(k) { k = clamp(k, 0, 107); if (!TVC_.has(k)) { const im = TVF[k], c = makeCanvas(im.width, im.height); c.getContext('2d').drawImage(im, 0, 0); TVC_.set(k, c); } return TVC_.get(k); }
+function tvCanvas(k) { k = clamp(k, 0, 107); if (!TVC_.has(k)) { const im = TVHD.get(k) || TVF[k], c = makeCanvas(im.width, im.height); c.getContext('2d').drawImage(im, 0, 0); TVC_.set(k, c); } return TVC_.get(k); }
 function monitorSet(g, img) {
   const { c, hw, hh } = MON;
   ab(g, [c[0] - 0.4, FLOOR_Y, c[2] + 0.12], [c[0] + 0.4, c[1] - hh, c[2] + 0.5], '#17171D');
@@ -1346,7 +1350,7 @@ export async function build(T) {
   // ======================= THE SPONSOR, AT THE END (rule 61): this game on Chessigma's review; free; their end card =======================
   const ad1A = s('ad1') - 0.06, gradedT = w('ad1', 6), thisT = w('ad1', 8);
   const ad2A = s('ad2') - 0.06, freeT = w('ad2', 4), unlT = w('ad2', 6), CLOSE = w('ad2', 7) - 0.05, linkT = w('ad2', 15);
-  const TVC = [MON.c[0] + 0.83, MON.c[1], MON.c[2]];  // the middle of the board and the coach's panel of the page
+  const TVC = [MON.c[0], MON.c[1], MON.c[2]];  // the board and the coach's panel sit in the middle of the screen
   const TVK = [ARENA(0.0, 15), K(0.0, 0.02, 10.5, TVC, { cy: H * 0.42 })];  // 10.2 away the frame holds both whole
   shot(ad1A, (g, lt, t, sh) => {
     rig(B, lt, [[0, TVK[0]], [Math.min(1.0, len(sh)), TVK[1], ease.inOut], [len(sh), K(0.0, 0.02, 10.3, TVC, { cy: H * 0.42 })]], { t });

@@ -209,8 +209,13 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
   его `README.md`).
 - Развязка: фразы `and` («And...», пауза 1,6 с) и `resign` («Witty lost.», `tempo: 1.0`); время разреза `CUT`, звук
   `slash` из `audio/samples` (сделан `tools/sfxgen.py`).
-- Блок Chessigma в конце (их карточка `photos/rec/closer.mp4`, кадры — `tools/frames.py`): предложен Элиоту письмом
-  13.11 вместе с исправленным `woodpecker` v7 — ждём ответа; если откажутся, блок вырезать.
+- Блок Chessigma в конце (их карточка `photos/rec/closer.mp4`, кадры — `tools/frames.py`): **Элиот принял ролик
+  13.11.2026** (бонус $100 за 1 млн просмотров за 30 дней) и попросил снять разбор из-под входа в аккаунт и без боковой
+  панели — сделано в тот же день (`photos/tv`, `photos/tv/hd`; как переснять — `capture/` и SOURCES, «Телевизор с
+  разбором»). Публиковать — после его «ок» на финальный файл, с Branded content и #ad (`memory/sponsors.md`).
+- **Канал-копия на YouTube** перезаливает ролики автора; таблица копий, ссылки для жалоб и доказательства —
+  `business/youtube_copies.md` (13.11.2026: подано 6 жалоб из 24, канал автора на YouTube заблокирован «за
+  impersonation», новый — `@the64filesofficial`).
 - Сборка: `python3 tools/frames.py episodes/witty2 && node render.mjs witty2 --workers 4 --scale 2 && python3 audio/mix.py
   episodes/witty2`, кодирование — два прохода x264, как в шаге 8 `CLAUDE.md`.
 
