@@ -1,11 +1,11 @@
 // The two looks of witty2 (rule 62: a nod in our own drawing, not a copy of the manga): Witty Alien as Gojo, Magnus
 // Carlsen as Sukuna ("Jujutsu Kaisen"). Version 5: redrawn after the author's "сделай их дизайн в образе лучше".
-// Witty: white hair in soft curved locks, standing up over the black blindfold; when the blindfold comes off the hair
-// falls into a fringe and the eyes show (bright blue irises with a pale ring, white lashes and brows); a dark
-// high-collared jacket with one bronze button. Magnus: black marks (forehead, the bridge of the nose, two bands on each
-// cheek), a second pair of eyes under his own that open when the glow is up, red irises with a slit pupil, his white
-// shirt closed like a kimono over a black collar. Head units: the face is 100·fw wide and 125·fh tall from its centre,
-// the eyes sit at (±38, −2).
+// Witty: white hair in curved locks, standing up over the black blindfold; when the blindfold comes off (e.band 1 → 0)
+// the hair falls into a fringe and the eyes show: bright blue irises with a pale ring, white lashes and brows; a dark
+// jacket with a high collar and one bronze button. Magnus: black marks (a diamond between the brows, a bar across the
+// bridge of the nose, two tapering bands on each cheekbone), a second pair of eyes under his own that opens with the
+// glow (e.glow), red irises with a slit pupil, his white shirt closed like a kimono over a black collar.
+// Head units: the face is 100·fw wide and 125·fh tall from its centre, the eyes sit at (±38, −2).
 import { clamp, lerp, rgba, mix, ease } from '../../engine/js/core.js';
 import { CAST } from '../../engine/js/characters.js';
 

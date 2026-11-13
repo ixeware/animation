@@ -611,7 +611,7 @@ function splitTex(cams, t) {
   const x = SPLIT.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, 1760, 990);
   for (const [who, x0] of [['wit', 0], ['mag', 880]]) {
     const o = cams[who] || {}, L = CAMLOOK[who];
-    webcam(x, x0, 0, 880, 990, o.anime ? who : who + 'N', o.e || 'focus', t, { bg: L.bg, zoom: 1.12 * (o.zoom || 1), cy: 0.47, shake: o.shake || 0 });
+    webcam(x, x0, 0, 880, 990, o.anime ? who : who + 'N', o.e || 'focus', t + (who === 'mag' ? 1.37 : 0), { bg: L.bg, zoom: 1.12 * (o.zoom || 1), cy: 0.47, shake: o.shake || 0 });  // the offset: they would blink together
     x.fillStyle = 'rgba(8,8,14,0.88)'; x.fillRect(x0, 990 - 92, 880, 92);
     x.font = sans(48, 900); x.letterSpacing = '5px'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = L.nameColor; x.fillText(L.name, x0 + 442, 990 - 43);
   }
@@ -881,8 +881,9 @@ function scoreDay(g, left, right, l, r, { y = 270, lc = CURSE, rc = VOID, label 
   qaRect(g, W / 2 - dx - 110, y - size * 0.3, 2 * dx + 220, size * 0.8, 'text', 'score');
   if (label) plate(g, label, W / 2, y + size * 0.42 + 62, { color: CREAM, size: 30, rot: -0.01, a });
 }
-// pieces right at the lens are left out (they were smears a third of the frame wide): gone nearer than d0, whole from d1
-const nearFade = (pieces, d0 = 3.4, d1 = 4.4) => pieces.map(p => { const d = depth(p.x, 0.6, p.z), a = clamp((d - d0) / (d1 - d0)); return a >= 1 ? p : { ...p, alpha: (p.alpha ?? 1) * a }; }).filter(p => (p.alpha ?? 1) > 0.02);
+// pieces right at the lens are left out (they were smears a third of the frame wide): gone nearer than d0, whole from
+// d0 + w; the band is narrow so that a piece does not hang half-transparent in the frame (a "ghost", rule 22)
+const nearFade = (pieces, d0 = 3.9, w = 0.3) => pieces.map(p => { const a = clamp((depth(p.x, 0.6, p.z) - d0) / w); return a >= 1 ? p : { ...p, alpha: (p.alpha ?? 1) * a }; }).filter(p => (p.alpha ?? 1) > 0.02);
 // the engine's eval bar as a big meter (the "bar flips" beat) or as the small one beside the board
 function evalHud(g, v, { a = 1, x = 40, y = 800, w = 46, h = 400, label = true, big = false } = {}) {
   if (a <= 0) return;
@@ -961,6 +962,8 @@ export async function build(T) {
   const clockAt = (k, run = 0, o = {}) => ({ names: ['WITTY', 'MAGNUS'], cols: [VOID, CURSE], l: CLKS[k][0], r: CLKS[k][1], run, ...o });
   const at3 = (sq, y = 0.6) => { const [x, z] = sqXZ(sq); return [x, y, z]; };
   // Witty's face in the look: the blindfold over his eyes (band 1) or off (0), the blue glow; Magnus's: the red glow
+  // a wide plate pops in from 120 % (from the usual 150 % it would stick out of the frame for a frame)
+  const popW = (t, t0) => ({ scale: lerp(1.2, 1, ease.back(clamp((t - t0) / 0.25))) });
   const WE = (base, o = {}) => ({ ...EXPR[base], band: 0, glow: 0, ...o });
   const ME = (base, o = {}) => ({ ...EXPR[base], glow: 0, ...o });
   const WILD = { ...EXPR.happy, lid: 0.02, open: 1, curve: 1, brow: -0.2, browY: -14, nod: 0.9, blush: 0.7 };  // eyes wide open (rule 51)
@@ -1039,7 +1042,7 @@ export async function build(T) {
   shot(wildA, (g, lt, t, sh) => {
     const c = CAMPOS.wit;
     rig(B, lt, [[0, K(-0.2, 0.04, 8.2, [c[0] + 0.5, c[1] + 0.1, c[2]])], [len(sh), K(-0.1, 0.03, 6.2, [c[0] + 0.4, c[1] + 0.15, c[2]])]], { t, bump: t > wildT && t < wildT + 0.3 ? 1.2 : 0 });
-    online(g, t, { pieces: nearFade(SEPT, 4.6, 5.6), cams: { wit: { e: WILD, shake: t >= wildT ? 0.9 : 0.3 }, mag: { e: 'sad' } } });
+    online(g, t, { pieces: nearFade(SEPT, 5.1), cams: { wit: { e: WILD, shake: t >= wildT ? 0.9 : 0.3 }, mag: { e: 'sad' } } });
     confetti(g, t, wildT);
   }, { trans: 'zoom', hud: (g, lt, t) => {
     if (t >= wildT) badge(g, 'LIVE ON STREAM', W / 2, 230, { color: RED, size: 56, ...pop(t, wildT) });
@@ -1113,7 +1116,7 @@ export async function build(T) {
   shot(kingA, (g, lt, t, sh) => {
     // the king on f7 from Magnus's side, Witty behind it
     rig(B, lt, [[0, K(PI + 0.34, 0.3, 7.6, [5.3, 1.3, 4.6], { cy: 830 })], [len(sh), K(PI + 0.22, 0.28, 6.4, [5.3, 1.35, 4.6], { cy: 830 })]], { t, e: glide });
-    domain(g, t, { pieces: nearFade(piecesAt(PL, 12), 4.9, 5.3), bPlayer: false, bChair: false, ew: { ...EXPR.focus, look: [0.2, 0.5] }, under: g2 => pieceRing(g2, B, 'f7', RED, seg(t, kingT - 0.15, kingT + 0.1)) });
+    domain(g, t, { pieces: nearFade(piecesAt(PL, 12), 5.1), bPlayer: false, bChair: false, ew: { ...EXPR.focus, look: [0.2, 0.5] }, under: g2 => pieceRing(g2, B, 'f7', RED, seg(t, kingT - 0.15, kingT + 0.1)) });
   }, { trans: 'zoom', hud: (g, lt, t) => { if (t >= kingT) badge(g, 'THE KING TOOK IT', 420, 230, { color: RED, size: 52, ...pop(t, kingT) }); } });
   cue(kingA - 0.04, 'whoosh_soft', 0.3); cue(kingT, 'dun_dun', 0.4);
   shot(engA, (g, lt, t, sh) => {
@@ -1133,13 +1136,13 @@ export async function build(T) {
     // 17...Bg6 from behind Black's pieces: Witty's window beyond the board
     rig(B, lt, [[0, K(PI - 0.36, 0.4, 9.0, [g6[0] - 0.5, 0.5, g6[2] - 1.0], { cy: 940 })], [len(sh), K(PI - 0.26, 0.38, 8.0, [g6[0] - 0.5, 0.5, g6[2] - 1.0], { cy: 940 })]], { t, e: lin, bump: t > BG6 && t < BG6 + 0.3 ? 1 : 0 });
     const r = runTo(PL, 33, [BG6], t, 0.3), fx = moveFx(r, 0.3, 0.8);
-    online(g, t, { pieces: nearFade(r.pieces, 3.2, 4.0), mon: false, under: fx.under, over: fx.over });
+    online(g, t, { pieces: nearFade(r.pieces, 3.6), mon: false, under: fx.under, over: fx.over });
     if (t >= BG6) flashTint(g, RED, 0.25 * (1 - seg(t, BG6, BG6 + 0.35)));
   }, { trans: 'cut', hud: (g, lt, t) => { evalHud(g, -1.0); if (t >= BG6) badge(g, 'MOVE 17: A SLIP', W / 2, 230, { color: RED, size: 60, ...pop(t, BG6) }); } });
   FF.forEach((a, i) => { if (i % 3 === 0) cue(a, 'piece', 0.12); }); cue(flipA, 'whoosh_fast', 0.25); cue(slipA - 0.03, 'whoosh_soft', 0.3); landCue(BG6, false, 0.6); cue(BG6, 'sting', 0.35);
   shot(barA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.22, 0.2, 12.4, [3.2, 2.8, 9.4])], [len(sh), K(-0.14, 0.18, 11.2, [3.2, 2.9, 9.5])]], { t, e: glide, bump: t > flipsT && t < flipsT + 0.3 ? 1 : 0 });
-    online(g, t, { pieces: nearFade(piecesAt(PL, 34), 4, 5), cams: { wit: { e: t >= flipsT ? GLAD : 'focus' }, mag: { e: t >= flipsT ? { ...EXPR.worried, lid: 0.05 } : ME('focus') } } });
+    online(g, t, { pieces: nearFade(piecesAt(PL, 34), 4.5), cams: { wit: { e: t >= flipsT ? GLAD : 'focus' }, mag: { e: t >= flipsT ? { ...EXPR.worried, lid: 0.05 } : ME('focus') } } });
     if (t >= flipsT) flashTint(g, LIME, 0.2 * (1 - seg(t, flipsT, flipsT + 0.4)));
   }, { trans: 'zoom', hud: (g, lt, t) => {
     const v = lerp(-1.0, 0.9, ease.inOut(seg(t, flipsT - 0.15, flipsT + 0.25)));
@@ -1186,7 +1189,7 @@ export async function build(T) {
     // Witty's own hand puts the rook on e6: seen from Magnus's side of the table, Witty's face over the board
     rig(B, lt, [[0, K(PI + 0.2, 0.3, 10.4, [4, 2.0, 1.2])], [len(sh), K(PI + 0.08, 0.27, 9.0, [4, 2.1, 1.0])]], { t, e: glide });
     const r = runTo(PL, 41, [...LT, RE6], t, t < RE6 - 0.3 ? 0.1 : 0.26), fx = moveFx(r, r.k === 45 ? 0.26 : 0.1, r.k === 45 ? 0.8 : 0.1, r.k === 45);
-    domain(g, t, { pieces: nearFade(r.pieces, 3.0, 4.0), under: fx.under, over: fx.over, bPlayer: false, bChair: false, ew: { ...EXPR.focus },
+    domain(g, t, { pieces: nearFade(r.pieces, 3.5), under: fx.under, over: fx.over, bPlayer: false, bChair: false, ew: { ...EXPR.focus },
       wReach: t > RE6 - 0.55 && t < RE6 + 0.45 ? { sq: 'e6', u: (t - RE6 + 0.55) / 1.0 } : null });
   }, { trans: 'whip', hud: (g, lt, t) => { evalHud(g, -0.1); if (t >= w('late', 0)) counter(g, 'MOVE 23', null, { y: 300, size: 120, color: GOLD, at: [t, w('late', 0)] }); } });
   LT.forEach(a => cue(a - 0.02, 'piece', 0.18)); landCue(RE6, false, 0.6); cue(RE6, 'ting', 0.3);
@@ -1303,11 +1306,11 @@ export async function build(T) {
     }
     if (lt < T_IN + 0.1) slashLine(g, 1, 1 - seg(lt, T_BLK, T_IN + 0.1), lerp(1, 0.25, seg(lt, T_BLK, T_IN)));  // the line left on the black, thinning out
   }, { trans: 'cut', grade: 'bw', vig: 0.8, kb: 0, post: (g, lt, t) => {  // after the black-and-white grade: the plates keep their colour
-    if (t >= lostW + 0.25 && t < humT - 0.1) badge(g, 'RESIGNED · 6 SECONDS LEFT', W / 2, 230, { color: '#16161E', size: 44, ...pop(t, lostW + 0.25) });
-    if (t >= humT - 0.1) badge(g, 'THE ALIEN CAN BEAT HUMANS', W / 2, 230, { color: VOID, size: 48, ...pop(t, humT - 0.1) });
+    if (t >= lostW + 0.25 && t < humT - 0.1) badge(g, 'RESIGNED · 6 SECONDS LEFT', W / 2, 230, { color: '#16161E', size: 44, ...popW(t, lostW + 0.25) });
+    if (t >= humT - 0.1) badge(g, 'THE ALIEN CAN BEAT HUMANS', W / 2, 230, { color: VOID, size: 48, ...popW(t, humT - 0.1) });
   } });
   cue(andA - 0.04, 'whoosh_deep', 0.3); cue(andA + 0.06, 'success', 0.4); cue(CUT - 0.34, 'revswell', 0.6);
-  cue(CUT - 0.03, 'slash', 1.0); cue(CUT + T_NEG, 'boom_big', 0.8); cue(CUT + T_IN + 0.1, 'heartbeat', 0.5); cue(lostW + 0.25, 'thud', 0.3); cue(humT - 0.1, 'sparkle_pop', 0.2);
+  cue(CUT - 0.03, 'slash', 1.7); cue(CUT + 0.02, 'slash', 0.8); cue(CUT + T_NEG, 'boom_big', 0.65); cue(CUT + T_IN + 0.1, 'heartbeat', 0.5); cue(lostW + 0.25, 'thud', 0.3); cue(humT - 0.1, 'sparkle_pop', 0.2);
   // BUT NOT THE GOAT. NOT TWICE: Magnus himself across the board, the day room back in colour
   shot(butA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.24, 0.05, 9.6, [4, 3.0, 9.3])], [len(sh), K(-0.12, 0.04, 7.8, [4, 3.05, 9.3])]], { t, e: glide, bump: t > goatT && t < goatT + 0.3 ? 1.2 : 0 });
@@ -1333,7 +1336,8 @@ export async function build(T) {
   shot(proudA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI - 0.6, 0.08, 9.6, [4, 3.2, -1.4])], [len(sh), K(PI - 0.42, 0.06, 7.8, [4, 3.25, -1.4])]], { t, e: glide });
     domain(g, t, { pieces: nearFade(piecesAt(PL, 107)), white: 'wit', dark: true, bPlayer: false, bChair: false, ew: exprAt([[proudA, WE('sad', { band: 1, look: [0, 0.5] })], [strongT - 0.1, WE('neutral', { band: 1, curve: 0.45 })]], t) });
-  }, { trans: 'fade', transDur: 0.3, hud: (g, lt, t) => {
+    flashTint(g, VOID, 0.4 * (1 - seg(lt, 0, 0.35)));
+  }, { trans: 'cut', hud: (g, lt, t) => {
     if (t >= proudA + 0.15) badge(g, 'STAND PROUD', W / 2, 230, { color: GOLD, size: 60, ...pop(t, proudA + 0.15) });
     if (t >= strongT) badge(g, "YOU'RE STRONG", W / 2, 340, { color: CREAM, size: 48, ...pop(t, strongT) });
   } });
@@ -1347,15 +1351,15 @@ export async function build(T) {
   shot(ad1A, (g, lt, t, sh) => {
     rig(B, lt, [[0, TVK[0]], [Math.min(1.0, len(sh)), TVK[1], ease.inOut], [len(sh), K(0.0, 0.02, 10.3, TVC, { cy: H * 0.42 })]], { t });
     const k = t < gradedT ? 11 : t < thisT ? 34 : 102;
-    online(g, t, { pieces: nearFade(piecesAt(PL, k), 3.4, 4.6), tv: k });
+    online(g, t, { pieces: nearFade(piecesAt(PL, k), 4.0), tv: k });
   }, { trans: 'whip', kb: 0, hud: (g, lt, t) => adTag(g) });
   shot(ad2A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.0, 0.02, 10.3, TVC, { cy: H * 0.42 })], [len(sh), K(0.0, 0.02, 10.1, TVC, { cy: H * 0.42 })]], { t, e: lin });
-    online(g, t, { pieces: nearFade(piecesAt(PL, 102), 3.4, 4.6), tv: 102 });
+    online(g, t, { pieces: nearFade(piecesAt(PL, 102), 4.0), tv: 102 });
   }, { trans: 'cut', kb: 0, hud: (g, lt, t) => {
     adTag(g);
     if (t >= freeT - 0.03) badge(g, 'FREE', 250, 262, { color: LIME, size: 58, ...pop(t, freeT - 0.03) });
-    if (t >= unlT - 0.03) badge(g, 'UNLIMITED GAME REVIEWS', 700, 262, { color: CREAM, size: 30, ...pop(t, unlT - 0.03) });
+    if (t >= unlT - 0.03) badge(g, 'UNLIMITED GAME REVIEWS', 670, 262, { color: CREAM, size: 30, ...popW(t, unlT - 0.03) });
   } });
   // their 3-second end card as it is (logo, 2M+ players, the store badges): flat, no captions over it
   shot(CLOSE, (g, lt) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
@@ -1368,7 +1372,7 @@ export async function build(T) {
     rig(B, lt, [[0, VS[1]], [len(sh), VS[0]]], { t, e: lin });
     online(g, t, { pieces: start, cams: vsCams(t) });
   }, { trans: 'whip', kb: 0, hud: (g, lt, t) => {
-    badge(g, 'HOW MANY MOVES WOULD YOU LAST?', W / 2, 220, { color: GOLD, size: 46, ...pop(t, ctaA + 0.1) });
+    badge(g, 'HOW MANY MOVES WOULD YOU LAST?', W / 2, 220, { color: GOLD, size: 46, ...popW(t, ctaA + 0.1) });
     badge(g, 'COMMENT A NUMBER', W / 2, 322, { color: VOID, size: 48, a: seg(t, movesT, movesT + 0.1), ...pop(t, movesT) });
     badge(g, 'FOLLOW ' + CHANNEL, W / 2, 420, { color: CREAM, size: 38, a: seg(t, lastT, lastT + 0.1) });
   } });

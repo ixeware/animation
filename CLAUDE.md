@@ -29,7 +29,7 @@
 2. Текст и голос — `episodes/<ep>/script.json`: фразы, Callum на `eleven_v3`, аудиотеги в `say`, `channel`, `post`.
 3. Озвучка: `python3 audio/tts.py episodes/<ep>`. Нужна переменная `ELEVENLABS_API_KEY`; ответы кэшируются в
    `build/tts_cache`, повторный запуск кредитов не тратит. Потом проверить голос: `python3 tools/voice_check.py episodes/<ep>`
-   (обрезанные слова, лишние паузы; другой дубль — `--takes`, правило 64).
+   (обрезанные слова, лишние паузы; другой дубль — `--takes`, правило 64); остаток кредитов — `python3 tools/voice_check.py --quota`.
 4. Сцены — `episodes/<ep>/scenes.js`, функция `build(T)` возвращает shots, cues, music, musicFx.
 5. Кадры для проверки: `node render.mjs <ep> --stills 1.0,2.5` (в `build/stills`). Если в ролике есть записи экрана
    (`photos/rec/*.mp4`), сначала `python3 tools/frames.py episodes/<ep>`.

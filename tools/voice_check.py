@@ -6,11 +6,16 @@
                                                                     other readings of a phrase (ElevenLabs v3, seeds
                                                                     1000 + n; cached, so "take": n in script.json
                                                                     then costs nothing)
+    python3 tools/voice_check.py --quota                             the credits left on the ElevenLabs account and the
+                                                                    day they reset. Look before asking for readings:
+                                                                    each one costs about a credit per character of
+                                                                    the line, and the free plan has 10 000 a month
 
 The report, per phrase (from the takes in build/tts_cache and build/narration.wav after audio/tts.py):
   ends     the level of the take's last 20 ms under its peak. eleven_v3 often stops a take while the last word still
-           sounds: above about -35 dB the end is cut (audio/tts.py, voice_fx engine 2, fades it out, but a reading that
-           ends in silence is better: ask for another with --takes and set "take": n on the phrase)
+           sounds: above -25 dB a vowel is cut, between -35 and -25 dB usually the release of a final t / k / s or a
+           breath (audio/tts.py, voice_fx engine 2, fades either out; a reading that ends in silence is better: ask for
+           another with --takes and set "take": n on the phrase)
   heard    what whisper hears without a prompt, against the script (1.00: word for word)
   pauses   silences longer than 0.25 s inside the take, before they are shortened
   f0       the median pitch and its range: a reading far off the others sounds like another speaker
@@ -75,7 +80,8 @@ def report(ep):
         if not f.exists(): print(f"{p['id']:9s} no cached take (run audio/tts.py)"); continue
         s = take_stats(tts.decode(base64.b64decode(json.loads(f.read_text())['audio_base64'])), say)
         notes = []
-        if s['ends'] > -35: notes.append(f"the take ends at {s['ends']:.0f} dB: cut while sounding")
+        if s['ends'] > -25: notes.append(f"the take ends at {s['ends']:.0f} dB: cut while the voice sounds")
+        elif s['ends'] > -35: notes.append(f"the take ends at {s['ends']:.0f} dB: a final consonant or a breath cut short (look at the plot)")
         if s['heard'] < 0.9: notes.append(f"heard {s['heard']:.2f}: {s['text']!r}")
         if T is not None and nar is not None:
             q = next(x for x in T['phrases'] if x['id'] == p['id'])
@@ -124,8 +130,19 @@ def plot(ep, out, ids=None):
     plt.tight_layout(); plt.savefig(out, dpi=70); print(out)
 
 
+def quota():
+    import datetime, os, requests
+    key = os.environ.get('ELEVENLABS_API_KEY') or sys.exit('ELEVENLABS_API_KEY is not set')
+    r = requests.get('https://api.elevenlabs.io/v1/user/subscription', headers={'xi-api-key': key}, timeout=30)
+    if r.status_code != 200: sys.exit(f'ElevenLabs {r.status_code}: {r.text[:200]}')
+    d = r.json()
+    reset = datetime.datetime.fromtimestamp(d['next_character_count_reset_unix'], datetime.timezone.utc)
+    print(f"plan {d['tier']}: {d['character_count']} of {d['character_limit']} credits used, {d['character_limit'] - d['character_count']} left; resets {reset:%d %b %Y %H:%M} UTC")
+
+
 if __name__ == '__main__':
     args = sys.argv[1:]
+    if args and args[0] == '--quota': quota(); sys.exit()
     ep = Path(args[0])
     if '--takes' in args:
         i = args.index('--takes'); takes(ep, args[i + 1], [int(x) for x in args[i + 2].split(',')], args[i + 3] if len(args) > i + 3 else None)
