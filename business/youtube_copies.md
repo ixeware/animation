@@ -28,6 +28,14 @@
   (@TeamYouTube) с доводом по существу: «The 64 Files» — собственный бренд автора (TikTok с 12.10.2026, спонсорские
   договоры), он не выдавал себя за канал `@the64files`, у которого нет ни одного видео.
 
+### Черновик обращения к @TeamYouTube (X, два сообщения по 280 и 220 знаков)
+
+> @TeamYouTube My channel "The 64 Files" (@The64FilesChess) was terminated for impersonation and the appeal was denied. I am the original creator: the same videos are on my TikTok @the64files (16.9K followers) since Oct 12. I never posed as anyone else. Could you take another look?
+
+> A different channel holds the handle @the64files and the same name, with no videos: I have nothing to do with it. And @the64stories re-uploads my videos to YouTube, 24 so far; my copyright removal requests are in review.
+
+Отправлять автору со своего аккаунта и только если канал `@the64files` действительно не его.
+
 ## Доказательства авторства
 
 1. **Даты.** Каждая копия из ленты залита позже оригинала: свежие ролики — через 20–32 часа после TikTok (ролик про
