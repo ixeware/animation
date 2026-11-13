@@ -1130,20 +1130,21 @@ export async function build(T) {
   cue(engA - 0.04, 'whoosh_fast', 0.3); cue(losingT, 'error', 0.35);
 
   // ======================= BUT MAGNUS SLIPS (17...Bg6): THE BAR FLIPS, WITTY IS BETTER =======================
-  const BG6 = slipsT + 0.08, slipA = BG6 - 0.34, FF = spaced(flipA + 0.08, slipA - 0.06, 21), g6 = at3('g6', 0.3);
+  // The ten moves in between are not shown. Version 5 ran through them in a 0.3 s shot with a move counter, and it
+  // read as a flash frame (the author, 13.11.2026: «резко кадр меняется странно как 25 кадр»). One cut to move 17.
+  const BG6 = slipsT + 0.08, g6 = at3('g6', 0.3);
   shot(flipA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, ARENA(0.06, 15.2)], [len(sh), ARENA(0.02, 14.4)]], { t, e: lin });
-    const r = runTo(PL, 12, FF, t, 0.03), fx = moveFx(r, 0.03, 0.05);
-    online(g, t, { pieces: r.pieces, under: fx.under, over: fx.over, clock: clockAt(r.k), tv: tvOf(r, 0.03) });
-  }, { trans: 'whip', hud: (g, lt, t) => { evalHud(g, -1.0); counter(g, 'MOVE ' + Math.min(17, 7 + Math.floor(10 * seg(t, flipA + 0.08, slipA - 0.06, lin))), null, { y: 300, size: 120, color: GOLD }); } });
-  shot(slipA, (g, lt, t, sh) => {
     // 17...Bg6 from behind Black's pieces: Witty's window beyond the board
     rig(B, lt, [[0, K(PI - 0.36, 0.4, 9.0, [g6[0] - 0.5, 0.5, g6[2] - 1.0], { cy: 940 })], [len(sh), K(PI - 0.26, 0.38, 8.0, [g6[0] - 0.5, 0.5, g6[2] - 1.0], { cy: 940 })]], { t, e: lin, bump: t > BG6 && t < BG6 + 0.3 ? 1 : 0 });
     const r = runTo(PL, 33, [BG6], t, 0.3), fx = moveFx(r, 0.3, 0.8);
     online(g, t, { pieces: nearFade(r.pieces, 3.6), mon: false, under: fx.under, over: fx.over });
     if (t >= BG6) flashTint(g, RED, 0.25 * (1 - seg(t, BG6, BG6 + 0.35)));
-  }, { trans: 'cut', hud: (g, lt, t) => { evalHud(g, -1.0); if (t >= BG6) badge(g, 'MOVE 17: A SLIP', W / 2, 230, { color: RED, size: 60, ...pop(t, BG6) }); } });
-  FF.forEach((a, i) => { if (i % 3 === 0) cue(a, 'piece', 0.12); }); cue(flipA, 'whoosh_fast', 0.25); cue(slipA - 0.03, 'whoosh_soft', 0.3); landCue(BG6, false, 0.6); cue(BG6, 'sting', 0.35);
+  }, { trans: 'cut', hud: (g, lt, t) => {
+    evalHud(g, -1.0);
+    badge(g, 'MOVE 17', W / 2, 230, { color: GOLD, size: 60, ...pop(t, flipA + 0.04) });
+    if (t >= BG6) badge(g, 'A SLIP', W / 2, 340, { color: RED, size: 60, ...pop(t, BG6) });
+  } });
+  cue(flipA - 0.03, 'whoosh_soft', 0.3); landCue(BG6, false, 0.6); cue(BG6, 'sting', 0.35);
   shot(barA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.22, 0.2, 12.4, [3.2, 2.8, 9.4])], [len(sh), K(-0.14, 0.18, 11.2, [3.2, 2.9, 9.5])]], { t, e: glide, bump: t > flipsT && t < flipsT + 0.3 ? 1 : 0 });
     online(g, t, { pieces: nearFade(piecesAt(PL, 34), 4.5), cams: { wit: { e: t >= flipsT ? GLAD : 'focus' }, mag: { e: t >= flipsT ? { ...EXPR.worried, lid: 0.05 } : ME('focus') } } });
@@ -1243,7 +1244,7 @@ export async function build(T) {
   landCue(KD1, true, 0.7); cue(KD1, 'glass', 0.35);
   shot(q2A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.2, 0.44, 16.6, [3.4, 0.8, 5.0], { cy: 1230 })], [Q2 - q2A, K(0.14, 0.44, 15.6, [3.4, 0.8, 5.0], { cy: 1230 })], [len(sh), K(0.1, 0.44, 15.0, [3.4, 0.8, 5.0], { cy: 1230 })]], { t, bump: t > Q2 && t < Q2 + 0.3 ? 1.6 : 0 });
-    const r = runTo(PL, 99, [...PRE, Q2, ...TAIL], t, t < Q2 - 0.3 ? 0.1 : t < Q2 + 0.4 ? 0.22 : 0.08), fx = moveFx(r, 0.1, 0.4), dark = t >= Q2 - 0.05;
+    const r = runTo(PL, 99, [...PRE, Q2, ...TAIL], t, t < Q2 - 0.3 ? 0.1 : t < Q2 + 0.4 ? 0.22 : 0.08), fx = moveFx(r, 0.1, 0.4), dark = true;  // from the first frame: lit for 0.33 s and then dark, it flickered
     online(g, t, { pieces: r.pieces, dark, cams: { wit: { e: { ...EXPR.shock, lid: 0 } }, mag: { e: ME(t >= Q2 ? 'smug' : 'focus', { glow: t >= Q2 ? 1 : 0.3 }), anime: dark } }, clock: clockAt(r.k),
       under: g2 => { fx.under(g2); if (t >= Q2) ledGlow(g2, B, 'a1', RED, t, Q2, { reach: 8 }); }, over: fx.over });
     if (t >= Q2) { flashTint(g, CURSE, 0.45 * (1 - seg(t, Q2, Q2 + 0.45))); slashes(g, t, Q2, { n: 3, seed: 7, life: 0.6 }); }
@@ -1386,7 +1387,7 @@ export async function build(T) {
   cue(tvOff, 'tvoff', 0.5);
   const music = [
     { t: 0, m: 'hook' }, { t: winT, m: 'slam' }, { t: nameA, m: 'digital' }, { t: remA, m: 'tension' }, { t: round2T, m: 'slam' }, { t: openA, m: 'build' },
-    { t: LAND, m: 'slam' }, { t: hisA + 0.6, m: 'glory' }, { t: takeA, m: 'intrigue' }, { t: flipA, m: 'build' }, { t: flipsT, m: 'victory' },
+    { t: LAND, m: 'slam' }, { t: hisA + 0.6, m: 'glory' }, { t: takeA, m: 'intrigue' }, { t: flipsT, m: 'victory' },
     { t: m21A, m: 'tension' }, { t: NXD5, m: 'drop' }, { t: endA, m: 'clockwork' }, { t: q1A, m: 'build' }, { t: Q2, m: 'slam' },
     { t: andA, m: 'victory' }, { t: CUT, m: 'void' }, { t: lostT - 0.2, m: 'elegy' }, { t: butA, m: 'hit' }, { t: scoreA, m: 'elegy' }, { t: ad1A, m: 'digital' }, { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];

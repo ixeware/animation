@@ -21,6 +21,9 @@ The report, per phrase (from the takes in build/tts_cache and build/narration.wa
   f0       the median pitch and its range: a reading far off the others sounds like another speaker
   gaps     in the finished narration: silences inside the phrase longer than voice_fx.max_gap + 0.1 s that are not a
            scripted "hold" (an odd pause), and word marks closer than 30 ms (whisper lost a word: check the frames cut to it)
+  level    the loudness of each sentence of the phrase: more than 2.5 dB apart, the louder sentence sounds like another
+           recording spliced in, all the more after a pause (witty2 v5: "[excited]" in the middle of a line made its
+           second half 3.7 dB louder). Ask for a reading without the tag in the middle and without the hold
 Needs ELEVENLABS_API_KEY only for readings that are not cached yet.
 """
 import base64, json, sys
@@ -94,6 +97,15 @@ def report(ep):
             ws = q['words']
             piled = [ws[i]['w'] for i in range(1, len(ws)) if ws[i]['s'] - ws[i - 1]['s'] < 0.03]
             if piled: notes.append(f'word marks piled up at {piled}')
+            lv, cur = [], []
+            for w in ws:  # the loudness of each sentence (its words, to 0.12 s past the last one)
+                cur.append(w)
+                if w['w'][-1] in '.?!…' or w is ws[-1]:
+                    x = nar[int(cur[0]['s'] * SR):int((cur[-1]['e'] + 0.12) * SR)]
+                    if len(x) > SR * 0.25: lv.append((float(20 * np.log10(np.sqrt((x ** 2).mean()) + 1e-9)), ' '.join(c['w'] for c in cur)))
+                    cur = []
+            if len(lv) > 1 and max(v for v, _ in lv) - min(v for v, _ in lv) > 2.5:
+                notes.append('sentences ' + ', '.join(f'{v:.1f} dB' for v, _ in lv) + f": {max(lv)[1]!r} stands out like a spliced-in take")
         bad += bool(notes)
         print(f"{p['id']:9s} {s['len']:5.2f}s  ends {s['ends']:4.0f} dB  heard {s['heard']:.2f}  f0 {s['f0']}  pauses {s['pauses']}" + (''.join('\n          ! ' + n for n in notes)))
     print(f'{bad} phrase(s) to look at' if bad else 'no phrase stands out')

@@ -125,17 +125,13 @@
     {
       "id": "flip",
       "text": "But Magnus slips. The bar flips. Witty is better.",
-      "say": "But Magnus slips. [excited] The bar flips. Witty is better.",
       "pause": 0.25,
       "colors": {
         "slips.": "red",
         "flips.": "lime",
         "better.": "lime"
       },
-      "hold": {
-        "after": "slips.",
-        "sec": 0.4
-      }
+      "take": 4
     },
     {
       "id": "miss",

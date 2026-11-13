@@ -10,7 +10,23 @@
 | [The 64 Stories](https://www.youtube.com/@the64stories) (`UCQxxWFxb02DCkTunX0rftJQ`) | копия | создан 19.09.2026; 6,1 тыс. подписчиков; 24 шортса, все — ролики The 64 Files; в сумме ≈5,3 млн просмотров; в описании просит писать о сотрудничестве на свою почту |
 | [@the64files в TikTok](https://www.tiktok.com/@the64files) | оригинал | 16,9 тыс. подписчиков, 28 роликов, первый — 12.10.2026 |
 | [The 64 Files](https://www.youtube.com/@the64filesofficial) (`UCsCp6_Ihp0wqsnkfanbck4g`) | новый канал автора | создан 11.11.2026, один шортс («Who can beat Mittens?») |
-| [The 64 Files](https://www.youtube.com/@the64files) (`UCP_JjtknigGxYbFO8BDl3hw`) | чей — уточнить у автора | создан 13.07.2026, видео нет, в описании «Every episode is a file. Every square hides a story.» |
+| [The 64 Files](https://www.youtube.com/@the64files) (`UCP_JjtknigGxYbFO8BDl3hw`) | чей — уточнить у автора; судя по нику, чужой | создан 13.07.2026, видео нет, в описании «Every episode is a file. Every square hides a story.» |
+| The 64 Files, `@The64FilesChess` | канал автора, заблокирован | «violates our Impersonation policy»; апелляция отклонена (экран автора от 13.11.2026) |
+
+## Блокировка канала автора (13.11.2026)
+
+- Ответ YouTube на апелляцию: «Your channel won't be put back on YouTube at this time. We've taken a careful look at
+  your channel again, and confirmed that it violates our Impersonation policy… Currently, your channel does not have
+  access to YouTube's pilot programme to apply for a new channel.» Канал — «The 64 Files», ник `@The64FilesChess`.
+- **Догадка, не факт.** Ник `@the64files` на YouTube занят другим каналом с тем же именем «The 64 Files» и той же
+  темой, созданным 13.07.2026, — раньше канала автора (у автора ник с добавкой «Chess», значит, короткий был занят).
+  Для YouTube канал автора выглядел копией этого канала: одно имя, одна тема. Тогда блокировка не обязательно связана
+  с каналом-копией The 64 Stories; кто подал жалобу и была ли она, по открытым данным не видно. Когда тот канал получил
+  имя и ник, тоже не видно: дата создания канала не меняется, а имя и ник меняются.
+- Что из этого следует: любой новый канал с именем «The 64 Files» упрётся в то же совпадение; новый канал после
+  блокировки YouTube к тому же считает обходом. Обычная апелляция использована. Остаётся обращение в поддержку
+  (@TeamYouTube) с доводом по существу: «The 64 Files» — собственный бренд автора (TikTok с 12.10.2026, спонсорские
+  договоры), он не выдавал себя за канал `@the64files`, у которого нет ни одного видео.
 
 ## Доказательства авторства
 

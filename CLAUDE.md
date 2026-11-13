@@ -41,8 +41,8 @@
    `ffmpeg -y -i final.mp4 -c:v libx264 -preset slow -b:v 3300k -pass 1 -passlogfile <tmp>/p -an -f mp4 /dev/null`, затем
    `ffmpeg -y -i final.mp4 -c:v libx264 -preset slow -b:v 3300k -pass 2 -passlogfile <tmp>/p -c:a aac -b:a 160k -movflags +faststart <имя>.mp4`.
 9. Перед отправкой — покадровый просмотр готового файла (контакт-листы кадров:
-   `python3 tools/sheet.py <имя>.mp4 sheet.jpg --every 1`, отдельные моменты — секундами вместо `--every`) и
-   проверка звука.
+   `python3 tools/sheet.py <имя>.mp4 sheet.jpg --every 1`, отдельные моменты — секундами вместо `--every`), поиск
+   планов-вспышек (`python3 tools/shortshots.py <имя>.mp4`, правило 65) и проверка звука.
 
 ## Правила работы
 - Коммитить и пушить только в ветку, которую назначила сессия. `build/` в git не попадает.
