@@ -76,6 +76,25 @@ videos from your email and have started processing your request». В списк
 шесть, которые в нём названы как уже поданные через форму (их номера система тоже приняла за заявку). Вреда в этом нет:
 это те же копии роликов автора; по ним возможны два ответа — на форму и на письмо.
 
+**14.11.2026, 04:45–04:50 UTC — YouTube запросил подтверждение** (три письма, обращения
+`U63E3AMUL5GS55AJG4EAC5MXE4`, `QHJR7OU565D37IRZDSHLVUXQOI`, `AZ47HRX6F5TTNNJ2JTCTCWMBFQ`): «We are concerned that some
+info in your takedown request may be fraudulent… For each video in question, please provide precise identification of
+the particular copyrighted work or works allegedly infringed and the basis for asserting that claim». Срок ответа —
+7 дней, иначе «your YouTube account may be terminated»; отзыв жалобы — фразой «I hereby retract my claim of copyright
+infringement».
+
+**Ответ отправлен 14.11.2026 около 06:20 UTC** во все три ветки, с согласия автора («ну давай»): по каждому из 24
+роликов — оригинал (название, длина, время публикации в TikTok, ссылка) и время загрузки копии; основание — автор сам
+пишет, анимирует и монтирует ролики; доказательства, которые проверяющий откроет сам:
+- почта отправителя стоит в био TikTok `@the64files`;
+- у 15 копий с известным временем загрузки оригинал старше (в одном случае на 26 минут);
+- имя автора внутри чужих роликов: гравировка «@THE64FILES» на ребре доски в копии `WLywVcbK5FY`
+  ([кадр](https://i.ytimg.com/vi/WLywVcbK5FY/oar2.jpg)) и плашка «FOLLOW FOR MORE / THE 64 FILES» в `nRx_hI8DvDs` и
+  `agXowu9Rv-I`;
+- готовность прислать исходники и аналитику TikTok.
+В ответе прямо сказано, что каналы автора «The 64 Files» удалены за impersonation и что причина, по его мнению, — этот
+канал-копия. Следить за ответами: почта the64filestt, отправитель `youtube-disputes+…@google.com`.
+
 | № | Копия на YouTube | Залита | Просмотры | Оригинал в TikTok | Вышел | Папка | Жалоба |
 |---|---|---|---|---|---|---|---|
 | 1 | [Hikaru realized Magnus is losing](https://www.youtube.com/shorts/Wmz-pghiWnE) | 11.11 19:21 | 146 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7706690840965582132) | 10.11 23:36 | `hikaru213` | письмо 13.11 |
