@@ -67,7 +67,7 @@
       "id": "name",
       "text": "Witty Alien. In September, he beat Magnus in blitz, and went wild on stream.",
       "say": "Witty Alien. In September, he beat Magnus in blitz, [excited] and went wild on stream.",
-      "pause": 1.1,
+      "pause": 1.5,
       "colors": {
         "Witty": "blue",
         "Alien.": "blue",

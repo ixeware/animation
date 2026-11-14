@@ -453,6 +453,30 @@ const SKY_T = tex(1200, 880, (x, w, h) => {
   }
   x.strokeStyle = '#FBF6EC'; x.lineWidth = 30; x.strokeRect(0, 0, w, h); x.lineWidth = 16; x.beginPath(); x.moveTo(w / 2, 0); x.lineTo(w / 2, h); x.moveTo(0, h * 0.46); x.lineTo(w, h * 0.46); x.stroke();
 });
+// Witty's window (version 7; the author: «и то что он с марса играет»): the same frame, Mars outside it. A dusty
+// sky with a small sun and the Earth as a blue dot, mesas, dunes, a rover on the nearest one.
+const MARS_WIN = tex(1200, 880, (x, w, h) => {
+  const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#B8683F'); gr.addColorStop(0.5, '#E2A06C'); gr.addColorStop(0.72, '#F4CFA0'); x.fillStyle = gr; x.fillRect(0, 0, w, h);
+  const sun = x.createRadialGradient(250, 210, 4, 250, 210, 150); sun.addColorStop(0, 'rgba(255,250,235,1)'); sun.addColorStop(0.16, 'rgba(255,240,210,0.9)'); sun.addColorStop(0.2, 'rgba(200,225,255,0.35)'); sun.addColorStop(1, 'rgba(200,225,255,0)');
+  x.fillStyle = sun; x.fillRect(80, 40, 340, 340);
+  x.fillStyle = '#BFE6FF'; x.beginPath(); x.arc(930, 150, 9, 0, 7); x.fill(); x.fillStyle = 'rgba(190,230,255,0.25)'; x.beginPath(); x.arc(930, 150, 22, 0, 7); x.fill();  // the Earth
+  x.fillStyle = '#B4683F';  // mesas on the horizon
+  for (const [x0, ww, hh] of [[60, 250, 86], [380, 150, 54], [720, 330, 104], [1010, 170, 60]]) { x.beginPath(); x.moveTo(x0 - 50, h * 0.72); x.lineTo(x0, h * 0.72 - hh); x.lineTo(x0 + ww, h * 0.72 - hh); x.lineTo(x0 + ww + 60, h * 0.72); x.closePath(); x.fill(); }
+  const r = rng(11);
+  for (const [col, y0, amp] of [['#C9683C', h * 0.72, 30], ['#A84D2A', h * 0.81, 36], ['#853720', h * 0.9, 28]]) {
+    x.fillStyle = col; x.beginPath(); x.moveTo(0, h);
+    for (let i = 0; i <= 10; i++) { const xx = i * w / 10; x.quadraticCurveTo(xx - w / 20, y0 - amp * (0.5 + 0.7 * r()), xx, y0 - amp * 0.3 * r()); }
+    x.lineTo(w, h); x.closePath(); x.fill();
+  }
+  x.fillStyle = 'rgba(70,24,12,0.5)'; for (let i = 0; i < 26; i++) { x.beginPath(); x.ellipse(r() * w, h * (0.76 + 0.22 * r()), 8 + r() * 20, 4 + r() * 7, 0, 0, 7); x.fill(); }  // stones
+  // the rover parked on the middle dune
+  x.save(); x.translate(820, h * 0.775); x.fillStyle = '#2C1A14';
+  for (const wx of [-52, 0, 52]) { x.beginPath(); x.arc(wx, 0, 17, 0, 7); x.fill(); }
+  x.fillStyle = '#E8E0D2'; x.fillRect(-66, -44, 132, 26); x.fillStyle = '#35508A'; x.fillRect(-58, -52, 116, 9);
+  x.fillStyle = '#E8E0D2'; x.fillRect(34, -100, 9, 58); x.fillRect(18, -122, 44, 24); x.fillStyle = '#1B2230'; x.beginPath(); x.arc(30, -110, 6, 0, 7); x.arc(50, -110, 6, 0, 7); x.fill();
+  x.restore();
+  x.strokeStyle = '#FBF6EC'; x.lineWidth = 30; x.strokeRect(0, 0, w, h); x.lineWidth = 16; x.beginPath(); x.moveTo(w / 2, 0); x.lineTo(w / 2, h); x.moveTo(0, h * 0.46); x.lineTo(w, h * 0.46); x.stroke();
+});
 // a wall calendar page: red header with the month, the days, one day ringed in red
 function calTex(month, first, days, ring) {
   return tex(420, 540, (x, w, h) => {
@@ -484,14 +508,14 @@ function curtain(g, x0, x1, z, dz, col) {
   }
 }
 // an end wall with its window: the wall, the skirting, the frame and the sky, a sill, a rod and two curtains
-function endWall(g, z, dz, col) {
+function endWall(g, z, dz, col, sky = SKY_T, lightC = '#FFF6DA') {
   const { x0, x1, top } = ROOM, wall = { color: '#F4E9D7', grout: 'rgba(0,0,0,0.03)', tu: 40, tv: 40 }, zi = (a, b) => [Math.min(z + dz * a, z + dz * b), Math.max(z + dz * a, z + dz * b)];
   if (dz < 0) tiled(g, [x0, FLOOR_Y, z], [x1 - x0, 0, 0], [0, top - FLOOR_Y, 0], wall); else tiled(g, [x1, FLOOR_Y, z], [x0 - x1, 0, 0], [0, top - FLOOR_Y, 0], wall);
   let [a, b] = zi(0, 0.12); ab(g, [x0, FLOOR_Y, a], [x1, FLOOR_Y + 0.5, b], '#E6D7BF');
   [a, b] = zi(0, 0.1); ab(g, [WIN.x0 - 0.3, WIN.y0 - 0.3, a], [WIN.x1 + 0.3, WIN.y1 + 0.3, b], '#FBF6EC');
   const zs = z + dz * 0.12;
-  if (dz < 0) texQuad(g, SKY_T, [WIN.x0, WIN.y1, zs], [WIN.x1, WIN.y1, zs], [WIN.x0, WIN.y0, zs]); else texQuad(g, SKY_T, [WIN.x1, WIN.y1, zs], [WIN.x0, WIN.y1, zs], [WIN.x1, WIN.y0, zs]);
-  pool(g, B, 4, 7, z + dz * 0.2, 12, '#FFF6DA', 0.26, true);
+  if (dz < 0) texQuad(g, sky, [WIN.x0, WIN.y1, zs], [WIN.x1, WIN.y1, zs], [WIN.x0, WIN.y0, zs]); else texQuad(g, sky, [WIN.x1, WIN.y1, zs], [WIN.x0, WIN.y1, zs], [WIN.x1, WIN.y0, zs]);
+  pool(g, B, 4, 7, z + dz * 0.2, 12, lightC, 0.26, true);
   [a, b] = zi(0, 0.7); ab(g, [WIN.x0 - 0.5, WIN.y0 - 0.55, a], [WIN.x1 + 0.5, WIN.y0 - 0.3, b], '#FFFBF2');
   curtain(g, WIN.x0 - 3.0, WIN.x0 + 0.1, z, dz, col); curtain(g, WIN.x1 - 0.1, WIN.x1 + 3.0, z, dz, col);
   [a, b] = zi(0.3, 0.48); ab(g, [WIN.x0 - 3.5, WIN.y1 + 0.72, a], [WIN.x1 + 3.5, WIN.y1 + 0.92, b], '#3A2E28');
@@ -516,7 +540,7 @@ function dayRoom(g, t, { flip = 1, cal = false } = {}) {
     tiled(g, [-5.5, FLOOR_Y + 0.02, -7.5], [19, 0, 0], [0, 0, 19.5], { color: '#7A97B8', grout: 'rgba(255,255,255,0.12)', tu: 19, tv: 1.3 });  // the rug
   }
   if (E[2] < z1) { endWall(g, z1, -1, '#B5544A'); if (cal) calendar(g, flip); }   // the far wall, behind the monitor and Magnus's seat (the calendar: only in its own shot)
-  if (E[2] > z0) { endWall(g, z0, 1, '#5B7FA8'); alienToy(g); }           // the near wall, behind Witty
+  if (E[2] > z0) { endWall(g, z0, 1, '#5B7FA8', MARS_WIN, '#FFDCB4'); alienToy(g); }  // the near wall, behind Witty: his window looks out on Mars
   const side = { color: '#EADCC6', grout: 'rgba(0,0,0,0.03)', tu: 40, tv: 40 };
   if (E[0] > x0) { tiled(g, [x0, FLOOR_Y, z0], [0, 0, z1 - z0], [0, top - FLOOR_Y, 0], side); bookcase(g); }
   if (E[0] < x1) { tiled(g, [x1, FLOOR_Y, z1], [0, 0, z0 - z1], [0, top - FLOOR_Y, 0], side); wallPrint(g); }
@@ -1240,6 +1264,258 @@ function farm3(g, t, { e = EXPR.smug, bleat = -1, bleat2 = -1 } = {}) {
   items.sort((a, b) => b.d - a.d).forEach(it => it.draw());
 }
 
+// ======================= WITTY'S HOUSE ON MARS; THE SHOUT (version 7) =======================
+// The author, 14.11.2026: «и то что он с марса играет, и когда он кричит вокруг предметы отталкиваются, типо вне его
+// марс дома, например марсоход отталкивается от звуковых волн». A set like the farm (rule 68): rust ground to the
+// horizon, mesas, a dusty sky with the Earth in it; a white dome with an airlock and a lit porthole, a side module, a
+// dish on a mast, solar panels, a flag with his alien; a rover parked in front, looking at the camera. `scr` is the time
+// since his shout began: rings of sound run out from the dome over the ground and through the air, the rover is thrown
+// toward the camera and lands on its back, the stones hop, the flag and the dish are blown back.
+const MH = { dome: [0, 0, 14], r: 7, rover: [1.6, -5], wave: 52, toss: vnorm([0.3, 0, -0.95]) };  // the dome; the rover's place (x, z); the speed of the sound, units a second
+const MARS_L = vnorm([-0.45, 0.8, -0.5]);
+const mhaze = (col, x, z) => mix(col, '#E9B98C', clamp((Math.hypot(x - B.E[0], z - B.E[2]) - 60) / 420) * 0.7);
+const MSTONES = (() => { const r = rng(808), out = []; for (let i = 0; i < 26; i++) { const a = r() * 6.2832, d = 9 + r() * 30; out.push([MH.dome[0] + Math.cos(a) * d, MH.dome[2] + Math.sin(a) * d * 0.8 - 4, 0.25 + r() * 0.55, r() * 6.28, r()]); }
+  for (let i = 0; i < 12; i++) out.push([-5 + r() * 15, -10 + r() * 13, 0.3 + r() * 0.45, r() * 6.28, r()]);  // and nearer the camera
+  return out.filter(([x, z]) => Math.hypot(x - MH.rover[0], z - MH.rover[1]) > 3.2 && !(Math.abs(x) < 3 && z < 8 && z > 3)); })();
+const MCRATERS = [[-22, 30, 5], [19, 34, 6.5], [30, 6, 4], [-30, 2, 3.2], [12, -8, 2.6], [-14, 54, 8], [44, 60, 10], [-48, 38, 7]];
+function marsSky(g, t) {
+  const yh = hz();
+  const sky = g.createLinearGradient(0, yh - 1300, 0, yh); sky.addColorStop(0, '#7E4630'); sky.addColorStop(0.55, '#D08A5C'); sky.addColorStop(1, '#F6D2A6');
+  g.fillStyle = sky; g.fillRect(0, 0, W, Math.max(0, Math.min(H, yh + 2)));
+  const dir = (az, el) => B.toCam(B.E[0] + Math.sin(az) * Math.cos(el) * 4000, B.E[1] + Math.sin(el) * 4000, B.E[2] + Math.cos(az) * Math.cos(el) * 4000);
+  let c = dir(-0.52, 0.4);  // the small pale sun, bluish round its edge as on Mars
+  if (c[2] > 1) { const x = B.cx + B.f * c[0] / c[2], y = B.cy - B.f * c[1] / c[2], sg = g.createRadialGradient(x, y, 4, x, y, 190); sg.addColorStop(0, 'rgba(255,252,240,1)'); sg.addColorStop(0.13, 'rgba(255,244,220,0.95)'); sg.addColorStop(0.17, 'rgba(205,228,255,0.4)'); sg.addColorStop(1, 'rgba(205,228,255,0)'); g.fillStyle = sg; g.fillRect(x - 190, y - 190, 380, 380); }
+  c = dir(-0.06, 0.27);  // the Earth, with its name
+  if (c[2] > 1) { const x = B.cx + B.f * c[0] / c[2], y = B.cy - B.f * c[1] / c[2]; g.fillStyle = 'rgba(190,230,255,0.25)'; g.beginPath(); g.arc(x, y, 20, 0, 7); g.fill(); g.fillStyle = '#C8ECFF'; g.beginPath(); g.arc(x, y, 8, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,0.7)'; g.lineWidth = 2; g.beginPath(); g.moveTo(x + 14, y - 12); g.lineTo(x + 40, y - 36); g.lineTo(x + 76, y - 36); g.stroke();
+    g.font = sans(30, 800); g.letterSpacing = '3px'; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = 'rgba(255,255,255,0.9)'; g.fillText('EARTH', x + 42, y - 44); }
+  const az0 = Math.atan2(B.F[0], B.F[2]);  // mesas along the horizon
+  for (const [R, Hh, col, ph] of [[1900, 210, '#C98A62', 0.4], [1100, 110, '#B36A44', 2.1]]) {
+    const pts = [];
+    for (let a = az0 - 1.1; a <= az0 + 1.1; a += 0.02) { const q = Math.round(a / 0.02) * 0.02, v = Math.sin(q * 4 + ph) + 0.6 * Math.sin(q * 9.7 + ph * 2), h = Hh * (v > 0.5 ? 1 : v > -0.2 ? 0.55 : 0.12), cc = B.toCam(Math.sin(q) * R, h, Math.cos(q) * R); if (cc[2] > 1) pts.push([B.cx + B.f * cc[0] / cc[2], B.cy - B.f * cc[1] / cc[2]]); }
+    if (pts.length < 2) continue;
+    g.fillStyle = col; g.beginPath(); g.moveTo(pts[0][0], yh + 80); for (const q of pts) g.lineTo(q[0], q[1]); g.lineTo(pts[pts.length - 1][0], yh + 80); g.closePath(); g.fill();
+  }
+}
+const mshadow = (g, verts, a = 0.26) => { const h = hullXZ(verts.map(([x, y, z]) => [x - MARS_L[0] / MARS_L[1] * y, z - MARS_L[2] / MARS_L[1] * y])); if (h.length > 2 && B.poly(g, h.map(([x, z]) => [x, 0.03, z]))) { g.fillStyle = `rgba(60,18,10,${a})`; g.fill(); } };
+function marsGround(g) {
+  const yh = hz(), y0 = Math.max(0, yh);
+  const gr = g.createLinearGradient(0, yh, 0, yh + 900); gr.addColorStop(0, '#DFA070'); gr.addColorStop(0.22, '#C7683C'); gr.addColorStop(1, '#A94E2C');
+  g.fillStyle = gr; g.fillRect(0, y0, W, H - y0);
+  const ring = (cx, cz, rx, rz, y = 0.03, n = 26) => Array.from({ length: n }, (_, i) => [cx + Math.cos(i / n * 6.2832) * rx, y, cz + Math.sin(i / n * 6.2832) * rz]);
+  for (const [x, z, r] of MCRATERS) { quad(g, ring(x, z, r * 1.18, r * 1.18), 'rgba(236,170,120,0.5)'); quad(g, ring(x, z, r, r, 0.04), 'rgba(120,46,24,0.55)'); quad(g, ring(x + r * 0.16, z - r * 0.12, r * 0.72, r * 0.72, 0.05), 'rgba(150,62,34,0.6)'); }
+  quad(g, ring(0, 12, 13, 10, 0.04), 'rgba(226,150,104,0.35)');  // the trodden ground round the house
+  // the rover's tracks, from far away to where it stands
+  g.strokeStyle = 'rgba(110,40,22,0.45)'; g.lineWidth = Math.max(2, B.project(MH.rover[0], 0, MH.rover[1]).s * 0.16); g.lineCap = 'round';
+  for (const off of [-1.15, 1.15]) { g.beginPath(); let pen = false; for (let k = 0; k <= 30; k++) { const u = k / 30, x = MH.rover[0] + off + 60 * (1 - u) + 14 * Math.sin((1 - u) * 2.2), z = MH.rover[1] + 2.2 + 40 * (1 - u) * (1 - u); if (depth(x, 0, z) < 1) { pen = false; continue; } const q = B.project(x, 0.04, z); pen ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y); pen = true; } g.stroke(); }
+}
+// the rover, thrown: u seconds after the wave reached it (u < 0: it stands and looks about)
+function roverParts(t, u) {
+  const dir = MH.toss, fly = u > 0;
+  const k = fly ? 5.2 * (1 - Math.exp(-2.6 * u)) : 0, y = fly ? Math.max(0, 7.5 * u - 12 * u * u, 2.4 * (u - 0.63) - 9 * (u - 0.63) ** 2) : 0;
+  const spin = fly ? Math.min(Math.PI, 6.4 * u) : 0, yaw0 = Math.atan2(-dir[0], -dir[2]) + 0.25 + (fly ? 0.5 * Math.min(1, u * 2) : 0);
+  const P = [MH.rover[0] + dir[0] * k, y + (spin > 1.2 ? 0.2 + 1.5 * Math.sin(Math.min(1, (spin - 1.2) / 1.9) * Math.PI / 2) : 0), MH.rover[1] + dir[2] * k];
+  // local: x forward, y up, z across; tumbling about the cross axis, then turned to face the camera
+  const T = p => { let q = rot3([p[0], p[1] - 1.0, p[2]], { rz: -spin }); q = rot3([q[0], q[1] + 1.0, q[2]], { ry: yaw0 + Math.PI / 2 }); return [P[0] + q[0], P[1] + q[1], P[2] + q[2]]; };
+  const parts = [], add = (m, col, o = {}) => { const V = m.verts.map(T); parts.push({ V, F: m.faces, col, o, d: depth(...vmid(V)) }); return V; }, bx = (c, h) => ({ verts: oboxV(c, h), faces: BOXF });
+  const sh = add(bx([0, 1.3, 0], [1.55, 0.36, 0.98]), '#E4DED0');
+  add(bx([0, 1.74, 0], [1.4, 0.07, 0.9]), '#2F5296', { spec: 0.4 });
+  add(bx([-1.2, 2.2, -0.55], [0.05, 0.5, 0.05]), '#8D8F96'); add(ellV([-1.2, 2.8, -0.55], [0.42, 0.12, 0.42], { rz: 0.5 }, 8, 3), '#F2EEE6');
+  const wob = fly ? 0 : 0.25 * Math.sin(t * 2.3), nodh = fly ? -0.5 * Math.min(1, u * 4) : 0;
+  add(bx([1.05, 2.45, 0], [0.09, 0.72, 0.09]), '#8D8F96');
+  const head = oboxV([1.12, 3.32, 0], [0.34, 0.25, 0.5], { ry: wob, rz: nodh }, [1.05, 3.1, 0]);
+  add({ verts: head, faces: BOXF }, '#F2EEE6');
+  for (const wx of [-1.4, 0, 1.4]) for (const wz of [-1.2, 1.2]) add(cylV([wx, 0.52, wz - 0.2], [wx, 0.52, wz + 0.2], 0.52, 10), '#34343A');
+  // its two lenses, on the front of the head
+  const hc = vmid(head.map(T)), fwd = vsub(T(vmid([head[1], head[2], head[5], head[6]])), hc);
+  if (vdot(fwd, vsub(B.E, hc)) > 0) for (const sz of [-0.24, 0.24]) { const c0 = rot3([0.35, 0.02, sz], { ry: wob, rz: nodh }); parts.push({ eye: T([1.12 + c0[0], 3.32 + c0[1], c0[2]]), d: depth(...hc) - 0.5, wide: fly }); }
+  parts.sort((a, b) => b.d - a.d);
+  return { parts, sh, P, d: depth(P[0], P[1] + 1.3, P[2]), y };
+}
+function marsHome(g, t, scr = -1) {
+  const [dx, , dz] = MH.dome, R = MH.r, on = scr >= 0, blow = on ? Math.min(1, scr * 6) * Math.exp(-scr * 1.4) : 0;
+  const hitAt = (x, z) => scr - Math.hypot(x - dx, z - dz) / MH.wave;  // seconds since the wave passed a place
+  marsSky(g, t); marsGround(g);
+  const ro = roverParts(t, hitAt(...MH.rover) - 0.02);
+  // shadows
+  mshadow(g, ellV([dx, 0, dz], [R, R, R], null, 14, 5).verts.filter(v => v[1] >= 0)); mshadow(g, cylV([9, 2.6, 15], [16.5, 2.6, 15], 2.6, 10).verts); mshadow(g, oboxV([dx, 1.9, dz - R - 1.2], [1.9, 1.9, 1.6]));
+  mshadow(g, oboxV([-10, 6, 18], [0.16, 6, 0.16]), 0.2); mshadow(g, oboxV([-13.5, 1.6, 5], [2.6, 0.1, 1.5], { rx: -0.5 }), 0.22);
+  for (const [x, z, r] of MSTONES) mshadow(g, ellV([x, r * 0.6, z], [r, r * 0.7, r], null, 6, 3).verts, 0.22);
+  if (ro.y < 3) mshadow(g, ro.sh, 0.26 * (1 - ro.y / 3));
+  const items = [];
+  // the dome on its ring, the airlock with its door, the lit porthole
+  items.push({ d: depth(dx, 3, dz), draw: () => {
+    lathe(g, dx, dz, [[0, R + 0.5, R + 0.5], [0.9, R + 0.5, R + 0.5]], '#9A9690', { n: 28, amb: 0.5, L: MARS_L });
+    const rings = []; for (let k = 0; k <= 7; k++) { const a = k / 7 * 1.5; rings.push([0.9 + R * Math.sin(a), R * Math.cos(a), R * Math.cos(a)]); } rings.push([0.9 + R, 0.05, 0.05]);
+    lathe(g, dx, dz, rings, '#F2ECE2', { n: 28, amb: 0.5, L: MARS_L, spec: 0.15 });
+    obox(g, [dx, 1.9, dz - R - 0.6], [1.9, 1.9, 2.2], '#DDD6CA', {}, { amb: 0.5, L: MARS_L }); obox(g, [dx, 3.95, dz - R - 0.6], [2.1, 0.16, 2.4], '#9A9690', {}, { amb: 0.5, L: MARS_L });
+    quad(g, [[dx - 1.1, 3.1, dz - R - 2.83], [dx + 1.1, 3.1, dz - R - 2.83], [dx + 1.1, 0.1, dz - R - 2.83], [dx - 1.1, 0.1, dz - R - 2.83]], '#5E6470');
+    const dw = B.project(dx, 2.2, dz - R - 2.84); g.fillStyle = '#9FE0FF'; g.beginPath(); g.arc(dw.x, dw.y, dw.s * 0.42, 0, 7); g.fill();
+    // the porthole: his stream's light inside, and himself; white while he shouts
+    const a0 = 0.62, pw = [dx - R * Math.cos(a0) * 0.5, 0.9 + R * Math.sin(a0), dz - R * Math.cos(a0) * 0.866], q = B.project(...pw), rr = q.s * 1.55;
+    g.fillStyle = '#3B3F48'; g.beginPath(); g.ellipse(q.x, q.y, rr * 1.16, rr * 1.1, 0, 0, 7); g.fill();
+    const wg = g.createRadialGradient(q.x, q.y, rr * 0.1, q.x, q.y, rr); wg.addColorStop(0, on ? mix('#BFEAFF', '#FFFFFF', blow) : '#BFEAFF'); wg.addColorStop(1, '#2E7AD8'); g.fillStyle = wg; g.beginPath(); g.ellipse(q.x, q.y, rr, rr * 0.94, 0, 0, 7); g.fill();
+    g.save(); g.beginPath(); g.ellipse(q.x, q.y, rr, rr * 0.94, 0, 0, 7); g.clip();
+    drawChar(g, 'witN', { x: q.x + (on ? Math.sin(t * 60) * rr * 0.05 * (blow + 0.2) : 0), y: q.y + rr * 0.12, s: rr / 190, e: on ? { ...EXPR.happy, lid: 0, open: 1, curve: 1, brow: -0.3, browY: -14 } : { ...EXPR.happy, lid: 0.1 }, t });
+    g.restore();
+    if (on) rim(g, q.x, q.y, rr * (2.2 + 2.5 * blow), '#DFF4FF', 0.75 * blow);
+  } });
+  // the side module, the dish on its mast, the solar panels, the flag
+  items.push({ d: depth(12.7, 2.6, 15), draw: () => { const m = cylV([8.6, 2.6, 15], [16.6, 2.6, 15], 2.6, 16); solid(g, m.verts, m.faces, '#E9E2D6', { amb: 0.5, L: MARS_L }); for (const x of [10.6, 13, 15.2]) { const q = B.project(x, 3.0, 12.42); g.fillStyle = '#7FD0FF'; g.beginPath(); g.arc(q.x, q.y, q.s * 0.5, 0, 7); g.fill(); } } });
+  items.push({ d: depth(-10, 8, 18), draw: () => { ab(g, [-10.16, 0, 17.84], [-9.84, 12, 18.16], '#8D8F96', { amb: 0.55, L: MARS_L }); const m = ellV([-10, 12.6, 18], [3.1, 0.55, 3.1], { rz: 0.75 - 0.55 * blow, rx: -0.35 + 0.3 * blow * Math.sin(t * 40) }, 14, 4); solid(g, m.verts, m.faces, '#F4F0E8', { amb: 0.55, L: MARS_L }); } });
+  items.push({ d: depth(-13.5, 1.6, 5), draw: () => { for (const x of [-15.4, -11.6]) { ab(g, [x - 0.1, 0, 5.4], [x + 0.1, 1.3, 5.6], '#8D8F96', { L: MARS_L }); obox(g, [x, 1.75, 5], [1.7, 0.07, 1.25], '#2F5296', { rx: -0.55 + 0.25 * blow * Math.sin(t * 34 + x) }, { amb: 0.6, L: MARS_L, spec: 0.5 }); } } });
+  items.push({ d: depth(6.6, 3, 5.2), draw: () => {
+    ab(g, [6.5, 0, 5.1], [6.66, 6.2, 5.26], '#C9C9CE', { L: MARS_L });
+    const N = 8, top = [], bot = [], lean = 0.35 + 1.1 * blow; for (let k = 0; k <= N; k++) { const u = k / N, wv = Math.sin(t * (on ? 26 : 7) - u * 5) * (0.12 + 0.3 * blow) * u; top.push([6.66 + u * 2.9 * Math.cos(lean * 0.3), 6.1 - u * 0.3 * lean + wv * 0.4, 5.18 - u * 2.9 * Math.sin(lean * 0.9) * 0.9 + wv]); bot.push([top[k][0], top[k][1] - 1.7, top[k][2]]); }
+    quad(g, [...top, ...bot.reverse()], '#1E2A44');
+    const c = top[4].map((v, i) => (v + bot[N - 4][i]) / 2), q = B.project(...c), s = q.s;  // his alien on it
+    g.fillStyle = '#8FD16A'; g.beginPath(); g.ellipse(q.x, q.y, 0.5 * s, 0.6 * s, 0, 0, 7); g.fill(); g.fillStyle = '#10140E'; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(q.x + sd * 0.2 * s, q.y + 0.03 * s, 0.14 * s, 0.2 * s, sd * -0.5, 0, 7); g.fill(); }
+  } });
+  // crates and a drum by the airlock: they go too
+  for (const [x, y0, z, kind, k] of [[3.7, 0, 6.3, 0, 0.3], [5.1, 0, 7.0, 0, 0.7], [4.3, 1.3, 6.6, 0, 0.9], [-3.6, 0, 6.6, 1, 0.5]]) {
+    const u = hitAt(x, z), dir = vnorm([x - dx + 0.6, 0, z - dz]), mv = u > 0 ? (5 + 6 * k) * (1 - Math.exp(-2.6 * u)) : 0, y = y0 + (u > 0 ? Math.max(-y0, (5 + 3 * k) * u - 13 * u * u) : 0), px = x + dir[0] * mv, pz = z + dir[2] * mv, sp = u > 0 ? u * (5 + 4 * k) : 0;
+    items.push({ d: depth(px, y + 0.7, pz), draw: () => { if (kind) { const a = rot3([0, 0.9, 0], { rx: sp }), m = cylV([px - a[0], y + 0.95 - a[1], pz - a[2]], [px + a[0], y + 0.95 + a[1], pz + a[2]], 0.62, 10); solid(g, m.verts, m.faces, '#D9A441', { amb: 0.55, L: MARS_L }); } else obox(g, [px, y + 0.65, pz], [0.65, 0.65, 0.65], k > 0.6 ? '#C9B48A' : '#B89A6A', { ry: 0.3 + sp, rx: sp * 0.7 }, { amb: 0.55, L: MARS_L }); } });
+  }
+  // the stones: each hops and rolls when the wave passes it
+  for (const [x, z, r, a, k] of MSTONES) {
+    const u = hitAt(x, z), dir = vnorm([x - dx, 0, z - dz]), mv = u > 0 ? (3 + 6 * k) * (1 - Math.exp(-3 * u)) : 0, y = u > 0 ? Math.max(0, (4 + 4 * k) * u - 14 * u * u) : 0, px = x + dir[0] * mv, pz = z + dir[2] * mv;
+    items.push({ d: depth(px, r, pz), draw: () => { const m = ellV([px, y + r * 0.62, pz], [r, r * 0.7, r * 0.85], { ry: a, rz: u > 0 ? u * 9 : 0 }, 6, 3); solid(g, m.verts, m.faces, mhaze(k < 0.5 ? '#8E3D22' : '#A9532F', px, pz), { amb: 0.5, L: MARS_L }); } });
+  }
+  items.push({ d: ro.d, draw: () => { for (const p of ro.parts) {
+    if (!p.eye) { solid(g, p.V, p.F, p.col, { amb: 0.55, L: MARS_L, ...p.o }); continue; }
+    const q = B.project(...p.eye), r = q.s * 0.17; g.fillStyle = '#1B2230'; g.beginPath(); g.arc(q.x, q.y, r, 0, 7); g.fill();
+    g.fillStyle = p.wide ? '#FFFFFF' : '#7FD0FF'; g.beginPath(); g.arc(q.x, q.y, r * (p.wide ? 0.72 : 0.5), 0, 7); g.fill(); if (p.wide) { g.fillStyle = '#1B2230'; g.beginPath(); g.arc(q.x, q.y, r * 0.26, 0, 7); g.fill(); }
+  } } });
+  items.sort((a, b) => b.d - a.d).forEach(it => it.draw());
+  if (!on) return;
+  // the sound: rings over the ground and arcs through the air, running out from the dome; dust where the rover was and where it lands
+  const rx = B.R[0], rz = B.R[2];
+  g.save(); g.lineCap = 'round'; g.globalCompositeOperation = 'screen';
+  for (let k = 0; k < 5; k++) {
+    const rad = MH.wave * (scr - k * 0.085); if (rad <= 1) continue;
+    const a = clamp(1.15 - rad / 75) * (k ? 0.75 : 1); if (a <= 0) continue;
+    g.strokeStyle = `rgba(255,244,230,${(0.9 * a).toFixed(3)})`; g.lineWidth = Math.max(4, (24 - k * 3) * a);
+    for (const pts of [Array.from({ length: 73 }, (_, i) => [dx + Math.cos(i / 72 * 6.2832) * rad, 0.08, dz + Math.sin(i / 72 * 6.2832) * rad]), Array.from({ length: 41 }, (_, i) => [dx + Math.cos(i / 40 * Math.PI) * rad * rx, 0.9 + Math.sin(i / 40 * Math.PI) * rad, dz + Math.cos(i / 40 * Math.PI) * rad * rz])]) {
+      g.beginPath(); for (let i = 0; i + 1 < pts.length; i++) line3(g, pts[i], pts[i + 1]); g.stroke();
+    }
+  }
+  g.restore();
+  const puff = (x, z, u, n, sp) => { if (u < 0 || u > 0.9) return; const q = B.project(x, 0.3, z); for (let i = 0; i < n; i++) { const a = i / n * 6.2832 + 0.4, d = q.s * sp * ease.out(u / 0.9) * (0.6 + 0.4 * ((i * 7) % 5) / 4); g.fillStyle = `rgba(232,170,124,${(0.55 * (1 - u / 0.9)).toFixed(3)})`; g.beginPath(); g.ellipse(q.x + Math.cos(a) * d, q.y - Math.abs(Math.sin(a)) * d * 0.45, q.s * (0.5 + 0.9 * u), q.s * (0.36 + 0.6 * u), 0, 0, 7); g.fill(); } };
+  const hu = hitAt(...MH.rover) - 0.02; puff(MH.rover[0], MH.rover[1], hu, 9, 2.4); puff(ro.P[0], ro.P[2], hu - 0.63, 8, 1.8);
+}
+
+// ======================= THE PLAYERS' CAMERAS OVER THE BOARD (version 7) =======================
+// The author, 14.11.2026: «в середине видео мой брат говорит что чуть скучно, потому что нет динамики и в кадре только
+// доска… чтоб витти и магнус в кадре были с эмоциями». Where a shot shows the board alone, their two stream cameras
+// sit under the title: Witty's on the left (he plays from Mars), Magnus's on the right; a shot that has one of them
+// at the table shows the other's. Each takes an expression, a time when it jumps (a reaction) and a shake.
+function faceCams(g, t, { wit = null, mag = null, t0 = 0, y = 412, hitW = -9, hitM = -9, shakeW = 0, shakeM = 0, xM = null, w = 232, m = 26 } = {}) {
+  const h = Math.round(w * 1.164), f = w / 232;
+  for (const [who, x, e, col, name, nc, hit, shake, bg, dt] of [['witN', m, wit, '#3A8FE0', 'WITTY · MARS', '#BFE6FF', hitW, shakeW, ['#E2A06C', '#8A3F22'], 0], ['magN', xM ?? W - m - w, mag, '#D8363C', 'MAGNUS · EARTH', '#FFC2BA', hitM, shakeM, ['#6FB7EE', '#2E6C3A'], 1.37]]) {
+    if (!e) continue;
+    const u = ease.back(clamp((t - t0) / 0.25)), k = (t >= hit ? 1 + 0.16 * Math.max(0, 1 - (t - hit) / 0.3) : 1) * lerp(0.6, 1, u), a = clamp((t - t0) / 0.12);
+    if (a <= 0) continue;
+    g.save(); g.globalAlpha *= a; g.translate(x + w / 2, y + h / 2); g.scale(k, k); g.rotate((who === 'witN' ? -1 : 1) * 0.02); g.translate(-w / 2, -h / 2);
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.roundRect(5, 9, w, h, 18); g.fill();
+    webcam(g, 0, 0, w, h - 44 * f, who, e, t + dt, { bg, zoom: 1.16, cy: 0.5, shake });
+    g.fillStyle = '#0B0B10'; g.beginPath(); g.roundRect(0, h - 52 * f, w, 52 * f, [0, 0, 16, 16]); g.fill();
+    g.font = sans(24 * f, 900); g.letterSpacing = '2px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = nc; g.fillText(name, w / 2 + 1, h - 25 * f);
+    const fl = t >= hit ? Math.max(0, 1 - (t - hit) / 0.28) : 0;
+    g.strokeStyle = fl > 0 ? mix(col, '#FFFFFF', fl) : col; g.lineWidth = 7 + 8 * fl; g.beginPath(); g.roundRect(0, 0, w, h, 16); g.stroke();
+    g.restore();
+  }
+}
+
+// ======================= THE TWO HAND SIGNS (version 7: the picture the author sent) =======================
+// A coloured manga panel: on the left, on red with black ink, the one with the marks on his face presses two fingers
+// together; on the right, on purple with white streaks, the white-haired one crosses his; a black diagonal between
+// them. «добавь где то там отсылку с картинки что я загрузил». Ours (rule 67): Magnus and Witty in their looks, in
+// those places and those two colours, on the whole frame, when the clocks say twenty seconds each.
+const HC = { a: [300, -60], b: [800, 1980] };
+const HC_L = [makeCanvas(W, H), makeCanvas(W, H)], HC_D = [makeCanvas(W, H), makeCanvas(W, H)], HC_O = makeCanvas(W, H);
+// a layer in two tones, its own shape kept: shadows to `dark`, lights to `light`
+function duoLayer(src, dst, dark, light, contrast = 1.25) {
+  const x = dst.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'source-over'; x.clearRect(0, 0, W, H);
+  x.filter = `grayscale(1) contrast(${contrast})`; x.drawImage(src, 0, 0, W, H); x.filter = 'none';
+  x.globalCompositeOperation = 'screen'; x.fillStyle = dark; x.fillRect(0, 0, W, H);
+  x.globalCompositeOperation = 'multiply'; x.fillStyle = light; x.fillRect(0, 0, W, H);
+  x.globalCompositeOperation = 'destination-in'; x.drawImage(src, 0, 0, W, H); x.globalCompositeOperation = 'source-over';
+}
+// a white edge round a layer, as the panel has round its figures
+function whiteEdge(g, src, r = 9) {
+  const x = HC_O.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'source-over'; x.clearRect(0, 0, W, H); x.drawImage(src, 0, 0, W, H);
+  x.globalCompositeOperation = 'source-in'; x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, W, H); x.globalCompositeOperation = 'source-over';
+  for (let i = 0; i < 12; i++) g.drawImage(HC_O, Math.cos(i / 12 * 6.2832) * r, Math.sin(i / 12 * 6.2832) * r, W, H);
+}
+const finger = (x, x0, y0, w, len, rot, fill, ink, lw, nail = null) => { x.save(); x.translate(x0, y0); x.rotate(rot); x.fillStyle = fill; x.strokeStyle = ink; x.lineWidth = lw; x.beginPath(); x.roundRect(-w / 2, -len, w, len + w * 0.4, w / 2); x.fill(); x.stroke(); if (nail) { x.fillStyle = nail; x.beginPath(); x.roundRect(-w * 0.3, -len + w * 0.12, w * 0.6, w * 0.7, w * 0.22); x.fill(); } x.restore(); };
+// Witty's sign: the first two fingers of one hand crossed
+function signCross(x, cx, cy, s, rot = 0) {
+  const SK = '#F4EDE6', INK = '#22122E', lw = 8;
+  x.save(); x.translate(cx, cy); x.scale(s, s); x.rotate(rot); x.lineJoin = 'round';
+  x.fillStyle = '#17131F'; x.strokeStyle = INK; x.lineWidth = lw; x.beginPath(); x.moveTo(-58, 130); x.lineTo(58, 130); x.lineTo(96, 420); x.lineTo(-96, 420); x.closePath(); x.fill(); x.stroke();  // the sleeve
+  x.fillStyle = SK; x.beginPath(); x.roundRect(-66, 0, 132, 150, 40); x.fill(); x.stroke();  // the palm
+  finger(x, 40, 34, 40, 34, 0.1, SK, INK, lw); finger(x, 70, 52, 36, 26, 0.2, SK, INK, lw);  // the two curled ones
+  finger(x, -20, 24, 46, 190, 0.12, SK, INK, lw, 'rgba(255,255,255,0.7)');  // the first finger
+  finger(x, 18, 24, 46, 206, -0.22, SK, INK, lw, 'rgba(255,255,255,0.7)');  // the second, twisted over it near the tips
+  x.save(); x.translate(-18, 96); x.rotate(-0.9); x.fillStyle = SK; x.beginPath(); x.roundRect(-26, -78, 52, 104, 26); x.fill(); x.stroke(); x.restore();  // the thumb over the palm
+  x.restore();
+}
+// Magnus's sign: both hands pressed together, two fingers up, black nails, black bands on the wrists
+function signShrine(x, cx, cy, s, rot = 0) {
+  const SK = '#F6E4DC', INK = '#2A0808', lw = 8;
+  x.save(); x.translate(cx, cy); x.scale(s, s); x.rotate(rot); x.lineJoin = 'round'; x.strokeStyle = INK; x.lineWidth = lw;
+  for (const sd of [-1, 1]) {  // the forearms and their bands
+    x.fillStyle = SK; x.beginPath(); x.moveTo(sd * 30, 120); x.lineTo(sd * 96, 110); x.lineTo(sd * 250, 420); x.lineTo(sd * 120, 440); x.closePath(); x.fill(); x.stroke();
+    x.fillStyle = '#140606'; for (const k of [0.3, 0.46]) { x.beginPath(); x.moveTo(sd * lerp(30, 120, k), lerp(120, 440, k)); x.lineTo(sd * lerp(96, 250, k), lerp(110, 420, k)); x.lineTo(sd * lerp(96, 250, k + 0.07), lerp(110, 420, k + 0.07)); x.lineTo(sd * lerp(30, 120, k + 0.07), lerp(120, 440, k + 0.07)); x.closePath(); x.fill(); }
+  }
+  x.fillStyle = SK; x.beginPath(); x.roundRect(-88, 0, 176, 150, 46); x.fill(); x.stroke();  // the two palms as one
+  for (const k of [-1, 0, 1]) { x.beginPath(); x.moveTo(-70 + (k + 1) * 14, 46 + k * 34); x.quadraticCurveTo(0, 30 + k * 34, 70 - (k + 1) * 14, 46 + k * 34); x.stroke(); }  // the folded fingers
+  finger(x, -24, 20, 46, 210, -0.02, SK, INK, lw, '#140606'); finger(x, 24, 20, 46, 210, 0.02, SK, INK, lw, '#140606');  // the two raised
+  x.restore();
+}
+const HC_INK = (() => { const r = rng(1225), out = []; for (let i = 0; i < 60; i++) out.push([r() * 760 - 60, r() * 2000, 14 + r() ** 2 * 120, 0.3 + r() * 0.5, r() * 6.28]); return out; })();
+const HC_STREAK = (() => { const r = rng(64), out = []; for (let i = 0; i < 26; i++) out.push([r(), r(), 60 + r() * 220, 300 + r() * 900, r()]); return out; })();
+function handClash(g, t, lt) {
+  const dx = HC.b[0] - HC.a[0], dy = HC.b[1] - HC.a[1], dl = Math.hypot(dx, dy), ux = dx / dl, uy = dy / dl, nx = uy, ny = -ux;  // the normal points to the purple side
+  const inn = ease.out(clamp(lt / 0.22)), sk = Math.max(0, 1 - lt / 0.45), zoom = 1 + 0.05 * clamp(lt / 1.4);
+  const half = (side, f) => { g.save(); g.beginPath(); if (side < 0) { g.moveTo(HC.a[0], HC.a[1]); g.lineTo(-400, HC.a[1]); g.lineTo(-400, HC.b[1]); g.lineTo(HC.b[0], HC.b[1]); } else { g.moveTo(HC.a[0], HC.a[1]); g.lineTo(W + 400, HC.a[1]); g.lineTo(W + 400, HC.b[1]); g.lineTo(HC.b[0], HC.b[1]); } g.closePath(); g.clip(); f(); g.restore(); };
+  g.save(); g.translate(W / 2 + Math.sin(t * 67) * 12 * sk, H / 2 + Math.cos(t * 59) * 9 * sk); g.scale(zoom, zoom); g.translate(-W / 2, -H / 2);
+  // the red half: flat red, darker bars along the cut, black ink thrown over it
+  half(-1, () => {
+    const gr = g.createLinearGradient(0, 0, 700, 1920); gr.addColorStop(0, '#E0141C'); gr.addColorStop(1, '#A80A12'); g.fillStyle = gr; g.fillRect(-400, -100, W + 800, H + 200);
+    g.save(); g.translate(HC.a[0], HC.a[1]); g.rotate(Math.atan2(dy, dx));
+    for (let i = 0; i < 9; i++) { g.fillStyle = `rgba(110,0,6,${0.22 + 0.1 * (i % 3)})`; g.fillRect(-200, 40 + i * 78 + 8 * Math.sin(t * 5 + i), 2600, 22 + (i % 3) * 14); }
+    g.restore();
+    g.fillStyle = '#12060A'; for (const [x, y, r, sq, a] of HC_INK) { g.save(); g.translate(x, y); g.rotate(a + Math.atan2(dy, dx)); g.beginPath(); g.ellipse(0, 0, r * 1.7, r * sq * 0.5, 0, 0, 7); g.fill(); g.restore(); }
+  });
+  // the purple half: magenta to violet, white streaks along the cut
+  half(1, () => {
+    const gr = g.createLinearGradient(400, 0, 1080, 1920); gr.addColorStop(0, '#C63CF0'); gr.addColorStop(0.6, '#9418C8'); gr.addColorStop(1, '#5A0C8E'); g.fillStyle = gr; g.fillRect(-400, -100, W + 800, H + 200);
+    g.save(); g.translate(HC.a[0], HC.a[1]); g.rotate(Math.atan2(dy, dx));
+    for (const [u, v, w0, L, k] of HC_STREAK) { const y = -(30 + v * 720), x0 = ((u * 2600 + t * (500 + 900 * k)) % 2900) - 300; g.fillStyle = `rgba(255,255,255,${0.5 + 0.45 * k})`; g.fillRect(x0, y, L, 10 + w0 * 0.22); g.fillStyle = 'rgba(255,170,250,0.5)'; g.fillRect(x0 + L * 0.2, y + 6, L * 0.5, 6); }
+    g.restore();
+  });
+  // the two of them, each in his half and in its two tones, a white edge round each
+  const ME_ = { ...EXPR.smug, lid: 0.3, curve: 0.9, open: 0.25, look: [0.5, -0.1], glow: 1, brow: 0.5 }, WE_ = { ...EXPR.happy, band: 0, glow: 1, lid: 0.02, pupil: 0.6, curve: 1, open: 0.5, look: [-0.4, 0.2], brow: 0.3, blush: 0 };
+  const rise = ease.back(clamp((lt - 0.08) / 0.3));
+  for (const [i, side, who, e, hx, hy, hs, tilt, sign, sx, sy, ss, sr, dark, light] of [
+    [0, -1, 'mag', ME_, 300 - 90 * (1 - inn), 950, 1.78, -0.05, signShrine, 430, 1470 + 260 * (1 - rise), 1.02, 0.06, '#6A050A', '#FFD6CE'],
+    [1, 1, 'wit', WE_, 752 + 90 * (1 - inn), 640, 1.78, 0.07, signCross, 846, 930 + 260 * (1 - rise), 0.98, 0.1, '#4A0E78', '#F6E2FF']]) {
+    const x = HC_L[i].getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, W, H);
+    drawChar(x, who, { x: hx, y: hy, s: hs, e, t: t + i * 1.3, tilt });
+    sign(x, sx, sy, ss, sr);
+    duoLayer(HC_L[i], HC_D[i], dark, light);
+    half(side, () => { whiteEdge(g, HC_L[i], 10); g.drawImage(HC_D[i], 0, 0, W, H);
+      if (i === 1) for (const sd of [-1, 1]) { const ex = hx + sd * 38 * hs * 0.93 * Math.cos(tilt) - (-2 * hs) * Math.sin(tilt), ey = hy + (-2 * hs) + sd * 38 * hs * Math.sin(tilt), eg = g.createRadialGradient(ex, ey, 2, ex, ey, 40 * hs * 0.5); eg.addColorStop(0, 'rgba(210,250,255,1)'); eg.addColorStop(0.35, 'rgba(60,220,255,0.85)'); eg.addColorStop(1, 'rgba(60,220,255,0)'); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = eg; g.fillRect(ex - 60, ey - 60, 120, 120); g.restore(); } });
+  }
+  // the cut between them: a black bar with a bright edge on each side
+  g.save(); g.translate(HC.a[0], HC.a[1]); g.rotate(Math.atan2(dy, dx));
+  g.fillStyle = '#0A0508'; g.fillRect(-200, -26, 2600, 52); g.fillStyle = '#FF5A50'; g.fillRect(-200, 22, 2600, 6); g.fillStyle = '#F2B8FF'; g.fillRect(-200, -28, 2600, 6);
+  g.restore();
+  g.restore();
+  flashTint(g, '#FFFFFF', 0.85 * (1 - clamp(lt / 0.16)));
+}
+
 // five standing cards on the table: every game of theirs on Chess.com (SOURCES.md), the winner's colour
 const GAMES = [['DEC 28, 2024', 'BULLET', 'mag'], ['DEC 13, 2025', 'BULLET', 'mag'], ['DEC 13, 2025', 'BULLET', 'mag'], ['SEP 30, 2026', 'BLITZ', 'wit'], ['NOV 7, 2026', 'BLITZ', 'mag']];
 const CARD_T = GAMES.map(([d, kind, who]) => tex(360, 520, (x, w, h) => {
@@ -1474,6 +1750,10 @@ export async function build(T) {
   const ME = (base, o = {}) => ({ ...EXPR[base], glow: 0, ...o });
   const WILD = { ...EXPR.happy, lid: 0.02, open: 1, curve: 1, brow: -0.2, browY: -14, nod: 0.9, blush: 0.7 };  // eyes wide open (rule 51)
   const GLAD = { ...EXPR.happy, lid: 0.08, open: 0.5 };
+  // faces for the two cameras over the board (version 7)
+  const EX = { calm: { ...EXPR.focus }, smirk: { ...EXPR.smug, lid: 0.3 }, wow: { ...EXPR.shock, lid: 0, sweat: 0 }, panic: { ...EXPR.shock, lid: 0 }, worry: { ...EXPR.worried, lid: 0.05 },
+    think: { ...EXPR.focus, look: [0.6, 0.5] }, cold: { ...EXPR.focus, lid: 0.42, curve: 0.25 }, relief: { ...EXPR.happy, lid: 0.3, open: 0.2, blush: 0 }, grin: { ...EXPR.triumph }, brows: { ...EXPR.neutral, brow: -0.5, browY: -12, lid: 0.02 } };
+  const face = (t, keys) => exprAt(keys, t);
   // the standing view of the board with the monitor behind it: plates over the window, the monitor, the board, and the
   // captions on its nearest ranks
   const ARENA = (yaw = 0.04, d = 15, o = {}) => K(yaw, 0.36, d, [4, 1.6, 6.6], { cy: 890, ...o });
@@ -1555,8 +1835,15 @@ export async function build(T) {
     if (t >= wildT) badge(g, 'LIVE ON STREAM', W / 2, 230, { color: RED, size: 56, ...pop(t, wildT) });
   } });
   cue(wildA - 0.04, 'whoosh_fast', 0.3); cue(wildT, 'cheer', 0.4); cue(wildT, 'confetti', 0.35);
-  // his own shout from that stream, in the pause after "...went wild on stream." (the clip the author sent; version 6)
-  cue(T.e('name') + 0.04, 'witty_scream', 0.95);
+  // his own shout from that stream, in the pause after "...went wild on stream." (the clip the author sent; version 6),
+  // heard from outside his house on Mars (version 7): the rover in front of it is thrown back by the sound
+  const SCR = T.e('name') + 0.14, outA = SCR - 0.26;  // a beat on the quiet house, then the shout
+  shot(outA, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.2, 0.1, 27, [0.2, 2.9, 8])], [0.26, K(0.2, 0.1, 26.4, [0.2, 2.9, 8]), lin], [0.7, K(0.25, 0.12, 31, [0.4, 2.8, 6.5]), ease.out], [len(sh), K(0.28, 0.13, 32.5, [0.5, 2.8, 6]), lin]], { t, shake: 0.6, bump: t > SCR && t < SCR + 0.45 ? 1.4 : 0 });
+    marsHome(g, t, t - SCR);
+    if (t >= SCR) flashTint(g, '#FFFFFF', 0.4 * (1 - seg(t, SCR, SCR + 0.25)));
+  }, { trans: 'cut', kb: 0, noJump: true, vig: 0.3, noCaptions: true, hud: (g, lt, t) => { badge(g, "WITTY'S HOUSE · MARS", W / 2, 230, { color: '#FF8A4A', size: 54, ...popW(t, outA + 0.05) }); } });
+  cue(SCR, 'witty_scream', 0.95); cue(SCR, 'boom', 0.4); cue(SCR + 0.3, 'whoosh_fast', 0.35); cue(SCR + 0.98, 'thud', 0.45);
 
   // ======================= FIVE WEEKS LATER: ROUND TWO, FIVE-MINUTE BLITZ =======================
   shot(remA, (g, lt, t, sh) => {
@@ -1581,7 +1868,7 @@ export async function build(T) {
     rig(B, lt, [[0, ARENA(0.06, 15.2)], [len(sh), ARENA(0.02, 14.2)]], { t, e: lin });
     const r = runTo(PL, 0, OPEN, t, 0.08), fx = moveFx(r, 0.08, 0.1);
     online(g, t, { pieces: r.pieces, under: fx.under, over: fx.over, clock: clockAt(r.k), tv: tvOf(r, 0.08) });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= sixT) counter(g, 'MOVE 6', null, { y: 300, size: 130, color: GOLD, at: [t, sixT] }); } });
+  }, { trans: 'whip', hud: (g, lt, t) => { faceCams(g, t, { wit: face(t, [[0, EX.calm], [sixT, EX.smirk]]), mag: EX.calm, t0: openA + 0.12, hitW: sixT, y: 150, w: 196, m: 14 }); if (t >= sixT) counter(g, 'MOVE 6', null, { y: 300, size: 130, color: GOLD, at: [t, sixT] }); } });
   OPEN.forEach((a, i) => cue(a - 0.02, 'piece', i % 2 ? 0.16 : 0.22)); cue(sixT, 'hit', 0.5);
   const KN = at3('g5', 1.0), F7 = at3('f7', 1.0);
   shot(throwA, (g, lt, t, sh) => {
@@ -1606,12 +1893,12 @@ export async function build(T) {
   shot(hisA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI + 0.45, 0.06, 7.6, [4, 3.15, -1.4])], [len(sh), K(PI + 0.3, 0.05, 6.4, [4, 3.2, -1.4])]], { t, e: glide });
     domain(g, t, { pieces: nearFade(piecesAt(PL, 11)), bPlayer: false, bChair: false, ew: { ...EXPR.smug, lid: 0.3 } });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= weaponT) badge(g, 'HIS OWN WEAPON', W / 2, 230, { color: VOID, size: 60, ...pop(t, weaponT) }); } });
+  }, { trans: 'whip', hud: (g, lt, t) => { faceCams(g, t, { mag: EX.brows, t0: hisA + 0.15, hitM: hisA + 0.15 }); if (t >= weaponT) badge(g, 'HIS OWN WEAPON', W / 2, 230, { color: VOID, size: 60, ...pop(t, weaponT) }); } });
   shot(titleA, (g, lt, t, sh) => {
     rig(B, lt, [[0, ARENA(0.34, 14.8)], [len(sh), ARENA(0.2, 13.8)]], { t, e: glide });
     const pcs = piecesAt(PL, 11).map(p => p.sq === 'f7' ? { ...p, halo: HOLLOW, haloA: 0.9 } : p);
     online(g, t, { pieces: pcs, tv: 11, under: g2 => ledGlow(g2, B, 'f7', HOLLOW, t, titleA, { reach: 2.5, a: 0.6 }) });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= gambT - 0.1) titleDay(g, t - gambT + 0.1, 'The Alien Gambit', '5.Ng5 h6 6.Nxf7!?', { y: 215, size: 74, color: HOLLOW }); } });
+  }, { trans: 'whip', hud: (g, lt, t) => { faceCams(g, t, { wit: GLAD, mag: EX.think, t0: gambT + 0.28, y: 150, w: 196, m: 14 }); /* after the title has landed: it swells over the corners as it comes */ if (t >= gambT - 0.1) titleDay(g, t - gambT + 0.1, 'The Alien Gambit', '5.Ng5 h6 6.Nxf7!?', { y: 215, size: 62, color: HOLLOW }); } });
   cue(hisA - 0.04, 'whoosh_fast', 0.3); cue(weaponT, 'sparkle_pop', 0.3); cue(titleA - 0.04, 'whoosh_fast', 0.3); cue(gambT, 'reveal_bell', 0.4);
 
   // ======================= MAGNUS TAKES IT. WITH HIS KING. THE ENGINE: −2 =======================
@@ -1620,7 +1907,7 @@ export async function build(T) {
     rig(B, lt, [[0, K(0.18, 0.2, 10.8, [4, 2.2, 8.0])], [len(sh), K(0.08, 0.18, 9.2, [4, 2.3, 8.1])]], { t, e: glide });
     const r = runTo(PL, 11, [KXF7], t, 0.26), fx = moveFx(r, 0.26, 0.6);
     domain(g, t, { pieces: nearFade(r.pieces), under: fx.under, over: fx.over, wPlayer: false, wChair: false, eb: ME('smug'), bReach: { sq: 'f7', u: (t - KXF7 + 0.45) / 0.8 } });
-  }, { trans: 'whip' });
+  }, { trans: 'whip', hud: (g, lt, t) => faceCams(g, t, { wit: face(t, [[0, EX.smirk], [KXF7, EX.wow]]), t0: takeA + 0.12, hitW: KXF7 }) });
   cue(takeA - 0.04, 'whoosh_fast', 0.3); landCue(KXF7, true, 0.75); cue(KXF7 + 0.02, 'glass', 0.35);
   shot(kingA, (g, lt, t, sh) => {
     // the king on f7 from Magnus's side, Witty behind it
@@ -1645,6 +1932,7 @@ export async function build(T) {
     online(g, t, { pieces: nearFade(r.pieces, 3.6), mon: false, under: fx.under, over: fx.over });
     if (t >= BG6) flashTint(g, RED, 0.25 * (1 - seg(t, BG6, BG6 + 0.35)));
   }, { trans: 'cut', hud: (g, lt, t) => {
+    faceCams(g, t, { wit: face(t, [[0, EX.worry], [BG6 + 0.1, EX.wow], [BG6 + 0.5, GLAD]]), mag: face(t, [[0, EX.smirk], [BG6 + 0.12, EX.worry]]), t0: flipA + 0.1, hitW: BG6 + 0.1, hitM: BG6 + 0.12 });
     evalHud(g, -1.0);
     badge(g, 'MOVE 17', W / 2, 230, { color: GOLD, size: 60, ...pop(t, flipA + 0.04) });
     if (t >= BG6) badge(g, 'A SLIP', W / 2, 340, { color: RED, size: 60, ...pop(t, BG6) });
@@ -1663,7 +1951,7 @@ export async function build(T) {
   shot(betterA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(PI - 0.14, 0.06, 8.2, [4, 3.1, -1.4])], [len(sh), K(PI - 0.04, 0.04, 6.6, [4, 3.15, -1.4])]], { t, e: glide });
     domain(g, t, { pieces: nearFade(piecesAt(PL, 34)), bPlayer: false, bChair: false, ew: GLAD });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= betterT) counter(g, '+0.9', 'WITTY IS BETTER', { y: 300, size: 140, color: LIME, at: [t, betterT] }); } });
+  }, { trans: 'whip', hud: (g, lt, t) => { faceCams(g, t, { mag: EX.worry, t0: betterA + 0.15, y: 470 }); if (t >= betterT) counter(g, '+0.9', 'WITTY IS BETTER', { y: 300, size: 140, color: LIME, at: [t, betterT] }); } });
   cue(betterA - 0.04, 'whoosh_fast', 0.3); cue(betterT, 'success', 0.35);
 
   // ======================= MOVE 21: THE ENGINE'S MOVE IS ROOK e6; HE PLAYS ROOK e2 =======================
@@ -1672,7 +1960,7 @@ export async function build(T) {
     rig(B, lt, [[0, ARENA(-0.3, 15.2)], [len(sh), ARENA(-0.22, 14.2)]], { t, e: lin });
     const r = runTo(PL, 34, M21, t, 0.08), fx = moveFx(r, 0.08, 0.1);
     online(g, t, { pieces: r.pieces, under: fx.under, over: fx.over, tv: tvOf(r, 0.08), clock: clockAt(r.k) });
-  }, { trans: 'whip', hud: (g, lt, t) => { evalHud(g, 1.0); if (t >= m21T) counter(g, 'MOVE 21', null, { y: 300, size: 130, color: GOLD, at: [t, m21T] }); } });
+  }, { trans: 'whip', hud: (g, lt, t) => { faceCams(g, t, { wit: EX.smirk, mag: { ...EXPR.angry, open: 0, mouth: 'line' }, t0: m21A + 0.12, y: 150, w: 196, m: 14 }); evalHud(g, 1.0); if (t >= m21T) counter(g, 'MOVE 21', null, { y: 300, size: 130, color: GOLD, at: [t, m21T] }); } });
   M21.forEach(a => cue(a - 0.02, 'piece', 0.16)); cue(m21T, 'hit', 0.45);
   const ghost = (g2, t, a) => {  // the engine's move as a ghost: an arrow e1–e6 and a pale rook on e6
     if (a <= 0) return;
@@ -1685,14 +1973,14 @@ export async function build(T) {
   shot(engMA, (g, lt, t, sh) => {
     rig(B, lt, [[0, EK[0]], [len(sh), EK[1]]], { t, e: lin });
     online(g, t, { pieces: nearFade(piecesAt(PL, 40)), mon: false, over: g2 => ghost(g2, t, 1) });
-  }, { trans: 'whip', hud: (g, lt, t) => { evalHud(g, 1.0); if (t >= e6T) badge(g, 'ENGINE: ROOK e6  +1.3', W / 2, 230, { color: LIME, size: 52, ...pop(t, e6T) }); } });
+  }, { trans: 'whip', hud: (g, lt, t) => { faceCams(g, t, { wit: { ...EX.think, look: [0.7 * Math.sin(t * 2.6), 0.5] }, mag: EX.worry, t0: engMA + 0.12 }); evalHud(g, 1.0); if (t >= e6T) badge(g, 'ENGINE: ROOK e6  +1.3', W / 2, 230, { color: LIME, size: 52, ...pop(t, e6T) }); } });
   cue(engMA - 0.04, 'whoosh_soft', 0.3); cue(engMA + 0.3, 'pen', 0.3); cue(e6T, 'sparkle_pop', 0.35);
   const RE2 = e2T + 0.06;
   shot(playsA, (g, lt, t, sh) => {
     rig(B, lt, [[0, EK[1]], [len(sh), EK[2]]], { t, e: lin });
     const r = runTo(PL, 40, [RE2], t, 0.26), fx = moveFx(r, 0.26, 0.8);
     online(g, t, { pieces: nearFade(r.pieces), mon: false, under: fx.under, over: g2 => { ghost(g2, t, 1 - seg(t, RE2, RE2 + 0.4)); fx.over(g2); } });
-  }, { trans: 'cut', hud: (g, lt, t) => { evalHud(g, lerp(1.0, -0.2, ease.inOut(seg(t, RE2, RE2 + 0.5)))); if (t >= RE2 + 0.1) badge(g, 'HE PLAYS ROOK e2', W / 2, 230, { color: RED, size: 52, ...pop(t, RE2 + 0.1) }); } });
+  }, { trans: 'cut', hud: (g, lt, t) => { faceCams(g, t, { wit: face(t, [[0, EX.think], [RE2 - 0.2, EX.smirk]]), mag: face(t, [[0, EX.worry], [RE2 + 0.2, EX.relief], [RE2 + 0.7, EX.smirk]]), t0: -9, hitM: RE2 + 0.2 }); evalHud(g, lerp(1.0, -0.2, ease.inOut(seg(t, RE2, RE2 + 0.5)))); if (t >= RE2 + 0.1) badge(g, 'HE PLAYS ROOK e2', W / 2, 230, { color: RED, size: 52, ...pop(t, RE2 + 0.1) }); } });
   landCue(RE2, false, 0.6); cue(RE2 + 0.05, 'error', 0.35);
   const LT = spaced(lateA + 0.1, w('late', 3), 3), RE6 = re6T + 0.06;
   shot(lateA, (g, lt, t, sh) => {
@@ -1701,7 +1989,7 @@ export async function build(T) {
     const r = runTo(PL, 41, [...LT, RE6], t, t < RE6 - 0.3 ? 0.1 : 0.26), fx = moveFx(r, r.k === 45 ? 0.26 : 0.1, r.k === 45 ? 0.8 : 0.1, r.k === 45);
     domain(g, t, { pieces: nearFade(r.pieces, 3.5), under: fx.under, over: fx.over, bPlayer: false, bChair: false, ew: { ...EXPR.focus },
       wReach: t > RE6 - 0.55 && t < RE6 + 0.45 ? { sq: 'e6', u: (t - RE6 + 0.55) / 1.0 } : null });
-  }, { trans: 'whip', hud: (g, lt, t) => { evalHud(g, -0.1); if (t >= w('late', 0)) counter(g, 'MOVE 23', null, { y: 300, size: 120, color: GOLD, at: [t, w('late', 0)] }); } });
+  }, { trans: 'whip', hud: (g, lt, t) => { faceCams(g, t, { mag: EX.cold, t0: lateA + 0.15, xM: 26 }); evalHud(g, -0.1); if (t >= w('late', 0)) counter(g, 'MOVE 23', null, { y: 300, size: 120, color: GOLD, at: [t, w('late', 0)] }); } });
   LT.forEach(a => cue(a - 0.02, 'piece', 0.18)); landCue(RE6, false, 0.6); cue(RE6, 'ting', 0.3);
   const NXD5 = tooT + 0.08;
   shot(tooA, (g, lt, t, sh) => {
@@ -1710,24 +1998,20 @@ export async function build(T) {
     const r = runTo(PL, 45, [NXD5], t, 0.22), fx = moveFx(r, 0.22, 0.8);
     online(g, t, { pieces: nearFade(r.pieces), mon: false, under: fx.under, over: fx.over });
     slashes(g, t, NXD5, { n: 1, seed: 3, life: 0.4 });
-  }, { trans: 'zoom', hud: (g, lt, t) => { evalHud(g, -0.1); if (t >= lateT) stamp(g, 'TOO LATE', W / 2 - 40, 290, t, lateT, { color: RED, size: 110 }); } });
+  }, { trans: 'zoom', hud: (g, lt, t) => { faceCams(g, t, { wit: face(t, [[0, EX.smirk], [NXD5 + 0.05, EX.panic]]), mag: face(t, [[0, EX.cold], [NXD5 + 0.1, EX.grin]]), t0: tooA + 0.1, hitW: NXD5 + 0.05, shakeW: t >= NXD5 ? 0.7 : 0, y: 470 }); evalHud(g, -0.1); if (t >= lateT) stamp(g, 'TOO LATE', W / 2 - 40, 290, t, lateT, { color: RED, size: 110 }); } });
   landCue(NXD5, true, 0.7); cue(NXD5, 'whoosh_fast', 0.35); cue(lateT, 'stamp', 0.5); cue(lateT - 0.004, 'boom', 0.45);
 
   // ======================= THE ENDGAME: TWENTY SECONDS EACH; MAGNUS WALKS HIS PAWNS =======================
-  shot(endA, (g, lt, t, sh) => {
-    // the clock, close and low; the board and the monitor behind it
-    rig(B, lt, [[0, K(0.62, 0.12, 5.0, [9.5, 0.3, 3.3], { cy: 1040 })], [len(sh), K(0.5, 0.1, 4.2, [9.6, 0.3, 3.3], { cy: 1040 })]], { t, shake: 1.4 });
-    const run = Math.floor((t - endA) / 0.5) % 2 ? 2 : 1, d = (t - endA) * 0.5;
-    online(g, t, { pieces: piecesAt(PL, 72), mon: false, clock: { ...clockAt(72), l: 21 - (run === 1 ? d : 0) - 0.4, r: 21.2 - (run === 2 ? d : 0), run } });
-    flashTint(g, RED, 0.08 * (0.5 + 0.5 * Math.sin(t * 9)));
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= twT) badge(g, '20 SECONDS EACH', W / 2, 230, { color: RED, size: 64, ...pop(t, twT) }); } });
+  // twenty seconds each: the two hand signs of the picture the author sent (version 7; the clock, close, stood here before)
+  shot(endA, (g, lt, t) => { handClash(g, t, lt); }, { trans: 'cut', flat: true, kb: 0, noJump: true, vig: 0.2, hud: (g, lt, t) => { if (t >= twT) badge(g, '20 SECONDS EACH', W / 2, 230, { color: '#16161E', size: 64, ...pop(t, twT) }); } });
+  cue(endA - 0.004, 'boom_big', 0.7); cue(endA + 0.02, 'hit_punch', 0.45); cue(endA + 0.04, 'shimmer', 0.35);
   cue(endA - 0.04, 'whoosh_fast', 0.3); cue(endA + 0.05, 'heartbeat', 0.45); cue(twT, 'clock_press', 0.4); cue(twT + 0.5, 'clock_press', 0.4); cue(twT + 1.0, 'clock_press', 0.4);
   const PW = spaced(pawnsA + 0.12, q1A - 0.1, 25);  // plies 73..97
   shot(pawnsA, (g, lt, t, sh) => {
     rig(B, lt, [[0, ARENA(0.3, 15)], [len(sh), ARENA(0.16, 13.6)]], { t, e: lin });
     const r = runTo(PL, 72, PW, t, 0.07), fx = moveFx(r, 0.07, 0.12);
     online(g, t, { pieces: r.pieces, under: fx.under, over: fx.over, clock: clockAt(r.k), tv: tvOf(r, 0.07) });
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= pawnsT) badge(g, 'PAWNS MARCHING', W / 2, 230, { color: RED, size: 56, ...pop(t, pawnsT) }); } });
+  }, { trans: 'whip', hud: (g, lt, t) => { faceCams(g, t, { wit: face(t, [[0, EX.worry], [pawnsT, EX.panic]]), mag: face(t, [[0, EX.cold], [pawnsT + 0.3, EX.smirk]]), t0: pawnsA + 0.12, hitW: pawnsT, shakeW: 0.25 + 0.6 * seg(t, pawnsA, q1A), y: 150, w: 196, m: 14 }); if (t >= pawnsT) badge(g, 'PAWNS MARCHING', W / 2, 230, { color: RED, size: 52, ...popW(t, pawnsT) }); } });
   PW.forEach((a, i) => cue(a - 0.02, 'piece', 0.12 + (i % 2) * 0.05));
 
   // ======================= A QUEEN. WITTY TAKES IT. ANOTHER QUEEN (Sukuna's cuts) =======================
@@ -1739,13 +2023,13 @@ export async function build(T) {
     const r = runTo(PL, 97, [Q1], t, 0.24), fx = moveFx(r, 0.24, 0.8);
     online(g, t, { pieces: nearFade(r.pieces), mon: false, under: g2 => { fx.under(g2); if (t >= Q1) ledGlow(g2, B, 'd1', RED, t, Q1, { reach: 3 }); }, over: fx.over });
     if (t >= Q1) flashTint(g, RED, 0.3 * (1 - seg(t, Q1, Q1 + 0.4)));
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= Q1) badge(g, 'A QUEEN', 300, 230, { color: RED, size: 68, ...pop(t, Q1) }); } });
+  }, { trans: 'whip', hud: (g, lt, t) => { faceCams(g, t, { wit: face(t, [[0, EX.worry], [Q1, EX.panic]]), mag: face(t, [[0, EX.cold], [Q1, EX.grin]]), t0: q1A + 0.1, hitW: Q1, hitM: Q1, shakeW: t >= Q1 ? 0.8 : 0.3 }); if (t >= Q1) badge(g, 'A QUEEN', 300, 230, { color: RED, size: 68, ...pop(t, Q1) }); } });
   boom(Q1, 0.7); landCue(Q1, false, 0.6); cue(Q1, 'shimmer', 0.3);
   shot(wtA, (g, lt, t, sh) => {
     rig(B, lt, [[0, QK[1]], [len(sh), QK[2]]], { t, e: lin });
     const r = runTo(PL, 98, [KD1], t, 0.22), fx = moveFx(r, 0.22, 0.6);
     online(g, t, { pieces: nearFade(r.pieces), mon: false, under: fx.under, over: fx.over });
-  }, { trans: 'cut', hud: (g, lt, t) => { if (t >= KD1) badge(g, 'TAKEN', 300, 230, { color: VOID, size: 64, ...pop(t, KD1) }); } });
+  }, { trans: 'cut', hud: (g, lt, t) => { faceCams(g, t, { wit: face(t, [[0, EX.panic], [KD1, EX.relief]]), mag: face(t, [[0, EX.grin], [KD1 + 0.1, EX.cold]]), t0: -9, hitW: KD1 }); if (t >= KD1) badge(g, 'TAKEN', 300, 230, { color: VOID, size: 64, ...pop(t, KD1) }); } });
   landCue(KD1, true, 0.7); cue(KD1, 'glass', 0.35);
   shot(q2A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.2, 0.44, 16.6, [3.4, 0.8, 5.0], { cy: 1230 })], [Q2 - q2A, K(0.14, 0.44, 15.6, [3.4, 0.8, 5.0], { cy: 1230 })], [len(sh), K(0.1, 0.44, 15.0, [3.4, 0.8, 5.0], { cy: 1230 })]], { t, bump: t > Q2 && t < Q2 + 0.3 ? 1.6 : 0 });
