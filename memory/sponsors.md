@@ -10,6 +10,12 @@
 > часы. Это же — условие спонсоров (#ad + Branded content обещаны в нашем предложении).
 
 ## Chessigma (Eliot Hennebo)
+- **14.11.2026, 13:29 UTC — Элиот одобрил `witty2` (версия 7):** «Great work, the video looks good! Regarding the
+  shout and the comment quote, I'm perfectly fine with keeping them in. Everything else looks good, please go ahead
+  with the post!» Публиковать можно: файл `episodes/witty2/build/witty2_4k.mp4`, Content disclosure → Branded content,
+  подпись из `episodes/witty2/script.json` (`post`, с #ad), ссылка в био
+  `https://www.chessigma.com/go/app/the64files?utm_content=witty2` — держать 7 дней после выхода. Бонус $100 — при
+  1 млн просмотров за 30 дней с даты публикации (дату и ссылку записать сюда, Элиоту написать «it's live»).
 - **14.11.2026, 13:22 UTC — Элиоту отправлена версия 7 `witty2` на согласование** (по слову автора «отправь письмо
   чессигме», в ветке про INV-2026-001, копия Мехди). Ссылка — превью с пометкой PREVIEW, которое автор сам выложил на
   Drive канала (`The64Files_Witty_vs_Magnus_Chessigma_PREVIEW.mp4`, id `1-TINwB7UsGjFAuyLmZ4c3KbKbKdz-Sx2`, доступ по
