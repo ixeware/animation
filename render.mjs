@@ -6,6 +6,8 @@
 //   any of these with --motion 1|2: the text motion profile (LOOK.motion) for an A/B; --out name.mp4: the video's file name
 //   --scale 2 with a render or --stills: every frame at twice the size, 2160 × 3840 (4K); the engine draws it that
 //   sharp itself (core.js: supersampling), it is not an upscale. About four times the render time
+//   --guard off: without the channel's moving watermark (a clean master for a sponsor's own channels and ads);
+//   --guard handle: the watermark's handle without the line about YouTube (engine/js/guard.js, STYLE_BIBLE rule 70)
 import { chromium } from 'playwright';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -33,7 +35,7 @@ async function openPage(browser, extra = '') {
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: SCALE });
   page.on('console', m => { if (m.type() === 'error') console.error('[page]', m.text()); });
   page.on('pageerror', e => console.error('[pageerror]', e.message));
-  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}${opt('motion') ? '&motion=' + opt('motion') : ''}${SCALE > 1 ? '&ss=' + SCALE : ''}`);
+  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}${opt('motion') ? '&motion=' + opt('motion') : ''}${opt('guard') ? '&guard=' + opt('guard') : ''}${SCALE > 1 ? '&ss=' + SCALE : ''}`);
   await page.waitForFunction('window.READY === true', null, { timeout: 120000 });
   return page;
 }

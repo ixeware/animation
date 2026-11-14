@@ -124,6 +124,15 @@
   `content`; маленькие (< ~20 КБ) приходят в ответ целиком — их не брать.
 
 ## Chessnut (Stella)
+- **14.11.2026, 16:05 UTC — просьба подать заявку на удаление копии.** Автор: «отправь стелле тоже письмо чтоб они
+  страйк кинули». Стелле ушло письмо в ветку про «2.13 seconds»: копия на YouTube
+  (`https://www.youtube.com/watch?v=Wmz-pghiWnE`, залита 11.11 в 19:21 UTC, 174 тыс. просмотров, описание пустое),
+  YouTube пока считает оригиналом тот канал, просьба подать заявку от своего имени (логотип и продукт, форма по
+  товарным знакам) или от нашего как представитель (авторское право); что приложить. Про рекламный блок в копии в
+  письме ничего не утверждается: из сессии копию не проиграть (что проверено — в
+  [business/youtube_copies.md](../business/youtube_copies.md)). Ждём ответа.
+- Её фраза от 13.11 «We would also love to share this video on our official channels» осталась без ответа: на каких
+  условиях — решает автор; файл для неё — чистый мастер без метки канала (`--guard off`, правило 70).
 - **13.11.2026, 10:22 UTC — Стелла про оплату:** «I've sent your PayPal info to our finance team. Since today is
   Friday, they have already left the office for the weekend, so the $400 will be processed next Monday» — то есть
   16.11. Ещё: «We would also love to share this video on our official channels.» На 14.11 на PayPal автора пусто —

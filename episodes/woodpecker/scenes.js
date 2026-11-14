@@ -1418,7 +1418,7 @@ export async function build(T) {
   // logo, 2M+ PLAYERS, 15M+ games analyzed, five stars, then the two store badges fading in. No captions over it (they
   // would cover the badges); its last frame holds until the question
   shot(CLOSE, (g, lt, t, sh) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
-    { flat: true, noCaptions: true, hud: (g, lt, t) => { adHud(g, lt, t); bdg(g, t, 'LINK IN BIO', linkT - 0.05, { y: 1462, color: SIG.yel, ink: SIG.bg, size: 50 }); } });
+    { flat: true, noGuard: true, noCaptions: true, hud: (g, lt, t) => { adHud(g, lt, t); bdg(g, t, 'LINK IN BIO', linkT - 0.05, { y: 1462, color: SIG.yel, ink: SIG.bg, size: 50 }); } });
   cue(trainS, 'swipe_card', 0.35); cue(sig2T - 0.25, 'reveal_bell', 0.4); cue(a3S, 'swipe_card', 0.4); cue(ownT + 0.1, 'swipe_card', 0.35); cue(buildsT - 0.2, 'swipe_card', 0.35);
   cue(buildsT, 'reveal_bell', 0.3); cue(freeS - 0.08, 'whoosh_fast', 0.35); cue(freeT - 0.03, 'success', 0.45); cue(freeT, 'reveal_bell', 0.45);
   [gradT, accT].forEach(x => cue(x - 0.03, 'sparkle_pop', 0.28)); cue(repS, 'swipe_card', 0.3); cue(qcS, 'swipe_card', 0.3); cue(h3S, 'piece', 0.3); cue(sigS, 'piece', 0.35); cue(sigS + 0.35, 'shimmer', 0.45); cue(sigS + 0.75, 'reveal_bell', 0.45); cue(CLOSE, 'whoosh_soft', 0.4); cue(CLOSE + 1.11, 'notify', 0.3); cue(linkT - 0.05, 'reveal_bell', 0.4);

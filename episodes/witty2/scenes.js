@@ -2170,7 +2170,7 @@ export async function build(T) {
   } });
   // their 3-second end card as it is (logo, 2M+ players, the store badges): flat, no captions over it
   shot(CLOSE, (g, lt) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
-    { flat: true, noCaptions: true, hud: (g, lt, t) => { adTag(g); if (t >= linkT - 0.05) badge(g, 'LINK IN BIO', W / 2, 1462, { color: GOLD, size: 50, ...pop(t, linkT - 0.05) }); } });
+    { flat: true, noGuard: true, noCaptions: true, hud: (g, lt, t) => { adTag(g); if (t >= linkT - 0.05) badge(g, 'LINK IN BIO', W / 2, 1462, { color: GOLD, size: 50, ...pop(t, linkT - 0.05) }); } });
   cue(ad1A - 0.04, 'whoosh_deep', 0.35); cue(gradedT, 'swipe_card', 0.35); cue(thisT, 'swipe_card', 0.35); cue(thisT + 0.1, 'reveal_bell', 0.3);
   cue(freeT - 0.03, 'success', 0.4); cue(unlT, 'sparkle_pop', 0.3); cue(CLOSE, 'whoosh_soft', 0.3); cue(CLOSE + 0.2, 'reveal_bell', 0.35); cue(linkT, 'sparkle_pop', 0.3);
 

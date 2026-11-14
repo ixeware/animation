@@ -6,6 +6,8 @@ import { screenShatter } from './fx.js';
 import { buildChunks, drawCaptions } from './captions.js';
 import { finish } from './post.js';
 import { CAM } from './stage.js';
+import { LOOK } from './look.js';
+import { makeGuard } from './guard.js';
 
 const q = new URLSearchParams(location.search);
 QA.on = q.has('qa');
@@ -50,12 +52,35 @@ const shots = film.shots.map((s, i) => ({ ...s, i }));
 shots.forEach((s, i) => { s.b = s.b ?? (shots[i + 1] ? shots[i + 1].a : film.duration ?? T.duration); });
 const chunks = buildChunks(T.phrases, ctx);
 const DURATION = film.duration ?? T.duration;
+// the channel's moving watermark (guard.js, STYLE_BIBLE rule 70): on for every film unless the film returns guard: false
+// or the order set its own mark; a film's guard: { ... } changes its options. The page's ?guard=off (render.mjs --guard off)
+// gives a clean master, ?guard=handle the handle without the line
+const GQ = q.get('guard');
+const guardOpt = GQ === 'off' || GQ === '0' || film.guard === false ? null : film.guard && typeof film.guard === 'object' ? { ...(LOOK.guard || {}), ...film.guard } : LOOK.guard;
+const guard = guardOpt ? makeGuard(shots, DURATION, { seed: ep, ...guardOpt, ...(GQ === 'handle' ? { line: '' } : {}) }, (s, times) => facesAt(s, times)) : null;
 
 function drawShot(s, t, g) {
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = 'none'; g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
   g.fillStyle = '#05090D'; g.fillRect(0, 0, W, H);
   s.draw(g, t - s.a, t, s);
   g.restore();
+}
+
+// the faces of a shot at given moments, for the watermark to keep off them: the shot and its hud drawn on a plain spare
+// canvas (1080 x 1920 at any render scale), where the drawing helpers log every face (core.js: QA.faces)
+const probe = document.createElement('canvas'); probe.width = W; probe.height = H; probe.dataset.qa = '1';
+const pctx = probe.getContext('2d');
+function facesAt(s, times) {
+  const keep = { items: QA.items, faces: QA.faces, M: QA.M, px: CAM.px }, out = [];
+  QA.items = [];
+  for (const t of times) {
+    QA.faces = [];
+    drawShot(s, t, pctx);
+    if (s.hud) { pctx.save(); pctx.setTransform(1, 0, 0, 1, 0, 0); s.hud(pctx, t - s.a, t, s); pctx.restore(); }
+    out.push(...QA.faces);
+  }
+  QA.items = keep.items; QA.faces = keep.faces; QA.M = keep.M; CAM.px = keep.px;
+  return out;
 }
 
 // screen shake driven by impact sounds (boom, hit, stamp, glass); decays in ~0.15 s
@@ -115,7 +140,8 @@ function motionBlur(s, t) {
 
 function compose(t, frame) {
   const s = shots.find(s => t >= s.a && t < s.b) || shots[shots.length - 1];
-  QA.items = []; QA.M = null; QA.skip = false; QA.shot = s.i; QA.allow = s.qaAllow || [];
+  if (guard && !s.noGuard) guard.prepare(t, s);
+  QA.items = []; QA.faces = []; QA.M = null; QA.skip = false; QA.shot = s.i; QA.allow = s.qaAllow || [];
   CAM.px = 0;
   drawShot(s, t, lctx);
   const items = QA.items;
@@ -169,6 +195,7 @@ function compose(t, frame) {
   if (nx && nx.trans === 'leak' && nx.a - t < 0.14) lightLeak(ctx, 0.5 - (nx.a - t) / 0.28);
   if (tr === 'flash') flash(ctx, 1 - lt / 0.3);
   if (!s.flat) vignette(ctx, s.vig ?? 0.55);
+  if (guard && !s.noGuard) guard(ctx, t, s);  // a sponsor's own card is shown as delivered: its shot says noGuard
   drawCaptions(ctx, chunks, t, { hide: s.noCaptions });
   if (!s.flat) grain(ctx, frame, 0.06);
 }
