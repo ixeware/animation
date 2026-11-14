@@ -12,7 +12,10 @@
 ## Chessigma (Eliot Hennebo)
 - **`witty2` опубликован 14.11.2026 в 13:49:20 UTC:** https://www.tiktok.com/@the64files/video/7708023874599980295 .
   Срок для бонуса $100 (1 млн просмотров за 30 дней) — до 14.12.2026, 13:49 UTC. Ссылку в био держать до 21.11.
-  Элиоту «it's live» ещё не писали.
+  Элиоту «it's live» отправлено 14.11 в 15:12 UTC одним письмом с двумя темами: (1) ссылка в био заменена автором на
+  `https://www.chessigma.com/download?utm_medium=creator&utm_campaign=app_link&utm_source=the64files` — их ссылка
+  `/go/app/the64files` у зрителя давала «Action cannot be completed»; вернём или сменим по его слову; (2) ролик через
+  39 минут перезалил канал-копия, просьба подать заявку на удаление в YouTube. Ждём ответ.
 - **14.11.2026 — ссылка в био открывается не у всех.** Зритель написал автору в личные сообщения TikTok: «UR LINK IN
   BIO STILL NOT WORKING», при нажатии — «Action cannot be completed», и на iPhone, и на Android; у автора на Android
   ссылка открывает Play Store. Проверено: в профиле стоит `https://www.chessigma.com/go/app/the64files` (в данных
