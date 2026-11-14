@@ -28,6 +28,17 @@
   (@TeamYouTube) с доводом по существу: «The 64 Files» — собственный бренд автора (TikTok с 12.10.2026, спонсорские
   договоры), он не выдавал себя за канал `@the64files`, у которого нет ни одного видео.
 
+### Второй канал тоже заблокирован (14.11.2026)
+
+Автор прислал экран формы «Appeal the removal of The 64 Files» со ссылкой на правило Impersonation: заблокирован и
+новый канал `@the64filesofficial`. Текст апелляции (поле до 800 знаков, здесь 751); почтой для связи указать
+the64filestt@gmail.com — она стоит в био TikTok, и по ней проверяющий увидит, что канал настоящий:
+
+> I am the original creator of The 64 Files, not an impersonator. I write, animate and publish these chess videos myself. Proof: my TikTok @the64files (16.9K followers) has the same videos, posted there first, and its bio names this YouTube channel and my business email the64filestt@gmail.com. I have no connection to the empty channel that holds the handle @the64files, and I do not pretend to be it or anyone else. My earlier channel @The64FilesChess, also mine, was removed for the same reason. I opened this one so viewers could find the real author while the channel @the64stories re-uploads my videos (copyright complaint 33GGAJCXQZSMNIHJNEHY3JQIMY is in review). If the name causes confusion, I will rename the channel. Please take another look.
+
+В тексте прямо сказано про первый канал: YouTube видит связь и без этого, а довод один — автор ни за кого себя не
+выдаёт. Риск остаётся: новый канал после блокировки YouTube считает обходом. Подавать один раз.
+
 ### Черновик обращения к @TeamYouTube (X, два сообщения по 280 и 220 знаков)
 
 > @TeamYouTube My channel "The 64 Files" (@The64FilesChess) was terminated for impersonation and the appeal was denied. I am the original creator: the same videos are on my TikTok @the64files (16.9K followers) since Oct 12. I never posed as anyone else. Could you take another look?
