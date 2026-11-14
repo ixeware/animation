@@ -1419,7 +1419,7 @@ function faceCams(g, t, { wit = null, mag = null, t0 = 0, y = 412, hitW = -9, hi
     g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.roundRect(5, 9, w, h, 18); g.fill();
     webcam(g, 0, 0, w, h - 44 * f, who, e, t + dt, { bg, zoom: 1.16, cy: 0.5, shake });
     g.fillStyle = '#0B0B10'; g.beginPath(); g.roundRect(0, h - 52 * f, w, 52 * f, [0, 0, 16, 16]); g.fill();
-    g.font = sans(24 * f, 900); g.letterSpacing = '2px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = nc; g.fillText(name, w / 2 + 1, h - 25 * f);
+    g.font = sans(21 * f, 900); g.letterSpacing = '1px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = nc; g.fillText(name, w / 2 + 1, h - 25 * f, w - 22);
     const fl = t >= hit ? Math.max(0, 1 - (t - hit) / 0.28) : 0;
     g.strokeStyle = fl > 0 ? mix(col, '#FFFFFF', fl) : col; g.lineWidth = 7 + 8 * fl; g.beginPath(); g.roundRect(0, 0, w, h, 16); g.stroke();
     g.restore();
