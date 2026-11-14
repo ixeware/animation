@@ -24,7 +24,7 @@
 | Миттенс (ролик автора) | he was able to beat a human, but not an alien | метафора | эталон автора |
 | `gmhunter` (Леви) | The Grandmaster Hunter | прозвище | автор приводит как пример |
 | `biggerfish` | Alien / Hunter / The Fisherman | прозвища | — |
-| `witty2` | Nah, I'd win → «WITTY WON.» → разрез → «Witty lost.»; The alien can beat humans. But not the GOAT. Not twice.; THE KING OF CURSES | мем + обманка (правило 66) + метафора-противопоставление + прозвище | ждём статистику |
+| `witty2` | Nah, I'd win → «WITTY WON.» → разрез → «Witty lost.» (версия 6: он лежит на Марсе, отлёт до планеты); The alien can beat humans (перелёт Марс → Земля, линейка «humans» на весь кадр, как в сине-фиолетовом меме с шахматистами). But not the GOAT (камера слетает к козьей ферме в 3D, Магнус у калитки «GOAT FARM», коза блеет). Not twice.; THE KING OF CURSES; в конце реплика самого Witty из комментариев: «The goat is too good» | мем + обманка (правило 66) + метафора-противопоставление + отсылка к мему (правило 67) + игра слов GOAT / goat + прозвище | ждём статистику |
 | `woodpecker` v3 | You can surprise a human. But not a library. He has seen your position before. | метафора | ждём статистику |
 
 ## Заготовки

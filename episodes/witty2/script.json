@@ -67,7 +67,7 @@
       "id": "name",
       "text": "Witty Alien. In September, he beat Magnus in blitz, and went wild on stream.",
       "say": "Witty Alien. In September, he beat Magnus in blitz, [excited] and went wild on stream.",
-      "pause": 0.25,
+      "pause": 1.1,
       "colors": {
         "Witty": "blue",
         "Alien.": "blue",
@@ -197,7 +197,7 @@
       "say": "[somber] Witty lost...",
       "take": 1,
       "tempo": 1.0,
-      "pause": 0.5,
+      "pause": 1.9,
       "colors": {
         "lost.": "red"
       }
@@ -206,7 +206,7 @@
       "id": "mirror",
       "text": "The alien can beat humans. But not the GOAT. Not twice.",
       "say": "The alien can beat humans. [pause] [serious] But not the goat. [pause] Not twice.",
-      "pause": 0.3,
+      "pause": 0.9,
       "colors": {
         "alien": "blue",
         "humans.": "lime",
@@ -229,7 +229,7 @@
       "id": "proud",
       "text": "Stand proud, Witty. You're strong.",
       "say": "[softly] Stand proud, Witty. [pause] You're strong.",
-      "pause": 0.45,
+      "pause": 1.25,
       "colors": {
         "proud,": "gold",
         "strong.": "gold"

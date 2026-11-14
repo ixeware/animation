@@ -11,7 +11,7 @@
 // The sponsor (Chessigma, if they agree) comes only at the end: their review of this very game on the monitor.
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect } from '../../engine/js/core.js';
 import { Board, sqXZ, piecesAt } from '../../engine/js/board.js';
-import { EXPR, CAST, drawChar, exprAt } from '../../engine/js/characters.js';
+import { EXPR, CAST, drawChar, exprAt, hand } from '../../engine/js/characters.js';
 import { badge, nameTitle, placeStamp, stamp, counter, score, vsLabel, plate, sans, mono, popIn } from '../../engine/js/hud.js';
 import { loadImage } from '../../engine/js/photo.js';
 import { rig, seated, CAM } from '../../engine/js/stage.js';
@@ -643,11 +643,12 @@ function online(g, t, { pieces, under = null, over = null, cams = {}, clock = nu
   lowKey(g, { cy: H * 0.46, a: dark ? 0.16 : 0.04 });
 }
 const img_glow = (tv, camA) => tv !== null || camA > 0;
-// ======================= "WITTY LOST." =======================
-// Witty on his back in a crater of cracked ground, seen from straight above, in black and white like the manga panel
-// the author sent (Gojo lying after the cut). Our own drawing: whole, no blood; his blindfold fallen beside his head,
-// his king tipped over by his open hand. The page is drawn in its own pixels round the middle of his face (the body
-// runs down and to the left); the camera is a look-at point (lx, ly) on the page, a zoom and a roll.
+// ======================= "WITTY LOST.": ON MARS (version 6) =======================
+// The author, 14.11.2026: «сделай в моменте где witty lost чтобы он лежал на марсе, и камера отдалялась медленно, и
+// потом показывается что он на марсе при второй итерации отдаления». Witty on his back in a crater of red ground, seen
+// from straight above (the pose of versions 4 and 5: whole, no blood; his blindfold fallen beside his head, his king
+// tipped over by his open hand). The ground is drawn in its own pixels round the middle of his face (the body runs
+// down and to the left). marsView() carries the same picture from that close-up out to the whole planet.
 const LIE_TH = 0.95, LIE_S = 1.6;
 const LIE = (() => {
   const r = rng(236), rocks = [], cracks = [], specks = [], rings = [];
@@ -671,45 +672,64 @@ const LIE = (() => {
   return { rocks, cracks, specks, rings, C0 };
 })();
 function polyline(g, pts) { let pen = false; g.beginPath(); for (const p of pts) { if (!p) { pen = false; continue; } if (pen) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); pen = true; } g.stroke(); }
+const RUST = { ink: '#2A0E08', lo: '#8E3D22', mid: '#B4532E', hi: '#C9683C', skin: '#F0C8A6' };
+// the ground near him (8000 ground pixels across) and the country round his crater (80000 across); each fades out at
+// its edge into what lies under it, so the pull-back from his face to the whole planet never shows a seam
+function marsPatch(seed, blots, craters, grain) {
+  return tex(1600, 1600, (x, w, h) => {
+    const r = rng(seed);
+    x.fillStyle = RUST.mid; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < blots; i++) {  // blotches of darker and paler dust
+      const rr = 30 + r() * 170; x.fillStyle = r() < 0.55 ? `rgba(110,40,20,${(0.05 + r() * 0.1).toFixed(3)})` : `rgba(240,160,108,${(0.04 + r() * 0.08).toFixed(3)})`;
+      x.beginPath(); x.ellipse(r() * w, r() * h, rr, rr * (0.45 + r() * 0.6), r() * 3, 0, 7); x.fill();
+    }
+    for (let i = 0; i < craters; i++) {  // craters: a dark bowl, a lit rim on the sun's side, a shaded one opposite
+      const px = r() * w, py = r() * h, rr = 7 + Math.pow(r(), 2.4) * 64;
+      x.fillStyle = 'rgba(70,24,12,0.42)'; x.beginPath(); x.ellipse(px, py, rr, rr * 0.88, 0, 0, 7); x.fill();
+      x.lineWidth = Math.max(1.5, rr * 0.13); x.strokeStyle = 'rgba(248,176,124,0.6)'; x.beginPath(); x.ellipse(px, py, rr, rr * 0.88, 0, 3.5, 5.6); x.stroke();
+      x.strokeStyle = 'rgba(50,16,8,0.5)'; x.beginPath(); x.ellipse(px, py, rr, rr * 0.88, 0, 0.4, 2.5); x.stroke();
+    }
+    for (let i = 0; i < grain; i++) { x.fillStyle = `rgba(60,20,10,${(0.15 + r() * 0.3).toFixed(3)})`; x.beginPath(); x.arc(r() * w, r() * h, 0.6 + r() * 2.2, 0, 7); x.fill(); }
+    x.globalCompositeOperation = 'destination-in';
+    const m = x.createRadialGradient(w / 2, h / 2, w * 0.33, w / 2, h / 2, w * 0.5); m.addColorStop(0, 'rgba(0,0,0,1)'); m.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = m; x.fillRect(0, 0, w, h); x.globalCompositeOperation = 'source-over';
+  });
+}
+const MARS_T1 = marsPatch(404, 240, 46, 900), MARS_T2 = marsPatch(909, 320, 150, 0);
+// Witty on the ground: z ground pixels to a screen pixel, his head at (cx, cy), the picture rolled by rot
 function lying(g, t, { z = 1, lx = 0, ly = 0, rot = 0, cx = W / 2, cy = H * 0.46 } = {}) {
-  const S = LIE_S, INK = '#08080B', [cxr, cyr] = LIE.C0;
-  g.save(); g.fillStyle = '#EEECE6'; g.fillRect(0, 0, W, H);
+  const S = LIE_S, INK = RUST.ink, [cxr, cyr] = LIE.C0;
+  g.save();
   g.translate(cx, cy); g.rotate(rot); g.scale(z, z); g.translate(-lx, -ly);
-  // the crater: a darker bowl under him, hatched twice toward its middle
-  const bowl = g.createRadialGradient(cxr, cyr, 120, cxr, cyr, 1150); bowl.addColorStop(0, 'rgba(40,38,36,0.42)'); bowl.addColorStop(0.5, 'rgba(70,68,64,0.2)'); bowl.addColorStop(1, 'rgba(90,88,84,0)');
+  g.drawImage(MARS_T1, -4000, -4000, 8000, 8000);
+  // the crater: a darker bowl under him, a paler rim round it
+  const bowl = g.createRadialGradient(cxr, cyr, 120, cxr, cyr, 1150); bowl.addColorStop(0, 'rgba(58,18,8,0.6)'); bowl.addColorStop(0.55, 'rgba(84,30,14,0.3)'); bowl.addColorStop(1, 'rgba(110,44,22,0)');
   g.fillStyle = bowl; g.beginPath(); g.ellipse(cxr, cyr, 1150, 1380, 0, 0, 7); g.fill();
-  g.save(); g.beginPath(); g.ellipse(cxr, cyr, 760, 920, 0, 0, 7); g.clip();
-  g.strokeStyle = 'rgba(12,12,14,0.2)'; g.lineWidth = 3; g.beginPath();
-  for (let i = -40; i <= 40; i++) { g.moveTo(cxr - 900 + i * 30, cyr - 1000); g.lineTo(cxr - 300 + i * 30, cyr + 1000); }
-  g.stroke(); g.restore();
-  g.save(); g.beginPath(); g.ellipse(cxr, cyr, 470, 580, 0, 0, 7); g.clip();  // the deepest part: the same hatching, twice as dense
-  g.strokeStyle = 'rgba(12,12,14,0.22)'; g.lineWidth = 3; g.beginPath();
-  for (let i = -40; i <= 40; i++) { g.moveTo(cxr - 885 + i * 30, cyr - 1000); g.lineTo(cxr - 285 + i * 30, cyr + 1000); }
-  g.stroke(); g.restore();
+  g.strokeStyle = 'rgba(246,170,118,0.28)'; g.lineWidth = 26; g.beginPath(); g.ellipse(cxr, cyr, 1010, 1220, 0, 3.3, 5.7); g.stroke();
   g.strokeStyle = INK; g.lineCap = 'round'; g.lineJoin = 'round';
-  g.lineWidth = 4; g.globalAlpha = 0.75; for (const pts of LIE.rings) polyline(g, pts); g.globalAlpha = 1;
-  for (const pts of LIE.cracks) { g.lineWidth = 7; polyline(g, pts.slice(0, 4)); g.lineWidth = 4; polyline(g, pts.slice(3)); }
-  g.fillStyle = '#17171A'; for (const [x, y, rr] of LIE.specks) { g.beginPath(); g.arc(x, y, rr, 0, 7); g.fill(); }
-  for (const rk of LIE.rocks) {
+  g.lineWidth = 4; g.globalAlpha = 0.4; for (const pts of LIE.rings) polyline(g, pts); g.globalAlpha = 1;
+  g.strokeStyle = '#431A0D'; for (const pts of LIE.cracks) { g.lineWidth = 7; polyline(g, pts.slice(0, 4)); g.lineWidth = 4; polyline(g, pts.slice(3)); }
+  g.fillStyle = '#4A1C0E'; for (const [x, y, rr] of LIE.specks) { g.beginPath(); g.arc(x, y, rr, 0, 7); g.fill(); }
+  LIE.rocks.forEach((rk, n) => {
     g.save(); g.translate(rk.x, rk.y); g.rotate(rk.rot);
-    g.fillStyle = 'rgba(12,12,14,0.32)'; g.beginPath(); rk.pts.forEach(([x, y], k) => (k ? g.lineTo : g.moveTo).call(g, x + 8, y + 10)); g.closePath(); g.fill();
-    g.fillStyle = rk.shade; g.strokeStyle = INK; g.lineWidth = 4.5; g.beginPath(); rk.pts.forEach(([x, y], k) => (k ? g.lineTo : g.moveTo).call(g, x, y)); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = 'rgba(40,12,6,0.4)'; g.beginPath(); rk.pts.forEach(([x, y], k) => (k ? g.lineTo : g.moveTo).call(g, x + 9, y + 12)); g.closePath(); g.fill();
+    g.fillStyle = n % 2 ? '#D27A4C' : '#A8502E'; g.strokeStyle = INK; g.lineWidth = 4.5; g.beginPath(); rk.pts.forEach(([x, y], k) => (k ? g.lineTo : g.moveTo).call(g, x, y)); g.closePath(); g.fill(); g.stroke();
     g.restore();
-  }
+  });
   // his shadow on the ground
-  g.save(); g.rotate(LIE_TH); g.fillStyle = 'rgba(10,10,12,0.3)'; g.beginPath(); g.ellipse(18, 560 * S, 250 * S, 520 * S, 0, 0, 7); g.fill(); g.restore();
+  g.save(); g.rotate(LIE_TH); g.fillStyle = 'rgba(36,10,5,0.42)'; g.beginPath(); g.ellipse(26, 566 * S, 256 * S, 524 * S, 0, 0, 7); g.fill(); g.restore();
   // the blindfold, fallen beside his head
   g.save(); g.translate(250, -230); g.rotate(-0.5); g.fillStyle = BAND; g.strokeStyle = INK; g.lineWidth = 4;
   g.beginPath(); g.moveTo(-150, -8); g.bezierCurveTo(-70, -54, 40, 34, 150, -18); g.lineTo(158, 30); g.bezierCurveTo(50, 84, -66, -8, -146, 42); g.closePath(); g.fill();
   g.strokeStyle = 'rgba(255,255,255,0.22)'; g.lineWidth = 3; g.beginPath(); g.moveTo(-140, 14); g.bezierCurveTo(-66, -28, 44, 58, 150, 4); g.stroke();
   g.restore();
-  // the body: the dark jacket and trousers, white fold lines, as the page's blacks
+  // the body: the dark jacket and trousers with pale fold lines
   const limb = (x, y, a, wd, l, fill, hand) => {
     g.save(); g.translate(x * S, y * S); g.rotate(a);
     g.fillStyle = fill; g.strokeStyle = INK; g.lineWidth = 6; g.beginPath(); g.roundRect(-wd / 2 * S, 0, wd * S, l * S, wd / 2 * S); g.fill(); g.stroke();
     g.strokeStyle = 'rgba(255,255,255,0.3)'; g.lineWidth = 4; for (const f of [0.3, 0.52, 0.74]) { g.beginPath(); g.moveTo(-wd * 0.3 * S, l * f * S); g.quadraticCurveTo(0, (l * f + 16) * S, wd * 0.32 * S, (l * f - 6) * S); g.stroke(); }
     if (hand === 'hand') {  // an open hand: the palm and four fingers
-      g.fillStyle = '#E9E6E0'; g.strokeStyle = INK; g.lineWidth = 5;
+      g.fillStyle = RUST.skin; g.strokeStyle = INK; g.lineWidth = 5;
       for (let k = 0; k < 4; k++) { g.save(); g.translate((-22 + k * 15) * S, (l + 44) * S); g.rotate((k - 1.5) * 0.16); g.beginPath(); g.roundRect(-6.5 * S, 0, 13 * S, (30 + (k === 1 || k === 2 ? 8 : 0)) * S, 6 * S); g.fill(); g.stroke(); g.restore(); }
       g.beginPath(); g.ellipse(0, (l + 26) * S, 36 * S, 32 * S, 0, 0, 7); g.fill(); g.stroke();
       g.save(); g.translate(34 * S, (l + 18) * S); g.rotate(-0.9); g.beginPath(); g.roundRect(-7 * S, 0, 14 * S, 30 * S, 6 * S); g.fill(); g.stroke(); g.restore();
@@ -723,21 +743,500 @@ function lying(g, t, { z = 1, lx = 0, ly = 0, rot = 0, cx = W / 2, cy = H * 0.46
   g.strokeStyle = 'rgba(255,255,255,0.3)'; g.lineWidth = 5;
   for (const [x0, y0, x1, y1] of [[-96, 250, -18, 322], [36, 300, 112, 246], [-76, 420, 66, 452], [-30, 196, 40, 214]]) { g.beginPath(); g.moveTo(x0 * S, y0 * S); g.quadraticCurveTo((x0 + x1) / 2 * S, (Math.max(y0, y1) + 30) * S, x1 * S, y1 * S); g.stroke(); }
   g.strokeStyle = 'rgba(0,0,0,0.6)'; g.lineWidth = 5; g.beginPath(); g.moveTo(0, 150 * S); g.lineTo(0, 520 * S); g.stroke();
-  g.fillStyle = '#B9B6AE'; g.strokeStyle = INK; g.lineWidth = 3; g.beginPath(); g.arc(22 * S, 214 * S, 12 * S, 0, 7); g.fill(); g.stroke();  // the button
+  g.fillStyle = '#C9A24A'; g.strokeStyle = INK; g.lineWidth = 3; g.beginPath(); g.arc(22 * S, 214 * S, 12 * S, 0, 7); g.fill(); g.stroke();  // the button
   g.restore();
   // his king, tipped over by his open hand
-  g.save(); g.filter = 'grayscale(1) contrast(1.15)'; drawPiece(g, 'k', 'w', -1010, 280, 300, { rot: -1.15 }); g.restore();
+  drawPiece(g, 'k', 'w', -1010, 280, 300, { rot: -1.15 });
   // the head: eyes shut, the hair fallen (no body: it is drawn above)
   const face = { ...EXPR.blind, band: 0, glow: 0, curve: -0.15, mouth: 'line', brow: -0.3, browTilt: 0 };
   g.save(); g.translate(3, 5); drawChar(g, 'wit', { x: 0, y: 0, s: S * 1.045, e: face, t: 0, tilt: LIE_TH, noBody: true, silhouette: true, shade: 'brightness(0)' }); g.restore();  // the contour
-  g.save(); g.filter = 'grayscale(1) contrast(1.25) brightness(0.9)'; INKED.on = true;
-  drawChar(g, 'wit', { x: 0, y: 0, s: S, e: face, t: 0, tilt: LIE_TH, noBody: true }); INKED.on = false;
-  g.restore();
-  g.save(); g.rotate(LIE_TH); g.strokeStyle = INK; g.lineCap = 'round'; g.lineWidth = 4;  // scuffs: three short strokes on a cheek, two on the jaw
+  drawChar(g, 'wit', { x: 0, y: 0, s: S, e: face, t: 0, tilt: LIE_TH, noBody: true });
+  g.save(); g.rotate(LIE_TH); g.strokeStyle = 'rgba(90,30,16,0.75)'; g.lineCap = 'round'; g.lineWidth = 4;  // scuffs: three short strokes on a cheek, two on the jaw
   for (const [x0, y0, x1, y1] of [[58, 30, 80, 20], [60, 42, 86, 31], [64, 54, 84, 46], [-72, 74, -54, 86], [-66, 62, -50, 72]]) { g.beginPath(); g.moveTo(x0 * S, y0 * S); g.lineTo(x1 * S, y1 * S); g.stroke(); }
   g.restore();
   g.restore();
 }
+// ---------- the planet, space, and the way out to it ----------
+const MARS_R = 230000, MARS_SITE = [0.2, -0.3];  // the planet's radius in ground pixels; where he lies on its disc (unit circle, y down)
+const MARS_DISC = tex(1024, 1024, (x, w) => {
+  const r = rng(77), c = w / 2, R = w * 0.47;
+  x.save(); x.beginPath(); x.arc(c, c, R, 0, 7); x.clip();
+  const gr = x.createRadialGradient(c - R * 0.3, c - R * 0.35, R * 0.1, c, c, R * 1.05); gr.addColorStop(0, '#DB7B4C'); gr.addColorStop(0.55, RUST.mid); gr.addColorStop(1, '#7E3219');
+  x.fillStyle = gr; x.fillRect(0, 0, w, w);
+  for (let i = 0; i < 26; i++) { x.fillStyle = `rgba(90,34,18,${(0.05 + r() * 0.08).toFixed(3)})`; x.beginPath(); x.ellipse(c + (r() - 0.5) * R * 1.7, c + (r() - 0.35) * R * 1.4, 40 + r() * 170, 24 + r() * 80, r() * 3, 0, 7); x.fill(); }  // the dark plains
+  for (let i = 0; i < 18; i++) { x.fillStyle = `rgba(244,166,112,${(0.06 + r() * 0.1).toFixed(3)})`; x.beginPath(); x.ellipse(c + (r() - 0.5) * R * 1.7, c + (r() - 0.5) * R * 1.7, 50 + r() * 150, 30 + r() * 70, r() * 3, 0, 7); x.fill(); }
+  x.strokeStyle = 'rgba(70,24,12,0.55)'; x.lineWidth = 9; x.lineCap = 'round';  // the long canyon
+  x.beginPath(); x.moveTo(c - R * 0.55, c + R * 0.12); x.bezierCurveTo(c - R * 0.2, c + R * 0.02, c + R * 0.1, c + R * 0.2, c + R * 0.5, c + R * 0.1); x.stroke();
+  for (let i = 0; i < 40; i++) {
+    const a = r() * 7, d = Math.sqrt(r()) * R * 0.92, px = c + Math.cos(a) * d, py = c + Math.sin(a) * d, rr = 4 + Math.pow(r(), 2) * 26;
+    x.fillStyle = 'rgba(80,28,14,0.4)'; x.beginPath(); x.arc(px, py, rr, 0, 7); x.fill();
+    x.strokeStyle = 'rgba(250,180,130,0.5)'; x.lineWidth = Math.max(1.2, rr * 0.14); x.beginPath(); x.arc(px, py, rr, 3.4, 5.4); x.stroke();
+  }
+  x.fillStyle = 'rgba(255,246,238,0.92)'; x.beginPath(); x.ellipse(c - R * 0.05, c - R * 0.93, R * 0.36, R * 0.12, -0.08, 0, 7); x.fill();  // the polar cap
+  const sh = x.createRadialGradient(c - R * 0.45, c - R * 0.45, R * 0.75, c - R * 0.2, c - R * 0.2, R * 1.45); sh.addColorStop(0, 'rgba(10,2,6,0)'); sh.addColorStop(1, 'rgba(10,2,6,0.82)');
+  x.fillStyle = sh; x.fillRect(0, 0, w, w);  // the night side
+  x.restore();
+});
+const EARTH_DISC = tex(1024, 1024, (x, w) => {
+  const r = rng(12), c = w / 2, R = w * 0.47;
+  x.save(); x.beginPath(); x.arc(c, c, R, 0, 7); x.clip();
+  const gr = x.createRadialGradient(c - R * 0.3, c - R * 0.35, R * 0.1, c, c, R * 1.05); gr.addColorStop(0, '#55A8F4'); gr.addColorStop(0.6, '#1F63C8'); gr.addColorStop(1, '#0B2A6B');
+  x.fillStyle = gr; x.fillRect(0, 0, w, w);
+  const land = (pts, col) => { x.fillStyle = col; x.beginPath(); pts.forEach(([px, py], k) => (k ? x.lineTo : x.moveTo).call(x, c + px * R, c + py * R)); x.closePath(); x.fill(); };
+  x.lineJoin = 'round';  // the Americas and the edge of the Old World, roughly: enough to read as home
+  land([[-0.66, -0.6], [-0.42, -0.76], [-0.1, -0.72], [0.1, -0.56], [0.02, -0.4], [-0.1, -0.3], [-0.16, -0.16], [-0.26, -0.1], [-0.3, 0.0], [-0.38, -0.12], [-0.5, -0.2], [-0.62, -0.38]], '#3E9A52');
+  land([[-0.26, -0.02], [-0.08, 0.02], [0.08, 0.14], [0.12, 0.3], [0.02, 0.5], [-0.06, 0.74], [-0.15, 0.62], [-0.2, 0.36], [-0.3, 0.16]], '#4BA35A');
+  land([[0.5, -0.56], [0.74, -0.46], [0.84, -0.2], [0.7, 0.0], [0.76, 0.3], [0.6, 0.26], [0.48, -0.02], [0.42, -0.32]], '#58A860');
+  land([[-0.5, -0.5], [-0.3, -0.56], [-0.2, -0.44], [-0.34, -0.36]], '#B9AA6A'); land([[-0.12, 0.2], [0.02, 0.24], [-0.02, 0.4], [-0.14, 0.36]], '#3A8A48'); land([[0.54, -0.3], [0.7, -0.26], [0.66, -0.1], [0.52, -0.14]], '#C2B272');
+  x.strokeStyle = 'rgba(255,255,255,0.78)'; x.lineCap = 'round';  // clouds
+  for (let i = 0; i < 24; i++) { const a = r() * 7, d = Math.sqrt(r()) * R * 0.9, px = c + Math.cos(a) * d, py = c + Math.sin(a) * d; x.lineWidth = 8 + r() * 22; x.beginPath(); x.moveTo(px, py); x.quadraticCurveTo(px + 40 + r() * 80, py - 20 + r() * 40, px + 90 + r() * 160, py - 10 + r() * 30); x.stroke(); }
+  x.fillStyle = 'rgba(255,255,255,0.9)'; x.beginPath(); x.ellipse(c, c - R * 0.95, R * 0.4, R * 0.12, 0, 0, 7); x.fill(); x.beginPath(); x.ellipse(c, c + R * 0.96, R * 0.34, R * 0.1, 0, 0, 7); x.fill();
+  const sh = x.createRadialGradient(c - R * 0.45, c - R * 0.45, R * 0.8, c - R * 0.2, c - R * 0.2, R * 1.5); sh.addColorStop(0, 'rgba(2,6,20,0)'); sh.addColorStop(1, 'rgba(2,6,20,0.8)');
+  x.fillStyle = sh; x.fillRect(0, 0, w, w);
+  x.restore();
+});
+const SPACE_S = (() => { const r = rng(5), o = []; for (let i = 0; i < 240; i++) o.push([r() * W, r() * H, 0.7 + Math.pow(r(), 3) * 2.6, r() * 7, 0.35 + r() * 0.65]); return o; })();
+function space(g, t, { streak = 0, cx = W / 2, cy = H / 2 } = {}) {  // the dark and its stars; streak > 0 draws them out from (cx, cy)
+  g.fillStyle = '#04050B'; g.fillRect(0, 0, W, H);
+  g.save(); g.lineCap = 'round';
+  for (const [x, y, rr, ph, al] of SPACE_S) {
+    const tw = (al * (0.7 + 0.3 * Math.sin(t * 3 + ph))).toFixed(3);
+    if (streak > 0.01) { const dx = x - cx, dy = y - cy, k = 1 + streak * 0.9; g.strokeStyle = `rgba(230,238,255,${tw})`; g.lineWidth = rr * 1.6; g.beginPath(); g.moveTo(cx + dx, cy + dy); g.lineTo(cx + dx * k, cy + dy * k); g.stroke(); }
+    else { g.fillStyle = `rgba(230,238,255,${tw})`; g.beginPath(); g.arc(x, y, rr, 0, 7); g.fill(); }
+  }
+  g.restore();
+}
+function planet(g, img, cx, cy, R, air) {  // a disc of radius R with a thin glow of air round it
+  if (R < 4000) { const h = g.createRadialGradient(cx, cy, R * 0.97, cx, cy, R * 1.13); h.addColorStop(0, `rgba(${air},0.55)`); h.addColorStop(1, `rgba(${air},0)`); g.fillStyle = h; g.beginPath(); g.arc(cx, cy, R * 1.13, 0, 7); g.fill(); }
+  const d = R / 0.94; g.drawImage(img, cx - d, cy - d, d * 2, d * 2);
+}
+// Mars at any distance. s: screen pixels to a ground pixel (1.3: his face fills the frame; 0.6: the whole of him;
+// 0.002: the planet); (hx, hy): his head on the screen. Near: the ground and Witty; farther: the country round his
+// crater; then the disc of the planet in space, his place marked on it.
+function marsView(g, t, s, { hx = W / 2, hy = H * 0.45, rot = 0 } = {}) {
+  const Rs = MARS_R * s, pcx = hx - MARS_SITE[0] * Rs, pcy = hy - MARS_SITE[1] * Rs;
+  if (Rs < 3600) space(g, t); else { g.fillStyle = RUST.mid; g.fillRect(0, 0, W, H); }
+  if (Rs < 90000) planet(g, MARS_DISC, pcx, pcy, Rs, '255,150,100');
+  const a2 = seg(s, 0.006, 0.02), a1 = seg(s, 0.045, 0.13);
+  if (a2 > 0) { g.save(); g.globalAlpha = a2; g.translate(hx, hy); g.rotate(rot); g.scale(s, s); g.drawImage(MARS_T2, -40000, -40000, 80000, 80000); g.restore(); }
+  if (a1 > 0) { g.save(); g.globalAlpha = a1; lying(g, t, { z: s, rot, cx: hx, cy: hy }); g.restore(); }
+  const far = 1 - seg(s, 0.003, 0.012);
+  if (far > 0) {  // where he lies: a ring, a line, his name
+    g.save(); g.globalAlpha = far; g.strokeStyle = '#FFFFFF'; g.fillStyle = '#FFFFFF'; g.lineWidth = 3.5; g.lineCap = 'round';
+    g.beginPath(); g.arc(hx, hy, 14 + 3 * Math.sin(t * 6), 0, 7); g.stroke(); g.beginPath(); g.arc(hx, hy, 4.5, 0, 7); g.fill();
+    g.beginPath(); g.moveTo(hx + 12, hy - 12); g.lineTo(hx + 66, hy - 66); g.lineTo(hx + 210, hy - 66); g.stroke();
+    g.font = sans(40, 900); g.letterSpacing = '3px'; g.textAlign = 'left'; g.textBaseline = 'bottom'; g.fillText('WITTY', hx + 72, hy - 72);
+    g.restore();
+  }
+}
+// "The alien can beat...": Mars falls away, the stars draw out, the Earth comes out of the dark and fills the frame
+function toEarth(g, t, u) {
+  const k = clamp(u), st = Math.sin(Math.PI * k) * 1.5, ex = lerp(W * 0.63, W / 2, k), ey = lerp(H * 0.35, H * 0.5, k);
+  space(g, t, { streak: st, cx: ex, cy: ey });
+  const mk = clamp(k / 0.42), mi = mk * mk;
+  if (mk < 1) { g.save(); g.globalAlpha = 1 - mi; planet(g, MARS_DISC, lerp(W / 2, -220, mi), lerp(H * 0.417, H * 0.9, mi), lerp(430, 24, mi), '255,150,100'); g.restore(); }
+  const ek = clamp((k - 0.08) / 0.92), ee = ek * ek * (3 - 2 * ek);
+  planet(g, EARTH_DISC, ex, ey, Math.exp(lerp(Math.log(3), Math.log(760), ee)), '120,190,255');
+}
+
+// ======================= "HUMANS": THE LINE-UP (version 6) =======================
+// The author sent a TikTok (7703432550877809940): a blue-violet clip of chess players crowding into the frame.
+// «в момент где humans сделай как на этом видео, с персами оттуда (фишер, хикару и т.д.), в такой цветовой гамме чтобы
+// зритель сразу понял отсылку, но надо только начало где все в кадре», and after the first stills: «и вот это нужно на
+// весь экран без черных полосок». Ours: five of our own characters in that crowd's places (one cut by the left edge,
+// the suit in front, the glasses above them all, the wide eyes on the right, one in front looking up from under his
+// brows), stacked to fill the tall frame, in the clip's two tones. The subtitle falls on their suits, under the faces.
+CAST.hKas = { ...CAST.kasparov, suit: '#3A404C', suitD: '#262B34' }; CAST.hFis = { ...CAST.bobby72, suit: '#5A6988', suitD: '#3A4763' }; CAST.hLev = { ...CAST.levy, suit: '#3E4352', suitD: '#272B36' }; CAST.hHik = { ...CAST.hikaru, suit: '#565A66', suitD: '#3A3D46' };
+CAST.hGuk = { face: [0.92, 1.06, 0.86], hair: 'swept', hairC: '#141010', brow: '#100C0A', suit: '#5E6678', suitD: '#3E4556', shirt: 'open', ears: 1.04, skin: { base: '#B07A57', shade: '#99664A', deep: '#7A4C33', blush: '#B86458', hi: '#C8936E' } };
+const HUM_A = makeCanvas(W, H), HUM_B = makeCanvas(W, H);
+function humans(g, t, lt) {
+  const x = HUM_A.getContext('2d'), E = EXPR; x.setTransform(1, 0, 0, 1, 0, 0);
+  const bg = x.createRadialGradient(W * 0.4, H * 0.24, 60, W / 2, H * 0.42, H * 0.8); bg.addColorStop(0, '#7C7C7C'); bg.addColorStop(1, '#141414'); x.fillStyle = bg; x.fillRect(0, 0, W, H);
+  const push = 1 + 0.07 * clamp(lt / 1.2);  // the clip's slow push in
+  x.save(); x.translate(W / 2, 780); x.scale(push, push); x.translate(-W / 2, -780);
+  // the shadow each one throws on those behind him
+  const dark = (cx, cy, r, a = 0.55) => { const d = x.createRadialGradient(cx, cy, r * 0.3, cx, cy, r); d.addColorStop(0, `rgba(0,0,0,${a})`); d.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = d; x.fillRect(cx - r, cy - r, 2 * r, 2 * r); };
+  drawChar(x, 'hLev', { x: 548, y: 392, s: 1.62, e: { ...E.smug, lid: 0.55, look: [0, 0.6], brow: 0.1, curve: 0.2 }, t, tilt: -0.05 });
+  dark(40, 640, 520); drawChar(x, 'hKas', { x: 28, y: 540, s: 1.9, e: { ...E.focus, look: [0.6, 0.2] }, t: t + 4, tilt: 0.1 });
+  dark(990, 680, 500); drawChar(x, 'hHik', { x: 978, y: 566, s: 1.72, e: { ...E.happy, brow: -0.7, browY: -16, lid: 0, pupil: 0.5, mouth: 'smile', curve: 1, open: 0.55, blush: 0 }, t: t + 2, tilt: 0.07 });
+  const fall = x.createLinearGradient(0, 760, 0, 1320); fall.addColorStop(0, 'rgba(0,0,0,0)'); fall.addColorStop(1, 'rgba(0,0,0,0.93)'); x.fillStyle = fall; x.fillRect(-200, 760, W + 400, H);  // the back row sinks into the dark
+  // arms crossed on the chest: the under arm first, then the upper one with its cuff and the hand on the other sleeve
+  const arms = (cx, cy, s, c, skin, flip = 1) => {
+    const fore = (ax, ay, bx, by, col, hand) => {
+      const A = [cx + flip * ax * s, cy + ay * s], Q = [cx + flip * bx * s, cy + by * s], l = Math.hypot(Q[0] - A[0], Q[1] - A[1]), u = [(Q[0] - A[0]) / l, (Q[1] - A[1]) / l];
+      x.lineCap = 'round'; x.strokeStyle = 'rgba(0,0,0,0.38)'; x.lineWidth = 100 * s; x.beginPath(); x.moveTo(A[0], A[1] + 16 * s); x.lineTo(Q[0], Q[1] + 16 * s); x.stroke();
+      x.strokeStyle = col; x.lineWidth = 92 * s; x.beginPath(); x.moveTo(A[0], A[1]); x.lineTo(Q[0], Q[1]); x.stroke();
+      if (!hand) return;
+      x.lineCap = 'butt'; x.strokeStyle = '#F4F2EE'; x.lineWidth = 88 * s; x.beginPath(); x.moveTo(Q[0] + u[0] * 22 * s, Q[1] + u[1] * 22 * s); x.lineTo(Q[0] + u[0] * 48 * s, Q[1] + u[1] * 48 * s); x.stroke();
+      x.fillStyle = skin; x.beginPath(); x.ellipse(Q[0] + u[0] * 84 * s, Q[1] + u[1] * 84 * s, 50 * s, 40 * s, Math.atan2(u[1], u[0]), 0, 7); x.fill();
+      x.strokeStyle = 'rgba(0,0,0,0.22)'; x.lineWidth = 4 * s; x.lineCap = 'round'; for (const k of [-0.33, 0, 0.33]) { x.beginPath(); x.moveTo(Q[0] + u[0] * 92 * s - u[1] * k * 60 * s, Q[1] + u[1] * 92 * s + u[0] * k * 60 * s); x.lineTo(Q[0] + u[0] * 128 * s - u[1] * k * 52 * s, Q[1] + u[1] * 128 * s + u[0] * k * 52 * s); x.stroke(); }
+    };
+    fore(-206, 396, 118, 338, c.suitD, false); fore(206, 380, -64, 330, mix(c.suit, '#FFFFFF', 0.1), true);
+  };
+  dark(300, 1010, 640); drawChar(x, 'hFis', { x: 292, y: 892, s: 2.05, e: { ...E.focus, lid: 0.2, look: [0, -0.1], curve: -0.2 }, t: t + 1, tilt: 0.03 }); arms(292, 892, 2.05, CAST.hFis, SKIN2.base, -1);
+  dark(800, 1040, 680); drawChar(x, 'hGuk', { x: 792, y: 916, s: 2.2, e: { ...E.focus, brow: 0.8, lid: 0.3, look: [0, -0.7], curve: 0.45 }, t: t + 3, tilt: -0.04 }); arms(792, 916, 2.2, CAST.hGuk, CAST.hGuk.skin.base);
+  x.restore();
+  const y2 = HUM_B.getContext('2d'); y2.setTransform(1, 0, 0, 1, 0, 0);  // the clip's two tones: indigo shadows, pale violet lights
+  y2.globalCompositeOperation = 'source-over'; y2.filter = 'grayscale(1) contrast(1.35) brightness(0.95)'; y2.drawImage(HUM_A, 0, 0, W, H); y2.filter = 'none';
+  y2.globalCompositeOperation = 'screen'; y2.fillStyle = '#23278C'; y2.fillRect(0, 0, W, H);
+  y2.globalCompositeOperation = 'multiply'; y2.fillStyle = '#B2ABFF'; y2.fillRect(0, 0, W, H);
+  y2.globalCompositeOperation = 'source-over';
+  const lg = y2.createLinearGradient(0, 0, W, 0); lg.addColorStop(0, 'rgba(120,200,255,0.16)'); lg.addColorStop(0.5, 'rgba(120,200,255,0)'); y2.fillStyle = lg; y2.fillRect(0, 0, W, H);  // the cold light from the left
+  const vg = y2.createRadialGradient(W / 2, H * 0.42, H * 0.3, W / 2, H * 0.42, H * 0.78); vg.addColorStop(0, 'rgba(8,6,40,0)'); vg.addColorStop(1, 'rgba(8,6,40,0.55)'); y2.fillStyle = vg; y2.fillRect(0, 0, W, H);
+  g.drawImage(HUM_B, 0, 0, W, H);
+}
+
+// ======================= "BUT NOT THE GOAT": THE FARM (version 6, a set in 3D) =======================
+// «затем but not goats, камера летит к ферме, где стоит магнус», and after the first stills: «сделай этот кадр получше
+// в 3д, а то криво выглядит». So the farm is a set like the rooms: pasture and fields to the horizon, a red barn with
+// its silo, a windpump, a pen of rails with a plank gate, goats built of solids, and Magnus leaning on the gate; the
+// camera really flies down to him from above the fields.
+const FARM_Y = 7.6, GATE_Z = -1.7, GATE_T0 = 4.85, PEN = { x0: -14, x1: 14, z1: 17 };  // Magnus's head; the pen's front line, the gate's top; the pen's sides and back
+const WOOD = '#BD8F58', WOOD_D = '#8E6538', FO = { amb: 0.6 };
+const BARN = { x: 35.95, z: 80, ry: 0.1, w: 22, d: 30, h0: 11, h1: 16.6, h2: 20 }, BARN_PX = 30;
+const SILO = { x: 55, z: 88, r: 3.7, h: 31 };
+const PUMP = { x: 1, z: 58, h: 19 };
+// convex hull of [x, z] points (monotone chain)
+function hullXZ(pts) {
+  const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]), lo = [], up = [];
+  for (const q of p) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+  for (let i = p.length - 1; i >= 0; i--) { const q = p[i]; while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+// the shadow a solid throws on the grass: its corners carried down the sun's rays, the outline of where they land
+function shadowOf(g, verts, a = 0.2) {
+  const h = hullXZ(verts.map(([x, y, z]) => [x - LIGHT[0] / LIGHT[1] * y, z - LIGHT[2] / LIGHT[1] * y]));
+  if (h.length > 2 && B.poly(g, h.map(([x, z]) => [x, 0.03, z]))) { g.fillStyle = `rgba(14,46,26,${a})`; g.fill(); }
+}
+// an ellipsoid (convex): rings of latitude, turned by r about its centre
+function ellV(c, [rx, ry, rz], r = null, n = 12, m = 6) {
+  const verts = [], faces = [];
+  for (let j = 0; j <= m; j++) { const v = -1.45 + 2.9 * j / m, sy = Math.sin(v), cr = Math.cos(v);
+    for (let i = 0; i < n; i++) { const a = i / n * 6.2832; let p = [Math.cos(a) * cr * rx, sy * ry, Math.sin(a) * cr * rz]; if (r) p = rot3(p, r); verts.push([c[0] + p[0], c[1] + p[1], c[2] + p[2]]); } }
+  for (let j = 0; j < m; j++) for (let i = 0; i < n; i++) { const i2 = (i + 1) % n; faces.push([j * n + i, j * n + i2, (j + 1) * n + i2, (j + 1) * n + i]); }
+  faces.push([...Array(n).keys()], [...Array(n).keys()].map(i => m * n + i));
+  return { verts, faces };
+}
+function cylV(a, b, r, n = 8, r2 = r) {
+  const ax = vnorm(vsub(b, a)), up = Math.abs(ax[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0], u = vnorm(vcross(ax, up)), v = vcross(ax, u), verts = [], faces = [];
+  for (const [p, rr] of [[a, r], [b, r2]]) for (let i = 0; i < n; i++) { const q = i / n * 6.2832, c = Math.cos(q) * rr, s = Math.sin(q) * rr; verts.push([p[0] + u[0] * c + v[0] * s, p[1] + u[1] * c + v[1] * s, p[2] + u[2] * c + v[2] * s]); }
+  for (let i = 0; i < n; i++) { const i2 = (i + 1) % n; faces.push([i, i2, n + i2, n + i]); }
+  faces.push([...Array(n).keys()], [...Array(n).keys()].map(i => n + i));
+  return { verts, faces };
+}
+// a texture on a quad the camera stands close to: cut into nx × ny smaller quads, each mapped on its own
+function texGrid(g, img, tl, tr, bl, nx = 6, ny = 3, o = {}) {
+  const P = (u, v) => [0, 1, 2].map(k => tl[k] + (tr[k] - tl[k]) * u + (bl[k] - tl[k]) * v), w = img.width, h = img.height;
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) texQuad(g, img, P(i / nx, j / ny), P((i + 1) / nx, j / ny), P(i / nx, (j + 1) / ny), { ...o, src: [w * i / nx, h * j / ny, w / nx, h / ny] });
+}
+const blob = (g, c, r, col, o = {}) => { const e = ellV(c, r, o.rot || null, o.n || 10, o.m || 5); solid(g, e.verts, e.faces, col, { amb: 0.6, ...o }); };
+const hazed = (col, x, z) => mix(col, '#CFE6F2', clamp((Math.hypot(x - B.E[0], z - B.E[2]) - 90) / 520) * 0.6);
+
+// ---------- the sky, the hills on the horizon, the ground ----------
+const CLOUDS = [[-1.25, 0.26, 1.0], [-0.78, 0.19, 1.15], [-0.42, 0.33, 0.9], [-0.02, 0.4, 1.05], [0.6, 0.37, 1.15], [1.0, 0.2, 1.0], [1.45, 0.3, 1.2]];
+function farmSky(g, t) {
+  const yh = hz(); if (yh < -40) return;
+  const sky = g.createLinearGradient(0, yh - 1500, 0, yh); sky.addColorStop(0, '#256FCB'); sky.addColorStop(0.55, '#6FB2EC'); sky.addColorStop(1, '#DCEFFB');
+  g.fillStyle = sky; g.fillRect(0, 0, W, Math.min(H, yh + 2));
+  for (const [az0, el, sc] of CLOUDS) {
+    const az = az0 + t * 0.004, c = B.toCam(B.E[0] + Math.sin(az) * Math.cos(el) * 4000, B.E[1] + Math.sin(el) * 4000, B.E[2] + Math.cos(az) * Math.cos(el) * 4000);
+    if (c[2] < 1) continue;
+    const cx = B.cx + B.f * c[0] / c[2], cy = B.cy - B.f * c[1] / c[2];
+    if (cx < -400 || cx > W + 400 || cy < -300) continue;
+    g.fillStyle = 'rgba(214,228,240,0.9)'; for (const [ox, oy, rr] of [[-74, 22, 50], [0, 24, 62], [78, 24, 46]]) { g.beginPath(); g.ellipse(cx + ox * sc, cy + oy * sc, rr * sc * 1.25, rr * sc * 0.62, 0, 0, 7); g.fill(); }  // the grey underside
+    g.fillStyle = '#FFFFFF'; for (const [ox, oy, rr] of [[0, 0, 66], [76, 12, 48], [-72, 14, 44], [24, -34, 46], [-30, -22, 40]]) { g.beginPath(); g.arc(cx + ox * sc, cy + oy * sc, rr * sc, 0, 7); g.fill(); }
+  }
+}
+function farmHills(g) {
+  const yh = hz(); if (yh < -260) return;
+  const az0 = Math.atan2(B.F[0], B.F[2]);
+  for (const [R, Hh, col, ph] of [[2100, 250, '#B3D2CF', 0.3], [1300, 120, '#9BCB9C', 1.7]]) {
+    const pts = [];
+    for (let a = az0 - 1.1; a <= az0 + 1.1; a += 0.02) {
+      const q = Math.round(a / 0.02) * 0.02, h = Hh * Math.max(0.08, 0.5 + 0.3 * Math.sin(q * 5 + ph) + 0.2 * Math.sin(q * 11.3 + ph * 2)), c = B.toCam(Math.sin(q) * R, h, Math.cos(q) * R);
+      if (c[2] > 1) pts.push([B.cx + B.f * c[0] / c[2], B.cy - B.f * c[1] / c[2]]);
+    }
+    if (pts.length < 2) continue;
+    g.fillStyle = col; g.beginPath(); g.moveTo(pts[0][0], yh + 80); for (const p of pts) g.lineTo(p[0], p[1]); g.lineTo(pts[pts.length - 1][0], yh + 80); g.closePath(); g.fill();
+  }
+}
+const FIELDS = (() => {
+  const r = rng(77), out = [], cols = ['#8CC56A', '#A8D27C', '#E6D27A', '#6DAF58', '#D9C36C', '#7FBF63', '#C6D780'];
+  for (let z = 84; z < 700;) { const dz = 44 + r() * 56; for (let x = -520; x < 640;) { const dx = 56 + r() * 96; out.push({ o: [x, 0.02, z], U: [dx - 4, 0, 0], V: [0, 0, dz - 4], c: cols[Math.floor(r() * cols.length)], rows: z < 200 ? (r() < 0.5 ? 'x' : 'z') : null }); x += dx; } z += dz; }
+  // the fields beside the yard and in front of it
+  out.push({ o: [-190, 0.02, -74], U: [146, 0, 0], V: [0, 0, 150], c: '#E6D27A', rows: 'z' }, { o: [66, 0.02, -74], U: [170, 0, 0], V: [0, 0, 100], c: '#7FBF63', rows: 'x' }, { o: [66, 0.02, 32], U: [170, 0, 0], V: [0, 0, 46], c: '#C6D780', rows: 'z' },
+    { o: [-190, 0.02, -260], U: [150, 0, 0], V: [0, 0, 180], c: '#8CC56A', rows: 'x' }, { o: [-34, 0.02, -260], U: [180, 0, 0], V: [0, 0, 180], c: '#D9C36C', rows: 'z' }, { o: [152, 0.02, -260], U: [160, 0, 0], V: [0, 0, 180], c: '#A8D27C', rows: null },
+    { o: [-400, 0.02, -260], U: [204, 0, 0], V: [0, 0, 336], c: '#6DAF58', rows: null }, { o: [242, 0.02, -74], U: [200, 0, 0], V: [0, 0, 152], c: '#E6D27A', rows: null });
+  return out;
+})();
+const ROAD = [[-70, -250], [-46, -120], [-22, -52], [-3, -19], [9, -8], [21, 12], [29.5, 38], [33.9, 62.6]];
+const TUFTS = (() => { const r = rng(404), out = []; for (let i = 0; i < 230; i++) out.push([-34 + r() * 84, -30 + r() * 100, 0.5 + r() * 0.6, r() < 0.16 ? 1 + Math.floor(r() * 2) : 0]); return out; })();
+function farmGround(g, t) {
+  const yh = hz(), y0 = Math.max(0, yh);
+  const gr = g.createLinearGradient(0, yh, 0, yh + 950); gr.addColorStop(0, '#A9D494'); gr.addColorStop(0.2, '#7CC063'); gr.addColorStop(1, '#5FAC49');
+  g.fillStyle = gr; g.fillRect(0, y0, W, H - y0);
+  farmHills(g);
+  for (const f of FIELDS) {
+    const cx = f.o[0] + f.U[0] / 2, cz = f.o[2] + f.V[2] / 2, c = B.toCam(cx, 0, cz); if (c[2] < -Math.max(f.U[0], f.V[2])) continue;
+    tiled(g, f.o, f.U, f.V, { color: hazed(f.c, cx, cz), grout: 'rgba(40,80,30,0.16)', tu: f.rows === 'z' ? 4.5 : 1e9, tv: f.rows === 'x' ? 4.5 : 1e9, lw: 1.4 });
+  }
+  // the pasture, mown in stripes that run away from the gate
+  for (let i = 0; i < 12; i++) quad(g, [[-30 + i * 8, 0.025, -30], [-26 + i * 8, 0.025, -30], [-26 + i * 8, 0.025, 76], [-30 + i * 8, 0.025, 76]], 'rgba(236,246,170,0.10)');
+  // the pond
+  const ring = (cx, cz, rx, rz, y = 0.03, n = 28) => Array.from({ length: n }, (_, i) => [cx + Math.cos(i / n * 6.2832) * rx, y, cz + Math.sin(i / n * 6.2832) * rz]);
+  quad(g, ring(-66, 34, 25, 15.5), '#4F9A45'); quad(g, ring(-66, 34, 22.5, 13.5, 0.04), '#4FA7DE'); quad(g, ring(-69, 31, 12, 6, 0.05), '#86C8EE');
+  // the dirt road to the barn, and the spur to the gate
+  const strip = (pts, w, col) => { for (let i = 0; i + 1 < pts.length; i++) { const [ax, az] = pts[i], [bx, bz] = pts[i + 1], l = Math.hypot(bx - ax, bz - az) || 1, nx = -(bz - az) / l * w / 2, nz = (bx - ax) / l * w / 2;
+    quad(g, [[ax - nx, 0.035, az - nz], [ax + nx, 0.035, az + nz], [bx + nx, 0.035, bz + nz], [bx - nx, 0.035, bz - nz]], col); quad(g, ring(bx, bz, w / 2, w / 2, 0.035, 12), col); } };
+  strip(ROAD, 6.6, '#B79A62'); strip(ROAD, 5.2, '#CFB27C'); strip([[-3, -19], [0, -2.2]], 5, '#B79A62'); strip([[-3, -19], [0, -2.2]], 3.8, '#CFB27C');
+  quad(g, ring(1, 7, 11.5, 7.2), 'rgba(196,170,112,0.5)'); quad(g, ring(-1, 5, 6.5, 4, 0.04), 'rgba(206,182,126,0.45)');  // the pen's trodden earth
+}
+function farmTufts(g, t) {
+  g.lineCap = 'round';
+  for (const [x, z, h, fl] of TUFTS) {
+    if (x > PEN.x0 - 0.6 && x < PEN.x1 + 0.6 && Math.abs(z - GATE_Z) < 0.7) continue;
+    const c = B.toCam(x, 0, z); if (c[2] < 2 || c[2] > 120) continue;
+    const p = B.project(x, 0, z), q = B.project(x, h, z), u = (q.y - p.y); if (p.x < -40 || p.x > W + 40 || p.y < -40 || p.y > H + 60 || Math.abs(u) < 2.5) continue;
+    const sw = Math.sin(t * 1.8 + x * 0.7 + z) * 0.12 * u;
+    g.strokeStyle = '#3F8F3A'; g.lineWidth = Math.max(1.2, p.s * 0.07); g.beginPath();
+    for (const d of [-0.55, 0, 0.55]) { g.moveTo(p.x + d * p.s * 0.12, p.y); g.quadraticCurveTo(p.x + d * p.s * 0.3, p.y + u * 0.6, p.x + d * p.s * 0.55 - sw, p.y + u * (1 - Math.abs(d) * 0.35)); }
+    g.stroke();
+    if (fl) { g.fillStyle = fl === 1 ? '#F7D84A' : '#FFFFFF'; g.beginPath(); g.arc(p.x + p.s * 0.2 - sw, p.y + u * 0.9, Math.max(1.5, p.s * 0.12), 0, 7); g.fill(); }
+  }
+}
+
+// ---------- the buildings ----------
+const BARN_FRONT = tex(BARN.w * BARN_PX, BARN.h2 * BARN_PX, (x, w, h) => {
+  const u = BARN_PX, b = BARN, X = v => (v + b.w / 2) * u, Y = v => h - v * u;
+  const gable = () => { x.beginPath(); x.moveTo(X(-b.w / 2), Y(0)); x.lineTo(X(-b.w / 2), Y(b.h0)); x.lineTo(X(-b.w * 0.3), Y(b.h1)); x.lineTo(X(0), Y(b.h2)); x.lineTo(X(b.w * 0.3), Y(b.h1)); x.lineTo(X(b.w / 2), Y(b.h0)); x.lineTo(X(b.w / 2), Y(0)); x.closePath(); };
+  x.save(); gable(); x.clip();
+  x.fillStyle = '#BC3B2F'; x.fillRect(0, 0, w, h);
+  x.fillStyle = 'rgba(70,10,8,0.2)'; for (let i = 1; i < b.w / 0.8; i++) x.fillRect(i * 0.8 * u - 1.5, 0, 3, h);
+  x.fillStyle = '#8F8C86'; x.fillRect(0, Y(0.7), w, 0.7 * u);
+  x.strokeStyle = '#F4F0E6'; x.lineJoin = 'miter'; x.lineWidth = 1.1 * u; gable(); x.stroke();
+  const door = (cx, y0, dw, dh, leaves) => {
+    x.fillStyle = '#A63128'; x.fillRect(X(cx - dw / 2), Y(y0 + dh), dw * u, dh * u);
+    x.strokeStyle = '#F4F0E6'; x.lineWidth = 0.42 * u; x.strokeRect(X(cx - dw / 2), Y(y0 + dh), dw * u, dh * u);
+    x.lineWidth = 0.32 * u;
+    for (let k = 0; k < leaves; k++) { const x0 = X(cx - dw / 2 + dw / leaves * k), x1 = X(cx - dw / 2 + dw / leaves * (k + 1)); x.beginPath(); x.moveTo(x0, Y(y0)); x.lineTo(x1, Y(y0 + dh)); x.moveTo(x1, Y(y0)); x.lineTo(x0, Y(y0 + dh)); x.moveTo(x1, Y(y0)); x.lineTo(x1, Y(y0 + dh)); x.stroke(); }
+  };
+  door(0, 0.5, 9.6, 7.9, 2); door(0, 12.7, 3.8, 3.5, 1);
+  x.fillStyle = '#F4F0E6'; x.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = (i % 2 ? 0.56 : 1.4) * u; x.lineTo(X(0) + Math.cos(a) * r, Y(10.5) + Math.sin(a) * r); } x.closePath(); x.fill();  // a barn star
+  x.restore();
+});
+const BARN_SIDE = tex(BARN.d * BARN_PX, BARN.h0 * BARN_PX, (x, w, h) => {
+  const u = BARN_PX;
+  x.fillStyle = '#BC3B2F'; x.fillRect(0, 0, w, h);
+  x.fillStyle = 'rgba(70,10,8,0.2)'; for (let i = 1; i < BARN.d / 0.8; i++) x.fillRect(i * 0.8 * u - 1.5, 0, 3, h);
+  x.fillStyle = '#8F8C86'; x.fillRect(0, h - 0.7 * u, w, 0.7 * u);
+  x.strokeStyle = '#F4F0E6'; x.lineWidth = 1.1 * u; x.strokeRect(0, -u, w, h + 2 * u);
+  for (const cx of [5.2, 11.7, 18.3, 24.8]) { x.fillStyle = '#27323E'; x.fillRect((cx - 1.5) * u, h - 7.4 * u, 3 * u, 3 * u); x.strokeStyle = '#F4F0E6'; x.lineWidth = 0.4 * u; x.strokeRect((cx - 1.5) * u, h - 7.4 * u, 3 * u, 3 * u);
+    x.lineWidth = 0.24 * u; x.beginPath(); x.moveTo(cx * u, h - 7.4 * u); x.lineTo(cx * u, h - 4.4 * u); x.moveTo((cx - 1.5) * u, h - 5.9 * u); x.lineTo((cx + 1.5) * u, h - 5.9 * u); x.stroke(); }
+});
+const barnT = p => { const q = rot3(p, { ry: BARN.ry }); return [BARN.x + q[0], q[1], BARN.z + q[2]]; };
+const BARN_V = (() => { const b = BARN, cs = [[-b.w / 2, 0], [-b.w / 2, b.h0], [-b.w * 0.3, b.h1], [0, b.h2], [b.w * 0.3, b.h1], [b.w / 2, b.h0], [b.w / 2, 0]];
+  return [...cs.map(([x, y]) => barnT([x, y, -b.d / 2])), ...cs.map(([x, y]) => barnT([x, y, b.d / 2]))]; })();
+const BARN_F = [[0, 1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12, 13], [0, 1, 8, 7], [1, 2, 9, 8], [2, 3, 10, 9], [3, 4, 11, 10], [4, 5, 12, 11], [5, 6, 13, 12], [6, 0, 7, 13]];
+const ROOF_C = '#55494A';
+const BARN_ROOF = (() => { const b = BARN, cs = [[-b.w / 2, b.h0], [-b.w * 0.3, b.h1], [0, b.h2], [b.w * 0.3, b.h1], [b.w / 2, b.h0]], out = [], th = 0.42, oz = 1.0, ox = 1.0;
+  for (let i = 0; i < 4; i++) {
+    let p = cs[i], q = cs[i + 1]; const l = Math.hypot(q[0] - p[0], q[1] - p[1]), d = [(q[0] - p[0]) / l, (q[1] - p[1]) / l];
+    let n = [-d[1], d[0]]; if (n[0] * ((p[0] + q[0]) / 2) + n[1] * ((p[1] + q[1]) / 2 - 6) < 0) n = [-n[0], -n[1]];
+    if (i === 0) p = [p[0] - d[0] * ox, p[1] - d[1] * ox]; if (i === 3) q = [q[0] + d[0] * ox, q[1] + d[1] * ox];
+    const ring = [p, q, [q[0] + n[0] * th, q[1] + n[1] * th], [p[0] + n[0] * th, p[1] + n[1] * th]];
+    out.push([...ring.map(([x, y]) => barnT([x, y, -b.d / 2 - oz])), ...ring.map(([x, y]) => barnT([x, y, b.d / 2 + oz]))]);
+  }
+  return out; })();
+const SLABF = [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]];
+function barn(g) {
+  const b = BARN, red = hazed('#BC3B2F', b.x, b.z);
+  solid(g, BARN_V, BARN_F, red, { amb: 0.6, cols: [red, red, red, ROOF_C, ROOF_C, ROOF_C, ROOF_C, red, red] });
+  // the painted walls on the sides the camera sees, each dimmed by how it stands to the sun
+  const face = (img, tl, tr, bl, n, under) => {
+    const N = rot3(n, { ry: b.ry }), c = vmid([tl, tr, bl]); if (vdot(N, vsub(B.E, c)) <= 0) return;
+    texQuad(g, img, tl, tr, bl, { under });
+    const k = 0.6 + 0.4 * Math.max(0, vdot(N, LIGHT)), br = [tr[0] + bl[0] - tl[0], tr[1] + bl[1] - tl[1], tr[2] + bl[2] - tl[2]];
+    if (!under) return;
+    quad(g, [tl, tr, br, bl], `rgba(30,6,10,${((1 - k) * 0.75).toFixed(3)})`);
+  };
+  const e = 0.03;
+  face(BARN_SIDE, barnT([-b.w / 2 - e, b.h0, b.d / 2]), barnT([-b.w / 2 - e, b.h0, -b.d / 2]), barnT([-b.w / 2 - e, 0, b.d / 2]), [-1, 0, 0], true);
+  face(BARN_SIDE, barnT([b.w / 2 + e, b.h0, -b.d / 2]), barnT([b.w / 2 + e, b.h0, b.d / 2]), barnT([b.w / 2 + e, 0, -b.d / 2]), [1, 0, 0], true);
+  face(BARN_FRONT, barnT([-b.w / 2, b.h2, -b.d / 2 - e]), barnT([b.w / 2, b.h2, -b.d / 2 - e]), barnT([-b.w / 2, 0, -b.d / 2 - e]), [0, 0, -1], false);
+  BARN_ROOF.map(v => ({ v, d: depth(...vmid(v)) })).sort((p, q) => q.d - p.d).forEach(({ v }) => solid(g, v, SLABF, hazed(ROOF_C, b.x, b.z), { amb: 0.55 }));
+}
+function silo(g) {
+  const s = SILO, col = hazed('#DAD6CA', s.x, s.z), n = 22;
+  cylinder(g, [s.x, 0, s.z], [s.x, s.h, s.z], s.r, col, { n, amb: 0.62 });
+  for (const y of [5.5, 11.5, 17.5, 23.5, 29.2]) lathe(g, s.x, s.z, [[y, s.r + 0.07, s.r + 0.07], [y + 0.4, s.r + 0.07, s.r + 0.07]], hazed('#A6A39A', s.x, s.z), { n, amb: 0.62 });
+  lathe(g, s.x, s.z, [[s.h, s.r + 0.15, s.r + 0.15], [s.h + 1.5, s.r * 0.9, s.r * 0.9], [s.h + 2.8, s.r * 0.66, s.r * 0.66], [s.h + 3.6, s.r * 0.36, s.r * 0.36], [s.h + 3.95, 0.1, 0.1]], hazed('#8A9098', s.x, s.z), { n, amb: 0.55, spec: 0.25 });
+}
+function windpump(g, t) {
+  const { x, z, h } = PUMP, col = hazed('#5E666E', x, z), top = [x, h, z];
+  const p0 = B.project(x, h * 0.5, z); if (depth(x, h * 0.5, z) < 4) return;
+  g.save(); g.strokeStyle = col; g.lineCap = 'round'; g.lineWidth = Math.max(1.4, p0.s * 0.13); g.beginPath();
+  const leg = (sx, sz, y) => [x + sx * lerp(1.9, 0.32, y / h), y, z + sz * lerp(1.9, 0.32, y / h)];
+  for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) line3(g, leg(sx, sz, 0), leg(sx, sz, h));
+  g.stroke(); g.lineWidth = Math.max(1, p0.s * 0.07); g.beginPath();
+  for (let k = 0; k < 5; k++) { const y0 = h * k / 5, y1 = h * (k + 1) / 5, C = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+    for (let i = 0; i < 4; i++) { const a = C[i], b = C[(i + 1) % 4]; line3(g, leg(...a, y1), leg(...b, y1)); line3(g, leg(...a, y0), leg(...b, y1)); } }
+  g.stroke();
+  // the wheel turns to the camera's side of the yard; its tail behind it
+  const n = vnorm([-0.28, 0, -0.96]), u = [n[2], 0, -n[0]], hub = [top[0] + n[0] * 0.9, top[1] + 0.5, top[2] + n[2] * 0.9];
+  const P = (r, a) => [hub[0] + u[0] * Math.cos(a) * r, hub[1] + Math.sin(a) * r, hub[2] + u[2] * Math.cos(a) * r];
+  quad(g, [[top[0] - n[0] * 1.0, top[1] + 0.7, top[2] - n[2] * 1.0], [top[0] - n[0] * 4.4, top[1] + 1.7, top[2] - n[2] * 4.4], [top[0] - n[0] * 4.4, top[1] - 0.7, top[2] - n[2] * 4.4], [top[0] - n[0] * 1.0, top[1] + 0.3, top[2] - n[2] * 1.0]], hazed('#C43C30', x, z));
+  const N = 14, a0 = t * 2.6;
+  for (let i = 0; i < N; i++) { const a = a0 + i / N * 6.2832; quad(g, [P(0.7, a - 0.05), P(3.5, a - 0.17), P(3.5, a + 0.17), P(0.7, a + 0.05)], hazed(i % 2 ? '#DCE1E4' : '#C4CBD0', x, z)); }
+  g.strokeStyle = col; g.lineWidth = Math.max(1, p0.s * 0.07); g.beginPath(); for (let i = 0; i < 28; i++) line3(g, P(3.5, i / 28 * 6.2832), P(3.5, (i + 1) / 28 * 6.2832)); g.stroke();
+  quad(g, Array.from({ length: 10 }, (_, i) => P(0.55, i / 10 * 6.2832)), col);
+  g.restore();
+}
+const TREES = (() => { const r = rng(2026), out = [];
+  for (let x = -220; x < 330; x += 15 + r() * 16) out.push([x, 118 + r() * 26, 13 + r() * 8, r()]);
+  for (const [x, z, h] of [[-6.5, 50, 19], [-13, 60, 15], [-88, 22, 16], [-94, 44, 13], [-60, 56, 15], [-40, -6, 14], [-46, 14, 17], [66, 22, 15], [72, 6, 12], [58, 90, 17], [14, 96, 14], [-30, 92, 16], [84, 64, 15], [-120, -20, 15], [-116, 70, 17], [110, -30, 14], [130, 40, 16]]) out.push([x, z, h, r()]);
+  return out; })();
+function tree(g, [x, z, h, k]) {
+  const r = h * 0.3, c1 = hazed(k < 0.5 ? '#3C8C3B' : '#458F35', x, z), c2 = hazed(k < 0.5 ? '#4FA148' : '#5AA844', x, z);
+  ab(g, [x - h * 0.04, 0, z - h * 0.04], [x + h * 0.04, h * 0.45, z + h * 0.04], hazed('#7A5A3A', x, z), FO);
+  blob(g, [x, h * 0.6, z], [r, h * 0.3, r], c1, { n: 9, m: 5 }); blob(g, [x + r * 0.22, h * 0.8, z - r * 0.1], [r * 0.7, h * 0.2, r * 0.7], c2, { n: 8, m: 4 });
+}
+const treeV = ([x, z, h]) => ellV([x, h * 0.62, z], [h * 0.3, h * 0.36, h * 0.3], null, 8, 3).verts;
+
+// ---------- the pen: posts and rails, the plank gate with the farm's name on it ----------
+const post = (g, x, z, h = 3.75) => { ab(g, [x - 0.22, 0, z - 0.22], [x + 0.22, h, z + 0.22], WOOD_D, FO); ab(g, [x - 0.28, h, z - 0.28], [x + 0.28, h + 0.14, z + 0.28], WOOD, FO); };
+const RAILS = [[1.2, 1.72], [2.85, 3.37]];
+const FENCE = (() => { const out = [], run = (x0, z0, x1, z1) => { const n = Math.max(1, Math.round(Math.hypot(x1 - x0, z1 - z0) / 4.7)); for (let i = 0; i < n; i++) out.push([lerp(x0, x1, i / n), lerp(z0, z1, i / n), lerp(x0, x1, (i + 1) / n), lerp(z0, z1, (i + 1) / n)]); };
+  run(PEN.x0, GATE_Z, -3.62, GATE_Z); run(3.62, GATE_Z, PEN.x1, GATE_Z); run(PEN.x0, GATE_Z, PEN.x0, PEN.z1); run(PEN.x1, GATE_Z, PEN.x1, PEN.z1); run(PEN.x0, PEN.z1, PEN.x1, PEN.z1);
+  return out; })();
+const railV = ([ax, az, bx, bz], [ya, yb]) => Math.abs(bx - ax) > Math.abs(bz - az) ? oboxV([(ax + bx) / 2, (ya + yb) / 2, az], [Math.abs(bx - ax) / 2, (yb - ya) / 2, 0.09]) : oboxV([ax, (ya + yb) / 2, (az + bz) / 2], [0.09, (yb - ya) / 2, Math.abs(bz - az) / 2]);
+function fenceSection(g, s) {
+  for (const r of RAILS) solid(g, railV(s, r), BOXF, WOOD, FO);
+  const ends = [[s[0], s[1]], [s[2], s[3]]].sort((a, b) => depth(b[0], 2, b[1]) - depth(a[0], 2, a[1]));
+  for (const [x, z] of ends) if (!(Math.abs(z - GATE_Z) < 0.01 && Math.abs(Math.abs(x) - 3.62) < 0.01)) post(g, x, z);
+}
+const GATE_TEX = tex(1320, 920, (x, w0, h0) => {
+  const w = 660, h = 460; x.scale(2, 2);
+  const cols = ['#B88A52', '#AE8048', '#BF925A', '#A97B45', '#B5874F'];
+  for (let i = 0; i < 10; i++) { x.fillStyle = cols[(i * 3) % 5]; x.fillRect(i * 66, 0, 66, h); x.fillStyle = 'rgba(60,34,12,0.5)'; x.fillRect(i * 66 - 2, 0, 4, h); x.fillStyle = 'rgba(255,236,200,0.10)'; x.fillRect(i * 66 + 4, 0, 5, h); }
+  x.fillStyle = 'rgba(60,34,12,0.16)'; for (let i = 0; i < 40; i++) x.fillRect((i * 137) % 640, (i * 71) % 440, 2, 30 + (i * 13) % 50);  // the grain
+  x.fillStyle = '#946A3A'; x.fillRect(0, 26, w, 44); x.fillRect(0, h - 78, w, 44);
+  x.strokeStyle = '#946A3A'; x.lineWidth = 42; x.beginPath(); x.moveTo(14, h - 60); x.lineTo(w - 14, 52); x.stroke();
+  x.fillStyle = 'rgba(40,22,8,0.35)'; x.fillRect(0, 70, w, 4); x.fillRect(0, h - 34, w, 4);
+  x.fillStyle = '#4B4B50'; for (const [cx, cy] of [[30, 48], [w - 30, 48], [30, h - 56], [w - 30, h - 56], [w / 2, 48], [w / 2, h - 56]]) { x.beginPath(); x.arc(cx, cy, 7, 0, 7); x.fill(); }
+  // the farm's name on a painted board, nailed over the planks
+  x.fillStyle = 'rgba(40,22,8,0.35)'; x.fillRect(102, 152, 468, 148);
+  x.fillStyle = '#EFE2B8'; x.fillRect(96, 144, 468, 148); x.strokeStyle = '#5E4020'; x.lineWidth = 9; x.strokeRect(100.5, 148.5, 459, 139);
+  x.fillStyle = '#4A2F18'; x.font = sans(76, 900); x.letterSpacing = '2px'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('GOAT FARM', w / 2 + 1, 222);
+});
+function gate(g) {
+  ab(g, [-3.3, 0.25, GATE_Z - 0.13], [3.3, GATE_T0, GATE_Z + 0.13], '#AE8048', FO);
+  if (B.E[2] < GATE_Z - 0.2) for (let k = 0; k < 2; k++) texGrid(g, GATE_TEX, [-3.3, GATE_T0, GATE_Z - 0.14], [3.3, GATE_T0, GATE_Z - 0.14], [-3.3, 0.25, GATE_Z - 0.14], 14, 6, { under: k === 0 });
+  for (const sx of [-1, 1].sort((a, b) => depth(b * 3.62, 2, GATE_Z) - depth(a * 3.62, 2, GATE_Z))) { ab(g, [sx * 3.62 - 0.3, 0, GATE_Z - 0.3], [sx * 3.62 + 0.3, 5.5, GATE_Z + 0.3], WOOD_D, FO); ab(g, [sx * 3.62 - 0.38, 5.5, GATE_Z - 0.38], [sx * 3.62 + 0.38, 5.72, GATE_Z + 0.38], WOOD, FO); }
+}
+const haybale = (g, x, y, z, ry = 0) => { obox(g, [x, y + 0.8, z], [1.75, 0.8, 0.95], '#E3BA52', { ry }, { amb: 0.62 }); for (const d of [-0.9, 0.9]) obox(g, [x, y + 0.8, z], [0.07, 0.82, 0.97], '#B78D34', { ry }, { amb: 0.62, pivot: null }); };
+const HAY = [[10.4, 0, 13.2, 0.12], [10.2, 0, 11.1, -0.06], [10.3, 1.6, 12.2, 0.3]];
+// round bales left on the mown pasture
+const BALES = [[-20, -44, 0.3], [-9, -50, 1.2], [14, -42, 0.1], [27, -52, 0.8], [40, -38, 1.4], [52, -50, 0.2], [34, -18, 0.6], [48, -6, 1.1], [-22, -22, 0.9], [56, 16, 0.4], [-24, 56, 1.3]];
+const baleV = ([x, z, ry]) => { const d = [Math.cos(ry) * 1.6, Math.sin(ry) * 1.6]; return cylV([x - d[0], 1.5, z - d[1]], [x + d[0], 1.5, z + d[1]], 1.5, 14); };
+
+// ---------- a goat of solids: barrel, four legs, neck and head (they nod and turn about the withers), horns, beard, tail ----------
+const GOAT_C = {
+  white: { body: '#F5F0E4', head: '#F5F0E4', muzzle: '#EBD8CA', leg: '#ECE5D5', ear: '#E3D4C0', horn: '#A39274', beard: '#E4DCCD' },
+  boer: { body: '#F5F0E4', head: '#A05C33', neck: '#A05C33', muzzle: '#EAD6C4', leg: '#ECE5D5', ear: '#88492A', horn: '#8C7C62', beard: '#8A4F2C' },
+  tan: { body: '#CFA878', head: '#CFA878', muzzle: '#F0E2D0', leg: '#6A4E34', ear: '#A8825A', horn: '#5E5244', beard: '#B9966A' },
+  grey: { body: '#BDB8B0', head: '#ADA8A0', muzzle: '#EEE6DC', leg: '#8E8A84', ear: '#8A8680', horn: '#6B6258', beard: '#D8D2C8' },
+};
+function goatParts({ x, z, y = 0, ry = 0, s = 1, nod = 0, turn = 0, jaw = 0, wag = 0, c = GOAT_C.white, horns = true }) {
+  const T = p => { const q = rot3([p[0] * s, p[1] * s, p[2] * s], { ry }); return [x + q[0], y + q[1], z + q[2]]; };
+  const PV = [1.4, 3.0, 0], Hd = p => { const q = rot3([p[0] - PV[0], p[1] - PV[1], p[2] - PV[2]], { rz: nod, ry: turn }); return T([PV[0] + q[0], PV[1] + q[1], PV[2] + q[2]]); };
+  const parts = [], sh = [];
+  const add = (m, col, f = T) => { const V = m.verts.map(f); parts.push({ V, F: m.faces, col, d: depth(...vmid(V)) }); return V; };
+  const bx = (cc, h, r, pivot) => ({ verts: oboxV(cc, h, r, pivot), faces: BOXF });
+  sh.push(...add(ellV([0, 2.6, 0], [2.0, 1.02, 0.95], null, 12, 6), c.body));
+  for (const [lx, lz] of [[1.2, 0.46], [1.2, -0.46], [-1.3, 0.46], [-1.3, -0.46]]) { add(bx([lx, 1.05, lz], [0.19, 0.9, 0.19]), c.leg); add(bx([lx, 0.17, lz], [0.22, 0.17, 0.22]), '#3B3029'); }
+  add(ellV([-2.02, 3.25, 0], [0.42, 0.2, 0.2], { rz: -0.75, ry: wag }, 8, 4), c.body);
+  add(bx([1.72, 3.5, 0], [0.45, 0.92, 0.42], { rz: -0.5 }), c.neck || c.body, Hd);
+  sh.push(...add(ellV([2.45, 4.5, 0], [0.82, 0.56, 0.52], { rz: -0.3 }, 12, 6), c.head, Hd));
+  add(ellV([3.1, 4.24, 0], [0.45, 0.31, 0.36], { rz: -0.3 }, 10, 5), c.muzzle, Hd);
+  add(bx([3.0, 3.94, 0], [0.36, 0.085, 0.25], { rz: -0.3 - jaw }, [2.7, 4.03, 0]), mix(c.muzzle, '#7A5A50', 0.25), Hd);
+  if (jaw > 0.05) add(bx([3.0, 4.02, 0], [0.3, 0.05, 0.2], { rz: -0.3 - jaw * 0.5 }, [2.7, 4.03, 0]), '#5A2028', Hd);
+  add(ellV([3.5, 4.14, 0], [0.1, 0.1, 0.2], null, 6, 3), '#4A3A36', Hd);
+  add(cylV([2.86, 3.88, 0], [2.98, 3.2, 0], 0.15, 6, 0.03), c.beard, Hd);
+  for (const sd of [-1, 1]) {
+    add(ellV([2.02, 4.62, sd * 0.68], [0.22, 0.13, 0.46], { rx: sd * 0.45 }, 8, 4), c.ear, Hd);
+    if (horns) { const P = [[2.2, 4.92, sd * 0.24], [1.98, 5.6, sd * 0.31], [1.58, 6.02, sd * 0.4], [1.1, 6.12, sd * 0.5]], R = [0.15, 0.115, 0.08, 0.04];
+      for (let k = 0; k < 3; k++) add(cylV(P[k], P[k + 1], R[k], 7, R[k + 1]), k === 2 ? mix(c.horn, '#FFFFFF', 0.2) : c.horn, Hd); }
+    const E0 = Hd([2.74, 4.68, sd * 0.47]), N = vsub(Hd([2.84, 4.76, sd * 1.47]), E0);
+    if (vdot(N, vsub(B.E, E0)) > 0) parts.push({ eye: E0, r: 0.125 * s, d: depth(...E0) - 0.3 * s });
+  }
+  parts.sort((a, b) => b.d - a.d);
+  return { parts, sh, d: depth(...T([0.3, 2.6, 0])) };
+}
+function drawGoat(g, G) {
+  for (const p of G.parts) {
+    if (!p.eye) { solid(g, p.V, p.F, p.col, { amb: 0.6 }); continue; }
+    const q = B.project(...p.eye), r = p.r * q.s; if (r < 1) continue;
+    if (r < 6) { g.fillStyle = '#2A2019'; g.beginPath(); g.arc(q.x, q.y, r, 0, 7); g.fill(); continue; }
+    g.fillStyle = '#2A2019'; g.beginPath(); g.arc(q.x, q.y, r * 1.12, 0, 7); g.fill();
+    g.fillStyle = '#D9A441'; g.beginPath(); g.arc(q.x, q.y, r * 0.92, 0, 7); g.fill();
+    g.fillStyle = '#231A14'; g.beginPath(); g.roundRect(q.x - r * 0.7, q.y - r * 0.26, r * 1.4, r * 0.52, r * 0.2); g.fill();  // a goat's level pupil
+    g.fillStyle = 'rgba(255,255,255,0.85)'; g.beginPath(); g.arc(q.x - r * 0.35, q.y - r * 0.45, r * 0.2, 0, 7); g.fill();
+  }
+}
+
+// ---------- the whole farm, from the current camera. e: Magnus's face; bleat: seconds since the goat beside him bleated ----------
+function farm3(g, t, { e = EXPR.smug, bleat = -1 } = {}) {
+  const bl = bleat >= 0 && bleat < 0.75 ? Math.sin(Math.PI * clamp(bleat / 0.75)) : 0, bj = bl * (0.75 + 0.25 * Math.sin(bleat * 60));
+  const goats = [
+    { x: -2.7, z: 6.9, ry: 1.38, c: GOAT_C.boer, nod: 0.08 + 0.03 * Math.sin(t * 1.3) + 0.3 * bl, turn: 0.12 * Math.sin(t * 0.8), jaw: 0.75 * bj, wag: 0.5 * Math.sin(t * 7) },
+    { x: 7.4, z: 6.6, ry: 2.85, c: GOAT_C.white, nod: 0.06 + 0.04 * Math.sin(t * 1.1 + 2), turn: -0.5, wag: 0.4 * Math.sin(t * 5 + 1) },
+    { x: 10.4, z: 12.3, y: 3.2, ry: 2.5, c: GOAT_C.tan, nod: 0.2, turn: -0.35 + 0.1 * Math.sin(t * 0.9), wag: 0.3 * Math.sin(t * 6) },
+    { x: 3.2, z: 12.2, ry: 0.5, s: 0.56, c: GOAT_C.white, horns: false, y: 0.9 * Math.abs(Math.sin(t * 5.2)), nod: 0.15, wag: 0.8 * Math.sin(t * 11) },
+    { x: -9.5, z: 9.5, ry: 0.9, c: GOAT_C.grey, nod: -1.75 + 0.06 * Math.sin(t * 6), wag: 0.3 * Math.sin(t * 4) },
+    { x: -7, z: 2.6, ry: -0.6, c: GOAT_C.white, nod: -1.7 + 0.06 * Math.sin(t * 5 + 1), wag: 0.4 * Math.sin(t * 6 + 2) },
+    { x: 20, z: 20, ry: 2.2, c: GOAT_C.tan, nod: -1.75 + 0.05 * Math.sin(t * 5.5), wag: 0 },
+    { x: -22, z: 12, ry: 0.3, c: GOAT_C.boer, nod: 0.1, turn: 0.4, wag: 0.4 * Math.sin(t * 5) },
+    { x: -18, z: 30, ry: 1.9, c: GOAT_C.white, nod: -1.7, wag: 0 },
+    { x: 40, z: 22, ry: -2.4, c: GOAT_C.grey, nod: 0.05, turn: 0.3, wag: 0.3 * Math.sin(t * 4) },
+    { x: 2, z: -30, ry: 0.4, c: GOAT_C.white, nod: -1.7, wag: 0 }, { x: 22, z: -28, ry: 2.6, c: GOAT_C.tan, nod: 0.1, turn: -0.3, wag: 0 }, { x: -14, z: -34, ry: -0.8, c: GOAT_C.boer, nod: -1.75, wag: 0 },
+    { x: 34, z: 26, ry: 1.2, c: GOAT_C.white, nod: 0.1, wag: 0 }, { x: 44, z: 44, ry: -2.0, c: GOAT_C.grey, nod: -1.7, wag: 0 },
+  ].map(goatParts);
+  farmSky(g, t); farmGround(g, t);
+  // every shadow first, on the ground
+  shadowOf(g, BARN_V, 0.24); shadowOf(g, cylV([SILO.x, 0, SILO.z], [SILO.x, SILO.h + 3, SILO.z], SILO.r, 12).verts, 0.2);
+  for (const tr of TREES) if (depth(tr[0], 0, tr[1]) > -30) shadowOf(g, treeV(tr), 0.2);
+  for (const s of FENCE) { for (const r of RAILS) shadowOf(g, railV(s, r), 0.16); shadowOf(g, oboxV([s[0], 1.9, s[1]], [0.22, 1.9, 0.22]), 0.16); }
+  shadowOf(g, oboxV([0, 2.5, GATE_Z], [3.3, 2.35, 0.13]), 0.2);
+  for (const [x, y, z, ry] of HAY) shadowOf(g, oboxV([x, y + 0.8, z], [1.75, 0.8, 0.95], { ry }), 0.2);
+  for (const G of goats) shadowOf(g, G.sh, 0.2);
+  for (const b of BALES) shadowOf(g, baleV(b).verts, 0.2);
+  shadowOf(g, ellV([0, 4.2, 0.1], [2.1, 4.2, 0.7], null, 10, 4).verts, 0.22);
+  farmTufts(g, t);
+  // then everything that stands on it, the far things first
+  const items = [{ d: depth(BARN.x, 6, BARN.z), draw: () => barn(g) }, { d: depth(SILO.x, 12, SILO.z), draw: () => silo(g) }, { d: depth(PUMP.x, 10, PUMP.z), draw: () => windpump(g, t) }];
+  for (const tr of TREES) { const d = depth(tr[0], tr[2] * 0.5, tr[1]); if (d > 3) items.push({ d, draw: () => tree(g, tr) }); }
+  for (const s of FENCE) items.push({ d: depth((s[0] + s[2]) / 2, 2, (s[1] + s[3]) / 2), draw: () => fenceSection(g, s) });
+  for (const h of HAY) items.push({ d: depth(h[0], h[1] + 0.8, h[2]) + (h[1] > 0 ? -0.6 : 0), draw: () => haybale(g, ...h) });
+  for (const G of goats) items.push({ d: G.d, draw: () => drawGoat(g, G) });
+  for (const b of BALES) { const d = depth(b[0], 1.5, b[1]); if (d > 2) items.push({ d, draw: () => { const m = baleV(b); solid(g, m.verts, m.faces, hazed('#E3BA52', b[0], b[1]), { amb: 0.62 }); } }); }
+  const dM = depth(0, 4, 0), dG = depth(0, 2.5, GATE_Z);
+  items.push({ d: dM, draw: () => {  // Magnus: short legs under the bust, as every one of them is built
+    for (const sx of [-1, 1]) { ab(g, [sx * 0.62 - 0.42, 0.3, -0.3], [sx * 0.62 + 0.42, 2.5, 0.3], '#2C3442', FO); ab(g, [sx * 0.62 - 0.46, 0, -0.75], [sx * 0.62 + 0.46, 0.36, 0.4], '#1B1C20', FO); }
+    const p = B.project(0, FARM_Y, 0); drawChar(g, 'magN', { x: p.x, y: p.y, s: p.s / 100 * 1.05, e, t });
+  } });
+  items.push({ d: Math.min(dG, dM - 0.2), draw: () => gate(g) });
+  items.push({ d: Math.min(dG, dM - 0.2) - 0.3, draw: () => {  // his hands on the gate: the knuckles on its top, four fingers over its front
+    const skin = SKIN2.base, FS = { amb: 0.8 };
+    for (const sd of [-1, 1].sort((p, q) => depth(q * 1.62, GATE_T0, GATE_Z) - depth(p * 1.62, GATE_T0, GATE_Z))) {
+      const hx = sd * 1.62;
+      blob(g, [hx, GATE_T0 + 0.1, GATE_Z + 0.04], [0.56, 0.2, 0.27], skin, FS);
+      for (const dx of [-0.39, -0.13, 0.13, 0.39].sort((p, q) => depth(hx + q, GATE_T0, GATE_Z) - depth(hx + p, GATE_T0, GATE_Z)))
+        blob(g, [hx + dx, GATE_T0 - 0.05, GATE_Z - 0.21], [0.122, 0.29, 0.13], skin, { ...FS, n: 8, m: 5 });
+    }
+  } });
+  items.sort((a, b) => b.d - a.d).forEach(it => it.draw());
+}
+
 // five standing cards on the table: every game of theirs on Chess.com (SOURCES.md), the winner's colour
 const GAMES = [['DEC 28, 2024', 'BULLET', 'mag'], ['DEC 13, 2025', 'BULLET', 'mag'], ['DEC 13, 2025', 'BULLET', 'mag'], ['SEP 30, 2026', 'BLITZ', 'wit'], ['NOV 7, 2026', 'BLITZ', 'mag']];
 const CARD_T = GAMES.map(([d, kind, who]) => tex(360, 520, (x, w, h) => {
@@ -991,9 +1490,10 @@ export async function build(T) {
   const endA = s('endgame') - 0.06, twT = w('endgame', 2), pawnsA = w('endgame', 5) - 0.06, pawnsT = w('endgame', 10);
   const q1A = s('queens') - 0.06, q1T = w('queens', 1), wtA = w('queens', 2) - 0.06, wtT = w('queens', 3), q2A = w('queens', 5) - 0.06, q2T = w('queens', 6);
   const andA = s('and') - 0.06, CUT = T.e('and') + 0.1, lostT = w('resign', 0), lostW = w('resign', 1);
-  const humA = s('mirror') - 0.06, humT = w('mirror', 1), butA = w('mirror', 5) - 0.06, goatT = w('mirror', 8), twiceT = w('mirror', 10);
+  // the second pull-back starts when "lost." has sounded; the flight to the Earth with the phrase; the line-up on "beat"
+  const REV = T.e('resign') + 0.1, alienA = s('mirror') - 0.06, humS = w('mirror', 3) - 0.05, butA = w('mirror', 5) - 0.06, goatT = w('mirror', 8), twiceT = w('mirror', 10);
   const scoreA = s('score') - 0.06, fourT = w('score', 4), forA = w('score', 7) - 0.06;
-  const proudA = s('proud') - 0.06, strongT = w('proud', 4);
+  const proudA = s('proud') - 0.06, strongT = w('proud', 4), saidT = T.e('proud') + 0.2;
   const ctaA = s('cta') - 0.06, movesT = w('cta', 3), lastT = w('cta', 6);
 
   // ======================= HOOK (rules 1, 28, 42, 57): the stream, both faces big; then Magnus across the board =======================
@@ -1052,6 +1552,8 @@ export async function build(T) {
     if (t >= wildT) badge(g, 'LIVE ON STREAM', W / 2, 230, { color: RED, size: 56, ...pop(t, wildT) });
   } });
   cue(wildA - 0.04, 'whoosh_fast', 0.3); cue(wildT, 'cheer', 0.4); cue(wildT, 'confetti', 0.35);
+  // his own shout from that stream, in the pause after "...went wild on stream." (the clip the author sent; version 6)
+  cue(T.e('name') + 0.04, 'witty_scream', 0.95);
 
   // ======================= FIVE WEEKS LATER: ROUND TWO, FIVE-MINUTE BLITZ =======================
   shot(remA, (g, lt, t, sh) => {
@@ -1278,11 +1780,11 @@ export async function build(T) {
     for (const [wd, col, al] of [[150 * lw, CURSE, 0.16], [64 * lw, '#FF8A80', 0.3], [26 * lw, '#FFFFFF', 0.65], [9 * lw, '#FFFFFF', 1]]) { g.strokeStyle = rgba(col, al * k); g.lineWidth = wd; g.beginPath(); g.moveTo(...SL.a); g.lineTo(x1, y1); g.stroke(); }
     g.restore();
   };
-  const T_NEG = 0.06, T_BLK = 0.17, T_IN = 0.5, T_UP = 0.95, HOLD = 1.25;  // after the cut: the negative, the black, the fade-in, the hold on his face
-  const lieCam = t => {  // the zoom falls in equal ratios; his head keeps a straight path on the screen (it never leaves the frame)
-    const u = ease.inOut(seg(t, CUT + HOLD, butA + 0.2)), d = seg(t, CUT + T_IN, CUT + HOLD + 0.2, lin);
-    const z = Math.exp(lerp(Math.log(1.3 - 0.05 * d), Math.log(0.56), u)), cy = lerp(H * 0.42, H * 0.45, u), hx = lerp(575, 876, u), hy = lerp(745, 629, u);
-    return { z, lx: (W / 2 - hx) / z, ly: (cy - hy) / z, rot: lerp(-0.07, 0, u), cx: W / 2, cy };
+  const T_NEG = 0.06, T_BLK = 0.17, T_IN = 0.5, T_UP = 0.95, REV_D = 1.15;  // after the cut: the negative, the black, the fade-in; the length of the second pull-back
+  const S_PLANET = 430 / MARS_R;
+  const marsCam = t => {  // the first pull-back, slow, from his face to the whole of him; from REV the second, out to the planet
+    const u = ease.inOut(seg(t, CUT + T_IN, REV)), v = ease.inOut(seg(t, REV, REV + REV_D));
+    return { s: Math.exp(lerp(lerp(Math.log(1.3), Math.log(0.58), u), Math.log(S_PLANET), v)), hx: lerp(lerp(575, 870, u), 626, v), hy: lerp(lerp(745, 630, u), 671, v), rot: lerp(-0.07, 0, u) };
   };
   const DUST = (() => { const r = rng(91), d = []; for (let i = 0; i < 70; i++) d.push([r() * W, r() * H, 1.5 + r() * 4.5, 12 + r() * 40, r() * 7, 0.15 + r() * 0.4]); return d; })();
   shot(CUT, (g, lt, t) => {
@@ -1294,37 +1796,47 @@ export async function build(T) {
       return;
     }
     g.fillStyle = '#000000'; g.fillRect(0, 0, W, H);
-    if (lt >= T_IN) {  // he lies there: the hand-held camera, the beam, the dust, the dark edges
-      const a = seg(lt, T_IN, T_UP), hit = 1 - seg(lt, T_IN, T_IN + 0.9), c = lieCam(t);
-      const sx = Math.sin(t * 2.1) * 6 + Math.sin(t * 13.7) * (2 + 9 * hit), sy = Math.cos(t * 1.7) * 5 + Math.cos(t * 11.3) * (2 + 7 * hit);
+    if (lt >= T_IN) {  // he lies on red ground: the hand-held camera, a low sun's beam, the dust, the dark edges; then the way out
+      const a = seg(lt, T_IN, T_UP), hit = 1 - seg(lt, T_IN, T_IN + 0.9), c = marsCam(t), near = seg(c.s, 0.06, 0.3);
+      const sx = (Math.sin(t * 2.1) * 6 + Math.sin(t * 13.7) * (2 + 9 * hit)) * near, sy = (Math.cos(t * 1.7) * 5 + Math.cos(t * 11.3) * (2 + 7 * hit)) * near;
       g.save(); g.globalAlpha = a;
-      g.save(); g.translate(sx, sy); lying(g, t, { ...c, rot: c.rot + Math.sin(t * 1.3) * 0.006 }); g.restore();
-      g.save(); g.globalCompositeOperation = 'screen';  // a pale beam from the upper right, slowly breathing
-      const bm = g.createLinearGradient(W * 0.9, 0, W * 0.35, H * 0.75); bm.addColorStop(0, `rgba(255,255,255,${(0.3 + 0.06 * Math.sin(t * 1.4)).toFixed(3)})`); bm.addColorStop(1, 'rgba(255,255,255,0)');
-      g.fillStyle = bm; g.beginPath(); g.moveTo(W * 0.62, -40); g.lineTo(W * 1.1, -40); g.lineTo(W * 0.62, H * 0.9); g.lineTo(W * 0.18, H * 0.7); g.closePath(); g.fill(); g.restore();
-      g.fillStyle = '#2A2A2A';  // dust settling through the light
-      for (const [x0, y0, r, v, ph, al] of DUST) { const y = (y0 + v * (t - CUT)) % H, x = x0 + Math.sin(t * 0.7 + ph) * 18; g.globalAlpha = a * al * (0.6 + 0.4 * Math.sin(t * 2 + ph)); g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
-      g.globalAlpha = a;
-      const vg = g.createRadialGradient(W / 2, H * 0.45, H * 0.2, W / 2, H * 0.45, H * 0.72); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.6)');
-      g.fillStyle = vg; g.fillRect(0, 0, W, H);  // the heavy dark edges, on top of the engine's own vignette
+      marsView(g, t, c.s, { hx: c.hx + sx, hy: c.hy + sy, rot: c.rot + Math.sin(t * 1.3) * 0.006 * near });
+      if (near > 0) {
+        g.save(); g.globalAlpha = a * near; g.globalCompositeOperation = 'screen';
+        const bm = g.createLinearGradient(W * 0.9, 0, W * 0.35, H * 0.75); bm.addColorStop(0, `rgba(255,214,170,${(0.26 + 0.05 * Math.sin(t * 1.4)).toFixed(3)})`); bm.addColorStop(1, 'rgba(255,214,170,0)');
+        g.fillStyle = bm; g.beginPath(); g.moveTo(W * 0.62, -40); g.lineTo(W * 1.1, -40); g.lineTo(W * 0.62, H * 0.9); g.lineTo(W * 0.18, H * 0.7); g.closePath(); g.fill(); g.restore();
+        g.fillStyle = '#FFD9B8';  // dust drifting through the light
+        for (const [x0, y0, r, v, ph, al] of DUST) { const y = (y0 + v * (t - CUT)) % H, x = x0 + Math.sin(t * 0.7 + ph) * 18; g.globalAlpha = a * near * al * 0.7 * (0.6 + 0.4 * Math.sin(t * 2 + ph)); g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+        g.globalAlpha = a * near;
+        const vg = g.createRadialGradient(W / 2, H * 0.45, H * 0.2, W / 2, H * 0.45, H * 0.72); vg.addColorStop(0, 'rgba(20,4,2,0)'); vg.addColorStop(1, 'rgba(20,4,2,0.62)');
+        g.fillStyle = vg; g.fillRect(0, 0, W, H);  // the heavy dark edges, on top of the engine's own vignette
+      }
       g.restore();
     }
     if (lt < T_IN + 0.1) slashLine(g, 1, 1 - seg(lt, T_BLK, T_IN + 0.1), lerp(1, 0.25, seg(lt, T_BLK, T_IN)));  // the line left on the black, thinning out
-  }, { trans: 'cut', grade: 'bw', vig: 0.8, kb: 0, post: (g, lt, t) => {  // after the black-and-white grade: the plates keep their colour
-    if (t >= lostW + 0.25 && t < humT - 0.1) badge(g, 'RESIGNED · 6 SECONDS LEFT', W / 2, 230, { color: '#16161E', size: 44, ...popW(t, lostW + 0.25) });
-    if (t >= humT - 0.1) badge(g, 'THE ALIEN CAN BEAT HUMANS', W / 2, 230, { color: VOID, size: 48, ...popW(t, humT - 0.1) });
+  }, { trans: 'cut', vig: 0.8, kb: 0, noJump: true, hud: (g, lt, t) => {
+    if (t >= lostW + 0.25 && t < REV) badge(g, 'RESIGNED · 6 SECONDS LEFT', W / 2, 230, { color: '#16161E', size: 44, ...popW(t, lostW + 0.25) });
+    if (t >= REV + REV_D - 0.3) counter(g, 'MARS', null, { y: 330, size: 170, color: '#FF8A4A', at: [t, REV + REV_D - 0.3] });
   } });
   cue(andA - 0.04, 'whoosh_deep', 0.3); cue(andA + 0.06, 'success', 0.4); cue(CUT - 0.34, 'revswell', 0.6);
-  cue(CUT - 0.03, 'slash', 1.7); cue(CUT + 0.02, 'slash', 0.8); cue(CUT + T_NEG, 'boom_big', 0.65); cue(CUT + T_IN + 0.1, 'heartbeat', 0.5); cue(lostW + 0.25, 'thud', 0.3); cue(humT - 0.1, 'sparkle_pop', 0.2);
-  // BUT NOT THE GOAT. NOT TWICE: Magnus himself across the board, the day room back in colour
+  cue(CUT - 0.03, 'slash', 1.7); cue(CUT + 0.02, 'slash', 0.8); cue(CUT + T_NEG, 'boom_big', 0.65); cue(CUT + T_IN + 0.1, 'heartbeat', 0.5); cue(lostW + 0.25, 'thud', 0.3);
+  cue(CUT + T_IN, 'wind_barren', 0.45); cue(REV - 0.05, 'whoosh_deep', 0.55); cue(REV + REV_D - 0.3, 'boom_cine', 0.5);
+  // "THE ALIEN CAN BEAT...": from Mars to the Earth (the author: «в момент где alien can beat humans, идет быстрый зум с марса на землю»)
+  shot(alienA, (g, lt, t, sh) => { toEarth(g, t, seg(t, alienA, humS)); flashTint(g, '#FFFFFF', 0.85 * seg(lt, len(sh) - 0.1, len(sh))); }, { trans: 'cut', vig: 0.5, kb: 0, noJump: true });
+  cue(alienA - 0.05, 'riser', 0.5); cue(alienA + 0.1, 'whoosh_fast', 0.4);
+  // "...HUMANS.": the line-up of the clip the author sent, in its two tones, filling the frame
+  shot(humS, (g, lt, t) => { humans(g, t, lt); flashTint(g, '#FFFFFF', 0.7 * (1 - seg(lt, 0, 0.16))); }, { trans: 'cut', vig: 0.35, kb: 0, noJump: true });
+  cue(humS, 'boom_big', 0.5); cue(humS + 0.02, 'hit', 0.45);
+  // "BUT NOT THE GOAT. NOT TWICE.": the camera flies down over the fields to the farm; Magnus at the gate of the goats' pen
+  const FLY = goatT + 0.05 - butA, FARM_CAM = [0.3, 6.3, -0.2];
   shot(butA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(-0.24, 0.05, 9.6, [4, 3.0, 9.3])], [len(sh), K(-0.12, 0.04, 7.8, [4, 3.05, 9.3])]], { t, e: glide, bump: t > goatT && t < goatT + 0.3 ? 1.2 : 0 });
-    domain(g, t, { pieces: nearFade(piecesAt(PL, 107)), wPlayer: false, wChair: false, eb: { ...EXPR.smug, lid: 0.3 } });
-  }, { trans: 'whip', hud: (g, lt, t) => {
+    rig(B, lt, [[0, K(0.55, 0.95, 150, [16, 0, 26])], [FLY * 0.5, K(0.2, 0.62, 62, [4, 3, 9]), lin], [FLY, K(-0.28, 0.15, 13.4, FARM_CAM), ease.out], [len(sh), K(-0.2, 0.14, 12.2, FARM_CAM), lin]], { t, shake: 0.5 });
+    farm3(g, t, { e: t >= twiceT ? { ...EXPR.smug, lid: 0.3 } : { ...EXPR.focus, lid: 0.2 }, bleat: t - (goatT + 0.14) });
+  }, { trans: 'cut', kb: 0, noJump: true, vig: 0.25, hud: (g, lt, t) => {
     if (t >= goatT - 0.05) badge(g, 'BUT NOT THE GOAT', W / 2, 230, { color: GOLD, size: 66, ...pop(t, goatT - 0.05) });
     if (t >= twiceT) badge(g, 'NOT TWICE', W / 2, 345, { color: RED, size: 56, ...pop(t, twiceT) });
   } });
-  cue(butA - 0.04, 'whoosh_fast', 0.35); cue(goatT - 0.05, 'boom', 0.5); cue(goatT, 'reveal_bell', 0.35); cue(twiceT, 'stamp', 0.45);
+  cue(butA - 0.04, 'whoosh_fast', 0.4); cue(goatT - 0.05, 'boom', 0.45); cue(goatT + 0.14, 'goat', 0.95); cue(twiceT, 'stamp', 0.45);
 
   // ======================= 4–1 FOR MAGNUS; STAND PROUD =======================
   shot(scoreA, (g, lt, t, sh) => {
@@ -1343,10 +1855,12 @@ export async function build(T) {
     domain(g, t, { pieces: nearFade(piecesAt(PL, 107)), white: 'wit', dark: true, bPlayer: false, bChair: false, ew: exprAt([[proudA, WE('sad', { band: 1, look: [0, 0.5] })], [strongT - 0.1, WE('neutral', { band: 1, curve: 0.45 })]], t) });
     flashTint(g, VOID, 0.4 * (1 - seg(lt, 0, 0.35)));
   }, { trans: 'cut', hud: (g, lt, t) => {
-    if (t >= proudA + 0.15) badge(g, 'STAND PROUD', W / 2, 230, { color: GOLD, size: 60, ...pop(t, proudA + 0.15) });
-    if (t >= strongT) badge(g, "YOU'RE STRONG", W / 2, 340, { color: CREAM, size: 48, ...pop(t, strongT) });
+    if (t >= proudA + 0.15 && t < saidT) badge(g, 'STAND PROUD', W / 2, 230, { color: GOLD, size: 60, ...pop(t, proudA + 0.15) });
+    if (t >= strongT && t < saidT) badge(g, "YOU'RE STRONG", W / 2, 340, { color: CREAM, size: 48, ...pop(t, strongT) });
+    // his answer: what Witty wrote under a clip of the game (SOURCES.md; version 6)
+    if (t >= saidT) speech(g, 'WITTY, IN THE COMMENTS', 'The goat is too good \u{1F47D}\u{2764}\u{FE0F}', W / 2, 290, { size: 56, ...popW(t, saidT) });
   } });
-  cue(proudA + 0.05, 'shimmer', 0.25); cue(strongT, 'sparkle_pop', 0.25);
+  cue(proudA + 0.05, 'shimmer', 0.25); cue(strongT, 'sparkle_pop', 0.25); cue(saidT, 'notify', 0.4);
 
   // ======================= THE SPONSOR, AT THE END (rule 61): this game on Chessigma's review; free; their end card =======================
   const ad1A = s('ad1') - 0.06, gradedT = w('ad1', 6), thisT = w('ad1', 8);
@@ -1389,13 +1903,13 @@ export async function build(T) {
     { t: 0, m: 'hook' }, { t: winT, m: 'slam' }, { t: nameA, m: 'digital' }, { t: remA, m: 'tension' }, { t: round2T, m: 'slam' }, { t: openA, m: 'build' },
     { t: LAND, m: 'slam' }, { t: hisA + 0.6, m: 'glory' }, { t: takeA, m: 'intrigue' }, { t: flipsT, m: 'victory' },
     { t: m21A, m: 'tension' }, { t: NXD5, m: 'drop' }, { t: endA, m: 'clockwork' }, { t: q1A, m: 'build' }, { t: Q2, m: 'slam' },
-    { t: andA, m: 'victory' }, { t: CUT, m: 'void' }, { t: lostT - 0.2, m: 'elegy' }, { t: butA, m: 'hit' }, { t: scoreA, m: 'elegy' }, { t: ad1A, m: 'digital' }, { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: andA, m: 'victory' }, { t: CUT, m: 'void' }, { t: lostT - 0.2, m: 'elegy' }, { t: humS, m: 'hit' }, { t: scoreA, m: 'elegy' }, { t: ad1A, m: 'digital' }, { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: winT - 0.32, t1: winT - 0.01, kind: 'mute' }, { t0: round2T - 0.3, t1: round2T - 0.01, kind: 'mute' }, { t0: round2T, t1: openA, kind: 'boost', db: 4 }, { t0: winT, t1: nameA, kind: 'boost', db: 4 },
     { t0: LAND - 0.34, t1: LAND - 0.01, kind: 'mute' }, { t0: LAND, t1: hisA + 0.6, kind: 'boost', db: 5 },
     { t0: Q2 - 0.32, t1: Q2 - 0.01, kind: 'mute' }, { t0: Q2, t1: andA, kind: 'boost', db: 4 },
-    { t0: CUT - 0.06, t1: lostT - 0.2, kind: 'mute' }, { t0: lostT - 0.2, t1: butA, kind: 'lp', f: 700 },
+    { t0: CUT - 0.06, t1: lostT - 0.2, kind: 'mute' }, { t0: lostT - 0.2, t1: alienA, kind: 'lp', f: 700 },
     { t0: proudA, t1: ad1A, kind: 'lp', f: 900 }, { t0: ctaA, t1: T.duration, kind: 'lp', f: 900 },
   ];
   shots.sort((a, b) => a.a - b.a);

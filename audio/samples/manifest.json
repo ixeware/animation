@@ -129,6 +129,14 @@
   "prompt": "Glass display case door opening, light glass clink",
   "source": "ElevenLabs sound generation"
  },
+ "goat": {
+  "files": [
+   "goat_0.flac",
+   "goat_1.flac"
+  ],
+  "prompt": "One goat bleats once, close and clear, a short funny baa, dry outdoor recording, no music",
+  "source": "ElevenLabs sound generation"
+ },
  "heartbeat": {
   "files": [
    "heartbeat_0.flac"
@@ -328,5 +336,19 @@
   ],
   "prompt": "Soft airy swoosh transition, gentle and smooth, clean, no music",
   "source": "ElevenLabs sound generation"
+ },
+ "wind_barren": {
+  "files": [
+   "wind_barren_0.flac"
+  ],
+  "prompt": "Low steady wind over an empty desert plain, desolate, soft gusts, no music, no voices",
+  "source": "ElevenLabs sound generation"
+ },
+ "witty_scream": {
+  "files": [
+   "witty_scream_0.flac"
+  ],
+  "prompt": "Witty Alien's shout on his stream after beating Magnus Carlsen (30 Sep 2026), 1.2 s",
+  "source": "a 5-second clip of the stream sent by the author on 14 Nov 2026; used in witty2 only"
  }
 }
