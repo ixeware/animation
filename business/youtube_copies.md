@@ -56,10 +56,15 @@ the64filestt@gmail.com — она стоит в био TikTok, и по ней п
   апелляция по ссылке из письма.
 - **Проверено в тот же час:** все 24 копии на месте (oEmbed отвечает 200); на три ответа, отправленные с the64filestt
   14.11 в 06:21–06:22 UTC, YouTube ещё не ответил.
-- **Расхождение, которое надо снять.** В заявках через форму автор указал одно полное имя, а письма с the64filestt
-  подписаны именем из его инвойса — другим. Для YouTube это два разных заявителя на одни и те же шесть роликов за одни
-  сутки; этого достаточно для пометки «fraudulent». В ответе нужно прямо написать, какое имя по документам и что обе
-  заявки подал один человек (или кто из двоих автор, а кто действует по его поручению). Имена в хранилище не пишем.
+- **Расхождение, которое надо снять.** В заявках через форму автор указал своё полное имя, а письма с the64filestt
+  были подписаны именем из инвойса. Автор (14.11.2026): «тот что в инвойсе это моего двоюродного брата» — то есть в
+  письмах стояло не имя автора; ошибка моя, имя взято из инвойса без вопроса автору. Для YouTube это два разных
+  заявителя на одни и те же шесть роликов за одни сутки; этого достаточно для пометки «fraudulent». Исправление —
+  отдельным письмом в те же ветки (см. ниже, только с согласия автора). Имена в хранилище не пишем.
+- **Гравировка в первом кадре пяти копий.** Автор прислал экран копии «Bongcloud» из приложения YouTube с надписью
+  «@THE64FILES» на ребре доски. Проверено по кадрам с сервера YouTube (`https://i.ytimg.com/vi/<id>/frame0.jpg` —
+  первый кадр, 268×480): надпись читается в `A_MNOn0hvck`, `NwbQCns0Bl4`, `WLywVcbK5FY`, `-m9a1wTFDCs` и
+  `J14e_O5V-TQ`.
 - **Чего не делать:** новых каналов и новых заявок с других аккаунтов — каждая выглядит для YouTube продолжением
   того же «мошенничества».
 - **Новое доказательство по ролику из заявки автора.** В копии `J14e_O5V-TQ` («GothamChess Lost to Amateur») на кадре
@@ -67,12 +72,21 @@ the64filestt@gmail.com — она стоит в био TikTok, и по ней п
   [кадр](https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg). Время публикации оригинала зашито в номер ролика TikTok
   (первые 32 бита — время Unix), задним числом его не изменить; по шести роликам из заявок оно совпадает с таблицей.
 
+**Исправление имени отправлено 14.11.2026 около 09:15 UTC** в три ветки с the64filestt (автор на вопрос «отправить
+исправление?» ответил «Да, отправить»). В письме: прежняя подпись — имя двоюродного брата, взятое по ошибке из
+делового документа канала; автор и правообладатель всех 24 роликов — он сам, полное имя как в его заявках через
+форму; заявки через форму с его аккаунта YouTube подал тот же человек; новое доказательство — гравировка
+«@THE64FILES» в начале пяти копий (ссылки на `frame0.jpg`); оба обязательных заявления повторены от его имени.
+
 **Что сделать автору (по порядку):**
 1. В био TikTok `@the64files` дописать строку `YT-64F-1114` — проверяющий увидит, что заявитель владеет аккаунтом, где
    ролики вышли первыми. Без этой строки пункт (c) из текста убрать.
 2. Ответить на письмо «your account has been terminated» из того же ящика, куда оно пришло, текстом ниже; вписать имя.
 3. Открыть ссылку «appeal» из этого письма и подать то же самое (если поле короткое — короткий вариант).
 4. Если есть X: написать @TeamYouTube (черновик ниже, обновлён).
+
+**Правило на будущее:** имя для юридических писем спрашивать у автора, а не брать из документов; в инвойсах канала
+стоит имя родственника.
 
 Текст ответа (английский; в квадратных скобках — вписать):
 
@@ -88,17 +102,21 @@ episode myself. I publish first on TikTok, on my account @the64files (https://ww
 since 12 October 2026, about 17,000 followers. The YouTube channel "The 64 Stories" (@the64stories) downloads my
 episodes from TikTok and re-uploads them without my permission, 24 so far.
 
-My full legal name is [FULL LEGAL NAME AS IN YOUR ID]. [IF THE NAME IN THE WEB FORM WAS DIFFERENT, SAY SO HERE IN
-ONE HONEST SENTENCE, FOR EXAMPLE: "The web form requests were filed under the name shown on this Google account;
-it is not my legal name, and I am sorry for the confusion."] I am also the person who sent a notice about the other
-18 copies on the same channel by email from the64filestt@gmail.com (reference 33GGAJCXQZSMNIHJNEHY3JQIMY). That
-address is the business contact printed in the bio of my TikTok account. Both sets of requests come from me.
+My full legal name is [FULL LEGAL NAME], as stated in my requests. The notice about the other 18 copies on the
+same channel, sent by email from the64filestt@gmail.com (reference 33GGAJCXQZSMNIHJNEHY3JQIMY), is also mine: that
+address is the business contact printed in the bio of my TikTok account. That email was signed by mistake with the
+name of my cousin, taken from a business document of the channel; I have sent a correction in that thread. There
+is one claimant, me, not two.
 
 2. EVIDENCE YOU CAN CHECK YOURSELVES
 (a) My handle is inside the copies. The edge of the chessboard in my videos is engraved "@THE64FILES". The
-uploader did not remove it. YouTube's own stills of the copies show it:
-https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg (a video in this request: look at the front edge of the board)
-https://i.ytimg.com/vi/WLywVcbK5FY/oar2.jpg
+uploader did not remove it. Open these copies at 0:00 and look at the edge of the board, or see YouTube's own
+first-frame stills:
+https://i.ytimg.com/vi/J14e_O5V-TQ/frame0.jpg (a video in this request; larger: https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg)
+https://i.ytimg.com/vi/A_MNOn0hvck/frame0.jpg
+https://i.ytimg.com/vi/NwbQCns0Bl4/frame0.jpg
+https://i.ytimg.com/vi/WLywVcbK5FY/frame0.jpg
+https://i.ytimg.com/vi/-m9a1wTFDCs/frame0.jpg
 Two more copies still end with my plate "FOLLOW FOR MORE / THE 64 FILES":
 https://i.ytimg.com/vi/nRx_hI8DvDs/oar3.jpg and https://i.ytimg.com/vi/agXowu9Rv-I/oar3.jpg
 The uploader's channel is called "The 64 Stories". The name written inside the videos is mine.
@@ -141,8 +159,8 @@ rights that are infringed.
 ```
 My removal requests are accurate. I am the author of "The 64 Files", a chess-history series I publish first on
 TikTok (@the64files, since 12 Oct 2026). The channel @the64stories re-uploads my episodes. You can check it
-yourselves: (1) my handle is engraved inside its copies, see YouTube's own stills
-https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg and https://i.ytimg.com/vi/WLywVcbK5FY/oar2.jpg (board edge reads
+yourselves: (1) my handle is engraved inside its copies: open them at 0:00, or see YouTube's own stills
+https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg and https://i.ytimg.com/vi/A_MNOn0hvck/frame0.jpg (board edge reads
 @THE64FILES); (2) every original was on TikTok before the copy, and the upload time is part of the TikTok video
 ID; (3) the line "YT-64F-1114" is now in the bio of my TikTok account, which only its owner can edit; (4) I can
 send the project files and 4K masters. My channels were removed for impersonation, but the copying went the other
