@@ -101,6 +101,14 @@
   "prompt": "Denim jeans fabric rustle, clothing movement",
   "source": "ElevenLabs sound generation"
  },
+ "farm_birds": {
+  "files": [
+   "farm_birds_0.flac",
+   "farm_birds_1.flac"
+  ],
+  "prompt": "Sunny farm morning ambience: several songbirds chirping, a light breeze in the grass, calm and bright, no music, no voices, no animals bleating",
+  "source": "ElevenLabs sound generation"
+ },
  "footsteps": {
   "files": [
    "footsteps_0.flac"

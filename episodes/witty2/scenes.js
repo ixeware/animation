@@ -970,7 +970,10 @@ const FIELDS = (() => {
   return out;
 })();
 const ROAD = [[-70, -250], [-46, -120], [-22, -52], [-3, -19], [9, -8], [21, 12], [29.5, 38], [33.9, 62.6]];
-const TUFTS = (() => { const r = rng(404), out = []; for (let i = 0; i < 230; i++) out.push([-34 + r() * 84, -30 + r() * 100, 0.5 + r() * 0.6, r() < 0.16 ? 1 + Math.floor(r() * 2) : 0]); return out; })();
+const TUFTS = (() => { const r = rng(404), out = [];
+  const off = (x, z, P, w) => P.every((p, i) => { if (!i) return true; const [ax, az] = P[i - 1], [bx, bz] = p, l2 = (bx - ax) ** 2 + (bz - az) ** 2, u = clamp(((x - ax) * (bx - ax) + (z - az) * (bz - az)) / l2); return Math.hypot(x - ax - (bx - ax) * u, z - az - (bz - az) * u) > w; });
+  for (let i = 0; i < 260; i++) { const x = -34 + r() * 84, z = -30 + r() * 100, h = 0.5 + r() * 0.6, f = r() < 0.16 ? 1 + Math.floor(r() * 2) : 0; if (off(x, z, ROAD, 4.2) && off(x, z, [[-3, -19], [0, -2.2]], 3.4)) out.push([x, z, h, f]); }
+  return out; })();
 function farmGround(g, t) {
   const yh = hz(), y0 = Math.max(0, yh);
   const gr = g.createLinearGradient(0, yh, 0, yh + 950); gr.addColorStop(0, '#A9D494'); gr.addColorStop(0.2, '#7CC063'); gr.addColorStop(1, '#5FAC49');
@@ -1185,11 +1188,11 @@ function drawGoat(g, G) {
 }
 
 // ---------- the whole farm, from the current camera. e: Magnus's face; bleat: seconds since the goat beside him bleated ----------
-function farm3(g, t, { e = EXPR.smug, bleat = -1 } = {}) {
-  const bl = bleat >= 0 && bleat < 0.75 ? Math.sin(Math.PI * clamp(bleat / 0.75)) : 0, bj = bl * (0.75 + 0.25 * Math.sin(bleat * 60));
+function farm3(g, t, { e = EXPR.smug, bleat = -1, bleat2 = -1 } = {}) {
+  const mouth = b => { const k = b >= 0 && b < 0.75 ? Math.sin(Math.PI * clamp(b / 0.75)) : 0; return [k, k * (0.75 + 0.25 * Math.sin(b * 60))]; }, [bl, bj] = mouth(bleat), [bl2, bj2] = mouth(bleat2);
   const goats = [
     { x: -2.7, z: 6.9, ry: 1.38, c: GOAT_C.boer, nod: 0.08 + 0.03 * Math.sin(t * 1.3) + 0.3 * bl, turn: 0.12 * Math.sin(t * 0.8), jaw: 0.75 * bj, wag: 0.5 * Math.sin(t * 7) },
-    { x: 7.4, z: 6.6, ry: 2.85, c: GOAT_C.white, nod: 0.06 + 0.04 * Math.sin(t * 1.1 + 2), turn: -0.5, wag: 0.4 * Math.sin(t * 5 + 1) },
+    { x: 7.4, z: 6.6, ry: 2.85, c: GOAT_C.white, nod: 0.06 + 0.04 * Math.sin(t * 1.1 + 2) + 0.3 * bl2, turn: -0.5 - 0.15 * bl2, jaw: 0.75 * bj2, wag: 0.4 * Math.sin(t * 5 + 1) },
     { x: 10.4, z: 12.3, y: 3.2, ry: 2.5, c: GOAT_C.tan, nod: 0.2, turn: -0.35 + 0.1 * Math.sin(t * 0.9), wag: 0.3 * Math.sin(t * 6) },
     { x: 3.2, z: 12.2, ry: 0.5, s: 0.56, c: GOAT_C.white, horns: false, y: 0.9 * Math.abs(Math.sin(t * 5.2)), nod: 0.15, wag: 0.8 * Math.sin(t * 11) },
     { x: -9.5, z: 9.5, ry: 0.9, c: GOAT_C.grey, nod: -1.75 + 0.06 * Math.sin(t * 6), wag: 0.3 * Math.sin(t * 4) },
@@ -1830,13 +1833,14 @@ export async function build(T) {
   // "BUT NOT THE GOAT. NOT TWICE.": the camera flies down over the fields to the farm; Magnus at the gate of the goats' pen
   const FLY = goatT + 0.05 - butA, FARM_CAM = [0.3, 6.3, -0.2];
   shot(butA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.55, 0.95, 150, [16, 0, 26])], [FLY * 0.5, K(0.2, 0.62, 62, [4, 3, 9]), lin], [FLY, K(-0.28, 0.15, 13.4, FARM_CAM), ease.out], [len(sh), K(-0.2, 0.14, 12.2, FARM_CAM), lin]], { t, shake: 0.5 });
-    farm3(g, t, { e: t >= twiceT ? { ...EXPR.smug, lid: 0.3 } : { ...EXPR.focus, lid: 0.2 }, bleat: t - (goatT + 0.14) });
+    rig(B, lt, [[0, K(0.55, 0.95, 150, [16, 0, 26])], [FLY * 0.5, K(0.2, 0.62, 62, [4, 3, 9]), x => x * x], [FLY, K(-0.28, 0.15, 13.4, FARM_CAM), ease.out], [len(sh), K(-0.2, 0.14, 12.2, FARM_CAM), lin]], { t, shake: 0.5, bump: lt > FLY - 0.02 && lt < FLY + 0.26 ? 1.1 : 0 });
+    farm3(g, t, { e: t >= twiceT ? { ...EXPR.smug, lid: 0.3 } : { ...EXPR.focus, lid: 0.2 }, bleat: t - (goatT + 0.14), bleat2: t - (twiceT + 0.74) });
   }, { trans: 'cut', kb: 0, noJump: true, vig: 0.25, hud: (g, lt, t) => {
     if (t >= goatT - 0.05) badge(g, 'BUT NOT THE GOAT', W / 2, 230, { color: GOLD, size: 66, ...pop(t, goatT - 0.05) });
     if (t >= twiceT) badge(g, 'NOT TWICE', W / 2, 345, { color: RED, size: 56, ...pop(t, twiceT) });
   } });
   cue(butA - 0.04, 'whoosh_fast', 0.4); cue(goatT - 0.05, 'boom', 0.45); cue(goatT + 0.14, 'goat', 0.95); cue(twiceT, 'stamp', 0.45);
+  cue(butA + 0.3, 'farm_birds', 0.3); cue(twiceT + 0.74, 'goat', 0.5);  // birdsong under the farm; the other goat answers in the pause
 
   // ======================= 4–1 FOR MAGNUS; STAND PROUD =======================
   shot(scoreA, (g, lt, t, sh) => {
