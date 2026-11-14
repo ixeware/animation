@@ -10,6 +10,10 @@
 > часы. Это же — условие спонсоров (#ad + Branded content обещаны в нашем предложении).
 
 ## Chessigma (Eliot Hennebo)
+- **Оплата за `woodpecker` получена полностью** (экраны банка от автора, 14.11.2026): +67,64 € 12.11 и +67,96 € 13.11,
+  оба перевода от ARCHE LABS LTD с одной и той же пометкой «inv-2026-001» (вторую половину Элиот провёл с номером
+  первого счёта — из-за этого автор решил, что вторая не пришла). За `witty2` оплаты нет по условиям нашего же
+  предложения: только бонус $100 при 1 млн просмотров за 30 дней.
 - **14.11.2026, 13:29 UTC — Элиот одобрил `witty2` (версия 7):** «Great work, the video looks good! Regarding the
   shout and the comment quote, I'm perfectly fine with keeping them in. Everything else looks good, please go ahead
   with the post!» Публиковать можно: файл `episodes/witty2/build/witty2_4k.mp4`, Content disclosure → Branded content,
@@ -103,6 +107,11 @@
   `content`; маленькие (< ~20 КБ) приходят в ответ целиком — их не брать.
 
 ## Chessnut (Stella)
+- **13.11.2026, 10:22 UTC — Стелла про оплату:** «I've sent your PayPal info to our finance team. Since today is
+  Friday, they have already left the office for the weekend, so the $400 will be processed next Monday» — то есть
+  16.11. Ещё: «We would also love to share this video on our official channels.» На 14.11 на PayPal автора пусто —
+  это ожидаемо. Если к 18.11 денег нет — напомнить ей (по слову автора) и проверить, что почта, которую мы ей дали,
+  привязана к этому PayPal.
 - 12.11.2026: Стелла прислала данные для описания (ссылка chessnutech.com/pages/chessnut-move, промокод BLACKFRIDAY,
   тег @chessnutech) и попросила PayPal-почту для $400. Автор обновил описание (проверено на TikTok: тег ведёт на
   chessnutech); ей отправлен ответ с цифрами (198 тыс. просмотров) и PayPal-почтой автора (по его просьбе).
