@@ -10,6 +10,9 @@
 > часы. Это же — условие спонсоров (#ad + Branded content обещаны в нашем предложении).
 
 ## Chessigma (Eliot Hennebo)
+- **`witty2` опубликован 14.11.2026 в 13:49:20 UTC:** https://www.tiktok.com/@the64files/video/7708023874599980295 .
+  Срок для бонуса $100 (1 млн просмотров за 30 дней) — до 14.12.2026, 13:49 UTC. Ссылку в био держать до 21.11.
+  Элиоту «it's live» ещё не писали.
 - **14.11.2026 — ссылка в био открывается не у всех.** Зритель написал автору в личные сообщения TikTok: «UR LINK IN
   BIO STILL NOT WORKING», при нажатии — «Action cannot be completed», и на iPhone, и на Android; у автора на Android
   ссылка открывает Play Store. Проверено: в профиле стоит `https://www.chessigma.com/go/app/the64files` (в данных
