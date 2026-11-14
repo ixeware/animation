@@ -39,11 +39,125 @@ the64filestt@gmail.com — она стоит в био TikTok, и по ней п
 В тексте прямо сказано про первый канал: YouTube видит связь и без этого, а довод один — автор ни за кого себя не
 выдаёт. Риск остаётся: новый канал после блокировки YouTube считает обходом. Подавать один раз.
 
+### Апелляция по второму каналу отклонена, аккаунт заявителя удалён (14.11.2026)
+
+Автор прислал экраны (14.11.2026, около 11:50 его времени):
+
+- **Канал.** «Appeal decision: Your channel won't be put back on YouTube at this time… confirmed that it violates our
+  Impersonation… Currently, your channel does not have access to YouTube's pilot program to apply for a new channel.
+  Please stay tuned.» Это ответ на апелляцию по `@the64filesofficial`. Обычный путь обжалования по обоим каналам
+  исчерпан.
+- **Заявки через форму.** На две заявки автора (шесть роликов, строки 2–7 таблицы) пришло то же «Need more info… may
+  be fraudulent… within 7 days», что и на письма с the64filestt, а затем: «We're concerned that some info within this
+  legal request may be fraudulent… As a result, your account has been terminated. If you believe that all of the info
+  you provided in this legal request was accurate, respond with an explanation… you may appeal this decision. If your
+  appeal is accepted, your removal request will be processed and your YouTube channel will be reinstated.» То есть
+  удалён аккаунт YouTube, с которого автор подавал заявки; путь назад назван в самом письме — ответ с объяснением и
+  апелляция по ссылке из письма.
+- **Проверено в тот же час:** все 24 копии на месте (oEmbed отвечает 200); на три ответа, отправленные с the64filestt
+  14.11 в 06:21–06:22 UTC, YouTube ещё не ответил.
+- **Расхождение, которое надо снять.** В заявках через форму автор указал одно полное имя, а письма с the64filestt
+  подписаны именем из его инвойса — другим. Для YouTube это два разных заявителя на одни и те же шесть роликов за одни
+  сутки; этого достаточно для пометки «fraudulent». В ответе нужно прямо написать, какое имя по документам и что обе
+  заявки подал один человек (или кто из двоих автор, а кто действует по его поручению). Имена в хранилище не пишем.
+- **Чего не делать:** новых каналов и новых заявок с других аккаунтов — каждая выглядит для YouTube продолжением
+  того же «мошенничества».
+- **Новое доказательство по ролику из заявки автора.** В копии `J14e_O5V-TQ` («GothamChess Lost to Amateur») на кадре
+  с сервера YouTube видна гравировка «@THE64FILES» на переднем ребре доски:
+  [кадр](https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg). Время публикации оригинала зашито в номер ролика TikTok
+  (первые 32 бита — время Unix), задним числом его не изменить; по шести роликам из заявок оно совпадает с таблицей.
+
+**Что сделать автору (по порядку):**
+1. В био TikTok `@the64files` дописать строку `YT-64F-1114` — проверяющий увидит, что заявитель владеет аккаунтом, где
+   ролики вышли первыми. Без этой строки пункт (c) из текста убрать.
+2. Ответить на письмо «your account has been terminated» из того же ящика, куда оно пришло, текстом ниже; вписать имя.
+3. Открыть ссылку «appeal» из этого письма и подать то же самое (если поле короткое — короткий вариант).
+4. Если есть X: написать @TeamYouTube (черновик ниже, обновлён).
+
+Текст ответа (английский; в квадратных скобках — вписать):
+
+```
+Hello,
+
+All of the information in my removal requests is accurate. I am the author of these videos. I ask you to review
+this decision, process the requests and reinstate my channel.
+
+1. WHO I AM
+I make a chess-history series called "The 64 Files": I write the scripts, build the animation and publish every
+episode myself. I publish first on TikTok, on my account @the64files (https://www.tiktok.com/@the64files), active
+since 12 October 2026, about 17,000 followers. The YouTube channel "The 64 Stories" (@the64stories) downloads my
+episodes from TikTok and re-uploads them without my permission, 24 so far.
+
+My full legal name is [FULL LEGAL NAME AS IN YOUR ID]. [IF THE NAME IN THE WEB FORM WAS DIFFERENT, SAY SO HERE IN
+ONE HONEST SENTENCE, FOR EXAMPLE: "The web form requests were filed under the name shown on this Google account;
+it is not my legal name, and I am sorry for the confusion."] I am also the person who sent a notice about the other
+18 copies on the same channel by email from the64filestt@gmail.com (reference 33GGAJCXQZSMNIHJNEHY3JQIMY). That
+address is the business contact printed in the bio of my TikTok account. Both sets of requests come from me.
+
+2. EVIDENCE YOU CAN CHECK YOURSELVES
+(a) My handle is inside the copies. The edge of the chessboard in my videos is engraved "@THE64FILES". The
+uploader did not remove it. YouTube's own stills of the copies show it:
+https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg (a video in this request: look at the front edge of the board)
+https://i.ytimg.com/vi/WLywVcbK5FY/oar2.jpg
+Two more copies still end with my plate "FOLLOW FOR MORE / THE 64 FILES":
+https://i.ytimg.com/vi/nRx_hI8DvDs/oar3.jpg and https://i.ytimg.com/vi/agXowu9Rv-I/oar3.jpg
+The uploader's channel is called "The 64 Stories". The name written inside the videos is mine.
+(b) Dates. Every original was public on TikTok before its copy was uploaded to YouTube (list below). TikTok
+keeps the upload time inside the video ID (its first 32 bits are the Unix time), so it cannot be changed later.
+(c) Control of the original account. I have added the line "YT-64F-1114" to the bio of my TikTok account
+@the64files. Only the owner of that account can do this.
+(d) Source files. Every episode is generated from my own project: scene code, scripts, narration sessions. On
+request I will send the project and the 4K master of any of these videos, and the analytics of the originals.
+The uploader of the copies has none of this.
+
+3. THE WORKS IN MY REQUESTS (each copy is my entire video)
+https://www.youtube.com/watch?v=Dw0bCwE_gNg (uploaded 4 Nov 2026, 19:00 UTC) is a copy of my "Gothamchess, The
+Grandmaster Hunter", published 3 Nov 2026, 19:45 UTC: https://www.tiktok.com/@the64files/video/7704033750190951688
+https://www.youtube.com/watch?v=rUg2CLvelHg (uploaded 9 Nov 2026, 18:44 UTC) is a copy of my "Bobby Fischer - The
+Fischerman", published 8 Nov 2026, 20:29 UTC: https://www.tiktok.com/@the64files/video/7705900508925398279
+https://www.youtube.com/watch?v=J14e_O5V-TQ (uploaded 3 Nov 2026, 18:57 UTC) is a copy of my "Gothamchess Lost to
+Amateur", published 2 Nov 2026, 11:23 UTC: https://www.tiktok.com/@the64files/video/7703533116886961426
+https://www.youtube.com/watch?v=Lm9o3BTdFAA (uploaded 7 Nov 2026, 19:14 UTC) is a copy of my "Bobby Fischer's
+paranoia", published 12 Oct 2026, 22:29 UTC: https://www.tiktok.com/@the64files/video/7695912005613407489
+https://www.youtube.com/watch?v=bCMlxBvqwXg (uploaded 6 Nov 2026, 18:59 UTC) is a copy of my "Who has the most
+brilliant moves on Chess.com?", published 14 Oct 2026, 06:02 UTC:
+https://www.tiktok.com/@the64files/video/7696399796298353928
+https://www.youtube.com/watch?v=hCf_l85jvwo (uploaded 5 Nov 2026, 19:19 UTC) is a copy of my "Who can beat
+Mittens?", published 4 Nov 2026, 20:46 UTC: https://www.tiktok.com/@the64files/video/7704420423659982098
+
+4. ABOUT MY CHANNEL
+My YouTube channels named "The 64 Files" were removed for impersonation. I did not impersonate anyone: "The 64
+Files" is my own series, and the channel that had my videos on YouTube before me is the one that copied them.
+
+I have a good faith belief that the use of my videos by this channel is not authorized by me, my agent or the
+law. The information in this message is accurate, and under penalty of perjury I am the owner of the exclusive
+rights that are infringed.
+
+[FULL LEGAL NAME]
+```
+
+Короткий вариант для поля апелляции (около 820 знаков без имени):
+
+```
+My removal requests are accurate. I am the author of "The 64 Files", a chess-history series I publish first on
+TikTok (@the64files, since 12 Oct 2026). The channel @the64stories re-uploads my episodes. You can check it
+yourselves: (1) my handle is engraved inside its copies, see YouTube's own stills
+https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg and https://i.ytimg.com/vi/WLywVcbK5FY/oar2.jpg (board edge reads
+@THE64FILES); (2) every original was on TikTok before the copy, and the upload time is part of the TikTok video
+ID; (3) the line "YT-64F-1114" is now in the bio of my TikTok account, which only its owner can edit; (4) I can
+send the project files and 4K masters. My channels were removed for impersonation, but the copying went the other
+way. Please review, process the requests and reinstate my channel. [FULL LEGAL NAME]
+```
+
 ### Черновик обращения к @TeamYouTube (X, два сообщения по 280 и 220 знаков)
 
 > @TeamYouTube My channel "The 64 Files" (@The64FilesChess) was terminated for impersonation and the appeal was denied. I am the original creator: the same videos are on my TikTok @the64files (16.9K followers) since Oct 12. I never posed as anyone else. Could you take another look?
 
 > A different channel holds the handle @the64files and the same name, with no videos: I have nothing to do with it. And @the64stories re-uploads my videos to YouTube, 24 so far; my copyright removal requests are in review.
+
+Вариант от 14.11 (после удаления аккаунта заявителя), одно сообщение: 281 знак, ссылку X считает за 23, итого 258:
+
+> @TeamYouTube I make The 64 Files (TikTok @the64files). @the64stories re-uploads my videos; my handle is still engraved inside its copies: https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg Yet my channels were removed for impersonation and my takedowns marked fraudulent. Please escalate.
 
 Отправлять автору со своего аккаунта и только если канал `@the64files` действительно не его.
 
@@ -65,8 +179,8 @@ the64filestt@gmail.com — она стоит в био TikTok, и по ней п
 
 ## Все 24 копии
 
-Время — UTC. «Жалоба»: «подана» — заявка на удаление за нарушение авторских прав в YouTube Studio (первые шесть,
-статус «на рассмотрении»); «письмо 13.11» — одно уведомление на остальные 18 роликов, отправленное по просьбе автора
+Время — UTC. «Жалоба»: «подана» — заявка на удаление за нарушение авторских прав в YouTube Studio (первые шесть;
+14.11.2026 аккаунт, с которого они поданы, удалён, заявки не обработаны — см. выше); «письмо 13.11» — одно уведомление на остальные 18 роликов, отправленное по просьбе автора
 13.11.2026 в 23:46 UTC с адреса the64filestt@gmail.com на copyright@youtube.com (YouTube принимает уведомления в тексте
 письма; в нём полное имя автора как подпись, почта для связи, пары ссылок «копия — оригинал» и два обязательных
 заявления). Ответы YouTube придут на тот же адрес.
