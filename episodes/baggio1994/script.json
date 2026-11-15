@@ -1,0 +1,119 @@
+{
+  "title": "The best player in the world sent it over the bar: Roberto Baggio, the 1994 World Cup final",
+  "format": "football",
+  "channel": null,
+  "post": "17 July 1994, the Rose Bowl, Pasadena: Brazil and Italy play 120 minutes without a goal, and for the first time a World Cup final goes to penalties. Italy's last kick belongs to Roberto Baggio, the world player of the year. He aims for the middle; the ball goes over the bar, and Brazil win their fourth World Cup.\n\n#baggio #robertobaggio #worldcup #worldcup1994 #brazil #italy #penalty #football #footballstory #footballhistory #footballtiktok",
+  "lead_in": 0.05,
+  "tail": 2.2,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "timing": "alignment",
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"; the settings of plea2005 (STYLE_BIBLE rule 68)",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.92,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.17,
+    "max_gap": 0.26
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5,
+    "reverb": 0.32,
+    "reverb_sec": 2.0,
+    "duck": 0.5,
+    "amb_gap": 13,
+    "amb_duck": 0.4
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "The best player in the world. One penalty to keep a World Cup final alive. He sent it over the bar. His name? Roberto Baggio.",
+      "say": "[grave] The best player in the world. ... One penalty, to keep a World Cup final alive. ... He sent it over the bar. ... His name? ... Roberto Baggio.",
+      "pause": 0.45,
+      "colors": {
+        "world.": "gold",
+        "penalty": "gold",
+        "over": "red",
+        "bar.": "red",
+        "Roberto": "gold",
+        "Baggio.": "gold"
+      }
+    },
+    {
+      "id": "ctx",
+      "text": "July 17, 1994. Pasadena, a hundred degrees. Brazil against Italy, and Baggio plays with an injured hamstring.",
+      "say": "July seventeenth, nineteen ninety-four. Pasadena, a hundred degrees. Brazil against Italy... [quietly] and Baggio plays with an injured hamstring.",
+      "pause": 0.4,
+      "colors": {
+        "1994.": "gold",
+        "hundred": "red",
+        "degrees.": "red",
+        "Brazil": "gold",
+        "Italy,": "gold",
+        "injured": "red",
+        "hamstring.": "red"
+      }
+    },
+    {
+      "id": "match",
+      "text": "Two hours, no goals. For the first time, a World Cup final goes to penalties.",
+      "say": "Two hours... no goals. [building] For the first time, a World Cup final goes to penalties.",
+      "pause": 0.4,
+      "colors": {
+        "no": "red",
+        "goals.": "red",
+        "first": "gold",
+        "penalties.": "red"
+      }
+    },
+    {
+      "id": "shoot",
+      "text": "Baresi: over the bar. Márcio Santos: saved. Then four goals in a row. Taffarel saves from Massaro. Dunga scores. 3–2, Brazil.",
+      "say": "[tense] Baresi: over the bar. Marcio Santos: saved. Then four goals in a row. Taffarel saves from Massaro. Dunga scores. ... Three–two, Brazil.",
+      "pause": 0.45,
+      "colors": {
+        "bar.": "red",
+        "saved.": "red",
+        "four": "lime",
+        "Massaro.": "red",
+        "3–2,": "gold"
+      }
+    },
+    {
+      "id": "last",
+      "text": "Italy's last kick: Baggio. He knows Taffarel always dives, so he aims for the middle. Taffarel dives. The ball flies over the bar.",
+      "say": "Italy's last kick: ... Baggio. He knows Taffarel always dives, so he aims for the middle. ... Taffarel dives. ... [quietly] The ball flies over the bar.",
+      "pause": 0.5,
+      "colors": {
+        "Baggio.": "gold",
+        "middle.": "gold",
+        "over": "red",
+        "bar.": "red"
+      }
+    },
+    {
+      "id": "end",
+      "text": "Brazil are world champions for the fourth time. And Baggio stays at the spot, alone, head down. Years later he said: if I could erase a moment from my career, it would be that one.",
+      "say": "[warmly] Brazil are world champions for the fourth time. ... [quietly] And Baggio stays at the spot... alone... head down. ... Years later he said: if I could erase a moment from my career... it would be that one.",
+      "pause": 0.3,
+      "colors": {
+        "fourth": "gold",
+        "alone,": "gold",
+        "erase": "red",
+        "one.": "gold"
+      }
+    }
+  ]
+}
