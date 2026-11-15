@@ -1,0 +1,99 @@
+{
+ "title": "Who stat-pads more: Messi or Ronaldo?",
+ "format": "football",
+ "channel": null,
+ "post": "Messi fans say Ronaldo stat-pads. Ronaldo fans say Messi does. So: 1,922 goals, one question. Whose goals actually win games? (Stats as of 10 November 2026.)\n\n#messi #ronaldo #messivsronaldo #goat #football #footballstats #barcelona #realmadrid #footballtiktok",
+ "lead_in": 0.05,
+ "tail": 2.2,
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "timing": "alignment",
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"; the settings of plea2005 (STYLE_BIBLE rule 68)",
+  "fallback": {
+   "provider": "kokoro",
+   "name": "am_michael",
+   "speed": 0.92,
+   "pitch_semitones": -1.0
+  }
+ },
+ "voice_fx": {
+  "tempo": 1.17,
+  "max_gap": 0.26
+ },
+ "mix": {
+  "engine": "v2",
+  "music_gap": 11,
+  "music_air": -1,
+  "music_lp": 7500,
+  "sfx_gap": 5,
+  "reverb": 0.32,
+  "reverb_sec": 2.0,
+  "duck": 0.5,
+  "amb_gap": 13,
+  "amb_duck": 0.4
+ },
+ "phrases": [
+  {
+   "id": "hook",
+   "text": "Messi fans say Ronaldo stat-pads. Ronaldo fans say Messi does. So let's go through all 1,922 of their goals and find out whose goals actually win games.",
+   "say": "[confident] Messi fans say Ronaldo stat-pads. ... Ronaldo fans say Messi does. ... So let's go through all nineteen hundred twenty-two of their goals... and find out whose goals actually win games.",
+   "pause": 0.45,
+   "colors": {
+    "Ronaldo": "gold",
+    "stat-pads.": "red",
+    "does.": "red",
+    "1,922": "gold",
+    "win": "lime",
+    "games.": "lime"
+   }
+  },
+  {
+   "id": "winners",
+   "text": "Goals that won the match: Messi 196, Ronaldo 240. That's 21% of Messi's goals and 24% of Ronaldo's.",
+   "say": "Goals that won the match: Messi, one hundred ninety-six. Ronaldo, two hundred forty. That's twenty-one percent of Messi's goals... and twenty-four percent of Ronaldo's.",
+   "pause": 0.45,
+   "colors": {
+    "won": "lime",
+    "196,": "gold",
+    "240.": "gold",
+    "21%": "gold",
+    "24%": "gold"
+   }
+  },
+  {
+   "id": "delete",
+   "text": "Now delete every goal they ever scored. Ronaldo's bicycle kick in Turin? Gone. Messi's run through Getafe? Never happened. Without Messi's goals, his teams lose 364 points. Without Ronaldo's, 418. That's 0.39 points per Messi goal and 0.42 per Ronaldo goal.",
+   "say": "[mischievously] Now... delete every goal they ever scored. Ronaldo's bicycle kick in Turin? Gone. Messi's run through Getafe? Never happened. [serious] Without Messi's goals, his teams lose three hundred sixty-four points. Without Ronaldo's... four hundred eighteen. That's zero point three nine points per Messi goal, and zero point four two per Ronaldo goal.",
+   "pause": 0.45,
+   "colors": {
+    "delete": "red",
+    "Gone.": "red",
+    "Never": "red",
+    "happened.": "red",
+    "364": "gold",
+    "418.": "gold",
+    "0.39": "gold",
+    "0.42": "gold"
+   }
+  },
+  {
+   "id": "verdict",
+   "text": "So who stat-pads more? The numbers say Messi. More of his goals came when Barcelona were already cruising, which, to be fair, was most weekends. Ronaldo's goals decide more games. Case closed.",
+   "say": "So... who stat-pads more? ... The numbers say Messi. More of his goals came when Barcelona were already cruising... which, to be fair, was most weekends. [firmly] Ronaldo's goals decide more games. ... Case closed.",
+   "pause": 0.3,
+   "colors": {
+    "Messi.": "gold",
+    "cruising,": "lime",
+    "weekends.": "lime",
+    "decide": "gold",
+    "Case": "red",
+    "closed.": "red"
+   }
+  }
+ ],
+ "_take": "The narration is one ElevenLabs take of a longer script (81.7 s), cut at sentence ends with audio/cut in build (the quota was spent, no new take): the phrase 'basics' (\"First, the basics. Messi: 937 goals in 1,185 games. Ronaldo: 985 in 1,343.\") and the end of 'winners' (\"Wins that only came because they scored: Messi 177, Ronaldo 211.\") were cut out to bring the film to 1:02 (STYLE_BIBLE rule 70); the basics are on screen instead. Do not re-run tts.py without credits: it would try to record the changed phrases again. After \"So who stat-pads more?\" the narration holds a 2.0 s silence (the author asked for suspense before the verdict, 12 Nov 2026): pausevoice.py, working from the cut narration kept in voice_backup; every later word moves 2.0 s, the film runs 1:04.6."
+}
