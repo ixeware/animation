@@ -4,8 +4,9 @@
 // another height, side, tilt, size and shape (on a cut when one is near) and drifts in between, so no fixed patch covers
 // it and no mask made for one video fits the next (the jumps are seeded by the episode's name). A second, smaller handle
 // crawls across the whole frame all the time. Both lie under the captions and under the film grain.
-// The mark keeps off the faces: for every stretch of a shot it takes the planned height, or, when that would lie across
-// somebody's eyes and mouth there, the nearest height that does not (the shot is drawn at three moments to see its faces).
+// The mark keeps off the faces and off our own titles, counters and stamps: for every stretch of a shot it takes the
+// planned height, or, when that would lie across somebody's eyes and mouth or across a title there, the nearest height
+// that does not (the shot and its titles are drawn at three moments to see where they are).
 import { makeCanvas, rng, clamp, lerp } from './core.js';
 
 const DEF = {
@@ -109,8 +110,9 @@ export function makeGuard(shots, duration, opts = {}, faces = null) {
     let y = s.y;
     if (faces && b - a > 0.15) {
       // what must stay clear of a face: from the brows to the chin, with room for the camera's push-in
-      const keep = faces(shot, [a + 0.05, (a + b) / 2, b - 0.05]).filter(f => f.w >= 80)
-        .map(f => ({ x0: f.x + f.w * 0.08 - 30, y0: f.y + f.h * 0.3 - 24, x1: f.x + f.w * 0.92 + 30, y1: f.y + f.h * 0.9 + 24 }));
+      const keep = faces(shot, [a + 0.05, (a + b) / 2, b - 0.05]).filter(f => f.kind === 'text' ? f.w >= 40 && f.y < 1200 : f.w >= 80)
+        .map(f => f.kind === 'text' ? { x0: f.x - 24, y0: f.y - 18, x1: f.x + f.w + 24, y1: f.y + f.h + 18 }  // a title: all of it
+          : { x0: f.x + f.w * 0.08 - 30, y0: f.y + f.h * 0.3 - 24, x1: f.x + f.w * 0.92 + 30, y1: f.y + f.h * 0.9 + 24 });  // a face: brows to chin
       const hit = yy => {
         const p = place(s, yy, 0), c = Math.abs(Math.cos(p.rot)), sn = Math.abs(Math.sin(p.rot)), w = p.tex.width * s.k / 2, h = p.tex.height * s.k / 2;
         const hw = w * c + h * sn + 30, hh = w * sn + h * c + 14;

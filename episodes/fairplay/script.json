@@ -1,0 +1,226 @@
+{
+ "title": "Chess.com will catch you anyway",
+ "channel": "THE 64 FILES",
+ "post": "Magnus resigned after one move. Chess.com never resigns 🕵️ How many points did YOU get back? #chess #chesscom #magnuscarlsen #fairplay #story",
+ "lead_in": 0.05,
+ "tail": 1.6,
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+  "fallback": {
+   "provider": "kokoro",
+   "name": "am_michael",
+   "speed": 0.84,
+   "pitch_semitones": -1.0
+  }
+ },
+ "voice_fx": {
+  "engine": 2,
+  "tempo": 1.28,
+  "max_gap": 0.16
+ },
+ "mix": {
+  "engine": "v2",
+  "music_gap": 11,
+  "music_air": -1,
+  "music_lp": 7500,
+  "sfx_gap": 5.0,
+  "reverb": 0.4,
+  "reverb_sec": 2.3,
+  "duck": 0.5
+ },
+ "phrases": [
+  {
+   "id": "hook",
+   "text": "Magnus Carlsen resigned after one move.",
+   "say": "[intense] Magnus Carlsen resigned after one move.",
+   "pause": 0.25,
+   "colors": {
+    "Magnus": "red",
+    "Carlsen": "red",
+    "resigned": "gold",
+    "one": "gold",
+    "move.": "gold"
+   },
+   "take": 1
+  },
+  {
+   "id": "report",
+   "text": "Chess.com later said his opponent likely cheated in over a hundred online games.",
+   "say": "Chess dot com later said his opponent likely cheated in over a hundred online games.",
+   "pause": 0.2,
+   "colors": {
+    "Chess.com": "blue",
+    "cheated": "red",
+    "hundred": "gold"
+   }
+  },
+  {
+   "id": "clue",
+   "text": "One clue: he played better when he clicked away from the board.",
+   "say": "One clue: he played better when he clicked away from the board.",
+   "pause": 0.15,
+   "colors": {
+    "better": "lime",
+    "clicked": "red",
+    "away": "red"
+   },
+   "take": 2
+  },
+  {
+   "id": "bait",
+   "text": "Your opponent can't see you leave. Chess.com can.",
+   "say": "Your opponent can't see you leave. [dramatic] Chess dot com can.",
+   "pause": 0.6,
+   "colors": {
+    "can't": "red",
+    "leave.": "red",
+    "Chess.com": "blue",
+    "can.": "blue"
+   },
+   "hold": {
+    "after": "leave.",
+    "sec": 0.45
+   }
+  },
+  {
+   "id": "trap1",
+   "text": "That's trap one. There are three more.",
+   "say": "That's trap one. There are three more.",
+   "pause": 0.2,
+   "colors": {
+    "one.": "gold",
+    "three": "gold"
+   },
+   "take": 3
+  },
+  {
+   "id": "two",
+   "text": "Two: it knows how often players at your rating find the best move. Not even Magnus plays like an engine.",
+   "say": "Two: it knows how often players at your rating find the best move. Not even Magnus plays like an engine.",
+   "pause": 0.1,
+   "colors": {
+    "Two:": "gold",
+    "rating": "gold",
+    "best": "lime",
+    "move.": "lime",
+    "Magnus": "red",
+    "engine.": "blue"
+   }
+  },
+  {
+   "id": "stand",
+   "text": "Find it more often, and you stand out.",
+   "say": "Find it more often... and you stand out.",
+   "pause": 0.25,
+   "colors": {
+    "more": "red",
+    "stand": "red",
+    "out.": "red"
+   }
+  },
+  {
+   "id": "three",
+   "text": "Three: one engine move per game? Over a hundred games, that's a pattern.",
+   "say": "Three: one engine move per game? Over a hundred games... that's a pattern.",
+   "pause": 0.5,
+   "colors": {
+    "Three:": "gold",
+    "one": "gold",
+    "hundred": "gold",
+    "pattern.": "red"
+   },
+   "take": 2
+  },
+  {
+   "id": "four",
+   "text": "Four: your opponents. In October, they sent 1.4 million reports.",
+   "say": "Four: your opponents. In October, they sent one point four million reports.",
+   "pause": 0.75,
+   "colors": {
+    "Four:": "gold",
+    "opponents.": "blue",
+    "1.4": "gold",
+    "million": "gold",
+    "reports.": "red"
+   }
+  },
+  {
+   "id": "closed",
+   "text": "Almost 282,000 accounts closed. 97% by the algorithm alone.",
+   "say": "Almost two hundred eighty-two thousand accounts... closed. Ninety-seven percent by the algorithm alone.",
+   "pause": 0.6,
+   "colors": {
+    "282,000": "gold",
+    "closed.": "red",
+    "97%": "gold",
+    "algorithm": "blue",
+    "alone.": "blue"
+   },
+   "take": 4
+  },
+  {
+   "id": "twist",
+   "text": "And the points a cheater took from you? Chess.com gives them back.",
+   "say": "And the points a cheater took from you? Chess dot com gives them back.",
+   "pause": 0.15,
+   "colors": {
+    "points": "gold",
+    "cheater": "red",
+    "back.": "lime"
+   }
+  },
+  {
+   "id": "refund",
+   "text": "69 million points. In one month.",
+   "say": "Sixty-nine million points. In one month.",
+   "pause": 0.3,
+   "colors": {
+    "69": "gold",
+    "million": "gold",
+    "points.": "gold",
+    "one": "gold"
+   }
+  },
+  {
+   "id": "never",
+   "text": "Magnus resigned after one move. Chess.com never resigns.",
+   "say": "Magnus resigned after one move. [confident] Chess dot com never resigns.",
+   "pause": 0.3,
+   "colors": {
+    "Magnus": "red",
+    "resigned": "red",
+    "never": "lime",
+    "resigns.": "lime"
+   },
+   "take": 4
+  },
+  {
+   "id": "stay",
+   "text": "So next time you're losing, stay on the board.",
+   "say": "So next time you're losing... stay on the board.",
+   "pause": 0.25,
+   "colors": {
+    "losing,": "red",
+    "stay": "lime",
+    "board.": "lime"
+   }
+  },
+  {
+   "id": "cta",
+   "text": "How many points has Chess.com given you back?",
+   "say": "How many points has Chess dot com given you back?",
+   "pause": 0.0,
+   "colors": {
+    "many": "gold",
+    "points": "gold",
+    "back?": "gold"
+   }
+  }
+ ],
+ "_voice_notes": "Takes chosen with tools/voice_check.py --takes (15.11.2026): each reading ends in silence and is heard word for word; hook 1, clue 2, trap1 3, three 2, never 4, closed 4 (whisper writes the numbers as digits: 0.88 is only the spelling)."
+}
