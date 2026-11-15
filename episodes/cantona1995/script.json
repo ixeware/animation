@@ -1,0 +1,143 @@
+{
+ "title": "Feet first: Eric Cantona's kung-fu kick",
+ "format": "football",
+ "channel": null,
+ "lead_in": 0.05,
+ "tail": 2.2,
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "timing": "alignment",
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"; the settings of plea2005 (STYLE_BIBLE rule 68)",
+  "fallback": {
+   "provider": "kokoro",
+   "name": "am_michael",
+   "speed": 0.92,
+   "pitch_semitones": -1.0
+  }
+ },
+ "voice_fx": {
+  "tempo": 1.17,
+  "max_gap": 0.26
+ },
+ "mix": {
+  "engine": "v2",
+  "music_gap": 11,
+  "music_air": -1,
+  "music_lp": 7500,
+  "sfx_gap": 5,
+  "reverb": 0.32,
+  "reverb_sec": 2.0,
+  "duck": 0.5,
+  "amb_gap": 13,
+  "amb_duck": 0.4
+ },
+ "post": "Selhurst Park, 25 January 1995. Eric Cantona is sent off, a fan comes down to the front, and Cantona goes over the barrier feet first. Eight months out, community service, and one sentence about seagulls.\n\n#cantona #ericcantona #manchesterunited #manutd #crystalpalace #premierleague #footballhistory #football #footballtiktok",
+ "phrases": [
+  {
+   "id": "hook",
+   "text": "Eric Cantona. Manchester United's number seven. On a January night in 1995, he jumped into the crowd, feet first.",
+   "say": "[intrigued] Eric Cantona. ... Manchester United's number seven. ... On a January night in nineteen ninety-five... he jumped into the crowd... feet first.",
+   "pause": 0.9,
+   "colors": {
+    "Eric": "gold",
+    "Cantona.": "gold",
+    "seven.": "gold",
+    "crowd,": "red",
+    "feet": "red",
+    "first.": "red"
+   }
+  },
+  {
+   "id": "red",
+   "text": "Selhurst Park, away at Crystal Palace. Three minutes into the second half, Cantona kicks out at defender Richard Shaw. The referee shows him red.",
+   "say": "Selhurst Park, away at Crystal Palace. Three minutes into the second half, Cantona kicks out at defender Richard Shaw. ... [firmly] The referee shows him red.",
+   "pause": 0.8,
+   "colors": {
+    "Selhurst": "gold",
+    "Park,": "gold",
+    "kicks": "red",
+    "red.": "red"
+   }
+  },
+  {
+   "id": "fan",
+   "text": "As he walks along the touchline, a Palace fan runs down to the front and shouts abuse at him.",
+   "say": "As he walks along the touchline... a Palace fan runs down to the front... and shouts abuse at him.",
+   "pause": 0.7,
+   "colors": {
+    "fan": "gold",
+    "abuse": "red"
+   }
+  },
+  {
+   "id": "kick",
+   "text": "Cantona stops. He turns. And he launches himself over the barrier, kung-fu style.",
+   "say": "[tense] Cantona stops. ... He turns. ... And he launches himself over the barrier... kung-fu style.",
+   "pause": 2.0,
+   "colors": {
+    "stops.": "gold",
+    "turns.": "gold",
+    "kung-fu": "red",
+    "style.": "red"
+   },
+   "hold": {
+    "after": "stops.",
+    "sec": 0.3
+   }
+  },
+  {
+   "id": "fallout",
+   "text": "United fine him £20,000. The FA bans him for eight months. A court sentences him to two weeks in prison, cut on appeal to community service, coaching children.",
+   "say": "United fine him twenty thousand pounds. The FA bans him for eight months. A court sentences him to two weeks in prison... cut on appeal to community service: coaching children.",
+   "pause": 1.0,
+   "colors": {
+    "£20,000.": "gold",
+    "eight": "red",
+    "months.": "red",
+    "prison,": "red",
+    "community": "lime",
+    "service,": "lime"
+   }
+  },
+  {
+   "id": "press",
+   "text": "Then he faces the press: When the seagulls follow the trawler, it's because they think sardines will be thrown into the sea. Thank you very much. And he walks out.",
+   "say": "Then he faces the press. ... [calmly] When the seagulls... follow the trawler... it's because they think sardines will be thrown into the sea. ... Thank you very much. ... [amused] And he walks out.",
+   "pause": 0.45,
+   "colors": {
+    "seagulls": "gold",
+    "trawler,": "gold",
+    "sardines": "lime",
+    "sea.": "lime",
+    "walks": "red",
+    "out.": "red"
+   },
+   "hold": [
+    {
+     "after": "sea.",
+     "sec": 0.8
+    },
+    {
+     "after": "much.",
+     "sec": 0.7
+    }
+   ]
+  },
+  {
+   "id": "coda",
+   "text": "Two years later, he lifts the Premier League trophy. Then he walks away.",
+   "say": "[warmly] Two years later, he lifts the Premier League trophy. [quietly] Then he walks away.",
+   "pause": 0.0,
+   "colors": {
+    "trophy.": "gold",
+    "walks": "red",
+    "away.": "red"
+   }
+  }
+ ],
+ "_take": "recorded 14 Nov 2026 on the author's second ElevenLabs account (Callum, eleven_v3, the settings of plea2005): 1,746 characters, six phrases, 56.55 s as recorded. To reach the length of rule 70 the pauses between phrases were widened (0.9 / 0.8 / 0.7 / 2.0 / 1.0 / 0.3 s; the 2.0 s after the kick is the real photograph, in silence) and three held beats were put in with pausevoice.py: 0.3 s after \"stops.\", 0.8 s after \"sea.\", 0.7 s after \"much.\". Film 61.303 s as first delivered. The coda (\"Two years later, he lifts the Premier League trophy. Then he walks away.\") was recorded the same day for the author's added ending (91 characters; a first, longer line was recorded and dropped: 129 characters). The three held beats are now fields of the script (\"hold\"), so audio/tts.py alone rebuilds the narration; the earlier phrases come from build/tts_cache and their word times are the same as in the first delivery. Film 66.76 s."
+}
