@@ -1283,11 +1283,11 @@ export async function build(T) {
   }, { kb: 0, hud: (g, lt, t) => {
     if (t < BURST) { const q = B.project(0, DOOR.h + 1.4, DOOR.z); bubble(g, 'FAIR PLAY! OPEN UP!', q.x, q.y, { size: 56, scale: lerp(1.25, 1, ease.back(clamp((t - closA) / 0.2))) }); }
     if (t >= numT) counter(g, fmt(tick(t, numT, 1.1, 281992)), 'ACCOUNTS CLOSED · OCTOBER', { y: 330, size: 150, color: '#FFFFFF' });
-    if (t >= clT + 0.35) badge(g, '97% BY THE ALGORITHM', W / 2, 520, { color: '#7CFC9A', size: 46, ...popW(t, clT + 0.35) });
+    if (t >= numT + 1.15) badge(g, '97% BY THE ALGORITHM', W / 2, 520, { color: '#7CFC9A', size: 46, ...popW(t, numT + 1.15) });
   } });
   cue(closA, 'footsteps', 0.4); cue(BURST - 0.02, 'door_slam', 0.9); cue(BURST, 'boom_big', 0.65); cue(clT - 0.15, 'stamp', 0.45);
   for (let k = 1; k < 5; k++) cue(clT - 0.15 + k * 0.22, 'stamp', 0.25);
-  cue(clT + 0.35, 'clock_tick', 0.35);
+  cue(numT + 1.15, 'clock_tick', 0.35);
 
   // ======================= TWIST (silence first): the points a cheater took from you come back =======================
   const quiet = T.e('closed') + 0.05;
