@@ -1,0 +1,165 @@
+{
+  "title": "It's a disgrace: Chelsea 1–1 Barcelona, Champions League semi-final (6 May 2009)",
+  "format": "football",
+  "channel": null,
+  "post": "Chelsea 1–1 Barcelona, 6 May 2009. Four penalty appeals turned down, a 93rd-minute equaliser with Barcelona's first shot on target, and Didier Drogba shouting into a live TV camera. The referee, Tom Henning Øvrebø, later said it was not his best day.\n\n#chelsea #barcelona #drogba #iniesta #championsleague #ucl #football #footballstory #footballtiktok",
+  "lead_in": 0.05,
+  "tail": 2.2,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "timing": "alignment",
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"; a tense, clipped read: every appeal ends on the same flat word",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.92,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.2,
+    "max_gap": 0.22
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5,
+    "reverb": 0.32,
+    "reverb_sec": 2.0,
+    "duck": 0.5,
+    "amb_gap": 13,
+    "amb_duck": 0.4
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "Live on TV, Didier Drogba screams into a camera: It's a disgrace! This is why.",
+      "say": "[intense] Live on TV, Didier Drogba screams into a camera: It's a disgrace! ... This is why.",
+      "pause": 0.35,
+      "colors": {
+        "Drogba": "gold",
+        "disgrace!": "red"
+      }
+    },
+    {
+      "id": "ctx",
+      "text": "May 2009. A Champions League semi-final: Chelsea against Barcelona. After 9 minutes, Essien volleys Chelsea in front.",
+      "say": "May two thousand and nine. A Champions League semi-final: Chelsea, against Barcelona. After nine minutes, Essien volleys Chelsea in front.",
+      "pause": 0.35,
+      "colors": {
+        "2009.": "gold",
+        "9": "gold",
+        "Essien": "lime"
+      }
+    },
+    {
+      "id": "a1",
+      "text": "Minute 23. Malouda goes down under Alves on the edge of the box. The referee, Tom Henning Øvrebø, gives a free kick. Outside.",
+      "say": "[intense] Minute twenty-three. Malouda goes down under Alves, on the edge of the box. The referee, Tom Henning Ovrebo, gives a free kick... Outside.",
+      "pause": 0.4,
+      "colors": {
+        "23.": "gold",
+        "Øvrebø,": "gold",
+        "Outside.": "red"
+      }
+    },
+    {
+      "id": "a2",
+      "text": "Three minutes later, Abidal pulls Drogba back inside it. Nothing.",
+      "say": "Three minutes later, Abidal pulls Drogba back, inside it. Nothing.",
+      "pause": 0.4,
+      "colors": {
+        "inside": "gold",
+        "Nothing.": "red"
+      }
+    },
+    {
+      "id": "red",
+      "text": "In the second half Abidal is sent off. Barcelona have ten men.",
+      "say": "In the second half, Abidal is sent off. Barcelona have ten men.",
+      "pause": 0.35,
+      "colors": {
+        "sent": "red",
+        "off.": "red",
+        "ten": "gold"
+      }
+    },
+    {
+      "id": "a3",
+      "text": "Then the ball hits Piqué's hand in the box. Nothing.",
+      "say": "Then the ball hits Piqué's hand, in the box. Nothing.",
+      "pause": 0.45,
+      "colors": {
+        "hand": "gold",
+        "Nothing.": "red"
+      }
+    },
+    {
+      "id": "goal",
+      "text": "Minute 93. Barcelona's first shot on target. Iniesta. 1–1, and Barcelona go through on away goals.",
+      "say": "[building] Minute ninety-three. Barcelona's first shot on target... [awed] Iniesta! One–one. And Barcelona go through, on away goals.",
+      "pause": 0.45,
+      "colors": {
+        "93.": "gold",
+        "first": "gold",
+        "Iniesta.": "lime",
+        "1–1,": "gold",
+        "away": "gold"
+      }
+    },
+    {
+      "id": "a4",
+      "text": "One last chance: Ballack's shot hits Eto'o's arm. Nothing. Four appeals. No penalty.",
+      "say": "One last chance: Ballack's shot hits Eto's arm. Nothing. Four appeals... no penalty.",
+      "pause": 0.4,
+      "colors": {
+        "arm.": "gold",
+        "Nothing.": "red",
+        "Four": "gold",
+        "No": "red",
+        "penalty.": "red"
+      }
+    },
+    {
+      "id": "drogba",
+      "text": "At the final whistle, Drogba, already substituted, marches back on in flip-flops, and finds a camera.",
+      "say": "At the final whistle, Drogba, already substituted, marches back on, in flip-flops... and finds a camera.",
+      "pause": 0.4,
+      "colors": {
+        "Drogba,": "gold",
+        "flip-flops,": "gold",
+        "camera.": "red"
+      }
+    },
+    {
+      "id": "after",
+      "text": "It cost him a three-match ban. The referee changed hotels that night, and got death threats for years.",
+      "say": "It cost him a three-match ban. The referee changed hotels that night, and got death threats for years.",
+      "pause": 0.45,
+      "colors": {
+        "three-match": "gold",
+        "hotels": "gold",
+        "death": "red",
+        "threats": "red"
+      }
+    },
+    {
+      "id": "end",
+      "text": "Nine years later he said: It was not my best day.",
+      "say": "[quietly] Nine years later, he said: it was not my best day.",
+      "pause": 0.3,
+      "colors": {
+        "Nine": "gold",
+        "not": "red",
+        "best": "red",
+        "day.": "red"
+      }
+    }
+  ]
+}
