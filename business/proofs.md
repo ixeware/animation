@@ -5,4 +5,4 @@
 
 | Записано (UTC) | Файл | Байт | Длина | Кадр | SHA-256 | Заметка |
 |---|---|---|---|---|---|---|
-| 2026-11-15 10:46:58 | `fairplay.mp4` | 27390809 | 63.20 s | 1080×1920 | `52ee0717d8020368df8198a1651ee5d526aeee74540e2306b9d7d5403f20bd8b` | fairplay, 1080p, the Mittens first frame — the file for TikTok |
+| 2026-11-15 12:19:48 | `fairplay.mp4` | 28441704 | 65.50 s | 1080×1920 | `e72369ff04abb2a4ad0cd3ae56ded42b0855384b523c3d59ef0bd13c7b0b545e` | fairplay, 1080p, TikTok (with the rumour beat) |
