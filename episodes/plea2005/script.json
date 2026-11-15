@@ -1,0 +1,143 @@
+{
+  "title": "The player who once stopped a war: Didier Drogba and Ivory Coast (2005–2007)",
+  "format": "football",
+  "channel": null,
+  "post": "8 October 2005: Ivory Coast reach their first World Cup, and in the dressing room Didier Drogba takes a microphone, kneels with his team-mates and begs both sides of a divided country to lay down their weapons. In 2007 the national team played in Bouaké, the rebels' capital, in front of soldiers from both sides.\n\n#drogba #ivorycoast #cotedivoire #football #footballstory #footballhistory #worldcup #footballtiktok",
+  "lead_in": 0.05,
+  "tail": 2.2,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "timing": "alignment",
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"; a grave, warm read: short sentences, the name held back to the end of the opening",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.92,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.17,
+    "max_gap": 0.26
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5,
+    "reverb": 0.32,
+    "reverb_sec": 2.0,
+    "duck": 0.5,
+    "amb_gap": 13,
+    "amb_duck": 0.4
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "This player once stopped a war. Not with an army. With a microphone, on his knees, in a dressing room. His name? Didier Drogba.",
+      "say": "[grave] This player once stopped a war. ... Not with an army. With a microphone... on his knees... in a dressing room. ... His name? ... Didier Drogba.",
+      "pause": 0.45,
+      "colors": {
+        "war.": "red",
+        "microphone,": "gold",
+        "knees,": "gold",
+        "Didier": "gold",
+        "Drogba.": "gold"
+      }
+    },
+    {
+      "id": "ctx",
+      "text": "October 2005. Ivory Coast win in Sudan, their rivals Cameroon miss a last-minute penalty, and Ivory Coast reach their first World Cup.",
+      "say": "October two thousand and five. Ivory Coast win in Sudan, their rivals Cameroon miss a last-minute penalty... [excited] and Ivory Coast reach their first World Cup!",
+      "pause": 0.4,
+      "colors": {
+        "2005.": "gold",
+        "miss": "red",
+        "first": "gold",
+        "World": "lime",
+        "Cup.": "lime"
+      }
+    },
+    {
+      "id": "mic",
+      "text": "The dressing room should be a party. Instead, in front of a national TV camera, Drogba takes the microphone.",
+      "say": "The dressing room should be a party. ... [quietly] Instead, in front of a national TV camera, Drogba takes the microphone.",
+      "pause": 0.4,
+      "colors": {
+        "party.": "gold",
+        "camera,": "gold",
+        "microphone.": "gold"
+      }
+    },
+    {
+      "id": "war",
+      "text": "Because back home, his country has been cut in two for three years: rebels in the north, the army in the south. A civil war.",
+      "say": "[grave] Because back home, his country has been cut in two, for three years: rebels in the north, the army in the south. ... A civil war.",
+      "pause": 0.45,
+      "colors": {
+        "two": "red",
+        "three": "gold",
+        "north,": "gold",
+        "south.": "gold",
+        "civil": "red",
+        "war.": "red"
+      }
+    },
+    {
+      "id": "plea",
+      "text": "So the whole team kneels. And he begs both sides: please, lay down your weapons.",
+      "say": "[solemn] So the whole team kneels. And he begs both sides: ... please, lay down your weapons.",
+      "pause": 0.5,
+      "colors": {
+        "kneels.": "gold",
+        "lay": "lime",
+        "down": "lime",
+        "your": "lime",
+        "weapons.": "lime"
+      }
+    },
+    {
+      "id": "after",
+      "text": "The clip plays on television for weeks. Both sides return to the table. In March 2007, they sign a peace deal.",
+      "say": "The clip plays on television, for weeks. Both sides return to the table. In March two thousand and seven, they sign a peace deal.",
+      "pause": 0.4,
+      "colors": {
+        "weeks.": "gold",
+        "2007,": "gold",
+        "peace": "lime",
+        "deal.": "lime"
+      }
+    },
+    {
+      "id": "bouake",
+      "text": "Then Drogba asks for one more thing: play the next home match in Bouaké, the rebel capital. Soldiers from both sides watch the same game, in the same stadium. Ivory Coast win 5–0. Drogba scores the fifth.",
+      "say": "Then Drogba asks for one more thing: play the next home match in Bwah-kay, the rebel capital. ... [building] Soldiers from both sides watch the same game, in the same stadium. Ivory Coast win five–nil. [awed] Drogba scores the fifth.",
+      "pause": 0.45,
+      "colors": {
+        "Bouaké,": "gold",
+        "rebel": "red",
+        "both": "gold",
+        "same": "gold",
+        "5–0.": "lime",
+        "fifth.": "lime"
+      }
+    },
+    {
+      "id": "end",
+      "text": "Next morning, one headline reads: five goals to erase five years of war.",
+      "say": "[quietly] Next morning, one headline reads: ... five goals, to erase five years of war.",
+      "pause": 0.3,
+      "colors": {
+        "five": "gold",
+        "goals": "gold",
+        "erase": "lime",
+        "war.": "red"
+      }
+    }
+  ]
+}
