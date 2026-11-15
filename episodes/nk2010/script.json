@@ -1,0 +1,111 @@
+{
+  "title": "North Korea 0–7 Portugal (World Cup 2010): the match they showed live",
+  "format": "football",
+  "channel": null,
+  "post": "North Korea 0–7 Portugal, World Cup 2010. The first match abroad that state TV showed live. Then, by one report, six hours of public shaming, rumours of the mines and worse, and a coach whose fate was never confirmed. Here is what is actually known.\n\n#worldcup #northkorea #portugal #ronaldo #football #footballstory #footballtiktok #worldcup2010",
+  "lead_in": 0.05,
+  "tail": 2.2,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "timing": "alignment",
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"; a dark, even documentary read",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.92,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.2,
+    "max_gap": 0.22
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11.5,
+    "music_air": -1,
+    "music_lp": 7000,
+    "sfx_gap": 5,
+    "reverb": 0.32,
+    "reverb_sec": 2.0,
+    "duck": 0.5,
+    "amb_gap": 13.5,
+    "amb_duck": 0.38
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "This team played Squid Game on a football field.",
+      "say": "[dramatic] This team played Squid Game... on a football field.",
+      "pause": 0.4,
+      "colors": { "Squid": "red", "Game": "red" }
+    },
+    {
+      "id": "ctx",
+      "text": "2010. North Korea's first World Cup in forty-four years.",
+      "say": "Twenty ten. North Korea's first World Cup in forty-four years.",
+      "pause": 0.3,
+      "colors": { "2010.": "gold", "forty-four": "gold" }
+    },
+    {
+      "id": "live",
+      "text": "After a narrow loss to Brazil, state TV took a risk. The next match, against Portugal, would go out live. A first.",
+      "say": "After a narrow loss to Brazil, state TV took a risk. The next match, against Portugal, would go out live. [quietly] A first.",
+      "pause": 0.35,
+      "colors": { "risk.": "gold", "live.": "red", "first.": "gold" }
+    },
+    {
+      "id": "half",
+      "text": "At half-time it was only 1–0.",
+      "say": "At half-time it was only one-nil.",
+      "pause": 0.3,
+      "colors": { "1–0.": "gold" }
+    },
+    {
+      "id": "rout",
+      "text": "Then, in pouring rain, six more. 7–0.",
+      "say": "[intense] Then, in pouring rain... six more. [somber] Seven-nil.",
+      "pause": 0.4,
+      "colors": { "six": "red", "7–0.": "red" }
+    },
+    {
+      "id": "tv",
+      "text": "At the whistle the commentator said: we are ending our live broadcast now. And the screen cut to factory workers praising the leader.",
+      "say": "At the whistle the commentator said: we are ending our live broadcast now. And the screen cut to factory workers, praising the leader.",
+      "pause": 0.4,
+      "colors": { "ending": "red", "factory": "gold", "workers": "gold" }
+    },
+    {
+      "id": "home",
+      "text": "Back in Pyongyang, Radio Free Asia reported, the team was put on a stage for six hours of public criticism, in front of four hundred people. The players had to denounce their own coach.",
+      "say": "[somber] Back in Pyongyang, Radio Free Asia reported, the team was put on a stage for six hours of public criticism, in front of four hundred people. The players had to denounce their own coach.",
+      "pause": 0.4,
+      "colors": { "six": "red", "hours": "red", "four": "gold", "hundred": "gold", "denounce": "red" }
+    },
+    {
+      "id": "rumours",
+      "text": "Then came the rumours. The mines. Executions. FIFA asked. Pyongyang answered: they are training as usual.",
+      "say": "Then came the rumours. The mines... [quietly] Executions. FIFA asked. Pyongyang answered: they are training as usual.",
+      "pause": 0.4,
+      "colors": { "mines.": "red", "Executions.": "red", "training": "lime", "usual.": "lime" }
+    },
+    {
+      "id": "truth",
+      "text": "Six months later, all eleven who started that match were back in the squad.",
+      "say": "Six months later, all eleven who started that match were back in the squad.",
+      "pause": 0.45,
+      "colors": { "eleven": "gold", "back": "lime" }
+    },
+    {
+      "id": "coach",
+      "text": "The coach was not. What happened to him has never been confirmed.",
+      "say": "[softly] The coach was not. What happened to him... has never been confirmed.",
+      "pause": 0.3,
+      "colors": { "not.": "red", "never": "gold" }
+    }
+  ]
+}
