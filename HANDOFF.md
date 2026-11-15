@@ -213,6 +213,9 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
   (камера-карточка в углу: Ханс в хуке, «ты» в ловушках), `hansDesk` (Ханс за столом без доски, отчёт перед ним),
   камера Ханса в `browser` (`face`) и переключение вкладок, `lineup` (опознание за стеклом: стена с ростом, таблички,
   «!», свет, шаг вперёд), `camWall({ mood: 'happy', from })` для возврата очков, `profile({ mood })`, `monRect`.
+- Версия 5 — хук с вибратора и эдит-байт на фразе Ханса (правило 72): «A vibrator has been accused of beating Magnus
+  Carlsen» (`pixVib` — предмет под мозаикой), «Hans said chess speaks for itself. Chess.com listened.»; Магнус с
+  «1 MOVE» теперь на 6-й секунде; финал — петля на первый кадр. 65,2 с.
 - Файлы: `episodes/fairplay/build/fairplay.mp4` (1080p, TikTok) и `fairplay_youtube.mp4` (метка без строки про
   YouTube); `fairplay_4k.mp4` — устаревшая первая версия. Перед публикацией — `python3 tools/proof.py <файл>`, коммит
   и пуш (шаг 10 в CLAUDE.md).

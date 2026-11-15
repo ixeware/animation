@@ -1,7 +1,7 @@
 {
  "title": "Chess.com will catch you anyway",
  "channel": "THE 64 FILES",
- "post": "Magnus resigned after one move. Chess.com never resigns 🕵️ How many points did YOU get back? #chess #chesscom #magnuscarlsen #fairplay #story",
+ "post": "Hans said chess speaks for itself. Chess.com was listening 🕵️ How many points did YOU get back? #chess #chesscom #hansniemann #magnuscarlsen #fairplay",
  "lead_in": 0.05,
  "tail": 1.6,
  "voice": {
@@ -36,17 +36,39 @@
  "phrases": [
   {
    "id": "hook",
-   "text": "Magnus Carlsen resigned after one move.",
-   "say": "[intense] Magnus Carlsen resigned after one move.",
+   "text": "A vibr*tor has been accused of beating Magnus Carlsen.",
+   "say": "[intense] A vibrator has been accused of beating Magnus Carlsen.",
+   "pause": 0.25,
+   "colors": {
+    "vibr*tor": "red",
+    "accused": "gold",
+    "Magnus": "red",
+    "Carlsen.": "red"
+   }
+  },
+  {
+   "id": "naked",
+   "text": "Hans Niemann offered to play n*ked.",
+   "say": "Hans Niemann offered to play naked.",
+   "pause": 0.25,
+   "colors": {
+    "Hans": "blue",
+    "Niemann": "blue",
+    "n*ked.": "gold"
+   },
+   "take": 3
+  },
+  {
+   "id": "mag",
+   "text": "Then Magnus resigned against him after one move.",
+   "say": "[intense] Then Magnus resigned against him after one move.",
    "pause": 0.25,
    "colors": {
     "Magnus": "red",
-    "Carlsen": "red",
     "resigned": "gold",
     "one": "gold",
     "move.": "gold"
-   },
-   "take": 1
+   }
   },
   {
    "id": "report",
@@ -60,34 +82,13 @@
    }
   },
   {
-   "id": "rumor",
-   "text": "The internet even blamed a vibrating device.",
-   "say": "The internet even blamed a vibrating device.",
-   "pause": 0.2,
-   "colors": {
-    "internet": "blue",
-    "vibrating": "red",
-    "device.": "red"
-   }
-  },
-  {
-   "id": "naked",
-   "text": "Hans offered to play n*ked.",
-   "say": "Hans offered to play naked.",
+   "id": "clue",
+   "text": "But Chess.com's clue wasn't a vibr*tor. He played better when he clicked away from the board.",
+   "say": "But Chess dot com's clue wasn't a vibrator. He played better when he clicked away from the board.",
    "pause": 0.25,
    "colors": {
-    "Hans": "blue",
-    "n*ked.": "gold"
-   }
-  },
-  {
-   "id": "clue",
-   "text": "But Chess.com's clue was simpler: he played better when he clicked away from the board.",
-   "say": "But Chess dot com's clue was simpler: he played better when he clicked away from the board.",
-   "pause": 0.15,
-   "colors": {
     "Chess.com's": "blue",
-    "simpler:": "gold",
+    "vibr*tor.": "red",
     "better": "lime",
     "clicked": "red",
     "away": "red"
@@ -95,19 +96,25 @@
   },
   {
    "id": "bait",
-   "text": "Your opponent can't see you leave. Chess.com can.",
-   "say": "Your opponent can't see you leave. [dramatic] Chess dot com can.",
+   "text": "Hans said chess speaks for itself.",
+   "say": "Hans said: chess speaks for itself.",
+   "pause": 0.5,
+   "colors": {
+    "Hans": "blue",
+    "speaks": "gold",
+    "itself.": "gold"
+   }
+  },
+  {
+   "id": "bait2",
+   "text": "Chess.com listened.",
+   "say": "[serious] Chess dot com listened.",
    "pause": 0.6,
    "colors": {
-    "can't": "red",
-    "leave.": "red",
     "Chess.com": "blue",
-    "can.": "blue"
+    "listened.": "lime"
    },
-   "hold": {
-    "after": "leave.",
-    "sec": 0.45
-   }
+   "take": 8
   },
   {
    "id": "trap1",
@@ -122,17 +129,16 @@
   },
   {
    "id": "two",
-   "text": "Two: it knows how often players at your rating find the best move. Not even Magnus plays like an engine.",
-   "say": "Two: it knows how often players at your rating find the best move. Not even Magnus plays like an engine.",
-   "pause": 0.1,
+   "text": "Two: it knows how often players at your rating find the best move.",
+   "say": "Two: it knows how often players at your rating find the best move.",
+   "pause": 0.15,
    "colors": {
     "Two:": "gold",
     "rating": "gold",
     "best": "lime",
-    "move.": "lime",
-    "Magnus": "red",
-    "engine.": "blue"
-   }
+    "move.": "lime"
+   },
+   "take": 2
   },
   {
    "id": "stand",

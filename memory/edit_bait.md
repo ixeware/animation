@@ -8,7 +8,15 @@
 2. **Громкое прозвище героя** — как «The Grandmaster Hunter» про Леви. Два-три слова, которые можно написать плашкой
    и повторить в комментариях.
 
+3. **Мем-цитата самого героя с поворотом** — как в `fairplay` v5: «Hans said chess speaks for itself. Chess.com
+   listened.» Берём фразу, которую уже режут в эдиты (у Ханса — «The chess speaks for itself», 2022), и
+   переворачиваем её одной строкой.
+
 Не байт: просто сильная фраза без образа («He has seen your position before» в `woodpecker` v2 автор байтом не счёл).
+Не байт: фраза про компанию или сайт. Автор (15.11.2026) про «Your opponent can't see you leave. Chess.com can.»:
+«эдит байт тут слабый, так как чесскому никто эдиты не делает, посмотри сейчас акутальные эдиты». Байт — про человека,
+о котором уже делают эдиты (Ханс, Магнус, Хикару, Готэм). Перед сценарием смотреть, что режут сейчас: поиск TikTok по
+имени и «edit», по его известной фразе (страницы `tiktok.com/discover/...` находит веб-поиск), новости о нём.
 
 ## Как ставить в ролик
 - В первых 12 секундах, сразу после развязки хука.
@@ -26,9 +34,13 @@
 | `biggerfish` | Alien / Hunter / The Fisherman | прозвища | — |
 | `witty2` | Nah, I'd win → «WITTY WON.» → разрез → «Witty lost.» (версия 6: он лежит на Марсе, отлёт до планеты); The alien can beat humans (перелёт Марс → Земля, линейка «humans» на весь кадр, как в сине-фиолетовом меме с шахматистами). But not the GOAT (камера слетает к козьей ферме в 3D, Магнус у калитки «GOAT FARM», коза блеет). Not twice.; THE KING OF CURSES; в конце реплика самого Witty из комментариев: «The goat is too good» | мем + обманка (правило 66) + метафора-противопоставление + отсылка к мему (правило 67) + игра слов GOAT / goat + прозвище | ждём статистику |
 | `woodpecker` v3 | You can surprise a human. But not a library. He has seen your position before. | метафора | ждём статистику |
+| `fairplay` v1–v4 | Your opponent can't see you leave. Chess.com can. | метафора про сайт | автор: слабый, «чесскому никто эдиты не делает» |
+| `fairplay` v5 | Hans said chess speaks for itself. Chess.com listened. (пузырь «THE CHESS SPEAKS FOR ITSELF.» → тишина → глаз в окне) | мем-цитата героя + поворот | ждём статистику |
 
 ## Заготовки
 - Witty против Магнуса (`witty2`): сделано — «Nah, I'd win» → «WITTY WON.» → разрез; Witty — Годжо, Магнус — Сукуна (правило 62).
 - Магнус: The Library; «you're not playing a man, you're playing every game he has ever seen».
 - Хикару: The Speedrunner, The Machine with a webcam.
 - Таль: The Magician from Riga (известное прозвище; перед роликом найти источник).
+- Ханс: «The chess speaks for itself» (использовано в `fairplay` v5). Что сейчас о нём: документалка Netflix «Untold:
+  Chess Mates» (апрель 2026), рейтинг 2697 в ноябре 2026, турниры в ноябре 2026.

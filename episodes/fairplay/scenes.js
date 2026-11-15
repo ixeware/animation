@@ -1118,6 +1118,30 @@ function camCard(g, t, who, e, { x = 838, y = 300, w = 210, label = null, closed
 }
 const youCard = (g, t, e, o = {}) => camCard(g, t, 'you', e, { label: 'YOU', ...o });
 
+// the "vibrating device" of the 2022 rumour, never shown: a pink wand under the censor's mosaic, buzzing (the hook, the
+// loop at the end; crossed out on "Chess.com's clue wasn't a vibrator")
+const VIB_SRC = tex(120, 260, (x, w, h) => {
+  const gr = x.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, '#E2559F'); gr.addColorStop(0.5, '#FF8FCB'); gr.addColorStop(1, '#C43C86'); x.fillStyle = gr;
+  x.beginPath(); x.ellipse(60, 54, 52, 50, 0, 0, 7); x.fill(); x.beginPath(); x.roundRect(36, 84, 48, 168, 22); x.fill();
+  x.fillStyle = '#8E2E66'; x.fillRect(36, 150, 48, 12); x.fillStyle = 'rgba(255,255,255,0.55)'; x.beginPath(); x.ellipse(40, 40, 13, 22, -0.4, 0, 7); x.fill();
+});
+const VIB_PIX = tex(9, 20, (x, w, h) => { x.imageSmoothingEnabled = true; x.drawImage(VIB_SRC, 0, 0, w, h); });
+function pixVib(g, x, y, h, t, { a = 1, buzz = 1, rot = 0.25, both = false } = {}) {  // both: the buzz on both sides (else away from the face on its left)
+  if (a <= 0) return;
+  const w = h * 120 / 260, sh = buzz ? 1 : 0;
+  g.save(); g.globalAlpha *= clamp(a); g.translate(x + Math.sin(t * 61) * h * 0.022 * sh, y + Math.cos(t * 53) * h * 0.016 * sh); g.rotate(rot + Math.sin(t * 47) * 0.05 * sh);
+  g.imageSmoothingEnabled = false; g.drawImage(VIB_PIX, -w / 2, -h / 2, w, h); g.imageSmoothingEnabled = true;
+  g.restore();
+  if (buzz <= 0) return;
+  g.save(); g.globalAlpha *= clamp(a) * buzz; g.lineCap = 'round';
+  for (let k = 0; k < 3; k++) { const ph = (t * 3.4 + k / 3) % 1; g.strokeStyle = rgba(GOLD, 1 - ph); g.lineWidth = Math.max(4, h * 0.035);
+    for (const sd of both ? [-1, 1] : [1]) { g.beginPath(); g.arc(x, y, h * (0.36 + ph * 0.32), sd > 0 ? -0.55 : Math.PI - 0.55, sd > 0 ? 0.55 : Math.PI + 0.55); g.stroke(); } }
+  g.font = sans(Math.round(h * 0.16), 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+  for (const [dx, dy, r] of [[0.22, -0.64, -0.2], [0.5, 0.5, 0.22]]) { g.save(); g.translate(clamp(x + dx * h, 150, W - 150) + Math.sin(t * 60) * 3, y + dy * h); g.rotate(r);
+    g.strokeStyle = '#16120E'; g.lineWidth = h * 0.05; g.strokeText('BZZZ', 0, 0); g.fillStyle = GOLD; g.fillText('BZZZ', 0, 0); g.restore(); }
+  g.restore();
+}
+
 // ---- trap 2 as a police lineup, seen through the one-way glass of the observation room (every trap a little story
 // with a face, rule 71): three players at your rating hold their rating on a slate, "you" in the middle as number 2;
 // the "!" of their best moves pop over their heads and pile up over his; on "stand out" the light finds him, the
@@ -1220,13 +1244,14 @@ export async function build(T) {
     down: { ...EXPR.focus, look: [0, 0.75], lid: 0.35 }, shock: { ...EXPR.shock, lid: 0 }, happy: { ...EXPR.happy, lid: 0.08 }, smug: { ...EXPR.smug, lid: 0.3 }, sweat: { ...EXPR.focus, sweat: 1, look: [0, 0.5] } };
 
   // the cuts, in order (a shot runs to the next one)
-  const carlT = w('hook', 1), resT = w('hook', 2), aftA = w('hook', 3) - 0.06, moveT = w('hook', 5);
+  const vibT = w('hook', 1), accT = w('hook', 4), beatA = w('hook', 6) - 0.06, carlNT = w('hook', 8);
+  const nakA = s('naked') - 0.06, scanT = w('naked', 1) + 0.05, nakT = w('naked', 5);
+  const magA = s('mag') - 0.06, carlT = w('mag', 1), resT = w('mag', 2), aftA = w('mag', 5) - 0.06, moveT = w('mag', 7);
   const repA = s('report') - 0.06, slamT = w('report', 0) + 0.1, hisA = w('report', 3) - 0.06, oppT = w('report', 4), likA = w('report', 5) - 0.06, chT = w('report', 6), hunT = w('report', 10);
-  const rumA = s('rumor') - 0.06, vibT = w('rumor', 5), nakA = s('naked') - 0.06, nakT = w('naked', 4), scanT = s('naked') + 0.15;
-  const clueA = s('clue') - 0.06, betT = w('clue', 7), clickT = w('clue', 10);
-  const baitA = s('bait') - 0.06, cantT = w('bait', 2), leaveT = w('bait', 5), canA = w('bait', 6) - 0.06, canT = w('bait', 6);
+  const clueA = s('clue') - 0.06, notVT = w('clue', 3), betT = w('clue', 8), clickT = w('clue', 11);
+  const baitA = s('bait') - 0.06, spkT = w('bait', 2), canA = s('bait2') - 0.06, canT = w('bait2', 0), lisT = w('bait2', 1);
   const t1A = s('trap1') - 0.06, oneT = w('trap1', 2), threeT = w('trap1', 5);
-  const twoA = s('two') - 0.06, twoT = w('two', 0), playT = w('two', 5), bestT = w('two', 11), notA = w('two', 13) - 0.06, magT = w('two', 15), engT = w('two', 19);
+  const twoA = s('two') - 0.06, twoT = w('two', 0), playT = w('two', 5), bestT = w('two', 11);
   const standA = s('stand') - 0.06, moreT = w('stand', 2), outT = w('stand', 6);
   const thrA = s('three') - 0.06, thrT = w('three', 0), engMT = w('three', 2), overA = w('three', 6) - 0.06, hundT = w('three', 8), patT = w('three', 12);
   const fourA = s('four') - 0.06, fourT = w('four', 0), oppsT = w('four', 1), milT = w('four', 7);
@@ -1237,20 +1262,49 @@ export async function build(T) {
   const nevA = s('never') - 0.06, nev2A = w('never', 5) - 0.06, neverT = w('never', 6);
   const ctaA = s('cta') - 0.06, manyT = w('cta', 1);
 
-  // ======================= HOOK (rules 1, 28, 42, 57): the online game, both faces; Magnus plays one move and resigns =======================
+  // ======================= HOOK (rules 1, 28, 57; the author: «в хук поставить самое цепляющее а это вибратор ханса»):
+  // "A vibrator has been accused of beating Magnus Carlsen." Hans at the board, the device of the rumour beside him under
+  // the censor's mosaic, EXHIBIT A over them (the first frame: one face, one object, one line); then both their webcams
+  const HANSB = [K(0.0, 0.1, 8.9, [4, 2.95, 8.7]), K(0.0, 0.09, 8.0, [4, 3.0, 8.8])];
+  const HOOKK = [K(0.0, 0.1, 9.4, [4.35, 3.0, 8.8]), K(0.0, 0.09, 8.5, [4.35, 3.05, 8.9])], VIBW = [5.95, 3.15, 8.4];
+  shot(0, (g, lt, t, sh) => {
+    rig(B, lt, [[0, HOOKK[0]], [len(sh), HOOKK[1]]], { t, e: lin, bump: t > accT && t < accT + 0.3 ? 1 : 0 });
+    hansAtBoard(g, t, { pieces: piecesAt(NC, 0), e: t >= accT ? { ...EXPR.worried, sweat: 1, look: [0.9, 0.1] } : { ...EXPR.neutral, look: [0.8, 0] } });
+    const q = B.project(...VIBW); pixVib(g, q.x, q.y + Math.sin(t * 2.4) * 10, q.s * 2.7, t);
+  }, { kb: 0, hud: (g, lt, t) => { counter(g, 'EXHIBIT A', "THE INTERNET'S THEORY", { y: 330, size: 130, color: GOLD }); } });
+  // "...of beating Magnus Carlsen": the online game's two webcams, Hans sweating with the device by him, Magnus's side-eye
+  shot(beatA, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.0, 0.08, 10.6, [4, 2.95, 10.6])], [len(sh), K(0.0, 0.07, 9.6, [4, 3.0, 10.6])]], { t, e: glide, bump: t > carlNT + 0.2 && t < carlNT + 0.5 ? 1.1 : 0 });
+    room(g, t, { pieces: piecesAt(NC, 0), cams: { left: { who: 'hans', e: { ...EXPR.worried, sweat: 1, look: [0.6, 0] } }, right: { who: 'magnus', e: { ...EXPR.focus, lid: 0.5, look: [-1, 0], curve: -0.3 } } } });
+    const q = B.project(CAMPOS.left[0] + 1.25, CAMPOS.left[1] - 0.55, MON.c[2] - 0.4); pixVib(g, q.x, q.y + Math.sin(t * 2.4) * 8, q.s * 2.1, t);
+  }, { kb: 0, trans: 'whip', hud: (g, lt, t) => { if (t >= carlNT + 0.2) stamp(g, 'RUMOR', W / 2, 1540, t, carlNT + 0.2, { color: GOLD, size: 88, rot: -0.1 }); } });
+  cue(0, 'buzz', 0.55); cue(0.02, 'whoosh_soft', 0.2); cue(accT, 'hit', 0.4); cue(beatA - 0.04, 'whoosh_fast', 0.3); cue(beatA + 0.1, 'buzz', 0.35); cue(carlNT + 0.2, 'stamp', 0.55); cue(carlNT + 0.25, 'record_scratch', 0.25);
+
+  // ======================= "Hans Niemann offered to play n*ked": hands up, the scan finds nothing =======================
+  shot(nakA, (g, lt, t, sh) => {
+    rig(B, lt, [[0, HANSB[1]], [len(sh), K(0.02, 0.09, 7.4, [4, 3.05, 8.9])]], { t, e: glide });
+    hansAtBoard(g, t, { pieces: piecesAt(NC, 0), e: t >= nakT ? EX.smug : EX.calm, up: clamp((t - nakA) / 0.3) });
+    wand(g, t, clamp((t - scanT) / 0.9), clamp((t - scanT) / 0.15) * (1 - clamp((t - magA + 0.15) / 0.15)));
+  }, { kb: 0, trans: 'whip', hud: (g, lt, t) => {
+    nameTitle(g, t - nakA, 'HANS NIEMANN', "MAGNUS'S OPPONENT", { y: 250 });
+    if (t >= scanT + 0.85) stamp(g, 'NOTHING FOUND', W / 2, 1540, t, scanT + 0.85, { color: '#3D9A4A', size: 70, rot: -0.1 });
+  } });
+  cue(nakA - 0.04, 'whoosh_fast', 0.3); cue(nakA + 0.05, 'fabric', 0.4); cue(scanT, 'swipe_card', 0.3); cue(scanT + 0.45, 'shimmer', 0.25); cue(scanT + 0.85, 'stamp', 0.5); cue(nakT + 0.1, 'laugh', 0.22);
+
+  // ======================= "Then Magnus resigned against him after one move.": one move, RESIGNED, his camera goes off =======================
   const ROOMK = [K(0.0, 0.17, 13.1, [4, 3.2, 9.6]), K(0.0, 0.15, 12.4, [4, 3.25, 9.7])];
   const hookCams = (eM, off = 0) => ({ left: { who: 'hans', e: EX.calm }, right: { who: 'magnus', e: eM, off } });
-  const LANDS = [0.42, carlT + 0.12];
+  const LANDS = [magA + 0.32, carlT + 0.12];
   // his opponent's camera in the corner (the game was online, both on webcams): "?" when Magnus resigns, shock when Magnus's camera goes off
   const hansCard = (g, t) => camCard(g, t, 'hans', t >= moveT + 0.12 ? { ...EXPR.shock, lid: 0, look: [-0.5, 0] } : { ...EXPR.worried, sweat: 0, look: [-0.6, 0.1], brow: -0.4 },
     { label: 'HANS', a: clamp((t - resT - 0.08) / 0.15), q: t < moveT + 0.12 ? clamp((t - resT - 0.25) / 0.2) : 0 });
-  // the first frame (rule 28, the Mittens frame): Magnus at the board, "1 MOVE" over his head
+  // Magnus at the board, "1 MOVE" over his head (the first frame of the earlier versions)
   const MAGB = [K(0.0, 0.1, 8.6, [4, 2.95, 8.7]), K(0.0, 0.09, 7.9, [4, 3.0, 8.8])], MAGC = [K(0.04, 0.08, 7.4, [4, 3.05, 9.0]), K(0.02, 0.07, 6.3, [4, 3.1, 9.1])];
-  shot(0, (g, lt, t, sh) => {
+  shot(magA, (g, lt, t, sh) => {
     rig(B, lt, [[0, MAGB[0]], [len(sh), MAGB[1]]], { t, e: lin, bump: t > resT && t < resT + 0.3 ? 1 : 0 });
     const r = runTo(NC, 0, LANDS, t);
     magAtBoard(g, t, { pieces: r.pieces, e: t >= resT ? EX.cold : EX.think, ...moveFx(r, SLIDE, 0.5, false) });
-  }, { kb: 0, hud: (g, lt, t) => {
+  }, { kb: 0, trans: 'whip', hud: (g, lt, t) => {
     counter(g, '1', 'MOVE', { y: 330, size: 190, color: GOLD });
     if (t >= resT) stamp(g, 'RESIGNED', W / 2, 1540, t, resT, { color: RED, size: 76, rot: -0.12 });
     hansCard(g, t);
@@ -1265,7 +1319,7 @@ export async function build(T) {
     if (t >= moveT + 0.37) badge(g, 'CAMERA OFF', W / 2, H / 2, { color: '#2A2D33', size: 56, ...pop(t, moveT + 0.37) });
     hansCard(g, t);
   } });
-  cue(0, 'whoosh_soft', 0.25); cue(LANDS[0] - MOVE_HIT, 'move', 0.6); cue(LANDS[1] - MOVE_HIT, 'move', 0.6); cue(resT, 'stamp', 0.55); cue(resT, 'hit', 0.35);
+  cue(magA - 0.04, 'whoosh_fast', 0.3); cue(LANDS[0] - MOVE_HIT, 'move', 0.6); cue(LANDS[1] - MOVE_HIT, 'move', 0.6); cue(resT, 'stamp', 0.55); cue(resT, 'hit', 0.35);
   cue(aftA, 'whoosh_fast', 0.25); cue(moveT + 0.05, 'tvoff', 0.7); cue(resT + 0.1, 'sparkle_pop', 0.25); cue(moveT + 0.15, 'gasp', 0.3);
 
   // ======================= "CHESS.COM LATER SAID...": the report lands on the table in front of Hans =======================
@@ -1294,26 +1348,6 @@ export async function build(T) {
   cue(repA - 0.04, 'whoosh_fast', 0.3); cue(landT, 'thud', 0.9); cue(landT, 'boom_move', 0.5); cue(landT + 0.06, 'sparkle_pop', 0.3); cue(landT + 0.02, 'gasp', 0.25);
   cue(hisA + 0.05, 'page_flip', 0.5); cue(likA + 0.3, 'page_flip', 0.45); cue(chT, 'stamp', 0.6); cue(chT + 0.05, 'gasp', 0.3); cue(hunT, 'hit', 0.4);
 
-  // ======================= THE RUMOUR: "a vibrating device"; he offered to play naked; the scan found nothing =======================
-  const HANSB = [K(0.0, 0.1, 8.9, [4, 2.95, 8.7]), K(0.0, 0.09, 8.0, [4, 3.0, 8.8])];
-  shot(rumA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, HANSB[0]], [len(sh), HANSB[1]]], { t, e: glide, shake: 1.4 });
-    hansAtBoard(g, t, { pieces: piecesAt(NC, 2), e: t >= vibT ? { ...EXPR.worried, sweat: 1, look: [0.6, 0] } : EX.calm, buzz: clamp((t - vibT + 0.1) / 0.2) });
-  }, { trans: 'whip', hud: (g, lt, t) => {
-    badge(g, 'THE INTERNET:', W / 2, 240, { color: '#16161E', size: 54, ...popW(t, rumA + 0.05) });
-    if (t >= vibT) stamp(g, 'RUMOR', W / 2, 1540, t, vibT, { color: GOLD, size: 88, rot: -0.1 });
-  } });
-  shot(nakA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, HANSB[1]], [len(sh), K(0.02, 0.09, 7.4, [4, 3.05, 8.9])]], { t, e: glide });
-    hansAtBoard(g, t, { pieces: piecesAt(NC, 2), e: t >= nakT ? EX.smug : EX.calm, up: clamp((t - nakA) / 0.3) });
-    wand(g, t, clamp((t - scanT) / 1.0), clamp((t - scanT) / 0.15) * (1 - clamp((t - clueA + 0.15) / 0.15)));
-  }, { kb: 0, hud: (g, lt, t) => {
-    badge(g, 'SECURITY SCAN', W / 2, 240, { color: '#16161E', size: 54, ...popW(t, scanT) });
-    if (t >= scanT + 0.9) stamp(g, 'NOTHING FOUND', W / 2, 1540, t, scanT + 0.9, { color: '#3D9A4A', size: 70, rot: -0.1 });
-  } });
-  cue(rumA - 0.04, 'whoosh_fast', 0.3); cue(vibT, 'buzz', 0.6); cue(vibT + 0.1, 'stamp', 0.45); cue(nakA, 'fabric', 0.4); cue(nakT, 'laugh', 0.25);
-  cue(scanT, 'swipe_card', 0.3); cue(scanT + 0.45, 'shimmer', 0.25); cue(scanT + 0.9, 'stamp', 0.5);
-
   // ======================= "CHESS.COM'S CLUE": the tab he clicked away to; his eyes go with it, back and forth =======================
   // (rule 71: his face on the screen beside the board) the toggling: the tab and his eyes flip between the board and the other tab
   const MONK = [K(0.0, 0.07, 11.9, [4, 3.3, 10.6]), K(0.0, 0.06, 11.0, [4, 3.3, 10.6])], TOG = 0.24;
@@ -1327,28 +1361,31 @@ export async function build(T) {
     monRect(g, 1010 + 150, 360 + 40, 1010 + 480, 360 + 420, 'face', 'hans');
   }, { kb: 0, noJump: false, hud: (g, lt, t) => {
     badge(g, "CHESS.COM'S CLUE", W / 2, 240, { color: GOLD, size: 58, ...pop(t, clueA + 0.08) });
+    if (t >= notVT && t < betT + 0.1) {  // "wasn't a vibrator": the device, crossed out
+      const a = clamp((t - notVT) / 0.12) * (1 - clamp((t - betT + 0.1) / 0.2)), x = W / 2, y = 560;
+      pixVib(g, x, y, 230, t, { a, buzz: 0, rot: 0.3 });
+      if (t >= notVT + 0.25) { const u = clamp((t - notVT - 0.25) / 0.15); g.save(); g.globalAlpha *= a; g.strokeStyle = RED; g.lineWidth = 22; g.lineCap = 'round';
+        g.beginPath(); g.moveTo(x - 110, y - 110); g.lineTo(x - 110 + 220 * u, y - 110 + 220 * u); g.stroke(); if (u >= 1) { g.beginPath(); g.moveTo(x + 110, y - 110); g.lineTo(x - 110, y + 110); g.stroke(); } g.restore(); }
+    }
   } });
-  cue(clueA - 0.04, 'whoosh_soft', 0.3); cue(betT, 'riser', 0.25);
+  cue(clueA - 0.04, 'whoosh_soft', 0.3); cue(notVT + 0.25, 'error', 0.35); cue(betT, 'riser', 0.25);
   for (let k = 0; clickT + k * TOG < T.e('clue') + 0.1; k++) cue(clickT + k * TOG, k ? 'clack' : 'swipe_card', k ? 0.22 : 0.5);
 
-  // ======================= EDIT-BAIT: "Your opponent can't see you leave. Chess.com can." =======================
-  // you leave your own camera; your opponent keeps looking at the board. Music out. Then the eye in the window
-  const youCams = (t, dx = 0, eY = EX.sly) => ({ left: { who: 'you', look: 'you', e: eY, dx }, right: { who: 'opp', look: 'opp', e: EX.down } });
+  // ======================= EDIT-BAIT (the author: «эдит байт тут слабый, так как чесскому никто эдиты не делает»):
+  // Hans's own line of 2022, the one his edits are cut from, in his speech bubble; music out; then the eye: "Chess.com listened."
   shot(baitA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, 0.08, 9.0, [4, 3.3, 10.6])], [len(sh), K(0.0, 0.07, 8.2, [4, 3.3, 10.6])]], { t, e: glide });
-    const dx = -760 * ease.in(clamp((t - (leaveT - 0.15)) / 0.32));
-    room(g, t, { pieces: piecesAt(NC, 2), cams: youCams(t, dx, t >= cantT ? { ...EXPR.smug, look: [-1, 0.1], lid: 0.45 } : EX.sly) });
-  }, { kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { if (t >= cantT) badge(g, "THEY CAN'T SEE YOU", W / 2, 240, { color: '#16161E', size: 56, ...popW(t, cantT) }); } });
+    rig(B, lt, [[0, HANSB[0]], [len(sh), K(0.0, 0.09, 7.6, [4, 3.05, 8.9])]], { t, e: glide });
+    hansAtBoard(g, t, { pieces: piecesAt(NC, 2), e: t >= spkT ? { ...EXPR.smug, look: [0, -0.1] } : EX.calm });
+  }, { trans: 'whip', hud: (g, lt, t) => {
+    if (t >= spkT - 0.1) speech(g, 'HANS NIEMANN, 2022', 'THE CHESS SPEAKS FOR ITSELF.', W / 2, 360, { size: 50, tail: 0.02, scale: lerp(1.25, 1, ease.back(clamp((t - spkT + 0.1) / 0.22))) });
+  } });
   shot(canA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.0, -0.04, 18.5, [4, 7.0, 13.4])], [len(sh), K(0.0, -0.05, 15.8, [4, 7.0, 13.4])]], { t, e: glide, bump: t > canT && t < canT + 0.45 ? 1.3 : 0 });
     const u = ease.out(clamp((t - canT) / 0.35));
     room(g, t, { pieces: piecesAt(NC, 2), mon: false, farSky: eyeTex(u, t, Math.sin((t - canT) * 3) * 0.5), dim: 0.25 * u });
     g.save(); g.fillStyle = `rgba(6,10,16,${0.35 * u})`; g.fillRect(0, 0, W, H); g.restore();
-  }, { trans: 'whip', vig: 0.65, hud: (g, lt, t) => {
-    if (t >= canT + 0.08) badge(g, 'CHESS.COM CAN.', W / 2, 240, { color: '#7CFC9A', size: 64, ...popW(t, canT + 0.08) });
-    youCard(g, t, { ...EXPR.shock, lid: 0, look: [0.4, -0.3] }, { a: clamp((t - canT - 0.25) / 0.15) });  // seen
-  } });
-  cue(baitA - 0.04, 'whoosh_soft', 0.25); cue(leaveT - 0.1, 'whoosh_fast', 0.35); cue(canT, 'boom_big', 0.6); cue(canT + 0.05, 'heartbeat', 0.5); cue(canT + 0.4, 'dun_dun', 0.35);
+  }, { trans: 'whip', vig: 0.65, hud: (g, lt, t) => { if (t >= lisT) badge(g, 'CHESS.COM LISTENED.', W / 2, 240, { color: '#7CFC9A', size: 60, ...popW(t, lisT) }); } });
+  cue(baitA - 0.04, 'whoosh_soft', 0.25); cue(spkT - 0.1, 'sparkle_pop', 0.3); cue(canT, 'boom_big', 0.6); cue(canT + 0.05, 'heartbeat', 0.5); cue(lisT, 'dun_dun', 0.4);
 
   // ======================= TRAP 1 OF 4: the row of traps on the giant board; the first one snaps =======================
   shot(t1A, (g, lt, t, sh) => {
@@ -1364,34 +1401,27 @@ export async function build(T) {
   }, { trans: 'zoom', hud: (g, lt, t) => {
     if (t >= oneT) { badge(g, 'TRAP 1', W / 2, 240, { color: RED, size: 64, ...pop(t, oneT) }); trapRow(g, 1, t, oneT); }
     { const pz = lerp(3.6, TRAPS[0][1], ease.out(clamp((t - t1A) / (oneT - t1A - 0.04)))), jmp = t > oneT ? Math.sin(Math.PI * clamp((t - oneT) / 0.34)) * 1.5 : 0; if (t >= oneT - 0.12) plate3(g, 'YOU', [0, 3.3 + jmp, pz], { color: GOLD, size: 34, ...pop(t, oneT - 0.12) }); }
-    youCard(g, t, t >= threeT ? { ...EXPR.worried, sweat: 1 } : t >= oneT ? { ...EXPR.shock, lid: 0 } : { ...EXPR.smug, look: [-0.6, 0] });
+    youCard(g, t, t >= threeT ? { ...EXPR.worried, sweat: 1 } : t >= oneT ? { ...EXPR.shock, lid: 0 } : { ...EXPR.smug, look: [-0.6, 0] }, { a: clamp((t - t1A - 0.15) / 0.2) });
   } });
   cue(t1A - 0.1, 'whoosh_deep', 0.35); cue(oneT, 'hit_punch', 0.8); cue(oneT, 'stamp', 0.4); cue(threeT, 'shimmer', 0.35);
 
   // ======================= TRAP 2: the lineup of players at your rating; not even Magnus plays like an engine; you stand out =======================
   const LU_E = [{ ...EXPR.tired, look: [0, 0.1] }, { ...EXPR.worried, sweat: 1 }, { ...EXPR.neutral, curve: -0.2 }];
-  shot(twoA, (g, lt, t, sh) => {
+  shot(twoA, (g, lt, t, sh) => {  // the lineup, wide: three of them, slates down
+    lineup(g, t, { e: LU_E, slate: 0, zoom: lerp(1.0, 1.04, clamp(lt / len(sh))), zc: [540, 820] });
+  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'TRAP 2', W / 2, 200, { color: RED, size: 64, ...pop(t, twoT) }); trapRow(g, 2, t, twoT, { y: 330 }); } });
+  shot(playT - 0.06, (g, lt, t, sh) => {  // closer: the slates go up with the flash; the "!" of the best moves
     const b = k => t >= bestT + k * 0.08 ? 1 : 0;
-    lineup(g, t, { e: LU_E, bangs: [b(1), b(0), b(2)], slate: (t - playT) / 0.3, zoom: lerp(1.0, 1.07, clamp(lt / len(sh))), zc: [540, 820], flash: playT + 0.32 });
-  }, { trans: 'whip', kb: 0, noJump: false, hud: (g, lt, t) => {
-    if (t < twoT + 1.1) { badge(g, 'TRAP 2', W / 2, 200, { color: RED, size: 64, ...pop(t, twoT) }); trapRow(g, 2, t, twoT, { y: 330 }); }
-    else badge(g, 'PLAYERS AT YOUR RATING', W / 2, 220, { color: '#16161E', size: 50, ...popW(t, twoT + 1.1) });
-  } });
-  shot(notA, (g, lt, t, sh) => {  // Magnus beside the engine: sure of himself on "Magnus", then he looks up at it
-    rig(B, lt, [[0, K(0.0, 0.1, 17, [0, 3.6, 12])], [len(sh), K(0.06, 0.09, 15.0, [0, 3.7, 12])]], { t, e: glide, bump: t > engT && t < engT + 0.3 ? 1 : 0 });
-    arena(g, t); engineTower(g, t, 4.2, 13); magScreen(g, t, -3.9, 13, t >= engT ? { ...EXPR.worried, sweat: 0, look: [1, -0.6] } : t >= magT ? EX.smug : EX.think);
-  }, { kb: 0, hud: (g, lt, t) => {
-    badge(g, 'NOT EVEN MAGNUS', W / 2, 240, { color: GOLD, size: 58, ...popW(t, magT) });
-    if (t >= engT) plate3(g, 'ENGINE', [3.6, 6.9, 12.6], { color: '#7CFC9A', size: 42, ...pop(t, engT) });
-  } });
+    lineup(g, t, { e: LU_E, bangs: [b(1), b(0), b(2)], slate: (t - playT) / 0.3, zoom: lerp(1.12, 1.18, clamp(lt / len(sh))), zc: [540, 820], flash: playT + 0.3 });
+  }, { kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { badge(g, 'PLAYERS AT YOUR RATING', W / 2, 220, { color: '#16161E', size: 50, ...popW(t, playT) }); } });
   shot(standA, (g, lt, t, sh) => {  // the "!" pile up over him; the light finds him, the other two turn, he steps forward
     const n = t < moreT ? 1 : Math.min(5, 2 + Math.floor((t - moreT) / 0.15)), lk = clamp((t - outT + 0.15) / 0.25);
     const z = t < outT - 0.1 ? lerp(1.0, 1.04, clamp(lt / 1.2)) : lerp(1.04, 1.28, ease.out(clamp((t - outT + 0.1) / 0.5)));
     lineup(g, t, { e: [{ ...EXPR.tired, look: [lk, 0.1], turn: 0.3 * lk, lid: lerp(0.6, 0.2, lk) }, t >= outT ? { ...EXPR.shock, lid: 0 } : { ...EXPR.worried, sweat: 1, look: [0, -0.5] }, { ...EXPR.neutral, look: [-lk, 0], turn: -0.3 * lk, curve: -0.2 }],
       bangs: [1, n, 1], spot: clamp((t - outT + 0.1) / 0.25), step: clamp((t - outT) / 0.3), zoom: z, zc: [540, 820] });
   }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { if (t >= outT) stamp(g, 'STANDS OUT', W / 2, 1540, t, outT, { color: RED, size: 80, rot: -0.1 }); } });
-  cue(twoA - 0.08, 'whoosh_fast', 0.3); cue(twoT, 'hit_punch', 0.7); cue(twoT, 'stamp', 0.35); cue(playT + 0.32, 'camera', 0.55); cue(bestT, 'sparkle_pop', 0.3);
-  cue(notA - 0.04, 'whoosh_soft', 0.3); cue(magT, 'hit', 0.35); cue(engT, 'error', 0.3);
+  cue(twoA - 0.08, 'whoosh_fast', 0.3); cue(twoT, 'hit_punch', 0.7); cue(twoT, 'stamp', 0.35); cue(playT + 0.3, 'camera', 0.55); cue(bestT, 'sparkle_pop', 0.3);
+  cue(playT - 0.06, 'whoosh_soft', 0.25);
   cue(standA - 0.05, 'whoosh_fast', 0.3); for (let k = 0; k < 4; k++) cue(moreT + k * 0.15, 'sparkle_pop', 0.22); cue(outT - 0.05, 'riser', 0.2); cue(outT, 'stamp', 0.6); cue(outT + 0.05, 'gasp', 0.3); cue(outT, 'boom_move', 0.35);
 
   // ======================= TRAP 3: "you", one engine move a game; the cork board fills; the strings find him =======================
@@ -1494,14 +1524,15 @@ export async function build(T) {
   cue(nevA - 0.04, 'record_scratch', 0.35); cue(w('never', 4) + 0.05, 'tvoff', 0.5); cue(nev2A - 0.04, 'whoosh_fast', 0.3); cue(neverT, 'boom_big', 0.55); cue(neverT, 'stamp', 0.5);
 
   // ======================= CTA (rules 10, 26, 39): the first frame again, the question with a number =======================
-  shot(ctaA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, MAGB[1]], [len(sh), MAGB[0]]], { t, e: lin });
-    magAtBoard(g, t, { pieces: piecesAt(NC, 0), e: EX.smug });
+  shot(ctaA, (g, lt, t, sh) => {  // the first frame again: Hans, the device under its mosaic (the loop into the hook)
+    rig(B, lt, [[0, HOOKK[1]], [len(sh), HOOKK[0]]], { t, e: lin });
+    hansAtBoard(g, t, { pieces: piecesAt(NC, 0), e: { ...EXPR.smug, look: [0.6, 0] } });
+    const q = B.project(...VIBW); pixVib(g, q.x, q.y + Math.sin(t * 2.4) * 10, q.s * 2.7, t);
   }, { kb: 0, trans: 'whip', hud: (g, lt, t) => {
     coverTitle(g, 'HOW MANY', 'POINTS?', 205);
     if (t >= manyT) { badge(g, 'COMMENT YOUR NUMBER', W / 2, 1530, { color: GOLD, size: 50, ...popW(t, manyT) }); badge(g, `FOLLOW ${CHANNEL}`, W / 2, 1640, { color: '#16161E', size: 36, ...pop(t, manyT + 0.3) }); }
   } });
-  cue(ctaA - 0.04, 'whoosh_fast', 0.3); cue(manyT, 'reveal_bell', 0.35);
+  cue(ctaA - 0.04, 'whoosh_fast', 0.3); cue(ctaA + 0.1, 'buzz', 0.3); cue(manyT, 'reveal_bell', 0.35);
 
   const music = [
     { t: 0, m: 'hook' }, { t: repA, m: 'intrigue' }, { t: baitA, m: 'tension' }, { t: canT, m: 'slam' }, { t: t1A, m: 'clockwork' },
@@ -1509,7 +1540,7 @@ export async function build(T) {
     { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
-    { t0: T.e('bait') - 1.35, t1: canT - 0.01, kind: 'mute' }, { t0: canT, t1: t1A, kind: 'boost', db: 4 },
+    { t0: spkT + 0.3, t1: canT - 0.01, kind: 'mute' }, { t0: canT, t1: t1A, kind: 'boost', db: 4 },
     { t0: BURST - 0.32, t1: BURST - 0.01, kind: 'mute' }, { t0: BURST, t1: T.e('closed'), kind: 'boost', db: 3 },
     { t0: quiet, t1: givT - 0.02, kind: 'mute' },
     { t0: neverT - 0.3, t1: neverT - 0.01, kind: 'mute' },

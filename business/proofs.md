@@ -11,3 +11,5 @@
 | 2026-11-15 14:58:46 | `fairplay_youtube.mp4` | 28479355 | 65.50 s | 1080×1920 | `98059ea3bd63f0840dae2915a314f04e768b7400768e018d866932c3de2c9505` | fairplay v3, 1080p, YouTube version (the handle without the YouTube line) |
 | 2026-11-15 15:39:56 | `fairplay.mp4` | 28508187 | 65.50 s | 1080×1920 | `bc1ba001ad98ab427d615a4b318784fc26cf0213dc8925f390a00c923d3d200d` | fairplay v4, 1080p, TikTok (every scene with a face) |
 | 2026-11-15 15:39:56 | `fairplay_youtube.mp4` | 28549330 | 65.50 s | 1080×1920 | `e7cf693faece49ac5879ed7a3b6b589be3c5e3bb614cfa48737bc24ddddde9fa` | fairplay v4, 1080p, YouTube version (the handle without the YouTube line) |
+| 2026-11-15 17:58:04 | `fairplay.mp4` | 28408537 | 65.23 s | 1080×1920 | `ecc86cac18af102175abd8e51bcf06122523ca334c0f817b08a31348bc93f296` | fairplay v5, 1080p, TikTok (vibrator hook, Hans's quote as the edit-bait) |
+| 2026-11-15 17:58:04 | `fairplay_youtube.mp4` | 28406694 | 65.23 s | 1080×1920 | `c68a9a6de4e6d7c9188d932cf7b7dee6cc165b69ab65c481b6dd9b05b8696b6d` | fairplay v5, 1080p, YouTube version (the handle without the YouTube line) |
