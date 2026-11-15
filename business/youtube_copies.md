@@ -312,6 +312,26 @@ impersonation по ссылке со страницы правила YouTube
 https://i.ytimg.com/vi/RKOz8rgxtRM/oar1.jpg, плашка — https://i.ytimg.com/vi/nRx_hI8DvDs/oar3.jpg; копия последнего
 ролика залита через 39 минут после оригинала (https://www.tiktok.com/@the64files/video/7708023874599980295).
 
+## Пост автора на Reddit (r/PartneredYoutube, 15.11.2026)
+
+Автор выложил пост «Some person on youtube (@the64stories) is copying my entire tiktok channel (@the64files), and when
+i upload my videos from tiktok to youtube, i get banned for impersonation (2 times) What tf should i do?» (сначала в
+r/fuckyoutubedevs). Из сессии Reddit не открывается (403), читали по скриншотам автора. Что советуют и что из этого
+следует:
+- «Upload to YouTube first and keep it private, then post to TikTok, then make it public; strike his copies» (34 голоса;
+  то же советует автор канала на 1,7 млн подписчиков). Верно в принципе: YouTube признаёт оригиналом того, у кого
+  загрузка раньше, а инструмент Copyright Match сам находит перезаливы. Но сейчас нельзя: каналы автора удалены, а
+  новый канал после удаления YouTube считает обходом блокировки. Только после того, как канал вернут.
+- «Copyright removal request for each copied video with links to your TikTok originals and their dates; watermark;
+  an on-screen line with your TikTok handle; side-by-side screenshots in the appeal» — всё это уже сделано (заявки на
+  все копии, правило 70, сравнение аватаров).
+- **Подсказка о причине бана.** Комментатор: его второй канал удалили за impersonation, потому что логотип был похож на
+  логотип основного. У автора так и вышло, только наоборот: канал-копия взял его логотип из TikTok (король с печатью
+  «64», см. [сравнение](avatar_compare_2026-11-15.png)) и появился на YouTube раньше, чем канал автора. Для YouTube
+  канал автора с тем же логотипом и похожим именем выглядел копией «The 64 Stories». Это сильнее прежней догадки про
+  чужой ник `@the64files`. Вывод: жалоба на копию за impersonation (логотип) и в любом обращении о возврате канала
+  прямо писать, что логотип украли у автора.
+
 ## Режим защиты со следующего ролика (14.11.2026)
 
 Автор: «сделай для следущих видео режим защиты, типо вотермарка прозрачная где лого тт @the64files, и снизу IF YOU SEE
