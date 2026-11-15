@@ -820,7 +820,7 @@ function door(g, t, t0) {
 }
 // the agents: dark pawns in yellow vests running out of the door toward the camera
 const AGENTS = [[0, 0], [-1.8, 0.5], [1.8, 0.5], [-3.4, 1.2], [3.4, 1.2]];
-function agents(g, t, t0, { stop = 9 } = {}) {
+function agents(g, t, t0, { stop = 5.5 } = {}) {
   if (t < t0) return;
   const list = AGENTS.map(([dx, lag], i) => { const u = clamp((t - t0 - lag * 0.18) / 1.1), zz = lerp(DOOR.z + 0.5, DOOR.z - stop + lag * 1.2, ease.out(u)), bob = Math.abs(Math.sin((t - t0) * 14 + i)) * 0.25 * (1 - u); return { x: DOOR.x + dx * ease.out(u), z: zz, y: bob, u }; })
     .filter(a => a.u > 0).map(a => ({ ...a, q: B.project(a.x, a.y, a.z) })).filter(a => a.q.z > 0.6).sort((a, b) => b.q.z - a.q.z);
@@ -1084,7 +1084,7 @@ export async function build(T) {
     rig(B, lt, [[0, MONK[0]], [len(sh), MONK[1]]], { t, e: glide });
     const cu = clamp((t - (clickT - 0.55)) / 0.5), cur = t > clickT - 0.6 ? [lerp(1260, 560, ease.inOut(cu)), lerp(760, 58, ease.inOut(cu))] : null;
     room(g, t, { pieces: piecesAt(NC, 2), screen: browser(t, { away: t >= clickT ? 1 : 0, chart: (t - betT) / 0.55, cursor: cur }) });
-  }, { kb: 0, hud: (g, lt, t) => {
+  }, { kb: 0, noJump: false, hud: (g, lt, t) => {
     badge(g, 'ONE CLUE', W / 2, 240, { color: GOLD, size: 62, ...pop(t, clueA + 0.08) });
   } });
   cue(clueA - 0.04, 'whoosh_soft', 0.3); cue(betT, 'riser', 0.25); cue(clickT, 'swipe_card', 0.5);
@@ -1121,7 +1121,7 @@ export async function build(T) {
   shot(twoA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.05, 0.55, 30, [0, 0, 15])], [len(sh), K(-0.06, 0.45, 25, [0, 0, 14])]], { t, e: glide });
     arena(g, t); crowd(g, t);
-  }, { trans: 'whip', hud: (g, lt, t) => {
+  }, { trans: 'whip', noJump: false, hud: (g, lt, t) => {
     if (t < twoT + 1.1) { badge(g, 'TRAP 2', W / 2, 240, { color: RED, size: 64, ...pop(t, twoT) }); trapRow(g, 2, t, twoT); }
     else badge(g, 'PLAYERS AT YOUR RATING', W / 2, 240, { color: '#16161E', size: 50, ...popW(t, twoT + 1.1) });
   } });
@@ -1168,11 +1168,17 @@ export async function build(T) {
     rig(B, lt, [[0, K(0.0, 0.07, 38, [0, 9.5, 22])], [len(sh), K(0.03, 0.06, 33, [0, 9.6, 22])]], { t, e: glide });
     arena(g, t); camWall(g, t, oppsT + 0.2);
     for (let k = 0; k < 9; k++) { const [cx, cy, cz] = camAt(k), a = B.project(cx - 1.4, cy + 1.6, cz), b = B.project(cx + 1.4, cy - 1.0, cz); qaRect(g, a.x, a.y, b.x - a.x, b.y - a.y, 'face', OPPS[k]); }
-    if (t >= milT - 0.4) reportsFly(g, t, milT - 0.4);
   }, { trans: 'whip', qaAllow: ['text over face'], hud: (g, lt, t) => {
     if (t < fourT + 1.0) { badge(g, 'TRAP 4', W / 2, 240, { color: RED, size: 64, ...pop(t, fourT) }); trapRow(g, 4, t, fourT); }
-    else if (t < milT - 0.3) badge(g, 'YOUR OPPONENTS', W / 2, 240, { color: '#16161E', size: 58, ...popW(t, fourT + 1.0) });
-    else counter(g, fmt(tick(t, milT - 0.3, 1.0, 1415111)), 'REPORTS · OCTOBER 2026', { y: 330, size: 150, color: '#FFFFFF' });
+    else badge(g, 'YOUR OPPONENTS', W / 2, 240, { color: '#16161E', size: 58, ...popW(t, fourT + 1.0) });
+  } });
+  shot(milT - 0.35, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(-0.22, -0.02, 25, [0, 12.4, 22])], [len(sh), K(-0.28, -0.03, 22, [0, 12.5, 22])]], { t, e: glide });
+    arena(g, t); camWall(g, t, oppsT + 0.2);
+    for (let k = 0; k < 9; k++) { const [cx, cy, cz] = camAt(k), a = B.project(cx - 1.4, cy + 1.6, cz), b = B.project(cx + 1.4, cy - 1.0, cz); qaRect(g, a.x, a.y, b.x - a.x, b.y - a.y, 'face', OPPS[k]); }
+    reportsFly(g, t, milT - 0.4);
+  }, { kb: 0, qaAllow: ['text over face', 'face cut by frame'], hud: (g, lt, t) => {
+    counter(g, fmt(tick(t, milT - 0.3, 1.0, 1415111)), 'REPORTS · OCTOBER 2026', { y: 330, size: 150, color: '#FFFFFF' });
   } });
   cue(fourA - 0.08, 'whoosh_fast', 0.3); cue(fourT, 'hit_punch', 0.7); cue(fourT, 'stamp', 0.35);
   for (let k = 0; k < 9; k++) cue(oppsT + 0.2 + k * 0.16, 'swipe_card', 0.14);
@@ -1194,8 +1200,8 @@ export async function build(T) {
     // the algorithm: big gears turning in front of the wall; the agents only stand and watch
     [[-3.2, 6.2, 1.6, 2.6, 14, '#5D8C3E'], [1.4, 5.0, 1.3, 2.0, 11, '#7CFC9A'], [4.6, 7.4, 1.2, 1.5, 9, '#4E7A3A']].forEach(([gx, gy, gz, r, n, col], i) =>
       gear(g, B, gx, gy, ACC.z - 2 - gz, r, { teeth: n, angle: (i % 2 ? -1 : 1) * (t - pctA) * (1.6 + i * 0.3), color: col, hub: '#1E2A18' }));
-    agents(g, t, -9, { stop: 9 });
-  }, { trans: 'whip', hud: (g, lt, t) => {
+    agents(g, t, -9);
+  }, { trans: 'whip', noJump: false, hud: (g, lt, t) => {
     counter(g, '97%', 'AUTOMATICALLY', { y: 330, size: 170, color: '#7CFC9A', at: [pctT, 0.22] });
     if (t >= algT) badge(g, 'BY THE ALGORITHM', W / 2, 500, { color: '#16161E', size: 50, ...popW(t, algT) });
   } });
@@ -1210,7 +1216,7 @@ export async function build(T) {
     const down = tick(t, cheT, 0.5, 14), up = tick(t, givT + 0.1, 0.7, 14);
     room(g, t, { pieces: piecesAt(NC, 2), screen: profile(t, { rating: 1200 - down + up, note: (t - givT + 0.05) / 0.35 }) });
     { const a = B.project(MON.c[0] - MON.hw + 0.25, MON.c[1] + 1.95, MON.c[2]), b = B.project(MON.c[0] - MON.hw + 2.7, MON.c[1] + 0.2, MON.c[2]); qaRect(g, a.x, a.y, b.x - a.x, b.y - a.y, 'face', 'opp'); }
-  }, { kb: 0, hud: (g, lt, t) => {
+  }, { kb: 0, noJump: false, hud: (g, lt, t) => {
     if (t >= cheT && t < givT) badge(g, '-14 TO A CHEATER', W / 2, 240, { color: RED, size: 54, ...popW(t, cheT) });
     if (t >= givT) badge(g, 'GIVEN BACK', W / 2, 240, { color: '#7CFC9A', size: 60, ...popW(t, givT) });
   } });
@@ -1220,7 +1226,7 @@ export async function build(T) {
   shot(refA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.32, 0.26, 24, [0, 4, 12])], [len(sh), K(0.16, 0.22, 18.5, [0, 4.6, 12])]], { t, e: glide });
     arena(g, t); jar(g, t, lerp(0.15, 0.95, ease.out(clamp((t - refA) / (nevA - refA)))), refA); coinsFall(g, t, refA, nevA);
-  }, { trans: 'whip', hud: (g, lt, t) => {
+  }, { trans: 'whip', noJump: false, hud: (g, lt, t) => {
     counter(g, fmt(tick(t, refA + 0.05, 1.5, 69617149)), 'POINTS GIVEN BACK · OCTOBER', { y: 330, size: 140, color: GOLD });
   } });
   cue(refA - 0.06, 'whoosh_deep', 0.3); cue(refA + 0.1, 'coins', 0.55); cue(milRT, 'cash', 0.45); cue(monthT, 'coins', 0.35);
