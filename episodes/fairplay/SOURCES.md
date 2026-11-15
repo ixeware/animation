@@ -28,10 +28,13 @@ read through search-engine excerpts that quote them word for word. Before postin
 
 - Magnus and Hans Niemann appear at a board in our daylight room (the online game of 19 September 2022 is drawn this
   way, as in our other videos); Niemann also in the rumour beat, where the scan finds nothing. He is never shown at an
-  engine or with a second screen; the toggling and the engine scenes use a generic player in a hoodie, "you".
+  engine or with a second screen; the toggling and the engine scenes use a generic player in a hoodie, "you". The same
+  "you" is the small YOU webcam in the corner through the traps; the CLOSED stamp that lands on it is a figure of speech
+  for the closures, not a real account.
   The report is drawn as a stack of 72 pages; its pages are not reproduced.
 - Charts are illustrations without made-up figures: the toggling chart is two bars marked only "STAYED" and "CLICKED
-  AWAY"; the dots of "a hundred games" are a picture of the idea, not data.
+  AWAY"; the hundred games of trap 3, pinned to a detective's cork board with red strings running from them to "you"
+  (the conspiracy-board meme, drawn by us), are a picture of the idea, not data: none of them is a real game.
 - The Fair Play team is drawn as pawns in vests bursting through a door, after the "FBI, open up" meme (rule 62: our
   drawing, no frames from elsewhere). Chess.com's logo is not drawn; the site is named in words.
 - After the settlement of August 2023 Niemann was reinstated on Chess.com; the video does not say otherwise.

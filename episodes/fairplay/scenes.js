@@ -1042,6 +1042,56 @@ function cardsBurst(g, t, t0, x, y, { n = 30 } = {}) {
     g.restore();
   }
 }
+// ---- trap 3 as a little story (the author: "я бы перелистнул на третьем этапе"): "you" at the board, smug, one
+// engine move a game; behind him a detective's cork board fills with the games, each with its red dot; on "pattern"
+// red strings run from every dot to him (the conspiracy-board meme, drawn our way)
+const CORKBASE = tex(1200, 880, (x, w, h) => {
+  x.fillStyle = '#B98A5A'; x.fillRect(0, 0, w, h);
+  const r = rng(19); for (let i = 0; i < 2600; i++) { x.fillStyle = r() < 0.5 ? 'rgba(120,80,40,0.35)' : 'rgba(225,190,140,0.35)'; x.fillRect(r() * w, r() * h, 2 + r() * 3, 2 + r() * 3); }
+  x.strokeStyle = '#6E4A2E'; x.lineWidth = 34; x.strokeRect(0, 0, w, h);
+});
+const CORK = makeCanvas(1200, 880);
+const corkAt = k => { const i = k % 10, j = Math.floor(k / 10); return [96 + i * 112 + (hash2(k, 3) - 0.5) * 40, 80 + j * 72 + (hash2(k, 7) - 0.5) * 22, (hash2(k, 5) - 0.5) * 0.45]; };
+// the order the games go up in: the first by his head (the close-up sees it), the rest all over the board
+const CORK1 = 86, CORKORD = [CORK1, ...[...Array(100).keys()].filter(k => k !== CORK1).sort((a, b) => hash2(a, 11) - hash2(b, 11))];
+function corkTex(t, { born = [], link = 0 } = {}) {  // born: when each game goes up, in CORKORD order
+  const x = CORK.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.drawImage(CORKBASE, 0, 0, 1200, 880);
+  const cs = 66, focus = [600, 900];
+  let n = 0; while (n < born.length && t >= born[n]) n++;
+  for (let r = 0; r < n; r++) {
+    const k = CORKORD[r], [cx, cy, rot] = corkAt(k), sc = 1 + 0.7 * (1 - ease.out(clamp((t - born[r]) / 0.14)));  // each lands with a slap
+    x.save(); x.translate(cx, cy); x.rotate(rot); x.scale(sc, sc);
+    x.fillStyle = 'rgba(40,24,10,0.35)'; x.fillRect(-cs / 2 + 4, -cs / 2 + 5, cs, cs); x.fillStyle = '#FFFFFF'; x.fillRect(-cs / 2 - 4, -cs / 2 - 4, cs + 8, cs + 8);
+    x.drawImage(MINI, -cs / 2, -cs / 2, cs, cs);
+    x.fillStyle = RED; x.beginPath(); x.arc(-cs / 2 + DOT[0] * cs, -cs / 2 + DOT[1] * cs, 7, 0, 7); x.fill();
+    x.fillStyle = k % 3 ? '#2F6FD0' : '#D8402F'; x.beginPath(); x.arc(0, -cs / 2 - 2, 7, 0, 7); x.fill();
+    x.restore();
+  }
+  if (link > 0) {  // the strings: from every dot to him, below the board
+    x.strokeStyle = 'rgba(214,40,40,0.9)'; x.lineWidth = 3;
+    for (let r = 0; r < n; r++) { const k = CORKORD[r], u = clamp(link * 1.6 - hash2(k, 13) * 0.6); if (u <= 0) continue; const [cx, cy, rot] = corkAt(k), dx = -cs / 2 + DOT[0] * cs, dy = -cs / 2 + DOT[1] * cs, px = cx + dx * Math.cos(rot) - dy * Math.sin(rot), py = cy + dx * Math.sin(rot) + dy * Math.cos(rot);
+      x.beginPath(); x.moveTo(px, py); x.lineTo(lerp(px, focus[0], u), lerp(py, focus[1], u)); x.stroke(); }
+  }
+  return CORK;
+}
+function youAtBoard(g, t, { pieces, e = 'focus', cork = null } = {}) {
+  dayRoom(g, t, { farSky: cork || SKY_T });
+  tableSet(g, t, { pieces, wPlayer: false, wChair: false, bPlayer: true, black: 'you', eb: e, tableCol: WOODT });
+  lowKey(g, { cy: H * 0.46, a: 0.04 });
+}
+// "you", a small webcam in the corner through the traps, more nervous at each one; CLOSED lands on it at the end
+function youCard(g, t, e, { x = 838, y = 300, w = 210, closed = Infinity, a = 1 } = {}) {
+  if (a <= 0) return;
+  const h = w * 1.15, L = CAMLOOK.you;
+  g.save(); g.globalAlpha *= a;
+  g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(x + 6, y + 8, w, h);
+  webcam(g, x, y, w, h - 34, 'you', e, t, { bg: L.bg, zoom: 1.2, cy: 0.52 });
+  g.fillStyle = '#101116'; g.fillRect(x, y + h - 34, w, 34); g.font = sans(22, 900); g.letterSpacing = '4px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = L.nameColor; g.fillText('YOU', x + w / 2, y + h - 16);
+  g.strokeStyle = '#FFD27A'; g.lineWidth = 5; g.strokeRect(x, y, w, h);
+  g.restore();
+  if (t >= closed) stamp(g, 'CLOSED', x + w * 0.42, y + h * 0.5, t, closed, { color: RED, size: 46, rot: -0.2 });  // a touch left: the frame edge is close
+}
+
 // his camera goes off: the picture squeezes to a line and goes black (off: 0..1)
 function camOff(g, off) {
   if (off <= 0) return;
@@ -1203,6 +1253,7 @@ export async function build(T) {
     if (t > threeT) TRAPS.slice(1).forEach(([x, z], i) => { const q = B.project(x, 0.8, z); burst(g, q.x, q.y, t, threeT + i * 0.12, { n: 8, color: '#FFF6C8', speed: 300, life: 0.4, size: 4, gravity: 300 }); });
   }, { trans: 'zoom', hud: (g, lt, t) => {
     if (t >= oneT) { badge(g, 'TRAP 1', W / 2, 240, { color: RED, size: 64, ...pop(t, oneT) }); trapRow(g, 1, t, oneT); }
+    youCard(g, t, t >= oneT ? { ...EXPR.worried, sweat: 0 } : { ...EXPR.smug, look: [-0.6, 0] }, { a: clamp((t - t1A - 0.2) / 0.2) });
   } });
   cue(t1A - 0.1, 'whoosh_deep', 0.35); cue(oneT, 'hit_punch', 0.8); cue(oneT, 'stamp', 0.4); cue(threeT, 'shimmer', 0.35);
 
@@ -1212,6 +1263,7 @@ export async function build(T) {
     arena(g, t); crowd(g, t);
   }, { trans: 'whip', noJump: false, hud: (g, lt, t) => {
     if (t >= playT + 0.2) [3, 11, 22, 30, 41].forEach((k, i) => { const p = CROWD[k]; if (t >= playT + 0.2 + i * 0.07) plate3(g, '1200', [p.x, 3.6, p.z], { color: '#FFFFFF', size: 26, ...pop(t, playT + 0.2 + i * 0.07) }); });
+    youCard(g, t, { ...EXPR.worried, sweat: 1 });
     if (t < twoT + 1.1) { badge(g, 'TRAP 2', W / 2, 240, { color: RED, size: 64, ...pop(t, twoT) }); trapRow(g, 2, t, twoT); }
     else badge(g, 'PLAYERS AT YOUR RATING', W / 2, 240, { color: '#16161E', size: 50, ...popW(t, twoT + 1.1) });
   } });
@@ -1227,31 +1279,35 @@ export async function build(T) {
     arena(g, t); crowd(g, t, { you: clamp((t - moreT + 0.2) / 0.3), dim: 0.65 * clamp((t - outT + 0.1) / 0.3), rate: 0.25 });
   }, { trans: 'whip', hud: (g, lt, t) => {
     if (t >= moreT) plate3(g, 'YOU', [YOU_P.x, 4.4, YOU_P.z], { color: GOLD, size: 40, ...pop(t, moreT) });
+    youCard(g, t, t >= outT ? { ...EXPR.shock, lid: 0 } : { ...EXPR.worried, sweat: 1 });
     if (t >= outT) stamp(g, 'STANDS OUT', W / 2, 380, t, outT, { color: RED, size: 74, rot: -0.1 });
   } });
   cue(twoA - 0.08, 'whoosh_fast', 0.3); cue(twoT, 'hit_punch', 0.7); cue(twoT, 'stamp', 0.35); cue(bestT, 'sparkle_pop', 0.3);
   cue(notA - 0.04, 'whoosh_soft', 0.3); cue(magT, 'hit', 0.35); cue(engT, 'error', 0.3);
   cue(standA - 0.05, 'whoosh_fast', 0.3); cue(moreT, 'riser', 0.3); cue(outT, 'stamp', 0.6);
 
-  // ======================= TRAP 3: one engine move per game; a hundred games make a pattern =======================
+  // ======================= TRAP 3: "you", one engine move a game; the cork board fills; the strings find him =======================
+  const YOUK = [K(0.02, 0.1, 8.6, [4, 3.4, 9.0]), K(0.0, 0.1, 8.0, [4, 3.45, 9.1])], CORKK = [K(0.0, 0.1, 13.5, [4, 5.4, 10.8]), K(0.0, 0.1, 16.5, [4, 6.0, 11.6])];
+  const corkN = t => t < engMT ? 0 : t < overA ? 1 : Math.min(100, 1 + Math.floor(99 * ease.inOut(clamp((t - overA) / 1.35))));
+  const corkBorn = [engMT]; for (let tt = overA; corkBorn.length < 100 && tt < overA + 2; tt += 0.002) { const n = corkN(tt); while (corkBorn.length < n) corkBorn.push(tt); }
+  const CORKK2 = K(0.0, 0.1, 10.5, [4, 4.5, 9.8]);  // after the strings: in on his face
   shot(thrA, (g, lt, t, sh) => {
-    const [cx, cz] = gamePos(44);
-    rig(B, lt, [[0, K(0.1, 1.28, 4.6, [cx, 0, cz])], [len(sh), K(0.04, 1.36, 3.7, [cx, 0, cz])]], { t, e: glide });
-    arena(g, t); games(g, t, { lit: t >= engMT ? 1 : 0, only: 44 });
-    if (t >= engMT) { const q = B.project(cx - 1 + DOT[0] * 2, 0.06, cz + 1 - DOT[1] * 2); shockwave(g, q.x, q.y, t, engMT, { r1: 200, color: RED, lw: 7 }); }
+    rig(B, lt, [[0, YOUK[0]], [len(sh), YOUK[1]]], { t, e: glide });
+    youAtBoard(g, t, { pieces: piecesAt(NC, 2), e: t >= engMT ? { ...EXPR.smug, look: [-0.8, 0.1] } : { ...EXPR.paranoid, sweat: 0 }, cork: corkTex(t, { born: corkBorn }) });
   }, { trans: 'whip', hud: (g, lt, t) => {
     if (t < thrT + 1.0) { badge(g, 'TRAP 3', W / 2, 240, { color: RED, size: 64, ...pop(t, thrT) }); trapRow(g, 3, t, thrT); }
     else counter(g, '1', 'ENGINE MOVE PER GAME', { y: 330, size: 170, color: RED, at: [thrT + 1.0, 0.22] });
   } });
   shot(overA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, 1.2, 26, [0, 0, 19.5])], [len(sh), K(0.0, 1.38, 40, [0, 0, 19.5])]], { t, e: glide });
-    arena(g, t); games(g, t, { lit: clamp((t - overA) / 1.3), link: clamp((t - patT + 0.1) / 0.5), glow: t >= patT ? 1 : 0 });
+    rig(B, lt, [[0, CORKK[0]], [patT + 0.45 - overA, CORKK[1]], [len(sh), CORKK2, ease.out]], { t, e: glide, bump: t > patT && t < patT + 0.4 ? 1.3 : 0 });
+    youAtBoard(g, t, { pieces: piecesAt(NC, 2), e: t >= patT + 0.1 ? { ...EXPR.shock, lid: 0 } : { ...EXPR.smug, look: [0, -0.2] }, cork: corkTex(t, { born: corkBorn, link: clamp((t - patT + 0.15) / 0.55) }) });
   }, { kb: 0, hud: (g, lt, t) => {
-    counter(g, String(Math.min(100, Math.max(1, Math.round(clamp((t - overA) / 1.3) * 100)))), 'GAMES', { y: 330, size: 170, color: GOLD });
-    if (t >= patT) stamp(g, 'PATTERN', W / 2, 860, t, patT, { color: RED, size: 110, rot: -0.12 });
+    counter(g, String(Math.max(1, corkN(t))), 'GAMES', { y: 330, size: 170, color: GOLD });
+    if (t >= patT) stamp(g, 'PATTERN', W / 2, 1540, t, patT, { color: RED, size: 110, rot: -0.12 });
   } });
-  cue(thrA - 0.08, 'whoosh_fast', 0.3); cue(thrT, 'hit_punch', 0.7); cue(thrT, 'stamp', 0.35); cue(engMT, 'error', 0.35);
-  cue(overA - 0.04, 'whoosh_deep', 0.3); cue(overA + 0.1, 'riser', 0.35); cue(patT, 'stamp', 0.7); cue(patT, 'boom_move', 0.5);
+  cue(thrA - 0.08, 'whoosh_fast', 0.3); cue(thrT, 'hit_punch', 0.7); cue(thrT, 'stamp', 0.35); cue(engMT, 'pen', 0.45);
+  for (let k = 0; k < 14; k++) cue(overA + 0.05 + k * 0.09, 'clack', 0.18);
+  cue(patT - 0.05, 'dun_dun', 0.5); cue(patT, 'stamp', 0.7); cue(patT, 'boom_move', 0.5);
 
   // ======================= TRAP 4: your opponents' reports =======================
   shot(fourA, (g, lt, t, sh) => {
@@ -1261,6 +1317,7 @@ export async function build(T) {
   }, { trans: 'whip', qaAllow: ['text over face'], hud: (g, lt, t) => {
     if (t < fourT + 1.0) { badge(g, 'TRAP 4', W / 2, 240, { color: RED, size: 64, ...pop(t, fourT) }); trapRow(g, 4, t, fourT); }
     else badge(g, 'YOUR OPPONENTS', W / 2, 240, { color: '#16161E', size: 58, ...popW(t, fourT + 1.0) });
+    youCard(g, t, { ...EXPR.paranoid, sweat: 1 });
   } });
   shot(milT - 0.35, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.22, -0.02, 25, [0, 12.4, 22])], [len(sh), K(-0.28, -0.03, 22, [0, 12.5, 22])]], { t, e: glide });
@@ -1280,14 +1337,15 @@ export async function build(T) {
     rig(B, lt, [[0, DK[0]], [BURST - closA, DK[0]], [len(sh), DK2, ease.out]], { t, bump: t > BURST && t < BURST + 0.45 ? 1.4 : 0 });
     arena(g, t); accounts(g, t, clT - 0.15); door(g, t, BURST); agents(g, t, BURST + 0.12);
     if (t > BURST + 0.3) { const q = B.project(0, 0.2, DOOR.z - DOOR.h * 0.6); dust(g, q.x, q.y, t, BURST + 0.3, { n: 14, color: '#E8E0D0', spread: 360 }); }
-  }, { kb: 0, hud: (g, lt, t) => {
+  }, { kb: 0, qaAllow: ['text over face'], hud: (g, lt, t) => {  // CLOSED lands on his webcam on purpose
     if (t < BURST) { const q = B.project(0, DOOR.h + 1.4, DOOR.z); bubble(g, 'FAIR PLAY! OPEN UP!', q.x, q.y, { size: 56, scale: lerp(1.25, 1, ease.back(clamp((t - closA) / 0.2))) }); }
     if (t >= numT) counter(g, fmt(tick(t, numT, 1.1, 281992)), 'ACCOUNTS CLOSED · OCTOBER', { y: 330, size: 150, color: '#FFFFFF' });
     if (t >= numT + 1.15) badge(g, '97% BY THE ALGORITHM', W / 2, 520, { color: '#7CFC9A', size: 46, ...popW(t, numT + 1.15) });
+    youCard(g, t, t >= clT ? { ...EXPR.shock, lid: 0 } : { ...EXPR.paranoid, sweat: 1 }, { closed: clT + 0.05, y: 560, a: clamp((t - BURST) / 0.12) });
   } });
   cue(closA, 'footsteps', 0.4); cue(BURST - 0.02, 'door_slam', 0.9); cue(BURST, 'boom_big', 0.65); cue(clT - 0.15, 'stamp', 0.45);
   for (let k = 1; k < 5; k++) cue(clT - 0.15 + k * 0.22, 'stamp', 0.25);
-  cue(numT + 1.15, 'clock_tick', 0.35);
+  cue(numT + 1.15, 'clock_tick', 0.35); cue(clT + 0.05, 'stamp', 0.5);
 
   // ======================= TWIST (silence first): the points a cheater took from you come back =======================
   const quiet = T.e('closed') + 0.05;
