@@ -985,6 +985,23 @@ function monFaces(g, cams) {
 }
 // the whole room with the monitor, the cameras on it, and its faces logged
 function room(g, t, o = {}) { online(g, t, o); if (!o.screen && o.cams && o.mon !== false) monFaces(g, o.cams); }
+// Magnus at the board in the daylight room, facing us (the author on the Mittens video, 15.11.2026: «с самого первого
+// кадра красивый кадр и сразу все понятно»): one big face, the window and the sky behind him, the board in front
+function magAtBoard(g, t, { pieces, e = 'focus', under = null, over = null } = {}) {
+  dayRoom(g, t, {});
+  tableSet(g, t, { pieces, under, over, wPlayer: false, wChair: false, bPlayer: true, black: 'magnus', eb: e, tableCol: WOODT });
+  lowKey(g, { cy: H * 0.46, a: 0.04 });
+}
+// his camera goes off: the picture squeezes to a line and goes black (off: 0..1)
+function camOff(g, off) {
+  if (off <= 0) return;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+  const u = ease.in(clamp(off * 1.25)), lh = lerp(H, 3, u);
+  g.fillStyle = '#08090C'; g.fillRect(0, 0, W, H / 2 - lh / 2); g.fillRect(0, H / 2 + lh / 2, W, H / 2 - lh / 2 + 1);
+  if (off < 1) { g.fillStyle = `rgba(255,255,255,${0.6 * u * (1 - off)})`; g.fillRect(0, H / 2 - lh / 2, W, lh); }
+  if (off >= 0.8) { g.fillStyle = `rgba(8,9,12,${clamp((off - 0.8) / 0.2)})`; g.fillRect(0, 0, W, H); }
+  g.restore();
+}
 // grey for a flashback: the frame keeps its light, loses its colour
 function grey(g, a = 1) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'saturation'; g.globalAlpha = a; g.fillStyle = '#808080'; g.fillRect(0, 0, W, H); g.restore(); }
 
@@ -1034,25 +1051,27 @@ export async function build(T) {
   const ROOMK = [K(0.0, 0.17, 13.1, [4, 3.2, 9.6]), K(0.0, 0.15, 12.4, [4, 3.25, 9.7])];
   const hookCams = (eM, off = 0) => ({ left: { who: 'hans', e: EX.calm }, right: { who: 'magnus', e: eM, off } });
   const LANDS = [0.42, carlT + 0.12];
+  // the first frame (rule 28, the Mittens frame): Magnus at the board, "1 MOVE" over his head
+  const MAGB = [K(0.0, 0.1, 8.6, [4, 2.95, 8.7]), K(0.0, 0.09, 7.9, [4, 3.0, 8.8])], MAGC = [K(0.04, 0.08, 7.4, [4, 3.05, 9.0]), K(0.02, 0.07, 6.3, [4, 3.1, 9.1])];
   shot(0, (g, lt, t, sh) => {
-    rig(B, lt, [[0, ROOMK[0]], [len(sh), ROOMK[1]]], { t, e: lin, bump: t > resT && t < resT + 0.3 ? 1 : 0 });
+    rig(B, lt, [[0, MAGB[0]], [len(sh), MAGB[1]]], { t, e: lin, bump: t > resT && t < resT + 0.3 ? 1 : 0 });
     const r = runTo(NC, 0, LANDS, t);
-    room(g, t, { pieces: r.pieces, cams: hookCams(t >= resT ? EX.cold : EX.think), ...moveFx(r) });
-  }, { kb: 0, qaAllow: ['text over face'], hud: (g, lt, t) => {
-    coverTitle(g, 'MAGNUS vs HANS', '1 MOVE', 205);
-    if (t >= resT) { const p = B.project(CAMPOS.right[0], CAMPOS.right[1] - 1.75, CAMPOS.right[2]); stamp(g, 'RESIGNED', p.x, p.y, t, resT, { color: RED, size: 70, rot: -0.14 }); }
+    magAtBoard(g, t, { pieces: r.pieces, e: t >= resT ? EX.cold : EX.think, ...moveFx(r, SLIDE, 0.5, false) });
+  }, { kb: 0, hud: (g, lt, t) => {
+    counter(g, '1', 'MOVE', { y: 330, size: 190, color: GOLD });
+    if (t >= resT) stamp(g, 'RESIGNED', W / 2, 1540, t, resT, { color: RED, size: 76, rot: -0.12 });
   } });
-  // his camera goes dark
-  const MAGK = [K(0.08, 0.06, 6.8, [6.15, 3.3, 10.6]), K(0.05, 0.05, 5.7, [6.15, 3.3, 10.6])];
+  // closer; on "move." his camera goes off
   shot(aftA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, MAGK[0]], [len(sh), MAGK[1]]], { t, e: glide });
-    room(g, t, { pieces: piecesAt(NC, 2), cams: hookCams(EX.cold, clamp((t - moveT - 0.05) / 0.22)) });
-  }, { kb: 0, qaAllow: ['text over face'], hud: (g, lt, t) => {
-    stamp(g, 'RESIGNED', W / 2, 1690, t, aftA - 1, { color: RED, size: 70, rot: -0.14 });
-    if (t >= moveT + 0.25) badge(g, 'CAMERA OFF', W / 2, 240, { color: '#16161E', size: 50, ...pop(t, moveT + 0.25) });
+    rig(B, lt, [[0, MAGC[0]], [len(sh), MAGC[1]]], { t, e: glide });
+    magAtBoard(g, t, { pieces: piecesAt(NC, 2), e: EX.cold });
+    camOff(g, clamp((t - moveT - 0.05) / 0.3));
+  }, { kb: 0, qaAllow: ['text over face'], hud: (g, lt, t) => {  // the face under the badge is already under black
+    if (t < moveT + 0.2) stamp(g, 'RESIGNED', W / 2, 1540, t, aftA - 1, { color: RED, size: 76, rot: -0.12 });
+    if (t >= moveT + 0.37) badge(g, 'CAMERA OFF', W / 2, H / 2, { color: '#2A2D33', size: 56, ...pop(t, moveT + 0.37) });
   } });
   cue(0, 'whoosh_soft', 0.25); cue(LANDS[0] - MOVE_HIT, 'move', 0.6); cue(LANDS[1] - MOVE_HIT, 'move', 0.6); cue(resT, 'stamp', 0.55); cue(resT, 'hit', 0.35);
-  cue(aftA, 'whoosh_fast', 0.25); cue(moveT + 0.05, 'tvoff', 0.6);
+  cue(aftA, 'whoosh_fast', 0.25); cue(moveT + 0.05, 'tvoff', 0.7);
 
   // ======================= "CHESS.COM LATER SAID...": the report lands on the table =======================
   const REPK = [K(0.42, 0.92, 11.5, [4, -0.1, 2.8]), K(0.32, 0.98, 10.0, [4, -0.1, 2.7])];
@@ -1233,18 +1252,18 @@ export async function build(T) {
 
   // ======================= THE LOOP: Magnus resigned after one move; Chess.com never resigns =======================
   shot(nevA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, MAGK[1]], [len(sh), K(0.03, 0.05, 5.2, [6.15, 3.3, 10.6])]], { t, e: glide });
-    room(g, t, { pieces: piecesAt(NC, 2), cams: hookCams(EX.cold, clamp((t - w('never', 4) - 0.05) / 0.2)) });
-    grey(g, 0.85);
-  }, { trans: 'whip', qaAllow: ['text over face'], hud: (g, lt, t) => {
-    stamp(g, 'RESIGNED', W / 2, 1690, t, nevA - 1, { color: '#B9B9B9', size: 70, rot: -0.14 });
+    rig(B, lt, [[0, MAGC[0]], [len(sh), MAGC[1]]], { t, e: glide });
+    magAtBoard(g, t, { pieces: piecesAt(NC, 2), e: EX.cold });
+    grey(g, 0.85); camOff(g, clamp((t - w('never', 4) - 0.05) / 0.3));
+  }, { trans: 'whip', hud: (g, lt, t) => {
+    if (t < w('never', 4) + 0.2) stamp(g, 'RESIGNED', W / 2, 1540, t, nevA - 1, { color: '#B9B9B9', size: 76, rot: -0.12 });
   } });
   shot(nev2A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.0, -0.05, 16.5, [4, 7.0, 13.4])], [len(sh), K(0.0, -0.05, 14.8, [4, 7.0, 13.4])]], { t, e: glide, bump: t > neverT && t < neverT + 0.4 ? 1.2 : 0 });
     room(g, t, { pieces: piecesAt(NC, 2), mon: false, farSky: eyeTex(1, t, Math.sin(t * 2) * 0.6), dim: 0.25 });
     g.save(); g.fillStyle = 'rgba(6,10,16,0.35)'; g.fillRect(0, 0, W, H); g.restore();
   }, { trans: 'whip', vig: 0.65, hud: (g, lt, t) => { if (t >= neverT) stamp(g, 'NEVER RESIGNS', W / 2, 330, t, neverT, { color: '#7CFC9A', size: 84, rot: -0.1 }); } });
-  cue(nevA - 0.04, 'record_scratch', 0.35); cue(nev2A - 0.04, 'whoosh_fast', 0.3); cue(neverT, 'boom_big', 0.55); cue(neverT, 'stamp', 0.5);
+  cue(nevA - 0.04, 'record_scratch', 0.35); cue(w('never', 4) + 0.05, 'tvoff', 0.5); cue(nev2A - 0.04, 'whoosh_fast', 0.3); cue(neverT, 'boom_big', 0.55); cue(neverT, 'stamp', 0.5);
 
   // ======================= "SO NEXT TIME YOU'RE LOSING, STAY ON THE BOARD" =======================
   shot(stayA, (g, lt, t, sh) => {
@@ -1255,8 +1274,8 @@ export async function build(T) {
 
   // ======================= CTA (rules 10, 26, 39): the first frame again, the question with a number =======================
   shot(ctaA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, ROOMK[1]], [len(sh), ROOMK[0]]], { t, e: lin });
-    room(g, t, { pieces: piecesAt(NC, 0), cams: hookCams(EX.think) });
+    rig(B, lt, [[0, MAGB[1]], [len(sh), MAGB[0]]], { t, e: lin });
+    magAtBoard(g, t, { pieces: piecesAt(NC, 0), e: EX.smug });
   }, { kb: 0, trans: 'whip', hud: (g, lt, t) => {
     coverTitle(g, 'HOW MANY', 'POINTS?', 205);
     if (t >= manyT) { badge(g, 'COMMENT YOUR NUMBER', W / 2, 1530, { color: GOLD, size: 50, ...popW(t, manyT) }); badge(g, `FOLLOW ${CHANNEL}`, W / 2, 1640, { color: '#16161E', size: 36, ...pop(t, manyT + 0.3) }); }
