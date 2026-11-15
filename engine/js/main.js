@@ -94,7 +94,8 @@ function shakeAmp(t) {
 }
 
 function jumpAt({ every = 1.4, zooms = [1, 1.15, 1.06], shift = 50 }, lt, len, i) {
-  const n = Math.floor(lt / every), last = Math.floor((len - 0.45) / every);
+  // no punch-in closer than 0.7 s to the end of the shot: the piece after it would flash by (STYLE_BIBLE rule 65)
+  const n = Math.floor(lt / every), last = Math.floor((len - 0.7) / every);
   const k = Math.min(n, Math.max(0, last));
   if (k <= 0) return [1, 0, 0];
   const sd = (k + i) % 2 ? 1 : -1;
