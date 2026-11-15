@@ -5,5 +5,4 @@
 
 | Записано (UTC) | Файл | Байт | Длина | Кадр | SHA-256 | Заметка |
 |---|---|---|---|---|---|---|
-| 2026-11-15 03:36:03 | `fairplay.mp4` | 27364130 | 63.20 s | 1080×1920 | `f8038c0dc79640e802ad68843d95a1d0cb7e546f93eec4d2c365e0845eda66da` | fairplay, 1080p — the file for TikTok |
-| 2026-11-15 03:36:04 | `fairplay_4k.mp4` | 96139025 | 63.20 s | 2160×3840 | `8d701766dd1515a0fa911184f3dbfb5473d56b2d93bc5c24dd800876ecd060ba` | fairplay, 4K |
+| 2026-11-15 10:46:58 | `fairplay.mp4` | 27390809 | 63.20 s | 1080×1920 | `52ee0717d8020368df8198a1651ee5d526aeee74540e2306b9d7d5403f20bd8b` | fairplay, 1080p, the Mittens first frame — the file for TikTok |
