@@ -1,0 +1,167 @@
+{
+  "title": "Five goals in nine minutes: Lewandowski against Wolfsburg (22 September 2015)",
+  "format": "football",
+  "channel": null,
+  "post": "Bayern were losing 1–0 at home. Pep Guardiola sent on Robert Lewandowski, and nine minutes after his first goal it was 5–1. 22 September 2015: the fastest hat-trick, the fastest four and the fastest five goals in Bundesliga history, all by a substitute.\n\n#lewandowski #bayern #bundesliga #guardiola #football #footballstory #footballtiktok #fcbayern",
+  "lead_in": 0.05,
+  "tail": 2.2,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "timing": "alignment",
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"; a quick, rising read: a commentary that cannot keep up",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.92,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.2,
+    "max_gap": 0.22
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5,
+    "reverb": 0.32,
+    "reverb_sec": 2.0,
+    "duck": 0.5,
+    "amb_gap": 13,
+    "amb_duck": 0.4
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "Five goals in nine minutes. Even his own coach couldn't believe it.",
+      "say": "[excited] Five goals... in nine minutes. Even his own coach couldn't believe it.",
+      "pause": 0.35,
+      "colors": {
+        "Five": "gold",
+        "nine": "gold",
+        "coach": "red"
+      }
+    },
+    {
+      "id": "ctx",
+      "text": "September 2015. Bayern Munich are losing at home to Wolfsburg. 1–0 at half-time.",
+      "say": "September twenty fifteen. Bayern Munich are losing at home, to Volfsburg. One–nil at half-time.",
+      "pause": 0.3,
+      "colors": {
+        "2015.": "gold",
+        "losing": "red",
+        "1–0": "red"
+      }
+    },
+    {
+      "id": "sub",
+      "text": "So Pep Guardiola sends on a substitute: Robert Lewandowski.",
+      "say": "So Pep Guardiola sends on a substitute... Robert Levandovski.",
+      "pause": 0.35,
+      "colors": {
+        "substitute:": "gold",
+        "Robert": "lime",
+        "Lewandowski.": "lime"
+      }
+    },
+    {
+      "id": "g1",
+      "text": "Minute 51. A loose ball in the box. He taps it in.",
+      "say": "[intense] Minute fifty-one. A loose ball in the box. He taps it in.",
+      "pause": 0.5,
+      "colors": {
+        "51.": "gold",
+        "taps": "lime"
+      }
+    },
+    {
+      "id": "g2",
+      "text": "One minute later, from outside the box. 2–1.",
+      "say": "One minute later, from outside the box. Two–one!",
+      "pause": 0.5,
+      "colors": {
+        "One": "gold",
+        "minute": "gold",
+        "2–1.": "lime"
+      }
+    },
+    {
+      "id": "g3",
+      "text": "The third takes three tries: the post, the keeper, the net. A hat-trick in 3 minutes 22 seconds.",
+      "say": "The third takes three tries: the post... the keeper... the net! A hat-trick, in three minutes and twenty-two seconds.",
+      "pause": 0.3,
+      "colors": {
+        "post,": "red",
+        "keeper,": "red",
+        "net.": "lime",
+        "hat-trick": "gold",
+        "3": "gold",
+        "22": "gold"
+      }
+    },
+    {
+      "id": "g4",
+      "text": "Then a cross, a volley, 4–1. And Guardiola is still giving instructions.",
+      "say": "Then a cross, a volley, four–one. [amused] And Guardiola is still giving instructions.",
+      "pause": 0.3,
+      "colors": {
+        "volley,": "lime",
+        "4–1.": "lime",
+        "instructions.": "gold"
+      }
+    },
+    {
+      "id": "g5",
+      "text": "Minute 60. Another cross. He meets it in mid-air. Five goals in 8 minutes 59 seconds.",
+      "say": "[building] Minute sixty. Another cross. He meets it... in mid-air! [awed] Five goals, in eight minutes and fifty-nine seconds.",
+      "pause": 0.5,
+      "colors": {
+        "60.": "gold",
+        "mid-air.": "lime",
+        "Five": "gold",
+        "8": "gold",
+        "59": "gold"
+      }
+    },
+    {
+      "id": "pep",
+      "text": "On the touchline, Guardiola holds his head in his hands. Later he says: I can't explain it.",
+      "say": "On the touchline, Guardiola holds his head in his hands. Later he says: [quietly] I can't explain it.",
+      "pause": 0.35,
+      "colors": {
+        "head": "gold",
+        "can't": "red",
+        "explain": "red"
+      }
+    },
+    {
+      "id": "rec",
+      "text": "That night set four Guinness World Records for the Bundesliga: the fastest hat-trick, the fastest four goals, the fastest five, and the most goals by a substitute.",
+      "say": "That night set four Guinness World Records for the Bundesliga: the fastest hat-trick, the fastest four goals, the fastest five, and the most goals by a substitute.",
+      "pause": 0.4,
+      "colors": {
+        "four": "gold",
+        "Records": "gold",
+        "hat-trick,": "lime",
+        "goals,": "lime",
+        "five,": "lime",
+        "substitute.": "lime"
+      }
+    },
+    {
+      "id": "end",
+      "text": "And he had started it on the bench.",
+      "say": "[softly] And he had started it... on the bench.",
+      "pause": 0.3,
+      "colors": {
+        "bench.": "gold"
+      }
+    }
+  ]
+}
