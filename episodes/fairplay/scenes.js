@@ -754,18 +754,19 @@ const OPP_BG = [['#6FA07E', '#24402E'], ['#C98E6A', '#4A2A1C'], ['#6A8EC9', '#1C
 const CAMS9 = OPPS.map(() => makeCanvas(480, 360));
 const WALL = { z: 22, w: 7.2, h: 5.4, gap: 0.5, y0: 1.2 };
 const camAt = k => { const i = k % 3, j = Math.floor(k / 3); return [(i - 1) * (WALL.w + WALL.gap), WALL.y0 + (2 - j) * (WALL.h + WALL.gap) + WALL.h / 2, WALL.z]; };
-function camWall(g, t, t0, { step = 0.16 } = {}) {
-  for (let k = 0; k < 9; k++) {
-    const c = CAMS9[k], x = c.getContext('2d'), rep = t >= t0 + k * step, e = rep ? { ...EXPR.angry, look: [0, 0.2] } : { ...EXPR.focus, look: [0, 0.4] };
+function camWall(g, t, t0, { step = 0.16, mood = null, from = 0 } = {}) {
+  const glad = mood === 'happy';
+  for (let k = from; k < 9; k++) {
+    const c = CAMS9[k], x = c.getContext('2d'), rep = !glad && t >= t0 + k * step, e = glad ? { ...EXPR.happy, lid: 0.1, nod: 0.6 } : rep ? { ...EXPR.angry, look: [0, 0.2] } : { ...EXPR.focus, look: [0, 0.4] };
     x.setTransform(1, 0, 0, 1, 0, 0);
     webcam(x, 0, 0, 480, 360, OPPS[k], e, t + k * 0.9, { bg: OPP_BG[k % 6], zoom: 1.1, cy: 0.5 });
-    if (rep) { x.strokeStyle = RED; x.lineWidth = 16; x.strokeRect(8, 8, 464, 344); }
+    if (rep || glad) { x.strokeStyle = glad ? '#7CFC9A' : RED; x.lineWidth = 16; x.strokeRect(8, 8, 464, 344); }
     const [cx, cy, cz] = camAt(k), hw = WALL.w / 2, hh = WALL.h / 2;
     ab(g, [cx - hw - 0.15, cy - hh - 0.15, cz], [cx + hw + 0.15, cy + hh + 0.15, cz + 0.3], '#14161B');
     texQuad(g, c, [cx - hw, cy + hh, cz - 0.02], [cx + hw, cy + hh, cz - 0.02], [cx - hw, cy - hh, cz - 0.02]);
   }
   // the REPORT flags pop on each camera
-  for (let k = 0; k < 9; k++) { const t1 = t0 + k * step; if (t < t1) continue; const [cx, cy, cz] = camAt(k), q = B.project(cx + WALL.w * 0.28, cy - WALL.h * 0.3, cz - 0.1); if (q.z < 0.5) continue;
+  if (!glad) for (let k = 0; k < 9; k++) { const t1 = t0 + k * step; if (t < t1) continue; const [cx, cy, cz] = camAt(k), q = B.project(cx + WALL.w * 0.28, cy - WALL.h * 0.3, cz - 0.1); if (q.z < 0.5) continue;
     plate(g, 'REPORT', q.x, q.y, { color: RED, size: Math.max(14, q.s * 0.55), scale: lerp(1.5, 1, ease.back(clamp((t - t1) / 0.2))), rot: -0.05, qa: false }); }
 }
 // paper planes (the reports) flying from the wall to the counter at the top of the screen
@@ -883,8 +884,8 @@ const REPORT_T = tex(620, 800, (x, w, h) => {
 });
 const PAGE_T = tex(620, 800, (x, w, h) => { x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, w, h); x.fillStyle = '#C9CED6'; for (let i = 0; i < 18; i++) x.fillRect(70, 70 + i * 38, i % 4 === 3 ? 280 : 480, 12); x.strokeStyle = '#7A8A96'; x.lineWidth = 3; x.beginPath(); x.moveTo(90, 760); for (let i = 0; i < 9; i++) x.lineTo(90 + i * 55, 720 - Math.sin(i * 1.3) * 30 - i * 6); x.stroke(); });
 const REP = { x: 4, z: 2.6, w: 3.1, d: 4.0, th: 0.62 };
-function report(g, t, t0, { flip = 0 } = {}) {
-  const { x, z, w, d, th } = REP, u = clamp((t - t0) / 0.32), y0 = -0.35 + (1 - ease.in(u)) * 7, rot = (1 - u) * 0.5;
+function report(g, t, t0, { flip = 0, at = null } = {}) {
+  const { w, d, th } = REP, [x, z] = at || [REP.x, REP.z], u = clamp((t - t0) / 0.32), y0 = -0.35 + (1 - ease.in(u)) * 7, rot = (1 - u) * 0.5;
   if (u > 0) shadow3(g, x, -0.34, z, w * 0.62 * (0.6 + 0.4 * u), d * 0.6 * (0.6 + 0.4 * u), 0.25 * u);
   const P = (px, py, pz) => { const c = Math.cos(rot), s = Math.sin(rot), dx = px - x, dz = pz - z; return [x + dx * c - dz * s, py, z + dx * s + dz * c]; };
   ab(g, P(x - w / 2, y0, z - d / 2), P(x + w / 2, y0 + th, z + d / 2), '#F4F1EA', { amb: 0.75 });
@@ -899,7 +900,7 @@ function report(g, t, t0, { flip = 0 } = {}) {
 }
 // the browser on the monitor: a game, a tab bar; the cursor clicks to another tab; then the toggling chart
 const BROW = makeCanvas(1760, 990);
-function browser(t, { away = 0, chart = 0, cursor = null } = {}) {
+function browser(t, { away = 0, chart = 0, cursor = null, face = null } = {}) {
   const x = BROW.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
   x.fillStyle = '#2B2D33'; x.fillRect(0, 0, 1760, 990);
   x.fillStyle = '#1C1D22'; x.fillRect(0, 0, 1760, 96);
@@ -909,20 +910,23 @@ function browser(t, { away = 0, chart = 0, cursor = null } = {}) {
     x.fillStyle = act ? '#FFFFFF' : '#8A8E98'; x.font = sans(36, 800); x.letterSpacing = '2px'; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText(s, x0 + 36, 60);
   });
   if (away > 0.5) {
-    x.fillStyle = '#E9ECF1'; x.fillRect(0, 96, 1760, 894); x.fillStyle = '#B8BEC8'; x.font = sans(300, 900); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('?', 880, 560);
+    x.fillStyle = '#E9ECF1'; x.fillRect(0, 96, 1760, 894); x.fillStyle = '#B8BEC8'; x.font = sans(300, 900); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('?', face ? 500 : 880, 560);
   } else {
     const s = 96, bx = 120, by = 140;
     for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { x.fillStyle = (i + j) % 2 ? '#769656' : '#EEEED2'; x.fillRect(bx + i * s, by + j * s, s, s); }
     const r = rng(8); x.fillStyle = '#1E2026'; for (let k = 0; k < 10; k++) { x.beginPath(); x.arc(bx + (Math.floor(r() * 8) + 0.5) * s, by + (Math.floor(r() * 8) + 0.5) * s, 30, 0, 7); x.fill(); }
     x.fillStyle = '#FFFFFF'; for (let k = 0; k < 10; k++) { x.beginPath(); x.arc(bx + (Math.floor(r() * 8) + 0.5) * s, by + (Math.floor(r() * 8) + 0.5) * s, 30, 0, 7); x.fill(); }
-    x.fillStyle = '#3A3D45'; x.fillRect(1000, 140, 640, 768); x.fillStyle = '#FFFFFF'; x.font = sans(52, 900); x.textAlign = 'left'; x.fillText('YOUR MOVE', 1050, 220);
-    x.fillStyle = '#E8413A'; x.font = sans(110, 900); x.fillText('0:09', 1050, 360);
+    if (face) { x.fillStyle = '#3A3D45'; x.fillRect(1010, 140, 630, 190); x.fillStyle = '#FFFFFF'; x.font = sans(44, 900); x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText('YOUR MOVE', 1050, 235); x.fillStyle = '#E8413A'; x.font = sans(84, 900); x.textAlign = 'right'; x.fillText('0:09', 1610, 238); }
+    else { x.fillStyle = '#3A3D45'; x.fillRect(1000, 140, 640, 768); x.fillStyle = '#FFFFFF'; x.font = sans(52, 900); x.textAlign = 'left'; x.fillText('YOUR MOVE', 1050, 220);
+      x.fillStyle = '#E8413A'; x.font = sans(110, 900); x.fillText('0:09', 1050, 360); }
   }
+  if (face) { const L = CAMLOOK[face.who]; webcam(x, 1010, 360, 630, 560, face.who, face.e, t, { bg: L.bg, zoom: 1.0, cy: 0.5, name: L.name, nameColor: L.nameColor }); }
   if (chart > 0) {  // two bars, no figures: how well he played when he stayed, and when he clicked away
     const u = ease.out(clamp(chart));
-    x.fillStyle = 'rgba(14,15,19,0.94)'; x.beginPath(); x.roundRect(380, 120, 1000, 700, 30); x.fill();
-    x.fillStyle = '#FFFFFF'; x.font = sans(54, 900); x.letterSpacing = '4px'; x.textAlign = 'center'; x.fillText('HOW WELL HE PLAYED', 880, 210);
-    [['STAYED', 0.3, '#8A8E98', 690], ['CLICKED AWAY', 0.9, '#7CFC9A', 1070]].forEach(([lab, v, col, cx]) => {
+    const bx = face ? 40 : 380, bw = face ? 940 : 1000, mid = bx + bw / 2;
+    x.fillStyle = 'rgba(14,15,19,0.94)'; x.beginPath(); x.roundRect(bx, 120, bw, 700, 30); x.fill();
+    x.fillStyle = '#FFFFFF'; x.font = sans(54, 900); x.letterSpacing = '4px'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('HOW WELL HE PLAYED', mid, 210);
+    [['STAYED', 0.3, '#8A8E98', mid - 200], ['CLICKED AWAY', 0.9, '#7CFC9A', mid + 200]].forEach(([lab, v, col, cx]) => {
       const hh = 420 * v * u; x.fillStyle = col; x.fillRect(cx - 120, 700 - hh, 240, hh);
       x.fillStyle = '#FFFFFF'; x.font = sans(40, 900); x.letterSpacing = '3px'; x.fillText(lab, cx, 762);
     });
@@ -932,10 +936,11 @@ function browser(t, { away = 0, chart = 0, cursor = null } = {}) {
 }
 // the profile on the monitor: the honest opponent, his rating, the refund note sliding in
 const PROF = makeCanvas(1760, 990);
-function profile(t, { rating = 1186, note = 0, plus = 14 } = {}) {
+function profile(t, { rating = 1186, note = 0, plus = 14, mood = null } = {}) {
   const x = PROF.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
   x.fillStyle = '#2B2D33'; x.fillRect(0, 0, 1760, 990);
-  webcam(x, 90, 110, 620, 700, 'opp', note > 0.5 ? { ...EXPR.happy, lid: 0.08 } : { ...EXPR.focus }, t, { bg: ['#6FA07E', '#24402E'], zoom: 1.0, cy: 0.5 });
+  const m = mood || (note > 0.5 ? 'happy' : 'focus'), e = m === 'happy' ? { ...EXPR.happy, lid: 0.08, nod: 0.7 } : m === 'sad' ? { ...EXPR.sad, look: [0.3, 0.2] } : { ...EXPR.focus };
+  webcam(x, 90, 110, 620, 700, 'opp', e, t, { bg: ['#6FA07E', '#24402E'], zoom: 1.0, cy: 0.5 });
   x.fillStyle = '#FFFFFF'; x.font = sans(60, 900); x.letterSpacing = '3px'; x.textAlign = 'left'; x.textBaseline = 'middle'; x.fillText('YOU', 790, 200);
   x.fillStyle = '#8A8E98'; x.font = sans(40, 800); x.letterSpacing = '6px'; x.fillText('RATING', 790, 320);
   x.fillStyle = note > 0.5 ? '#7CFC9A' : '#FFFFFF'; x.font = sans(230, 900); x.letterSpacing = '0px'; x.fillText(String(Math.round(rating)), 780, 470);
@@ -983,6 +988,12 @@ function monFaces(g, cams) {
     g.save(); g.setTransform(1, 0, 0, 1, 0, 0); qaRect(g, a.x, a.y, b.x - a.x, b.y - a.y, 'face', o.who); g.restore();
   }
 }
+// a rectangle of the monitor's picture (its 1760 x 990 pixels) logged on the film: a face shown on the screen
+function monRect(g, x0, y0, x1, y1, kind, label) {
+  const P = (px, py) => B.project(MON.c[0] - MON.hw + px / 1760 * 2 * MON.hw, MON.c[1] + MON.hh - py / 990 * 2 * MON.hh, MON.c[2] - 0.02);
+  const a = P(x0, y0), b = P(x1, y1); if (a.z < 0.5) return;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); qaRect(g, a.x, a.y, b.x - a.x, b.y - a.y, kind, label); g.restore();
+}
 // the whole room with the monitor, the cameras on it, and its faces logged
 function room(g, t, o = {}) { online(g, t, o); if (!o.screen && o.cams && o.mon !== false) monFaces(g, o.cams); }
 // Magnus at the board in the daylight room, facing us (the author on the Mittens video, 15.11.2026: «с самого первого
@@ -990,6 +1001,12 @@ function room(g, t, o = {}) { online(g, t, o); if (!o.screen && o.cams && o.mon 
 function magAtBoard(g, t, { pieces, e = 'focus', under = null, over = null } = {}) {
   dayRoom(g, t, {});
   tableSet(g, t, { pieces, under, over, wPlayer: false, wChair: false, bPlayer: true, black: 'magnus', eb: e, tableCol: WOODT });
+  lowKey(g, { cy: H * 0.46, a: 0.04 });
+}
+// Hans at the table with no board on it: the report lands in front of him
+function hansDesk(g, t, { e = 'focus', over = null } = {}) {
+  dayRoom(g, t, {});
+  tableSet(g, t, { pieces: null, slab: false, over, wPlayer: false, wChair: false, bPlayer: true, black: 'hans', eb: e, tableCol: WOODT });
   lowKey(g, { cy: H * 0.46, a: 0.04 });
 }
 // Hans at the board, the same frame as Magnus's: for the rumour (the buzz around him) and the scan (his hands up)
@@ -1079,17 +1096,90 @@ function youAtBoard(g, t, { pieces, e = 'focus', cork = null } = {}) {
   tableSet(g, t, { pieces, wPlayer: false, wChair: false, bPlayer: true, black: 'you', eb: e, tableCol: WOODT });
   lowKey(g, { cy: H * 0.46, a: 0.04 });
 }
-// "you", a small webcam in the corner through the traps, more nervous at each one; CLOSED lands on it at the end
-function youCard(g, t, e, { x = 838, y = 300, w = 210, closed = Infinity, a = 1 } = {}) {
+// a small webcam in a corner of the frame, a face with a name strip: "you" through the traps, more nervous at each one,
+// CLOSED lands on it at the end; Hans in the hook. q: a "?" pops beside it
+function camCard(g, t, who, e, { x = 838, y = 300, w = 210, label = null, closed = Infinity, a = 1, q = 0 } = {}) {
   if (a <= 0) return;
-  const h = w * 1.15, L = CAMLOOK.you;
-  g.save(); g.globalAlpha *= a;
+  const h = w * 1.15, L = CAMLOOK[who] || CAMLOOK.opp;
+  g.save(); g.globalAlpha *= clamp(a);
   g.fillStyle = 'rgba(0,0,0,0.3)'; g.fillRect(x + 6, y + 8, w, h);
-  webcam(g, x, y, w, h - 34, 'you', e, t, { bg: L.bg, zoom: 1.2, cy: 0.52 });
-  g.fillStyle = '#101116'; g.fillRect(x, y + h - 34, w, 34); g.font = sans(22, 900); g.letterSpacing = '4px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = L.nameColor; g.fillText('YOU', x + w / 2, y + h - 16);
+  webcam(g, x, y, w, h - 34, who, e, t, { bg: L.bg, zoom: 1.2, cy: 0.52 });
+  g.fillStyle = '#101116'; g.fillRect(x, y + h - 34, w, 34); g.font = sans(22, 900); g.letterSpacing = '4px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = L.nameColor; g.fillText(label || L.name, x + w / 2, y + h - 16);
   g.strokeStyle = '#FFD27A'; g.lineWidth = 5; g.strokeRect(x, y, w, h);
+  if (q > 0) {
+    const k = lerp(1.6, 1, ease.back(clamp(q)));
+    g.save(); g.translate(x - 30, y + 36); g.scale(k, k); g.rotate(-0.12);
+    g.fillStyle = '#FFFFFF'; g.beginPath(); g.arc(0, 0, 36, 0, 7); g.fill(); g.strokeStyle = '#16161E'; g.lineWidth = 6; g.stroke();
+    g.fillStyle = '#16161E'; g.font = sans(50, 900); g.letterSpacing = '0px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', 0, 3);
+    g.restore();
+  }
   g.restore();
   if (t >= closed) stamp(g, 'CLOSED', x + w * 0.42, y + h * 0.5, t, closed, { color: RED, size: 46, rot: -0.2 });  // a touch left: the frame edge is close
+}
+const youCard = (g, t, e, o = {}) => camCard(g, t, 'you', e, { label: 'YOU', ...o });
+
+// ---- trap 2 as a police lineup, seen through the one-way glass of the observation room (every trap a little story
+// with a face, rule 71): three players at your rating hold their rating on a slate, "you" in the middle as number 2;
+// the "!" of their best moves pop over their heads and pile up over his; on "stand out" the light finds him, the
+// other two turn to look, he steps forward
+const LU = { y: 742, s: 0.9, xs: [200, 540, 880], who: ['opp4', 'you', 'opp6'], win: [30, 300, 1050, 1200] };
+const LU_WALL = tex(1020, 900, (x, w, h) => {
+  const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#DCDFE5'); gr.addColorStop(1, '#AEB4C0'); x.fillStyle = gr; x.fillRect(0, 0, w, h);
+  x.font = sans(24, 800); x.textBaseline = 'middle';
+  for (let k = 0; k <= 15; k++) {
+    const y = 70 + k * 55, major = k % 2 === 0;
+    x.strokeStyle = `rgba(36,42,54,${major ? 0.5 : 0.25})`; x.lineWidth = major ? 4 : 2; x.beginPath(); x.moveTo(0, y); x.lineTo(w, y); x.stroke();
+    if (major) { const v = 7 - k / 4, lab = v % 1 ? `${Math.floor(v)}'6"` : `${v}'`; x.fillStyle = 'rgba(36,42,54,0.7)'; x.textAlign = 'left'; x.fillText(lab, 14, y - 17); x.textAlign = 'right'; x.fillText(lab, w - 14, y - 17); }
+  }
+});
+function lineup(g, t, { e = [], bangs = [0, 0, 0], slate = 1, spot = 0, step = 0, zoom = 1, zc = [540, 700], flash = -9 } = {}) {
+  const [wx0, wy0, wx1, wy1] = LU.win;
+  g.save();
+  g.fillStyle = '#1B1E25'; g.fillRect(0, 0, W, H);
+  g.translate(zc[0], zc[1]); g.scale(zoom, zoom); g.translate(-zc[0], -zc[1]);
+  // the dark observation room round the glass
+  { const gr = g.createLinearGradient(0, 0, 0, wy0); gr.addColorStop(0, '#15171D'); gr.addColorStop(1, '#262A33'); g.fillStyle = gr; g.fillRect(-200, -200, W + 400, wy0 + 200); }
+  // the lineup room behind the glass
+  g.save(); g.beginPath(); g.rect(wx0, wy0, wx1 - wx0, wy1 - wy0); g.clip();
+  g.drawImage(LU_WALL, wx0, wy0, wx1 - wx0, wy1 - wy0);
+  LU.xs.forEach(x => { const gr = g.createRadialGradient(x, wy0, 10, x, wy0 + 120, 420); gr.addColorStop(0, 'rgba(255,250,235,0.55)'); gr.addColorStop(1, 'rgba(255,250,235,0)'); g.fillStyle = gr; g.fillRect(x - 420, wy0, 840, 560); });
+  g.font = sans(72, 900); g.letterSpacing = '0px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = 'rgba(30,34,44,0.72)';
+  LU.xs.forEach((x, i) => g.fillText(String(i + 1), x, 500));
+  const bx = LU.xs[1], cone = () => { g.moveTo(bx - 90, wy0); g.lineTo(bx + 90, wy0); g.lineTo(bx + 250, wy1); g.lineTo(bx - 250, wy1); g.closePath(); };
+  if (spot > 0) { g.fillStyle = `rgba(10,12,20,${0.55 * spot})`; g.beginPath(); g.rect(wx0, wy0, wx1 - wx0, wy1 - wy0); cone(); g.fill('evenodd'); }  // the room goes dark round him
+  for (const i of [0, 2, 1]) {  // "you" last: he steps forward, a little bigger and lower
+    const isY = i === 1, st = isY ? ease.out(clamp(step)) : 0, s = LU.s * (1 + 0.1 * st), x = LU.xs[i], y = LU.y + 38 * st;
+    g.filter = !isY && spot > 0 ? `brightness(${(1 - 0.32 * spot).toFixed(3)}) saturate(${(1 - 0.45 * spot).toFixed(3)})` : 'none';
+    drawChar(g, LU.who[i], { x, y, s, e: e[i] || EXPR.neutral, t: t + i * 1.3 });
+    if (slate > 0) {  // the slate with the rating, raised to the chest
+      const sy = lerp(wy1 + 140, y + 262 * s, ease.out(clamp(slate))), sw = 214 * s, sh = 112 * s;
+      g.fillStyle = '#15161B'; g.beginPath(); g.roundRect(x - sw / 2, sy - sh / 2, sw, sh, 8 * s); g.fill();
+      g.strokeStyle = '#E6E6E6'; g.lineWidth = 3 * s; g.beginPath(); g.roundRect(x - sw / 2 + 8 * s, sy - sh / 2 + 8 * s, sw - 16 * s, sh - 16 * s, 5 * s); g.stroke();
+      g.fillStyle = '#F2F2F2'; g.font = sans(58 * s, 900); g.letterSpacing = '2px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('1200', x, sy + 3 * s);
+      for (const sd of [-1, 1]) hand(g, x + sd * sw * 0.47, sy + sh * 0.36, 25 * s);
+    }
+    g.filter = 'none';
+  }
+  if (spot > 0) {  // the beam from the ceiling that holds him
+    g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createLinearGradient(0, wy0, 0, wy1); gr.addColorStop(0, `rgba(255,240,200,${0.42 * spot})`); gr.addColorStop(1, 'rgba(255,240,200,0.02)'); g.fillStyle = gr; g.beginPath(); cone(); g.fill(); g.restore();
+  }
+  if (t >= flash && t < flash + 0.3) { g.fillStyle = `rgba(255,255,255,${0.85 * (1 - (t - flash) / 0.3)})`; g.fillRect(wx0, wy0, wx1 - wx0, wy1 - wy0); }  // the mugshot flash
+  g.save(); g.globalAlpha = 0.07; g.fillStyle = '#FFFFFF'; for (const [a, b] of [[80, 240], [330, 400], [700, 760]]) { g.beginPath(); g.moveTo(wx0 + a, wy0); g.lineTo(wx0 + b, wy0); g.lineTo(wx0 + b - 260, wy1); g.lineTo(wx0 + a - 260, wy1); g.closePath(); g.fill(); } g.restore();  // the glass
+  g.restore();
+  g.strokeStyle = '#0C0E12'; g.lineWidth = 26; g.strokeRect(wx0, wy0, wx1 - wx0, wy1 - wy0); g.strokeStyle = '#3A3F4A'; g.lineWidth = 3; g.strokeRect(wx0 - 13, wy0 - 13, wx1 - wx0 + 26, wy1 - wy0 + 26);
+  // the counter under the glass, with the intercom
+  { const gr = g.createLinearGradient(0, wy1 + 13, 0, H); gr.addColorStop(0, '#30343E'); gr.addColorStop(1, '#101216'); g.fillStyle = gr; g.fillRect(-200, wy1 + 13, W + 400, H); g.fillStyle = '#4A505C'; g.fillRect(-200, wy1 + 13, W + 400, 8); }
+  { const fx = 610, fy = 1700; g.save(); g.translate(fx, fy); g.rotate(-0.06);
+    g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(10, 14, 360, 230); g.fillStyle = '#C9A86A'; g.beginPath(); g.roundRect(0, -26, 120, 40, 8); g.fill(); g.fillRect(0, 0, 360, 230);
+    g.fillStyle = '#B08F55'; g.fillRect(0, 0, 360, 10); g.strokeStyle = 'rgba(178,34,34,0.85)'; g.lineWidth = 6; g.strokeRect(70, 80, 220, 74);
+    g.fillStyle = 'rgba(178,34,34,0.9)'; g.font = sans(40, 900); g.letterSpacing = '4px'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('CASE #2', 180, 119); g.restore();
+    g.fillStyle = '#E8E2D6'; g.beginPath(); g.roundRect(430, 1610, 100, 120, [6, 6, 18, 18]); g.fill(); g.strokeStyle = '#E8E2D6'; g.lineWidth = 12; g.beginPath(); g.arc(532, 1665, 24, -1.3, 1.3); g.stroke(); g.fillStyle = '#5A3A22'; g.beginPath(); g.ellipse(480, 1614, 46, 10, 0, 0, 7); g.fill(); }
+  { const bx = 120, by = 1680; g.fillStyle = '#17191E'; g.beginPath(); g.roundRect(bx, by, 170, 96, 12); g.fill(); g.fillStyle = '#2C3038'; for (let i = 0; i < 5; i++) g.fillRect(bx + 18, by + 18 + i * 13, 70, 5);
+    g.fillStyle = '#D23B33'; g.beginPath(); g.arc(bx + 128, by + 48, 22, 0, 7); g.fill(); g.strokeStyle = '#0A0B0D'; g.lineWidth = 7; g.lineCap = 'round'; g.beginPath(); g.moveTo(bx + 60, by); g.quadraticCurveTo(bx + 50, by - 120, bx + 120, by - 170); g.stroke(); g.fillStyle = '#0A0B0D'; g.beginPath(); g.ellipse(bx + 128, by - 178, 20, 30, 0.6, 0, 7); g.fill(); }
+  g.restore();
+  // the "!" of the best moves: over the glass, stacked over each head
+  LU.xs.forEach((x, i) => { const isY = i === 1, st = isY ? ease.out(clamp(step)) : 0, s = LU.s * (1 + 0.1 * st), y = LU.y + 38 * st;
+    for (let b = 0; b < bangs[i]; b++) { const p = zoom === 1 ? [x, y - 205 * s - b * 60] : [zc[0] + (x - zc[0]) * zoom, zc[1] + (y - 205 * s - b * 60 - zc[1]) * zoom]; bang(g, p[0], p[1], 0.95 * zoom); } });
 }
 
 // his camera goes off: the picture squeezes to a line and goes black (off: 0..1)
@@ -1151,6 +1241,9 @@ export async function build(T) {
   const ROOMK = [K(0.0, 0.17, 13.1, [4, 3.2, 9.6]), K(0.0, 0.15, 12.4, [4, 3.25, 9.7])];
   const hookCams = (eM, off = 0) => ({ left: { who: 'hans', e: EX.calm }, right: { who: 'magnus', e: eM, off } });
   const LANDS = [0.42, carlT + 0.12];
+  // his opponent's camera in the corner (the game was online, both on webcams): "?" when Magnus resigns, shock when Magnus's camera goes off
+  const hansCard = (g, t) => camCard(g, t, 'hans', t >= moveT + 0.12 ? { ...EXPR.shock, lid: 0, look: [-0.5, 0] } : { ...EXPR.worried, sweat: 0, look: [-0.6, 0.1], brow: -0.4 },
+    { label: 'HANS', a: clamp((t - resT - 0.08) / 0.15), q: t < moveT + 0.12 ? clamp((t - resT - 0.25) / 0.2) : 0 });
   // the first frame (rule 28, the Mittens frame): Magnus at the board, "1 MOVE" over his head
   const MAGB = [K(0.0, 0.1, 8.6, [4, 2.95, 8.7]), K(0.0, 0.09, 7.9, [4, 3.0, 8.8])], MAGC = [K(0.04, 0.08, 7.4, [4, 3.05, 9.0]), K(0.02, 0.07, 6.3, [4, 3.1, 9.1])];
   shot(0, (g, lt, t, sh) => {
@@ -1160,6 +1253,7 @@ export async function build(T) {
   }, { kb: 0, hud: (g, lt, t) => {
     counter(g, '1', 'MOVE', { y: 330, size: 190, color: GOLD });
     if (t >= resT) stamp(g, 'RESIGNED', W / 2, 1540, t, resT, { color: RED, size: 76, rot: -0.12 });
+    hansCard(g, t);
   } });
   // closer; on "move." his camera goes off
   shot(aftA, (g, lt, t, sh) => {
@@ -1169,33 +1263,36 @@ export async function build(T) {
   }, { kb: 0, qaAllow: ['text over face'], hud: (g, lt, t) => {  // the face under the badge is already under black
     if (t < moveT + 0.2) stamp(g, 'RESIGNED', W / 2, 1540, t, aftA - 1, { color: RED, size: 76, rot: -0.12 });
     if (t >= moveT + 0.37) badge(g, 'CAMERA OFF', W / 2, H / 2, { color: '#2A2D33', size: 56, ...pop(t, moveT + 0.37) });
+    hansCard(g, t);
   } });
   cue(0, 'whoosh_soft', 0.25); cue(LANDS[0] - MOVE_HIT, 'move', 0.6); cue(LANDS[1] - MOVE_HIT, 'move', 0.6); cue(resT, 'stamp', 0.55); cue(resT, 'hit', 0.35);
-  cue(aftA, 'whoosh_fast', 0.25); cue(moveT + 0.05, 'tvoff', 0.7);
+  cue(aftA, 'whoosh_fast', 0.25); cue(moveT + 0.05, 'tvoff', 0.7); cue(resT + 0.1, 'sparkle_pop', 0.25); cue(moveT + 0.15, 'gasp', 0.3);
 
-  // ======================= "CHESS.COM LATER SAID...": the report lands on the table =======================
-  const REPK = [K(0.42, 0.92, 11.5, [4, -0.1, 2.8]), K(0.32, 0.98, 10.0, [4, -0.1, 2.7])];
-  const repCams = { left: { who: 'hans', e: EX.calm }, right: { who: 'magnus', e: EX.cold, off: 1 } };
+  // ======================= "CHESS.COM LATER SAID...": the report lands on the table in front of Hans =======================
+  // (rule 71: the beat is his face, the report in front of him) it slams down and he jumps; he reads; LIKELY CHEATED and shock
+  const RAT = [4, 5.7], landT = slamT + 0.32;
+  const RK = [K(0.0, 0.36, 12.8, [4, 1.4, 6.6]), K(0.0, 0.33, 11.6, [4, 1.5, 6.8])];
+  const hansRead = t => t < landT ? EX.calm : t < landT + 0.45 ? { ...EXPR.shock, lid: 0 } : { ...EXPR.worried, sweat: 0, look: [0, 0.85] };
   shot(repA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, REPK[0]], [len(sh), REPK[1]]], { t, e: glide, bump: t > slamT + 0.3 && t < slamT + 0.6 ? 1.2 : 0 });
-    room(g, t, { pieces: null, slab: false, mon: false, cams: repCams, over: g2 => report(g2, t, slamT) });
-    if (t > slamT + 0.32) { const q = B.project(REP.x, -0.3, REP.z); dust(g, q.x, q.y, t, slamT + 0.32, { n: 12, color: '#E8DCC6', spread: 260 }); }
-  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= slamT + 0.36) badge(g, '72 PAGES', W / 2, 240, { color: GOLD, size: 60, ...pop(t, slamT + 0.36) }); } });
-  const COVK = [K(0.12, 1.05, 7.4, [4, -0.1, 2.7]), K(0.06, 1.12, 6.2, [4, -0.1, 2.7])];
-  shot(hisA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, COVK[0]], [len(sh), COVK[1]]], { t, e: glide });
-    room(g, t, { pieces: null, slab: false, mon: false, cams: repCams, over: g2 => report(g2, t, -9, { flip: (t - hisA) / 1.1 }) });
-  }, { kb: 0.02, hud: (g, lt, t) => { if (t >= oppT - 0.1) nameTitle(g, t - oppT + 0.1, 'HANS NIEMANN', 'HIS OPPONENT', { y: 250 }); } });
-  shot(likA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.05, 1.12, 6.4, [4, -0.1, 2.7])], [len(sh), K(-0.05, 1.02, 8.4, [4, -0.1, 2.8])]], { t, e: glide, bump: t > chT && t < chT + 0.3 ? 1 : 0 });
-    room(g, t, { pieces: null, slab: false, mon: false, cams: repCams, over: g2 => report(g2, t, -9) });
+    rig(B, lt, [[0, RK[0]], [len(sh), RK[1]]], { t, e: glide, bump: t > landT && t < landT + 0.3 ? 1.2 : 0 });
+    hansDesk(g, t, { e: hansRead(t), over: g2 => report(g2, t, slamT, { at: RAT }) });
+    if (t > landT) { const q = B.project(RAT[0], -0.3, RAT[1]); dust(g, q.x, q.y, t, landT, { n: 12, color: '#E8DCC6', spread: 260 }); }
+  }, { trans: 'whip', hud: (g, lt, t) => { if (t >= landT + 0.04) badge(g, '72 PAGES', W / 2, 240, { color: GOLD, size: 60, ...pop(t, landT + 0.04) }); } });
+  shot(hisA, (g, lt, t, sh) => {  // "his opponent": his face over the pages
+    rig(B, lt, [[0, K(0.0, 0.16, 8.2, [4, 2.85, 8.8])], [len(sh), K(0.0, 0.15, 7.6, [4, 2.9, 8.9])]], { t, e: glide });
+    hansDesk(g, t, { e: hansRead(t), over: g2 => report(g2, t, -9, { at: RAT }) });
+  }, { kb: 0, hud: (g, lt, t) => { if (t >= oppT - 0.1) nameTitle(g, t - oppT + 0.1, 'HANS NIEMANN', 'HIS OPPONENT', { y: 250 }); } });
+  const RK2 = [K(0.0, 0.4, 10.8, [4, 2.45, 6.6]), K(0.0, 0.3, 9.4, [4, 2.6, 7.4])];
+  shot(likA, (g, lt, t, sh) => {  // "likely cheated in over a hundred online games": the stamp on the cover, his face; the games burst out
+    rig(B, lt, [[0, RK2[0]], [len(sh), RK2[1]]], { t, e: glide, bump: t > chT && t < chT + 0.3 ? 1 : 0 });
+    hansDesk(g, t, { e: t >= chT ? { ...EXPR.shock, lid: 0 } : { ...EXPR.worried, sweat: 0, look: [0, 0.85] }, over: g2 => report(g2, t, -9, { at: RAT, flip: t < chT ? (t - likA) / 0.9 : 0 }) });
   }, { kb: 0, hud: (g, lt, t) => {
     if (t < hunT - 0.08) nameTitle(g, t - oppT + 0.1, 'HANS NIEMANN', 'HIS OPPONENT', { y: 250 });
-    if (t >= chT) { const q = B.project(REP.x, -0.35 + REP.th, REP.z - 0.55); stamp(g, 'LIKELY CHEATED', q.x, q.y, t, chT, { color: RED, size: 58, rot: -0.12, sub: 'CHESS.COM REPORT' }); }
-    if (t >= hunT) { const q = B.project(REP.x, -0.3, REP.z); cardsBurst(g, t, hunT - 0.05, q.x, q.y); counter(g, '100+', 'ONLINE GAMES', { y: 330, size: 170, color: GOLD, at: [hunT, 0.22] }); }
+    if (t >= chT) { const q = B.project(RAT[0], -0.35 + REP.th, RAT[1] - 0.55); stamp(g, 'LIKELY CHEATED', q.x, Math.max(q.y, 1500), t, chT, { color: RED, size: 58, rot: -0.12, sub: 'CHESS.COM REPORT' }); }  // on the cover, below the captions
+    if (t >= hunT) { const q = B.project(RAT[0], -0.3, RAT[1]); cardsBurst(g, t, hunT - 0.05, q.x, q.y); counter(g, '100+', 'ONLINE GAMES', { y: 330, size: 170, color: GOLD, at: [hunT, 0.22] }); }
   } });
-  cue(repA - 0.04, 'whoosh_fast', 0.3); cue(slamT + 0.3, 'thud', 0.9); cue(slamT + 0.3, 'boom_move', 0.5); cue(slamT + 0.38, 'sparkle_pop', 0.3);
-  cue(hisA + 0.05, 'page_flip', 0.5); cue(hisA + 0.45, 'page_flip', 0.45); cue(chT, 'stamp', 0.6); cue(hunT, 'hit', 0.4);
+  cue(repA - 0.04, 'whoosh_fast', 0.3); cue(landT, 'thud', 0.9); cue(landT, 'boom_move', 0.5); cue(landT + 0.06, 'sparkle_pop', 0.3); cue(landT + 0.02, 'gasp', 0.25);
+  cue(hisA + 0.05, 'page_flip', 0.5); cue(likA + 0.3, 'page_flip', 0.45); cue(chT, 'stamp', 0.6); cue(chT + 0.05, 'gasp', 0.3); cue(hunT, 'hit', 0.4);
 
   // ======================= THE RUMOUR: "a vibrating device"; he offered to play naked; the scan found nothing =======================
   const HANSB = [K(0.0, 0.1, 8.9, [4, 2.95, 8.7]), K(0.0, 0.09, 8.0, [4, 3.0, 8.8])];
@@ -1217,16 +1314,22 @@ export async function build(T) {
   cue(rumA - 0.04, 'whoosh_fast', 0.3); cue(vibT, 'buzz', 0.6); cue(vibT + 0.1, 'stamp', 0.45); cue(nakA, 'fabric', 0.4); cue(nakT, 'laugh', 0.25);
   cue(scanT, 'swipe_card', 0.3); cue(scanT + 0.45, 'shimmer', 0.25); cue(scanT + 0.9, 'stamp', 0.5);
 
-  // ======================= "CHESS.COM'S CLUE": the tab he clicked away to =======================
-  const MONK = [K(0.0, 0.07, 11.4, [4, 3.3, 10.6]), K(0.0, 0.06, 9.6, [4, 3.3, 10.6])];
+  // ======================= "CHESS.COM'S CLUE": the tab he clicked away to; his eyes go with it, back and forth =======================
+  // (rule 71: his face on the screen beside the board) the toggling: the tab and his eyes flip between the board and the other tab
+  const MONK = [K(0.0, 0.07, 11.9, [4, 3.3, 10.6]), K(0.0, 0.06, 11.0, [4, 3.3, 10.6])], TOG = 0.24;
+  const awayAt = t => t >= clickT && Math.floor((t - clickT) / TOG) % 2 === 0;
   shot(clueA, (g, lt, t, sh) => {
     rig(B, lt, [[0, MONK[0]], [len(sh), MONK[1]]], { t, e: glide });
-    const cu = clamp((t - (clickT - 0.55)) / 0.5), cur = t > clickT - 0.6 ? [lerp(1260, 560, ease.inOut(cu)), lerp(760, 58, ease.inOut(cu))] : null;
-    room(g, t, { pieces: piecesAt(NC, 2), screen: browser(t, { away: t >= clickT ? 1 : 0, chart: (t - betT) / 0.55, cursor: cur }) });
+    const away = awayAt(t), cu = clamp((t - (clickT - 0.55)) / 0.5);
+    const cur = t < clickT - 0.6 ? null : t < clickT ? [lerp(1260, 560, ease.inOut(cu)), lerp(760, 58, ease.inOut(cu))] : [away ? 560 : 200, 58];
+    const eH = t < clickT ? { ...EXPR.focus, look: [-0.9, 0.45] } : away ? { ...EXPR.focus, lid: 0.4, look: [1, -0.15], curve: 0.3 } : { ...EXPR.focus, look: [-0.9, 0.45] };
+    room(g, t, { pieces: piecesAt(NC, 2), screen: browser(t, { away: away ? 1 : 0, chart: (t - betT) / 0.55, cursor: cur, face: { who: 'hans', e: eH } }) });
+    monRect(g, 1010 + 150, 360 + 40, 1010 + 480, 360 + 420, 'face', 'hans');
   }, { kb: 0, noJump: false, hud: (g, lt, t) => {
     badge(g, "CHESS.COM'S CLUE", W / 2, 240, { color: GOLD, size: 58, ...pop(t, clueA + 0.08) });
   } });
-  cue(clueA - 0.04, 'whoosh_soft', 0.3); cue(betT, 'riser', 0.25); cue(clickT, 'swipe_card', 0.5);
+  cue(clueA - 0.04, 'whoosh_soft', 0.3); cue(betT, 'riser', 0.25);
+  for (let k = 0; clickT + k * TOG < T.e('clue') + 0.1; k++) cue(clickT + k * TOG, k ? 'clack' : 'swipe_card', k ? 0.22 : 0.5);
 
   // ======================= EDIT-BAIT: "Your opponent can't see you leave. Chess.com can." =======================
   // you leave your own camera; your opponent keeps looking at the board. Music out. Then the eye in the window
@@ -1234,57 +1337,62 @@ export async function build(T) {
   shot(baitA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.0, 0.08, 9.0, [4, 3.3, 10.6])], [len(sh), K(0.0, 0.07, 8.2, [4, 3.3, 10.6])]], { t, e: glide });
     const dx = -760 * ease.in(clamp((t - (leaveT - 0.15)) / 0.32));
-    room(g, t, { pieces: piecesAt(NC, 2), cams: youCams(t, dx) });
+    room(g, t, { pieces: piecesAt(NC, 2), cams: youCams(t, dx, t >= cantT ? { ...EXPR.smug, look: [-1, 0.1], lid: 0.45 } : EX.sly) });
   }, { kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { if (t >= cantT) badge(g, "THEY CAN'T SEE YOU", W / 2, 240, { color: '#16161E', size: 56, ...popW(t, cantT) }); } });
   shot(canA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.0, -0.04, 18.5, [4, 7.0, 13.4])], [len(sh), K(0.0, -0.05, 15.8, [4, 7.0, 13.4])]], { t, e: glide, bump: t > canT && t < canT + 0.45 ? 1.3 : 0 });
     const u = ease.out(clamp((t - canT) / 0.35));
     room(g, t, { pieces: piecesAt(NC, 2), mon: false, farSky: eyeTex(u, t, Math.sin((t - canT) * 3) * 0.5), dim: 0.25 * u });
     g.save(); g.fillStyle = `rgba(6,10,16,${0.35 * u})`; g.fillRect(0, 0, W, H); g.restore();
-  }, { trans: 'whip', vig: 0.65, hud: (g, lt, t) => { if (t >= canT + 0.08) badge(g, 'CHESS.COM CAN.', W / 2, 240, { color: '#7CFC9A', size: 64, ...popW(t, canT + 0.08) }); } });
+  }, { trans: 'whip', vig: 0.65, hud: (g, lt, t) => {
+    if (t >= canT + 0.08) badge(g, 'CHESS.COM CAN.', W / 2, 240, { color: '#7CFC9A', size: 64, ...popW(t, canT + 0.08) });
+    youCard(g, t, { ...EXPR.shock, lid: 0, look: [0.4, -0.3] }, { a: clamp((t - canT - 0.25) / 0.15) });  // seen
+  } });
   cue(baitA - 0.04, 'whoosh_soft', 0.25); cue(leaveT - 0.1, 'whoosh_fast', 0.35); cue(canT, 'boom_big', 0.6); cue(canT + 0.05, 'heartbeat', 0.5); cue(canT + 0.4, 'dun_dun', 0.35);
 
   // ======================= TRAP 1 OF 4: the row of traps on the giant board; the first one snaps =======================
   shot(t1A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.62, 0.36, 15, [0, 0.8, 10])], [len(sh), K(-0.48, 0.32, 13, [0, 0.8, 9.5])]], { t, e: glide, bump: t > oneT && t < oneT + 0.3 ? 1 : 0 });
     arena(g, t);
-    TRAPS.map((p, i) => ({ p, i, d: depth(p[0], 0, p[1]) })).sort((a, b) => b.d - a.d).forEach(({ p, i }) => trap(g, p[0], p[1], i === 0 ? snapU(t, oneT) : 0));
+    // the YOU pawn walks onto the first trap; it snaps on him, he jumps and shakes in its jaws
+    const pz = lerp(3.6, TRAPS[0][1], ease.out(clamp((t - t1A) / (oneT - t1A - 0.04)))), jmp = t > oneT ? Math.sin(Math.PI * clamp((t - oneT) / 0.34)) * 1.5 : 0, shk = t > oneT + 0.34 ? Math.sin(t * 52) * 0.07 : 0;
+    const pawnYou = () => { const q = B.project(shk, jmp, pz); if (q.z < 0.6) return; shadow3(g, 0, 0.01, pz, 0.75, 0.6, 0.22); drawPiece(g, 'p', 'b', q.x, q.y, 2.5 * q.s, { glow: '#FFD27A' }); };
+    [...TRAPS.map((p, i) => ({ d: depth(p[0], 0, p[1]), f: () => trap(g, p[0], p[1], i === 0 ? snapU(t, oneT) : 0) })), { d: depth(0, 0, pz) - 0.05, f: pawnYou }]
+      .sort((a, b) => b.d - a.d).forEach(o => o.f());
     if (t > oneT) { const q = B.project(TRAPS[0][0], 0.4, TRAPS[0][1]); shockwave(g, q.x, q.y, t, oneT, { r1: 260, color: '#FFFFFF', lw: 8 }); }
     if (t > threeT) TRAPS.slice(1).forEach(([x, z], i) => { const q = B.project(x, 0.8, z); burst(g, q.x, q.y, t, threeT + i * 0.12, { n: 8, color: '#FFF6C8', speed: 300, life: 0.4, size: 4, gravity: 300 }); });
   }, { trans: 'zoom', hud: (g, lt, t) => {
     if (t >= oneT) { badge(g, 'TRAP 1', W / 2, 240, { color: RED, size: 64, ...pop(t, oneT) }); trapRow(g, 1, t, oneT); }
-    youCard(g, t, t >= oneT ? { ...EXPR.worried, sweat: 0 } : { ...EXPR.smug, look: [-0.6, 0] }, { a: clamp((t - t1A - 0.2) / 0.2) });
+    { const pz = lerp(3.6, TRAPS[0][1], ease.out(clamp((t - t1A) / (oneT - t1A - 0.04)))), jmp = t > oneT ? Math.sin(Math.PI * clamp((t - oneT) / 0.34)) * 1.5 : 0; if (t >= oneT - 0.12) plate3(g, 'YOU', [0, 3.3 + jmp, pz], { color: GOLD, size: 34, ...pop(t, oneT - 0.12) }); }
+    youCard(g, t, t >= threeT ? { ...EXPR.worried, sweat: 1 } : t >= oneT ? { ...EXPR.shock, lid: 0 } : { ...EXPR.smug, look: [-0.6, 0] });
   } });
   cue(t1A - 0.1, 'whoosh_deep', 0.35); cue(oneT, 'hit_punch', 0.8); cue(oneT, 'stamp', 0.4); cue(threeT, 'shimmer', 0.35);
 
-  // ======================= TRAP 2: players at your rating; not even Magnus plays like an engine; you stand out =======================
+  // ======================= TRAP 2: the lineup of players at your rating; not even Magnus plays like an engine; you stand out =======================
+  const LU_E = [{ ...EXPR.tired, look: [0, 0.1] }, { ...EXPR.worried, sweat: 1 }, { ...EXPR.neutral, curve: -0.2 }];
   shot(twoA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.05, 0.55, 30, [0, 0, 15])], [len(sh), K(-0.06, 0.45, 25, [0, 0, 14])]], { t, e: glide });
-    arena(g, t); crowd(g, t);
-  }, { trans: 'whip', noJump: false, hud: (g, lt, t) => {
-    if (t >= playT + 0.2) [3, 11, 22, 30, 41].forEach((k, i) => { const p = CROWD[k]; if (t >= playT + 0.2 + i * 0.07) plate3(g, '1200', [p.x, 3.6, p.z], { color: '#FFFFFF', size: 26, ...pop(t, playT + 0.2 + i * 0.07) }); });
-    youCard(g, t, { ...EXPR.worried, sweat: 1 });
-    if (t < twoT + 1.1) { badge(g, 'TRAP 2', W / 2, 240, { color: RED, size: 64, ...pop(t, twoT) }); trapRow(g, 2, t, twoT); }
-    else badge(g, 'PLAYERS AT YOUR RATING', W / 2, 240, { color: '#16161E', size: 50, ...popW(t, twoT + 1.1) });
+    const b = k => t >= bestT + k * 0.08 ? 1 : 0;
+    lineup(g, t, { e: LU_E, bangs: [b(1), b(0), b(2)], slate: (t - playT) / 0.3, zoom: lerp(1.0, 1.07, clamp(lt / len(sh))), zc: [540, 820], flash: playT + 0.32 });
+  }, { trans: 'whip', kb: 0, noJump: false, hud: (g, lt, t) => {
+    if (t < twoT + 1.1) { badge(g, 'TRAP 2', W / 2, 200, { color: RED, size: 64, ...pop(t, twoT) }); trapRow(g, 2, t, twoT, { y: 330 }); }
+    else badge(g, 'PLAYERS AT YOUR RATING', W / 2, 220, { color: '#16161E', size: 50, ...popW(t, twoT + 1.1) });
   } });
-  shot(notA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, 0.1, 17, [0, 3.6, 12])], [len(sh), K(0.06, 0.09, 15.5, [0, 3.6, 12])]], { t, e: glide });
-    arena(g, t); engineTower(g, t, 4.2, 13); magScreen(g, t, -3.9, 13, t >= engT ? EX.smug : EX.think);
+  shot(notA, (g, lt, t, sh) => {  // Magnus beside the engine: sure of himself on "Magnus", then he looks up at it
+    rig(B, lt, [[0, K(0.0, 0.1, 17, [0, 3.6, 12])], [len(sh), K(0.06, 0.09, 15.0, [0, 3.7, 12])]], { t, e: glide, bump: t > engT && t < engT + 0.3 ? 1 : 0 });
+    arena(g, t); engineTower(g, t, 4.2, 13); magScreen(g, t, -3.9, 13, t >= engT ? { ...EXPR.worried, sweat: 0, look: [1, -0.6] } : t >= magT ? EX.smug : EX.think);
   }, { kb: 0, hud: (g, lt, t) => {
     badge(g, 'NOT EVEN MAGNUS', W / 2, 240, { color: GOLD, size: 58, ...popW(t, magT) });
     if (t >= engT) plate3(g, 'ENGINE', [3.6, 6.9, 12.6], { color: '#7CFC9A', size: 42, ...pop(t, engT) });
   } });
-  shot(standA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.08, 0.4, 19, [YOU_P.x, 1, YOU_P.z])], [len(sh), K(0.02, 0.3, 11.5, [YOU_P.x, 1.2, YOU_P.z])]], { t, e: glide });
-    arena(g, t); crowd(g, t, { you: clamp((t - moreT + 0.2) / 0.3), dim: 0.65 * clamp((t - outT + 0.1) / 0.3), rate: 0.25 });
-  }, { trans: 'whip', hud: (g, lt, t) => {
-    if (t >= moreT) plate3(g, 'YOU', [YOU_P.x, 4.4, YOU_P.z], { color: GOLD, size: 40, ...pop(t, moreT) });
-    youCard(g, t, t >= outT ? { ...EXPR.shock, lid: 0 } : { ...EXPR.worried, sweat: 1 });
-    if (t >= outT) stamp(g, 'STANDS OUT', W / 2, 380, t, outT, { color: RED, size: 74, rot: -0.1 });
-  } });
-  cue(twoA - 0.08, 'whoosh_fast', 0.3); cue(twoT, 'hit_punch', 0.7); cue(twoT, 'stamp', 0.35); cue(bestT, 'sparkle_pop', 0.3);
+  shot(standA, (g, lt, t, sh) => {  // the "!" pile up over him; the light finds him, the other two turn, he steps forward
+    const n = t < moreT ? 1 : Math.min(5, 2 + Math.floor((t - moreT) / 0.15)), lk = clamp((t - outT + 0.15) / 0.25);
+    const z = t < outT - 0.1 ? lerp(1.0, 1.04, clamp(lt / 1.2)) : lerp(1.04, 1.28, ease.out(clamp((t - outT + 0.1) / 0.5)));
+    lineup(g, t, { e: [{ ...EXPR.tired, look: [lk, 0.1], turn: 0.3 * lk, lid: lerp(0.6, 0.2, lk) }, t >= outT ? { ...EXPR.shock, lid: 0 } : { ...EXPR.worried, sweat: 1, look: [0, -0.5] }, { ...EXPR.neutral, look: [-lk, 0], turn: -0.3 * lk, curve: -0.2 }],
+      bangs: [1, n, 1], spot: clamp((t - outT + 0.1) / 0.25), step: clamp((t - outT) / 0.3), zoom: z, zc: [540, 820] });
+  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { if (t >= outT) stamp(g, 'STANDS OUT', W / 2, 1540, t, outT, { color: RED, size: 80, rot: -0.1 }); } });
+  cue(twoA - 0.08, 'whoosh_fast', 0.3); cue(twoT, 'hit_punch', 0.7); cue(twoT, 'stamp', 0.35); cue(playT + 0.32, 'camera', 0.55); cue(bestT, 'sparkle_pop', 0.3);
   cue(notA - 0.04, 'whoosh_soft', 0.3); cue(magT, 'hit', 0.35); cue(engT, 'error', 0.3);
-  cue(standA - 0.05, 'whoosh_fast', 0.3); cue(moreT, 'riser', 0.3); cue(outT, 'stamp', 0.6);
+  cue(standA - 0.05, 'whoosh_fast', 0.3); for (let k = 0; k < 4; k++) cue(moreT + k * 0.15, 'sparkle_pop', 0.22); cue(outT - 0.05, 'riser', 0.2); cue(outT, 'stamp', 0.6); cue(outT + 0.05, 'gasp', 0.3); cue(outT, 'boom_move', 0.35);
 
   // ======================= TRAP 3: "you", one engine move a game; the cork board fills; the strings find him =======================
   const YOUK = [K(0.02, 0.1, 8.6, [4, 3.4, 9.0]), K(0.0, 0.1, 8.0, [4, 3.45, 9.1])], CORKK = [K(0.0, 0.1, 13.5, [4, 5.4, 10.8]), K(0.0, 0.1, 16.5, [4, 6.0, 11.6])];
@@ -1352,7 +1460,7 @@ export async function build(T) {
   shot(twA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.0, 0.07, 12.8, [4, 3.3, 10.6])], [len(sh), K(0.0, 0.06, 11.8, [4, 3.3, 10.6])]], { t, e: glide });
     const down = tick(t, cheT, 0.5, 14), up = tick(t, givT + 0.1, 0.7, 14);
-    room(g, t, { pieces: piecesAt(NC, 2), screen: profile(t, { rating: 1200 - down + up, note: (t - givT + 0.05) / 0.35 }) });
+    room(g, t, { pieces: piecesAt(NC, 2), screen: profile(t, { rating: 1200 - down + up, note: (t - givT + 0.05) / 0.35, mood: t < cheT ? 'focus' : t < givT ? 'sad' : 'happy' }) });
     { const a = B.project(MON.c[0] - MON.hw + 0.25, MON.c[1] + 1.95, MON.c[2]), b = B.project(MON.c[0] - MON.hw + 2.7, MON.c[1] + 0.2, MON.c[2]); qaRect(g, a.x, a.y, b.x - a.x, b.y - a.y, 'face', 'opp'); }
   }, { kb: 0, noJump: false, hud: (g, lt, t) => {
     if (t >= cheT && t < givT) badge(g, '-14 TO A CHEATER', W / 2, 240, { color: RED, size: 54, ...popW(t, cheT) });
@@ -1363,8 +1471,9 @@ export async function build(T) {
   // ======================= 69 million points, in one month: the jar =======================
   shot(refA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.32, 0.26, 24, [0, 4, 12])], [len(sh), K(0.16, 0.22, 18.5, [0, 4.6, 12])]], { t, e: glide });
-    arena(g, t); jar(g, t, lerp(0.15, 0.95, ease.out(clamp((t - refA) / (nevA - refA)))), refA); coinsFall(g, t, refA, nevA);
-  }, { trans: 'whip', noJump: false, hud: (g, lt, t) => {
+    arena(g, t); camWall(g, t, -9, { mood: 'happy', from: 3 }); jar(g, t, lerp(0.15, 0.95, ease.out(clamp((t - refA) / (nevA - refA)))), refA); coinsFall(g, t, refA, nevA);
+    for (let k = 3; k < 9; k++) { const [cx, cy, cz] = camAt(k), a = B.project(cx - 1.4, cy + 1.6, cz), b = B.project(cx + 1.4, cy - 1.0, cz); if (a.z > 0.5) qaRect(g, a.x, a.y, b.x - a.x, b.y - a.y, 'face', OPPS[k]); }
+  }, { trans: 'whip', noJump: false, qaAllow: ['face cut by frame'], hud: (g, lt, t) => {  // the wall of cameras runs on past the frame
     counter(g, fmt(tick(t, refA + 0.05, 1.5, 69617149)), 'POINTS GIVEN BACK · OCTOBER', { y: 330, size: 140, color: GOLD });
   } });
   cue(refA - 0.06, 'whoosh_deep', 0.3); cue(refA + 0.1, 'coins', 0.55); cue(milRT, 'cash', 0.45); cue(monthT, 'coins', 0.35);

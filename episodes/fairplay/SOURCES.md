@@ -37,4 +37,11 @@ read through search-engine excerpts that quote them word for word. Before postin
   (the conspiracy-board meme, drawn by us), are a picture of the idea, not data: none of them is a real game.
 - The Fair Play team is drawn as pawns in vests bursting through a door, after the "FBI, open up" meme (rule 62: our
   drawing, no frames from elsewhere). Chess.com's logo is not drawn; the site is named in words.
+- Version 4 (every beat with a face, STYLE_BIBLE rule 71) adds drawn reactions, none of them a record of what anyone
+  did: Hans's small webcam in the hook (a "?" when Magnus resigns, shock when Magnus's camera goes off); Hans at a
+  table when the report lands in front of him (startled, reading, shocked at the stamp); his webcam beside the board
+  on the browser while the tabs flip back and forth, the toggling that the report describes, with nothing shown in the
+  other tab but a blank page and "?". Trap 2 is a police lineup of three drawn players "at your rating" holding the
+  number 1200 (an example rating, not a statistic), "you" in the middle; the "!" over their heads are a picture of
+  best moves found, not data. In the refund the opponents' webcams from trap 4 come back happy behind the jar.
 - After the settlement of August 2023 Niemann was reinstated on Chess.com; the video does not say otherwise.
