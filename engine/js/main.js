@@ -48,7 +48,11 @@ const mod = await import(`../../episodes/${ep}/scenes.js`);
 const film = await mod.build(T);
 const shots = film.shots.map((s, i) => ({ ...s, i }));
 shots.forEach((s, i) => { s.b = s.b ?? (shots[i + 1] ? shots[i + 1].a : film.duration ?? T.duration); });
-const chunks = buildChunks(T.phrases, ctx);
+// ?caps=fr: a dubbed version's captions (build/fr/captions.json, the words of the new voice with their times); the
+// shots stay on the English timeline
+const capLang = q.get('caps');
+const capTm = capLang ? await fetch(`../episodes/${ep}/build/${capLang}/captions.json`).then(r => r.json()) : tm;
+const chunks = buildChunks(capTm.phrases, ctx);
 const DURATION = film.duration ?? T.duration;
 
 function drawShot(s, t, g) {

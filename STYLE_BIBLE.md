@@ -823,6 +823,36 @@ Najdorf». Звук оригинальный («son original — Chess History»
       предмет, а не позу, которая уводит тело внутрь предмета: в `adema2002` у скамейки низкая спинка 0,62 м, она
       закрывает ноги со спины и оставляет видными спины и номера;
     - на покадровом просмотре смотреть крупно каждое место, где тело заходит за предмет.
+75. Каждый ролик сдаётся на двух языках, английском и французском: у автора два аккаунта TikTok. Автор 15.11.2026,
+    после французской версии `adema2002`: «c'est tres bien je veux que tu retienne ca pour les prochaine fois aussi ,
+    a partir de maintenant quand nous ferons une video tu m envoira la video en Anglais ET en Francais pour pouvoir
+    mettre les video sur les 2 compte tiktok». Как делать:
+    - английский ролик не меняется ни в чём, голос в нём — Callum, как всегда (`eleven_v3`, настройки `plea2005`,
+      правило 68). Автор: «Tu a bien retenu que tu ne change absolement pas la version anglaise et surtout pas la voix
+      Callum pour la version Anglaise». Всё французское живёт отдельно: `script_fr.json`, `build/fr/`;
+    - французский — та же картинка, файл с «_FR» в конце имени; оригинал не трогать;
+    - текст — `episodes/<ep>/script_fr.json`: такты, каждый привязан к английскому слову (`[фраза, номер слова]` в
+      `build/timings.json`), так что каждая фраза остаётся на своём плане; факты те же, что в английском тексте и
+      `SOURCES.md`; `fr` — что говорит голос (числа словами, аудиотеги), `text` — субтитр (цифры, настоящие
+      написания), `colors` — как в `script.json`;
+    - голос — Kev - Young, Dynamic and Bright (`jGpnMdbhtKgQbVrYezOx`), `eleven_v4`, стабильность 0,30, сильные
+      аудиотеги ([excited], [shouting], [amazed]…). Автор выбрал его сам («La voix de Kev me semble assez bonne»);
+      George и Callum по-французски он отверг: «pas du tout dynamique», «aucune emotion». На бесплатном тарифе API
+      не даёт голоса библиотеки: дубль делается на сайте ElevenLabs в аккаунте автора, забирается из истории
+      (`/v1/history/<id>/audio`) и ставится `python3 audio/dub.py episodes/<ep> fr --take <mp3>`; на платном тарифе —
+      `python3 audio/dub.py episodes/<ep> fr`;
+    - каждый дубль проверять распознаванием (Scribe): выразительные модели иногда проглатывают слова. Слово «not heard
+      in the take» — сначала посмотреть распознанный текст: другое написание того же звука (rebondi/rebondit,
+      ces/ses) не ошибка. Слова с дефисом `dub.py` сравнивает по частям: распознавание пишет «Cinquante-et-unième»
+      одним словом, и раньше первое слово такта не находилось, а голос уходил на 0,65 с раньше своего плана и
+      субтитра (`lewy5`, исправлено); такт с «LATE» больше 0,3 с — разобрать;
+    - музыка, эффекты и фон — стемы самого ролика: приглушение под английским голосом снимается и делается заново под
+      французским, эффекты тоже уходят под голос (`mix.sfx_duck`), голос по громкости как английский;
+    - субтитры французские: `node render.mjs <ep> --scale 2 --workers 2 --caps fr --out fr/video.mp4` (слова из
+      `build/fr/captions.json`, планы на английской шкале). Вне полосы субтитров кадры совпадают с английским
+      рендером; QA с `--caps fr` — «no issues»;
+    - надписи, нарисованные в кадре (титры, штампы), остаются английскими, пока автор не попросит иначе;
+    - сдаются оба ролика, каждый в 4K и копией 1080p для телефона.
 
 ## 8. Эффекты ходов (покадровый разбор @chess.history «Kramnik vs Topalov», Элиста 2006)
 

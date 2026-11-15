@@ -1,0 +1,54 @@
+{
+ "lang": "fr",
+ "_note": "French voice-over of the delivered film (15 Nov 2026). Each beat starts on the English word it replaces: [phrase id, word index] in build/timings.json, so every sentence keeps its shot (the score flips on Cinquante, Cent, Cent quarante-neuf). `fr` is what the voice says (with its audio `tag`), `text` the caption (digits as in the English captions, the real spellings l'Emyrne and Adema), `colors` as in script.json. Same facts as the English narration and SOURCES.md; nothing added. Built with python3 audio/dub.py episodes/adema2002 fr, captions with node render.mjs adema2002 --caps fr.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (ElevenLabs Voice Library, native French, verified on eleven_v4), the user's pick from the previews of Hugo, Troy and Kev: 'La voix de Kev me semble assez bonne' (15 Nov 2026). Library voices need a paid plan through the API.",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.8,
+  "style": 0.6,
+  "language_code": "fr",
+  "_take": "The free plan cannot use library voices through the API, so the take was made on the ElevenLabs website (Text to Speech) in the user's account on 15 Nov 2026: Kev, Eleven v4, stability 0.30, similarity 0.75, clone strength 0, language Auto, the whole text of the beats with their tags (996 characters), history item oKqJz3yCUKFL1oanCc3Q. Saved as build/fr/kev_take.mp3 and placed with python3 audio/dub.py episodes/adema2002 fr --take build/fr/kev_take.mp3."
+ },
+ "_tried": "George (JBFqnCBsd6RMkjVDRZzb) on eleven_multilingual_v2: 'pas du tout dynamique, je veux que la voix emmette de l emotion comme Callum pas simplement grave'. Callum on eleven_v3, stability 0.5, the English tags: 'je trouve qu il ny a absolument aucune emotion dans les video' (that script: build/fr/script_fr_callum.json).",
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[excited]", "fr": "Cent quarante-neuf à zéro !", "text": "149–0 !", "colors": {"149–0": "gold"}},
+   {"at": ["hook", 1], "fr": "Le score le plus fou du football !"},
+   {"at": ["hook", 6], "tag": "[dramatic]", "fr": "Et chaque but... un but contre son camp !", "text": "Et chaque but, un but contre son camp !", "colors": {"contre": "red", "son": "red", "camp": "red"}}]},
+  {"id": "champs", "beats": [
+   {"at": ["champs", 0], "fr": "Le Stade Olympique de l'Émyrne, champion en titre.", "text": "Le Stade Olympique de l'Emyrne, champion en titre.", "colors": {"champion": "gold", "en": "gold", "titre.": "gold"}},
+   {"at": ["champs", 8], "tag": "[serious]", "fr": "Mais au match précédent...", "text": "Mais au match précédent,"},
+   {"at": ["champs", 13], "tag": "[frustrated]", "fr": "un penalty contesté, en fin de match, offre le titre à Adéma.", "text": "un penalty contesté, en fin de match, offre le titre à Adema.", "colors": {"penalty": "red", "Adema.": "gold"}}]},
+  {"id": "plan", "beats": [
+   {"at": ["plan", 0], "tag": "[mischievously]", "fr": "Dernier match, contre Adéma...", "text": "Dernier match, contre Adema,"},
+   {"at": ["plan", 7], "fr": "leur coach décide de protester :", "colors": {"protester": "red"}},
+   {"at": ["plan", 12], "fr": "dès que ses joueurs auront le ballon...", "text": "dès que ses joueurs auront le ballon,"},
+   {"at": ["plan", 19], "tag": "[excited]", "fr": "ils marqueront contre leur camp !", "colors": {"contre": "red", "leur": "red", "camp": "red"}}]},
+  {"id": "goals", "beats": [
+   {"at": ["goals", 0], "tag": "[tense]", "fr": "Coup d'envoi.", "colors": {"Coup": "gold", "d'envoi.": "gold"}},
+   {"at": ["goals", 1], "fr": "Demi-tour...", "text": "Demi-tour,"},
+   {"at": ["goals", 3], "tag": "[shouting]", "fr": "et tir dans leurs propres filets !", "colors": {"propres": "red", "filets": "red"}},
+   {"at": ["goals", 9], "tag": "[excited]", "fr": "Encore !", "colors": {"Encore": "red"}},
+   {"at": ["goals", 10], "fr": "Et encore !", "colors": {"encore": "red"}},
+   {"at": ["goals", 12], "tag": "[amazed]", "fr": "Un but toutes les trente-six secondes !", "text": "Un but toutes les 36 secondes !", "colors": {"36": "gold", "secondes": "gold"}}]},
+  {"id": "watch", "beats": [
+   {"at": ["watch", 0], "tag": "[amused]", "fr": "Les joueurs d'Adéma, eux, regardent...", "text": "Les joueurs d'Adema, eux, regardent", "colors": {"regardent": "gold"}},
+   {"at": ["watch", 7], "fr": "le score grimper.", "text": "le score grimper."},
+   {"at": ["watch", 12], "tag": "[excited]", "fr": "Cinquante !", "text": "50 !", "colors": {"50": "red"}},
+   {"at": ["watch", 13], "fr": "Cent !", "text": "100 !", "colors": {"100": "red"}},
+   {"at": ["watch", 14], "tag": "[shouting]", "fr": "Cent quarante-neuf !", "text": "149 !", "colors": {"149": "red"}}]},
+  {"id": "fans", "beats": [
+   {"at": ["fans", 0], "tag": "[laughs]", "fr": "En tribune...", "text": "En tribune,"},
+   {"at": ["fans", 3], "fr": "les supporters filent aux guichets réclamer leur argent !", "colors": {"guichets": "gold", "argent": "gold"}}]},
+  {"id": "after", "beats": [
+   {"at": ["after", 0], "tag": "[firmly]", "fr": "La fédération suspend le coach trois ans...", "text": "La fédération suspend le coach trois ans", "colors": {"suspend": "red", "trois": "red", "ans": "red"}},
+   {"at": ["after", 8], "fr": "et plusieurs joueurs."},
+   {"at": ["after", 12], "tag": "[quietly]", "fr": "Et cent quarante-neuf buts contre son camp...", "text": "Et 149 buts contre son camp,", "colors": {"149": "gold"}},
+   {"at": ["after", 16], "tag": "[in awe]", "fr": "toujours un record du monde.", "colors": {"record": "gold", "du": "gold", "monde.": "gold"}}]}
+ ]
+}

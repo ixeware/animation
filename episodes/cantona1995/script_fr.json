@@ -1,0 +1,52 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). Same facts as the English narration and SOURCES.md; nothing added. The seagulls quote was said in English: the French is a word-for-word translation of it ('When the seagulls follow the trawler, it's because they think sardines will be thrown into the sea. Thank you very much.'). `fr` is what the voice says, `text` the caption, `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[excited]", "fr": "Éric Cantona.", "colors": {"Éric": "gold", "Cantona.": "gold"}},
+   {"at": ["hook", 2], "fr": "Le numéro sept de Manchester United.", "text": "Le numéro 7 de Manchester United.", "colors": {"7": "gold"}},
+   {"at": ["hook", 6], "fr": "Un soir de janvier mille neuf cent quatre-vingt-quinze...", "text": "Un soir de janvier 1995,"},
+   {"at": ["hook", 12], "tag": "[shouting]", "fr": "il saute dans la foule...", "text": "il saute dans la foule,", "colors": {"foule,": "red"}},
+   {"at": ["hook", 17], "fr": "les pieds en avant !", "colors": {"pieds": "red", "en": "red", "avant": "red"}}]},
+  {"id": "red", "beats": [
+   {"at": ["red", 0], "fr": "Selhurst Park, chez Crystal Palace.", "colors": {"Selhurst": "gold", "Park,": "gold"}},
+   {"at": ["red", 6], "fr": "Trois minutes après la reprise,"},
+   {"at": ["red", 12], "fr": "Cantona donne un coup de pied au défenseur Richard Shaw.", "colors": {"coup": "red", "de": "red", "pied": "red"}},
+   {"at": ["red", 19], "tag": "[firmly]", "fr": "L'arbitre lui montre le rouge.", "colors": {"rouge.": "red"}}]},
+  {"id": "fan", "beats": [
+   {"at": ["fan", 0], "fr": "Alors qu'il longe la ligne de touche...", "text": "Alors qu'il longe la ligne de touche,"},
+   {"at": ["fan", 6], "fr": "un supporter de Palace descend au premier rang...", "text": "un supporter de Palace descend au premier rang", "colors": {"supporter": "gold"}},
+   {"at": ["fan", 14], "fr": "et lui hurle des insultes.", "colors": {"insultes.": "red"}}]},
+  {"id": "kick", "beats": [
+   {"at": ["kick", 0], "tag": "[tense]", "fr": "Cantona s'arrête.", "colors": {"s'arrête.": "gold"}},
+   {"at": ["kick", 2], "fr": "Il se retourne.", "colors": {"retourne.": "gold"}},
+   {"at": ["kick", 4], "tag": "[shouting]", "fr": "Et il se jette par-dessus la barrière...", "text": "Et il se jette par-dessus la barrière,"},
+   {"at": ["kick", 11], "fr": "façon kung-fu !", "colors": {"kung-fu": "red"}}]},
+  {"id": "fallout", "beats": [
+   {"at": ["fallout", 0], "fr": "United lui inflige vingt mille livres d'amende.", "text": "United lui inflige 20 000 livres d'amende.", "colors": {"20 000": "gold", "livres": "gold"}},
+   {"at": ["fallout", 4], "fr": "La fédération anglaise le suspend huit mois.", "colors": {"huit": "red", "mois.": "red"}},
+   {"at": ["fallout", 11], "tag": "[serious]", "fr": "Un tribunal le condamne à deux semaines de prison...", "text": "Un tribunal le condamne à deux semaines de prison,", "colors": {"prison,": "red"}},
+   {"at": ["fallout", 20], "fr": "commuées en appel en travaux d'intérêt général : entraîner des enfants.", "colors": {"travaux": "lime", "d'intérêt": "lime", "général": "lime"}}]},
+  {"id": "press", "beats": [
+   {"at": ["press", 0], "fr": "Puis il affronte la presse.", "text": "Puis il affronte la presse :"},
+   {"at": ["press", 5], "tag": "[calmly]", "fr": "Quand les mouettes suivent le chalutier...", "text": "Quand les mouettes suivent le chalutier,", "colors": {"mouettes": "gold", "chalutier,": "gold"}},
+   {"at": ["press", 11], "fr": "c'est parce qu'elles pensent que des sardines vont être jetées à la mer.", "colors": {"sardines": "lime", "mer.": "lime"}},
+   {"at": ["press", 22], "fr": "Merci beaucoup."},
+   {"at": ["press", 26], "tag": "[amused]", "fr": "Et il s'en va.", "colors": {"s'en": "red", "va.": "red"}}]},
+  {"id": "coda", "beats": [
+   {"at": ["coda", 0], "tag": "[warmly]", "fr": "Deux ans plus tard,"},
+   {"at": ["coda", 3], "fr": "il soulève le trophée de Premier League.", "colors": {"trophée": "gold"}},
+   {"at": ["coda", 9], "tag": "[quietly]", "fr": "Puis il tire sa révérence.", "colors": {"révérence.": "red"}}]}
+ ]
+}

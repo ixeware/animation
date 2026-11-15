@@ -1,0 +1,50 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). Same facts as the English narration and SOURCES.md, with the same care: the rumours stay rumours, the reported criticism session is attributed to Radio Free Asia, the coach's fate 'has never been confirmed'. The commentator's and Pyongyang's words are translated. `fr` is what the voice says, `text` the caption, `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[dramatic]", "fr": "Cette équipe a joué à Squid Game... sur un terrain de foot.", "text": "Cette équipe a joué à Squid Game, sur un terrain de foot.", "colors": {"Squid": "red", "Game,": "red"}}]},
+  {"id": "ctx", "beats": [
+   {"at": ["ctx", 0], "fr": "Deux mille dix.", "text": "2010.", "colors": {"2010.": "gold"}},
+   {"at": ["ctx", 1], "fr": "La Corée du Nord dispute sa première Coupe du monde depuis quarante-quatre ans.", "text": "La Corée du Nord dispute sa première Coupe du monde depuis 44 ans.", "colors": {"44": "gold"}}]},
+  {"id": "live", "beats": [
+   {"at": ["live", 0], "fr": "Après une courte défaite contre le Brésil, la télé d'État prend un risque.", "colors": {"risque.": "gold"}},
+   {"at": ["live", 11], "fr": "Le match suivant, contre le Portugal, sera diffusé en direct.", "colors": {"direct.": "red"}},
+   {"at": ["live", 20], "tag": "[quietly]", "fr": "Une première.", "colors": {"première.": "gold"}}]},
+  {"id": "half", "beats": [
+   {"at": ["half", 0], "fr": "À la mi-temps, ce n'était qu'un à zéro.", "text": "À la mi-temps, ce n'était que 1–0.", "colors": {"1–0.": "gold"}}]},
+  {"id": "rout", "beats": [
+   {"at": ["rout", 0], "tag": "[intense]", "fr": "Puis, sous une pluie battante...", "text": "Puis, sous une pluie battante,"},
+   {"at": ["rout", 4], "fr": "six de plus.", "colors": {"six": "red"}},
+   {"at": ["rout", 6], "tag": "[somber]", "fr": "Sept à zéro.", "text": "7–0.", "colors": {"7–0.": "red"}}]},
+  {"id": "tv", "beats": [
+   {"at": ["tv", 0], "fr": "Au coup de sifflet, le commentateur annonce : nous arrêtons ici notre direct.", "colors": {"arrêtons": "red"}},
+   {"at": ["tv", 13], "fr": "Et l'écran passe à des ouvriers d'usine... qui font l'éloge du dirigeant.", "text": "Et l'écran passe à des ouvriers d'usine, qui font l'éloge du dirigeant.", "colors": {"ouvriers": "gold", "d'usine,": "gold"}}]},
+  {"id": "home", "beats": [
+   {"at": ["home", 0], "tag": "[somber]", "fr": "De retour à Pyongyang, selon Radio Free Asia...", "text": "De retour à Pyongyang, selon Radio Free Asia,"},
+   {"at": ["home", 7], "fr": "l'équipe est exposée sur une scène pendant six heures de critique publique, devant quatre cents personnes.", "text": "l'équipe est exposée sur une scène pendant six heures de critique publique, devant 400 personnes.", "colors": {"six": "red", "heures": "red", "400": "gold"}},
+   {"at": ["home", 26], "fr": "Les joueurs doivent dénoncer leur propre entraîneur.", "colors": {"dénoncer": "red"}}]},
+  {"id": "rumours", "beats": [
+   {"at": ["rumours", 0], "fr": "Puis viennent les rumeurs."},
+   {"at": ["rumours", 4], "fr": "Les mines...", "text": "Les mines.", "colors": {"mines.": "red"}},
+   {"at": ["rumours", 6], "tag": "[quietly]", "fr": "Des exécutions.", "colors": {"exécutions.": "red"}},
+   {"at": ["rumours", 7], "fr": "La FIFA s'informe."},
+   {"at": ["rumours", 9], "fr": "Pyongyang répond : ils s'entraînent comme d'habitude.", "colors": {"s'entraînent": "lime", "d'habitude.": "lime"}}]},
+  {"id": "truth", "beats": [
+   {"at": ["truth", 0], "fr": "Six mois plus tard, les onze titulaires de ce match étaient de retour en sélection.", "colors": {"onze": "gold", "retour": "lime"}}]},
+  {"id": "coach", "beats": [
+   {"at": ["coach", 0], "tag": "[softly]", "fr": "Pas l'entraîneur.", "colors": {"Pas": "red"}},
+   {"at": ["coach", 4], "fr": "Ce qui lui est arrivé... n'a jamais été confirmé.", "text": "Ce qui lui est arrivé n'a jamais été confirmé.", "colors": {"jamais": "gold"}}]}
+ ]
+}

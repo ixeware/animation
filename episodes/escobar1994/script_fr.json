@@ -1,0 +1,51 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). Same facts as the English narration and SOURCES.md; nothing added; the tone stays grave and respectful (the brief: 'Treat it respectfully'). His column line was written in Spanish ('Hasta pronto, porque la vida no termina aquí'): the French is a faithful translation of it. `fr` is what the voice says, `text` the caption, `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[serious]", "fr": "Andrés Escobar.", "colors": {"Andrés": "gold", "Escobar.": "gold"}},
+   {"at": ["hook", 2], "fr": "Le numéro deux de la Colombie.", "text": "Le numéro 2 de la Colombie."},
+   {"at": ["hook", 5], "fr": "Une touche de balle au Mondial...", "text": "Une touche de balle au Mondial,", "colors": {"touche": "lime"}},
+   {"at": ["hook", 11], "fr": "et dix jours plus tard...", "text": "et dix jours plus tard,"},
+   {"at": ["hook", 15], "fr": "il nous avait quittés.", "colors": {"quittés.": "red"}}]},
+  {"id": "rise", "beats": [
+   {"at": ["rise", 0], "fr": "En quatre-vingt-quatorze,", "text": "En 1994,"},
+   {"at": ["rise", 2], "fr": "la Colombie arrive à la Coupe du monde parmi les favoris.", "colors": {"favoris.": "gold"}},
+   {"at": ["rise", 13], "tag": "[building]", "fr": "Quelques mois plus tôt, elle avait écrasé l'Argentine cinq à zéro...", "text": "Quelques mois plus tôt, elle avait écrasé l'Argentine 5–0", "colors": {"écrasé": "lime", "5–0": "gold"}},
+   {"at": ["rise", 20], "fr": "à Buenos Aires !"}]},
+  {"id": "goal", "beats": [
+   {"at": ["goal", 0], "fr": "Mais elle perd son premier match.", "colors": {"perd": "red"}},
+   {"at": ["goal", 6], "fr": "Puis, le pays organisateur :"},
+   {"at": ["goal", 10], "fr": "les États-Unis.", "colors": {"États-Unis.": "gold"}},
+   {"at": ["goal", 11], "tag": "[tense]", "fr": "Un centre arrive."},
+   {"at": ["goal", 15], "fr": "Escobar tend la jambe...", "text": "Escobar tend la jambe,"},
+   {"at": ["goal", 17], "fr": "et la dévie dans son propre but.", "colors": {"propre": "red", "but.": "red"}},
+   {"at": ["goal", 24], "tag": "[quietly]", "fr": "La Colombie perd deux à un.", "text": "La Colombie perd 2–1.", "colors": {"2–1.": "gold"}},
+   {"at": ["goal", 27], "fr": "Quatre jours plus tard, elle est éliminée.", "colors": {"éliminée.": "red"}}]},
+  {"id": "home", "beats": [
+   {"at": ["home", 0], "tag": "[softly]", "fr": "Il écrit dans un journal :"},
+   {"at": ["home", 5], "fr": "à bientôt...", "text": "à bientôt,", "colors": {"bientôt,": "gold"}},
+   {"at": ["home", 8], "fr": "car la vie ne s'arrête pas ici.", "colors": {"vie": "lime", "ici.": "lime"}}]},
+  {"id": "night", "beats": [
+   {"at": ["night", 0], "tag": "[serious]", "fr": "Le deux juillet...", "text": "Le 2 juillet,", "colors": {"2": "gold"}},
+   {"at": ["night", 3], "fr": "dix jours après ce match...", "text": "dix jours après ce match,"},
+   {"at": ["night", 8], "fr": "il est abattu devant une discothèque de Medellín.", "colors": {"Medellín.": "gold"}},
+   {"at": ["night", 17], "fr": "Il avait vingt-sept ans.", "text": "Il avait 27 ans.", "colors": {"27": "red"}}]},
+  {"id": "tribute", "beats": [
+   {"at": ["tribute", 0], "fr": "Plus de cent mille personnes assistent à ses funérailles.", "text": "Plus de 100 000 personnes assistent à ses funérailles.", "colors": {"100 000": "gold"}},
+   {"at": ["tribute", 8], "tag": "[warmly]", "fr": "Aujourd'hui, sa statue se dresse à Medellín...", "text": "Aujourd'hui, sa statue se dresse à Medellín,", "colors": {"statue": "gold"}},
+   {"at": ["tribute", 14], "fr": "et on l'appelle toujours...", "text": "et on l'appelle toujours"},
+   {"at": ["tribute", 19], "fr": "le gentleman du football.", "colors": {"gentleman": "gold", "du": "gold", "football.": "gold"}}]}
+ ]
+}

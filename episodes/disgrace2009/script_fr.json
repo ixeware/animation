@@ -1,0 +1,61 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). Same facts as the English narration and SOURCES.md; nothing added. Drogba's words stay as he said them, in English ('It's a disgrace!'); the referee's line ('it was not my best day') is translated. The voice reads 'Ovrebo', the caption keeps 'Øvrebø'. `fr` is what the voice says, `text` the caption, `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[intense]", "fr": "En direct à la télé...", "text": "En direct à la télé,"},
+   {"at": ["hook", 3], "fr": "Didier Drogba hurle face caméra :", "colors": {"Drogba": "gold"}},
+   {"at": ["hook", 9], "tag": "[shouting]", "fr": "It's a disgrace !", "colors": {"disgrace": "red"}},
+   {"at": ["hook", 12], "fr": "Voici pourquoi."}]},
+  {"id": "ctx", "beats": [
+   {"at": ["ctx", 0], "fr": "Mai deux mille neuf.", "text": "Mai 2009.", "colors": {"2009.": "gold"}},
+   {"at": ["ctx", 2], "fr": "Demi-finale de Ligue des champions : Chelsea contre Barcelone."},
+   {"at": ["ctx", 9], "fr": "Après neuf minutes, Essien ouvre le score d'une reprise de volée.", "text": "Après 9 minutes, Essien ouvre le score d'une reprise de volée.", "colors": {"9": "gold", "Essien": "lime"}}]},
+  {"id": "a1", "beats": [
+   {"at": ["a1", 0], "tag": "[intense]", "fr": "Vingt-troisième minute.", "text": "23e minute.", "colors": {"23e": "gold"}},
+   {"at": ["a1", 2], "fr": "Malouda tombe sous Alves, à l'entrée de la surface."},
+   {"at": ["a1", 13], "fr": "L'arbitre, Tom Henning Ovrebo, siffle un coup franc...", "text": "L'arbitre, Tom Henning Øvrebø, siffle un coup franc,", "colors": {"Øvrebø,": "gold"}},
+   {"at": ["a1", 22], "fr": "Hors de la surface.", "colors": {"Hors": "red", "surface.": "red"}}]},
+  {"id": "a2", "beats": [
+   {"at": ["a2", 0], "fr": "Trois minutes plus tard, Abidal retient Drogba... dans la surface.", "text": "Trois minutes plus tard, Abidal retient Drogba dans la surface.", "colors": {"dans": "gold"}},
+   {"at": ["a2", 9], "fr": "Rien.", "colors": {"Rien.": "red"}}]},
+  {"id": "red", "beats": [
+   {"at": ["red", 0], "fr": "En deuxième mi-temps, Abidal est expulsé.", "colors": {"expulsé.": "red"}},
+   {"at": ["red", 8], "fr": "Le Barça joue à dix.", "colors": {"dix.": "gold"}}]},
+  {"id": "a3", "beats": [
+   {"at": ["a3", 0], "fr": "Puis le ballon touche la main de Piqué, dans la surface.", "colors": {"main": "gold"}},
+   {"at": ["a3", 9], "fr": "Rien.", "colors": {"Rien.": "red"}}]},
+  {"id": "goal", "beats": [
+   {"at": ["goal", 0], "tag": "[building]", "fr": "Quatre-vingt-treizième minute. Premier tir cadré du Barça...", "text": "93e minute. Premier tir cadré du Barça,", "colors": {"93e": "gold", "Premier": "gold"}},
+   {"at": ["goal", 7], "tag": "[excited]", "fr": "Iniesta !", "colors": {"Iniesta": "lime"}},
+   {"at": ["goal", 8], "fr": "Un partout...", "text": "1–1,", "colors": {"1–1,": "gold"}},
+   {"at": ["goal", 9], "fr": "et le Barça se qualifie grâce aux buts à l'extérieur.", "colors": {"l'extérieur.": "gold"}}]},
+  {"id": "a4", "beats": [
+   {"at": ["a4", 0], "fr": "Une dernière occasion :"},
+   {"at": ["a4", 3], "fr": "la frappe de Ballack touche le bras d'Eto'o.", "colors": {"bras": "gold"}},
+   {"at": ["a4", 8], "fr": "Rien.", "colors": {"Rien.": "red"}},
+   {"at": ["a4", 9], "fr": "Quatre penalties réclamés...", "text": "Quatre penalties réclamés,", "colors": {"Quatre": "gold"}},
+   {"at": ["a4", 11], "fr": "aucun accordé.", "colors": {"aucun": "red"}}]},
+  {"id": "drogba", "beats": [
+   {"at": ["drogba", 0], "fr": "Au coup de sifflet final, Drogba, déjà remplacé...", "text": "Au coup de sifflet final, Drogba, déjà remplacé,", "colors": {"Drogba,": "gold"}},
+   {"at": ["drogba", 7], "fr": "revient sur la pelouse... en tongs...", "text": "revient sur la pelouse, en tongs,", "colors": {"tongs,": "gold"}},
+   {"at": ["drogba", 12], "fr": "et trouve une caméra.", "colors": {"caméra.": "red"}}]},
+  {"id": "after", "beats": [
+   {"at": ["after", 0], "fr": "Ça lui coûte trois matchs de suspension.", "colors": {"trois": "gold", "matchs": "gold"}},
+   {"at": ["after", 6], "fr": "L'arbitre change d'hôtel cette nuit-là... et reçoit des menaces de mort pendant des années.", "text": "L'arbitre change d'hôtel cette nuit-là, et reçoit des menaces de mort pendant des années.", "colors": {"d'hôtel": "gold", "menaces": "red", "de": "red", "mort": "red"}}]},
+  {"id": "end", "beats": [
+   {"at": ["end", 0], "tag": "[quietly]", "fr": "Neuf ans plus tard, il dira :", "colors": {"Neuf": "gold"}},
+   {"at": ["end", 5], "fr": "ce n'était pas mon meilleur jour.", "colors": {"pas": "red", "meilleur": "red", "jour.": "red"}}]}
+ ]
+}

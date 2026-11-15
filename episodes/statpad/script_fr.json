@@ -1,0 +1,45 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). The figures are the English film's (as of 10 November 2026, SOURCES.md), the ones drawn in the picture; nothing added. 'Stat-pad' is 'gonfler ses stats'. `fr` is what the voice says, `text` the caption (French decimals and spaces), `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[confident]", "fr": "Les fans de Messi disent que Ronaldo gonfle ses stats.", "colors": {"Ronaldo": "gold", "gonfle": "red", "stats.": "red"}},
+   {"at": ["hook", 5], "fr": "Les fans de Ronaldo disent que c'est Messi.", "colors": {"Messi.": "red"}},
+   {"at": ["hook", 10], "fr": "Alors passons en revue leurs mille neuf cent vingt-deux buts...", "text": "Alors passons en revue leurs 1 922 buts", "colors": {"1 922": "gold"}},
+   {"at": ["hook", 19], "fr": "pour savoir lesquels font vraiment gagner des matchs.", "colors": {"gagner": "lime", "matchs.": "lime"}}]},
+  {"id": "winners", "beats": [
+   {"at": ["winners", 0], "fr": "Les buts décisifs :", "colors": {"décisifs": "lime"}},
+   {"at": ["winners", 5], "fr": "Messi, cent quatre-vingt-seize.", "text": "Messi, 196.", "colors": {"196.": "gold"}},
+   {"at": ["winners", 7], "fr": "Ronaldo, deux cent quarante.", "text": "Ronaldo, 240.", "colors": {"240.": "gold"}},
+   {"at": ["winners", 9], "fr": "Soit vingt et un pour cent des buts de Messi...", "text": "Soit 21 % des buts de Messi,", "colors": {"21 %": "gold"}},
+   {"at": ["winners", 14], "fr": "et vingt-quatre pour cent de ceux de Ronaldo.", "text": "et 24 % de ceux de Ronaldo.", "colors": {"24 %": "gold"}}]},
+  {"id": "delete", "beats": [
+   {"at": ["delete", 0], "tag": "[mischievously]", "fr": "Maintenant... effaçons tous leurs buts.", "text": "Maintenant, effaçons tous leurs buts.", "colors": {"effaçons": "red"}},
+   {"at": ["delete", 7], "fr": "Le retourné de Ronaldo à Turin ?"},
+   {"at": ["delete", 12], "fr": "Effacé.", "colors": {"Effacé.": "red"}},
+   {"at": ["delete", 13], "fr": "Le slalom de Messi contre Getafe ?"},
+   {"at": ["delete", 17], "fr": "N'a jamais existé.", "colors": {"jamais": "red", "existé.": "red"}},
+   {"at": ["delete", 19], "tag": "[serious]", "fr": "Sans les buts de Messi, ses équipes perdent trois cent soixante-quatre points.", "text": "Sans les buts de Messi, ses équipes perdent 364 points.", "colors": {"364": "gold"}},
+   {"at": ["delete", 27], "fr": "Sans ceux de Ronaldo... quatre cent dix-huit.", "text": "Sans ceux de Ronaldo, 418.", "colors": {"418.": "gold"}},
+   {"at": ["delete", 30], "fr": "Soit zéro virgule trente-neuf point par but de Messi...", "text": "Soit 0,39 point par but de Messi,", "colors": {"0,39": "gold"}},
+   {"at": ["delete", 36], "fr": "et zéro virgule quarante-deux par but de Ronaldo.", "text": "et 0,42 par but de Ronaldo.", "colors": {"0,42": "gold"}}]},
+  {"id": "verdict", "beats": [
+   {"at": ["verdict", 0], "fr": "Alors... qui gonfle le plus ses stats ?", "text": "Alors, qui gonfle le plus ses stats ?"},
+   {"at": ["verdict", 4], "fr": "Les chiffres disent : Messi.", "colors": {"Messi.": "gold"}},
+   {"at": ["verdict", 8], "fr": "Plus de ses buts sont arrivés quand le Barça déroulait déjà...", "text": "Plus de ses buts sont arrivés quand le Barça déroulait déjà,", "colors": {"déroulait": "lime"}},
+   {"at": ["verdict", 18], "tag": "[amused]", "fr": "soit, honnêtement, presque tous les week-ends.", "colors": {"week-ends.": "lime"}},
+   {"at": ["verdict", 25], "tag": "[firmly]", "fr": "Les buts de Ronaldo décident plus de matchs.", "colors": {"décident": "gold"}},
+   {"at": ["verdict", 30], "fr": "Affaire classée.", "colors": {"Affaire": "red", "classée.": "red"}}]}
+ ]
+}

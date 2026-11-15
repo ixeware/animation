@@ -1,0 +1,57 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). Same facts as the English narration and SOURCES.md; nothing added; the opening still says 'a war' and 'a civil war' comes in the middle, as the user asked. The plea ('please, lay down your weapons') and the headline ('Five goals to erase five years of war') are translated from the English quotes of SOURCES.md. `fr` is what the voice says, `text` the caption, `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[serious]", "fr": "Ce joueur a un jour arrêté une guerre.", "colors": {"guerre.": "red"}},
+   {"at": ["hook", 6], "fr": "Pas avec une armée."},
+   {"at": ["hook", 10], "fr": "Avec un micro...", "text": "Avec un micro,", "colors": {"micro,": "gold"}},
+   {"at": ["hook", 13], "fr": "à genoux...", "text": "à genoux,", "colors": {"genoux,": "gold"}},
+   {"at": ["hook", 16], "fr": "dans un vestiaire."},
+   {"at": ["hook", 20], "fr": "Son nom ?"},
+   {"at": ["hook", 22], "tag": "[dramatic]", "fr": "Didier Drogba.", "colors": {"Didier": "gold", "Drogba.": "gold"}}]},
+  {"id": "ctx", "beats": [
+   {"at": ["ctx", 0], "fr": "Octobre deux mille cinq.", "text": "Octobre 2005.", "colors": {"2005.": "gold"}},
+   {"at": ["ctx", 2], "fr": "La Côte d'Ivoire gagne au Soudan...", "text": "La Côte d'Ivoire gagne au Soudan,"},
+   {"at": ["ctx", 7], "fr": "le Cameroun, son rival, rate un penalty à la dernière minute...", "text": "le Cameroun, son rival, rate un penalty à la dernière minute,", "colors": {"rate": "red"}},
+   {"at": ["ctx", 14], "tag": "[excited]", "fr": "et la Côte d'Ivoire va à sa première Coupe du monde !", "colors": {"première": "gold", "Coupe": "lime", "du": "lime", "monde": "lime"}}]},
+  {"id": "mic", "beats": [
+   {"at": ["mic", 0], "fr": "Le vestiaire devrait être en fête.", "colors": {"fête.": "gold"}},
+   {"at": ["mic", 7], "tag": "[quietly]", "fr": "Mais devant une caméra de la télévision nationale, Drogba prend le micro.", "colors": {"caméra": "gold", "micro.": "gold"}}]},
+  {"id": "war", "beats": [
+   {"at": ["war", 0], "tag": "[serious]", "fr": "Car chez lui, son pays est coupé en deux depuis trois ans :", "colors": {"deux": "red", "trois": "gold"}},
+   {"at": ["war", 13], "fr": "les rebelles au nord, l'armée au sud.", "colors": {"nord,": "gold", "sud.": "gold"}},
+   {"at": ["war", 22], "fr": "Une guerre civile.", "colors": {"guerre": "red", "civile.": "red"}}]},
+  {"id": "plea", "beats": [
+   {"at": ["plea", 0], "tag": "[solemn]", "fr": "Alors toute l'équipe s'agenouille.", "colors": {"s'agenouille.": "gold"}},
+   {"at": ["plea", 5], "fr": "Et il supplie les deux camps :"},
+   {"at": ["plea", 10], "fr": "s'il vous plaît, déposez les armes.", "colors": {"déposez": "lime", "les": "lime", "armes.": "lime"}}]},
+  {"id": "after", "beats": [
+   {"at": ["after", 0], "fr": "Les images tournent à la télé pendant des semaines.", "colors": {"semaines.": "gold"}},
+   {"at": ["after", 7], "fr": "Les deux camps reviennent à la table."},
+   {"at": ["after", 13], "fr": "En mars deux mille sept...", "text": "En mars 2007,", "colors": {"2007,": "gold"}},
+   {"at": ["after", 16], "fr": "ils signent un accord de paix.", "colors": {"accord": "lime", "de": "lime", "paix.": "lime"}}]},
+  {"id": "bouake", "beats": [
+   {"at": ["bouake", 0], "fr": "Puis Drogba demande une dernière chose :"},
+   {"at": ["bouake", 7], "fr": "jouer le prochain match à domicile à Bouaké...", "text": "jouer le prochain match à domicile à Bouaké,", "colors": {"Bouaké,": "gold"}},
+   {"at": ["bouake", 14], "fr": "la capitale des rebelles.", "colors": {"rebelles.": "red"}},
+   {"at": ["bouake", 17], "tag": "[building]", "fr": "Des soldats des deux camps regardent le même match, dans le même stade.", "colors": {"deux": "gold", "même": "gold"}},
+   {"at": ["bouake", 29], "fr": "La Côte d'Ivoire gagne cinq à zéro.", "text": "La Côte d'Ivoire gagne 5–0.", "colors": {"5–0.": "lime"}},
+   {"at": ["bouake", 33], "tag": "[awed]", "fr": "Drogba marque le cinquième.", "colors": {"cinquième.": "lime"}}]},
+  {"id": "end", "beats": [
+   {"at": ["end", 0], "tag": "[quietly]", "fr": "Le lendemain, un journal titre :"},
+   {"at": ["end", 5], "fr": "cinq buts...", "text": "cinq buts,", "colors": {"cinq": "gold", "buts,": "gold"}},
+   {"at": ["end", 7], "fr": "pour effacer cinq ans de guerre.", "colors": {"effacer": "lime", "guerre.": "red"}}]}
+ ]
+}

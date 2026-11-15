@@ -1,0 +1,53 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). Same facts as the English narration and SOURCES.md; nothing added. Guardiola's line ('I can't explain it') is translated. `fr` is what the voice says, `text` the caption, `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[excited]", "fr": "Cinq buts... en neuf minutes.", "text": "Cinq buts, en neuf minutes.", "colors": {"Cinq": "gold", "neuf": "gold"}},
+   {"at": ["hook", 5], "fr": "Même son propre coach n'y croyait pas.", "colors": {"coach": "red"}}]},
+  {"id": "ctx", "beats": [
+   {"at": ["ctx", 0], "fr": "Septembre deux mille quinze.", "text": "Septembre 2015.", "colors": {"2015.": "gold"}},
+   {"at": ["ctx", 2], "fr": "Le Bayern Munich perd à domicile contre Wolfsburg.", "colors": {"perd": "red"}},
+   {"at": ["ctx", 10], "fr": "Un à zéro à la mi-temps.", "text": "1–0 à la mi-temps.", "colors": {"1–0": "red"}}]},
+  {"id": "sub", "beats": [
+   {"at": ["sub", 0], "fr": "Alors Pep Guardiola fait entrer un remplaçant :", "colors": {"remplaçant": "gold"}},
+   {"at": ["sub", 7], "fr": "Robert Lewandowski.", "colors": {"Robert": "lime", "Lewandowski.": "lime"}}]},
+  {"id": "g1", "beats": [
+   {"at": ["g1", 0], "tag": "[intense]", "fr": "Cinquante et unième minute. Ballon qui traîne dans la surface.", "text": "51e minute. Ballon qui traîne dans la surface.", "colors": {"51e": "gold"}},
+   {"at": ["g1", 8], "fr": "Il le pousse au fond.", "colors": {"pousse": "lime"}}]},
+  {"id": "g2", "beats": [
+   {"at": ["g2", 0], "fr": "Une minute plus tard, de l'extérieur de la surface.", "colors": {"Une": "gold", "minute": "gold"}},
+   {"at": ["g2", 7], "fr": "Deux-un !", "text": "2–1 !", "colors": {"2–1": "lime"}}]},
+  {"id": "g3", "beats": [
+   {"at": ["g3", 0], "fr": "Le troisième en trois tentatives :"},
+   {"at": ["g3", 5], "fr": "le poteau... le gardien... le filet !", "text": "le poteau, le gardien, le filet !", "colors": {"poteau,": "red", "gardien,": "red", "filet": "lime"}},
+   {"at": ["g3", 11], "fr": "Un triplé en trois minutes et vingt-deux secondes.", "text": "Un triplé en 3 minutes et 22 secondes.", "colors": {"triplé": "gold", "3": "gold", "22": "gold"}}]},
+  {"id": "g4", "beats": [
+   {"at": ["g4", 0], "fr": "Puis un centre, une reprise de volée... quatre-un.", "text": "Puis un centre, une reprise de volée, 4–1.", "colors": {"volée,": "lime", "4–1.": "lime"}},
+   {"at": ["g4", 6], "tag": "[amused]", "fr": "Et Guardiola donne encore des consignes.", "colors": {"consignes.": "gold"}}]},
+  {"id": "g5", "beats": [
+   {"at": ["g5", 0], "tag": "[building]", "fr": "Soixantième minute. Encore un centre.", "text": "60e minute. Encore un centre.", "colors": {"60e": "gold"}},
+   {"at": ["g5", 4], "fr": "Il le reprend... en plein vol !", "text": "Il le reprend, en plein vol !", "colors": {"vol": "lime"}},
+   {"at": ["g5", 9], "tag": "[awed]", "fr": "Cinq buts en huit minutes et cinquante-neuf secondes.", "text": "Cinq buts en 8 minutes et 59 secondes.", "colors": {"Cinq": "gold", "8": "gold", "59": "gold"}}]},
+  {"id": "pep", "beats": [
+   {"at": ["pep", 0], "fr": "Au bord du terrain, Guardiola se prend la tête à deux mains.", "colors": {"tête": "gold"}},
+   {"at": ["pep", 10], "fr": "Plus tard, il dira :"},
+   {"at": ["pep", 13], "tag": "[quietly]", "fr": "je ne peux pas l'expliquer.", "colors": {"peux": "red", "pas": "red", "l'expliquer.": "red"}}]},
+  {"id": "rec", "beats": [
+   {"at": ["rec", 0], "fr": "Cette soirée établit quatre records Guinness de Bundesliga :", "colors": {"quatre": "gold", "records": "gold"}},
+   {"at": ["rec", 10], "fr": "le triplé le plus rapide, les quatre buts les plus rapides, les cinq les plus rapides... et le plus de buts pour un remplaçant.", "text": "le triplé le plus rapide, les quatre buts les plus rapides, les cinq les plus rapides, et le plus de buts pour un remplaçant.", "colors": {"triplé": "lime", "remplaçant.": "lime"}}]},
+  {"id": "end", "beats": [
+   {"at": ["end", 0], "tag": "[softly]", "fr": "Et il avait commencé le match... sur le banc.", "text": "Et il avait commencé le match sur le banc.", "colors": {"banc.": "gold"}}]}
+ ]
+}

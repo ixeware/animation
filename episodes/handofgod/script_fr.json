@@ -1,0 +1,70 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). Same facts as the English narration and SOURCES.md; nothing added. 'Seven inches shorter' is said in centimetres (18 cm, as in SOURCES.md); Maradona's line and Víctor Hugo Morales' call are translated. `fr` is what the voice says, `text` the caption, `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[dramatic]", "fr": "Il a marqué de la main.", "colors": {"main.": "red"}},
+   {"at": ["hook", 5], "tag": "[excited]", "fr": "Quatre minutes plus tard...", "text": "Quatre minutes plus tard,"},
+   {"at": ["hook", 8], "fr": "il a marqué le but du siècle.", "colors": {"siècle.": "gold"}}]},
+  {"id": "place", "beats": [
+   {"at": ["place", 0], "fr": "Mexico, mille neuf cent quatre-vingt-six.", "text": "Mexico, 1986.", "colors": {"1986.": "gold"}},
+   {"at": ["place", 3], "fr": "Quart de finale du Mondial...", "text": "Quart de finale du Mondial,"},
+   {"at": ["place", 6], "fr": "l'Argentine contre l'Angleterre...", "text": "l'Argentine contre l'Angleterre,", "colors": {"l'Argentine": "blue", "l'Angleterre,": "red"}},
+   {"at": ["place", 9], "fr": "quatre ans après la guerre des Malouines.", "colors": {"guerre": "red"}}]},
+  {"id": "loop", "beats": [
+   {"at": ["loop", 0], "fr": "Cinquante et unième minute :", "text": "51e minute :", "colors": {"51e": "gold"}},
+   {"at": ["loop", 2], "fr": "un milieu anglais renvoie le ballon en cloche vers son gardien.", "colors": {"renvoie": "red", "gardien.": "lime"}}]},
+  {"id": "punch", "beats": [
+   {"at": ["punch", 0], "tag": "[intense]", "fr": "Maradona...", "text": "Maradona,", "colors": {"Maradona,": "blue"}},
+   {"at": ["punch", 1], "fr": "dix-huit centimètres de moins...", "text": "18 centimètres de moins,", "colors": {"18": "gold", "centimètres": "gold"}},
+   {"at": ["punch", 4], "fr": "saute...", "text": "saute,"},
+   {"at": ["punch", 5], "fr": "et marque du poing.", "colors": {"poing.": "red"}}]},
+  {"id": "ref", "beats": [
+   {"at": ["ref", 0], "fr": "L'arbitre ne voit rien."},
+   {"at": ["ref", 5], "tag": "[surprised]", "fr": "But.", "colors": {"But.": "lime"}}]},
+  {"id": "quote", "beats": [
+   {"at": ["quote", 0], "fr": "Plus tard, il dira :"},
+   {"at": ["quote", 3], "tag": "[smirking]", "fr": "un peu avec la tête de Maradona...", "text": "un peu avec la tête de Maradona,", "colors": {"tête": "blue"}},
+   {"at": ["quote", 10], "fr": "et un peu avec la main de Dieu.", "colors": {"main": "gold", "Dieu.": "gold"}}]},
+  {"id": "later", "beats": [
+   {"at": ["later", 0], "tag": "[serious]", "fr": "Quatre minutes plus tard...", "text": "Quatre minutes plus tard,"},
+   {"at": ["later", 3], "fr": "depuis son propre camp :", "colors": {"propre": "gold", "camp": "gold"}}]},
+  {"id": "run", "beats": [
+   {"at": ["run", 0], "tag": "[building excitement]", "fr": "Beardsley.", "colors": {"Beardsley.": "red"}},
+   {"at": ["run", 1], "fr": "Reid.", "colors": {"Reid.": "red"}},
+   {"at": ["run", 2], "fr": "Butcher.", "colors": {"Butcher.": "red"}},
+   {"at": ["run", 3], "fr": "Fenwick.", "colors": {"Fenwick.": "red"}},
+   {"at": ["run", 4], "fr": "Shilton...", "text": "Shilton.", "colors": {"Shilton.": "red"}},
+   {"at": ["run", 5], "tag": "[shouting]", "fr": "But !", "colors": {"But": "lime"}}]},
+  {"id": "radio", "beats": [
+   {"at": ["radio", 0], "fr": "Le commentateur hurle :"},
+   {"at": ["radio", 3], "tag": "[shouting]", "fr": "cerf-volant cosmique ! De quelle planète es-tu venu ?", "colors": {"cerf-volant": "gold", "cosmique": "gold", "planète": "blue"}}]},
+  {"id": "champ", "beats": [
+   {"at": ["champ", 0], "fr": "Une semaine plus tard...", "text": "Une semaine plus tard,", "colors": {"semaine": "gold"}},
+   {"at": ["champ", 3], "fr": "l'Argentine était championne du monde.", "colors": {"l'Argentine": "blue", "championne": "gold", "monde.": "gold"}}]},
+  {"id": "twist", "beats": [
+   {"at": ["twist", 0], "tag": "[conspiratorial]", "fr": "Et Steve Hodge...", "text": "Et Steve Hodge,", "colors": {"Steve": "red", "Hodge,": "red"}},
+   {"at": ["twist", 3], "fr": "celui qui avait renvoyé ce ballon...", "text": "celui qui avait renvoyé ce ballon,"},
+   {"at": ["twist", 8], "fr": "a échangé son maillot avec Maradona après le match.", "colors": {"échangé": "gold", "maillot": "gold"}}]},
+  {"id": "shop", "beats": [
+   {"at": ["shop", 0], "fr": "L'Argentine avait acheté ces maillots dans une boutique de Mexico...", "text": "L'Argentine avait acheté ces maillots dans une boutique de Mexico,", "colors": {"boutique": "gold"}},
+   {"at": ["shop", 10], "fr": "quelques jours plus tôt.", "colors": {"jours": "red"}}]},
+  {"id": "price", "beats": [
+   {"at": ["price", 0], "fr": "En deux mille vingt-deux...", "text": "En 2022,", "colors": {"2022,": "gold"}},
+   {"at": ["price", 2], "fr": "ce maillot s'est vendu...", "text": "ce maillot s'est vendu"},
+   {"at": ["price", 6], "tag": "[excited]", "fr": "neuf virgule trois millions de dollars.", "text": "9,3 millions de dollars.", "colors": {"9,3": "gold", "millions": "gold", "dollars.": "gold"}}]},
+  {"id": "cta", "beats": [
+   {"at": ["cta", 0], "tag": "[curious]", "fr": "Alors... combien de défenseurs pourrais-tu dribbler ?", "text": "Alors, combien de défenseurs pourrais-tu dribbler ?", "colors": {"défenseurs": "red", "dribbler": "lime"}}]}
+ ]
+}

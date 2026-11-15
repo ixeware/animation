@@ -4,6 +4,7 @@
 //   node render.mjs fischer --cues                       -> build/cues.json only (sound edits: then audio/mix.py)
 //   node render.mjs fischer --qa [--step 0.1]       -> build/qa.json: text over faces / captions, text off frame, faces cut
 //   any of these with --motion 1|2: the text motion profile (LOOK.motion) for an A/B; --out name.mp4: the video's file name
+//   --caps fr: captions from build/fr/captions.json (a dubbed version, audio/dub.py); the shots keep the English timing
 //   --scale 2 (stills and the video): render at twice the size, 2160x3840 ("4K"); see engine/js/hidpi.js. QA and the
 //   review sheets always run at 1080x1920: the picture is the same
 import { chromium } from 'playwright';
@@ -35,6 +36,7 @@ const PORT = server.address().port;
 const SS = args.includes('--qa') || args.includes('--review') ? 1 : Math.max(1, Math.min(4, Math.round(+(opt('scale') || 1)) || 1));
 async function openPage(browser, extra = '') {
   if (SS > 1) extra += '&ss=' + SS;
+  if (opt('caps')) extra += '&caps=' + opt('caps');  // --caps fr: the captions of a dubbed version (build/fr/captions.json)
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: SS });
   page.on('console', m => { if (m.type() === 'error') console.error('[page]', m.text()); });
   page.on('pageerror', e => console.error('[pageerror]', e.message));

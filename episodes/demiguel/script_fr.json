@@ -1,0 +1,54 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). Same facts as the English narration and SOURCES.md; nothing added; the tone stays grave, as in English. Owono's line ('these are the hardest days of my life') is translated. `fr` is what the voice says, `text` the caption, `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[somber]", "fr": "Un genou dans la poitrine.", "colors": {"poitrine.": "red"}},
+   {"at": ["hook", 5], "fr": "Quatre-vingt-dix-septième minute.", "text": "97e minute."},
+   {"at": ["hook", 7], "fr": "Jesús de Miguel...", "text": "Jesús de Miguel", "colors": {"Jesús": "gold", "de": "gold", "Miguel": "gold"}},
+   {"at": ["hook", 10], "tag": "[softly]", "fr": "ne s'est jamais relevé."}]},
+  {"id": "who", "beats": [
+   {"at": ["who", 0], "fr": "Il avait trente ans.", "text": "Il avait 30 ans.", "colors": {"30": "gold"}},
+   {"at": ["who", 3], "fr": "Un attaquant madrilène...", "text": "Un attaquant madrilène,"},
+   {"at": ["who", 7], "fr": "passé par les divisions inférieures, devenu pro seulement à vingt-sept ans.", "text": "passé par les divisions inférieures, devenu pro seulement à 27 ans.", "colors": {"27": "gold"}}]},
+  {"id": "goals", "beats": [
+   {"at": ["goals", 0], "fr": "La saison dernière, ses onze buts ont aidé Tenerife à remonter en deuxième division.", "colors": {"onze": "gold", "Tenerife": "blue"}}]},
+  {"id": "match", "beats": [
+   {"at": ["match", 0], "fr": "Lundi deux novembre.", "text": "Lundi 2 novembre."},
+   {"at": ["match", 3], "fr": "Tenerife contre Andorre.", "colors": {"Tenerife": "blue"}},
+   {"at": ["match", 6], "fr": "Deux partout, au bout du temps additionnel.", "text": "2–2, au bout du temps additionnel.", "colors": {"2–2,": "gold"}}]},
+  {"id": "clash", "beats": [
+   {"at": ["clash", 0], "fr": "Un dégagement rebondit vers le milieu."},
+   {"at": ["clash", 5], "fr": "Il le poursuit."},
+   {"at": ["clash", 8], "fr": "Le gardien d'Andorre, Jesús Owono, sort lui aussi.", "colors": {"Owono,": "gold"}}]},
+  {"id": "impact", "beats": [
+   {"at": ["impact", 0], "tag": "[quietly]", "fr": "Le genou du gardien le touche à la poitrine.", "colors": {"poitrine.": "red"}},
+   {"at": ["impact", 8], "fr": "Son cœur s'arrête.", "colors": {"cœur": "red", "s'arrête.": "red"}}]},
+  {"id": "help", "beats": [
+   {"at": ["help", 0], "fr": "Les joueurs hurlent pour les secours."},
+   {"at": ["help", 5], "fr": "On l'évacue... et son pouls revient dans l'ambulance.", "text": "On l'évacue, et son pouls revient dans l'ambulance.", "colors": {"pouls": "gold"}}]},
+  {"id": "death", "beats": [
+   {"at": ["death", 0], "tag": "[sad]", "fr": "Il meurt à l'hôpital le lendemain matin, à huit heures.", "text": "Il meurt à l'hôpital le lendemain matin, à 8 heures.", "colors": {"8": "gold"}},
+   {"at": ["death", 9], "fr": "Une autopsie préliminaire désigne le choc à la poitrine.", "colors": {"poitrine.": "red"}}]},
+  {"id": "owono", "beats": [
+   {"at": ["owono", 0], "fr": "Owono avait couru vers lui avec les autres.", "colors": {"Owono": "gold"}},
+   {"at": ["owono", 8], "fr": "Le lendemain, il écrit :"},
+   {"at": ["owono", 13], "tag": "[softly]", "fr": "ce sont les jours les plus durs de ma vie.", "colors": {"durs": "gold"}}]},
+  {"id": "tribute", "beats": [
+   {"at": ["tribute", 0], "fr": "Ce week-end-là, partout en Espagne, les matchs s'arrêtent à la neuvième minute.", "text": "Ce week-end-là, partout en Espagne, les matchs s'arrêtent à la 9e minute.", "colors": {"9e": "gold"}},
+   {"at": ["tribute", 10], "fr": "Son numéro.", "colors": {"numéro.": "gold"}}]},
+  {"id": "end", "beats": [
+   {"at": ["end", 0], "tag": "[softly]", "fr": "Repose en paix, Jesús.", "colors": {"Jesús.": "gold"}}]}
+ ]
+}

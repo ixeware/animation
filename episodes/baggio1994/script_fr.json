@@ -1,0 +1,55 @@
+{
+ "lang": "fr",
+ "_note": "French version of the delivered film (rule 75, 15 Nov 2026). Each beat starts on the English word it replaces ([phrase id, word index] in build/timings.json). Same facts as the English narration and SOURCES.md; nothing added. 'A hundred degrees' (Fahrenheit) is said as 38 degrees, the Celsius figure of SOURCES.md and of the picture ('38 °C IN THE SUN'). His line comes from his autobiography (Italian): the French is a faithful translation. `fr` is what the voice says, `text` the caption, `colors` as in script.json.",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "jGpnMdbhtKgQbVrYezOx",
+  "_name": "Kev - Young, Dynamic and Bright (rule 75)",
+  "model": "eleven_v4",
+  "stability": 0.3,
+  "similarity": 0.75,
+  "language_code": "fr"
+ },
+ "voice_fx": {"tempo": 1.0, "max_tempo": 1.2, "max_gap": 0.3},
+ "mix": {"sfx_duck": 0.3},
+ "phrases": [
+  {"id": "hook", "beats": [
+   {"at": ["hook", 0], "tag": "[serious]", "fr": "Le meilleur joueur du monde.", "colors": {"monde.": "gold"}},
+   {"at": ["hook", 6], "fr": "Un penalty...", "text": "Un penalty,", "colors": {"penalty,": "gold"}},
+   {"at": ["hook", 8], "fr": "pour garder une finale de Coupe du monde en vie."},
+   {"at": ["hook", 15], "fr": "Il l'envoie au-dessus de la barre.", "colors": {"au-dessus": "red", "barre.": "red"}},
+   {"at": ["hook", 21], "fr": "Son nom ?"},
+   {"at": ["hook", 23], "tag": "[dramatic]", "fr": "Roberto Baggio.", "colors": {"Roberto": "gold", "Baggio.": "gold"}}]},
+  {"id": "ctx", "beats": [
+   {"at": ["ctx", 0], "fr": "Dix-sept juillet quatre-vingt-quatorze.", "text": "17 juillet 1994.", "colors": {"1994.": "gold"}},
+   {"at": ["ctx", 3], "fr": "Pasadena...", "text": "Pasadena,"},
+   {"at": ["ctx", 4], "fr": "trente-huit degrés.", "text": "38 degrés.", "colors": {"38": "red", "degrés.": "red"}},
+   {"at": ["ctx", 7], "fr": "Brésil contre Italie...", "text": "Brésil contre Italie,", "colors": {"Brésil": "gold", "Italie,": "gold"}},
+   {"at": ["ctx", 10], "tag": "[quietly]", "fr": "et Baggio joue blessé aux ischio-jambiers.", "colors": {"blessé": "red", "ischio-jambiers.": "red"}}]},
+  {"id": "match", "beats": [
+   {"at": ["match", 0], "fr": "Deux heures...", "text": "Deux heures,"},
+   {"at": ["match", 2], "fr": "zéro but.", "colors": {"zéro": "red", "but.": "red"}},
+   {"at": ["match", 4], "tag": "[building]", "fr": "Pour la première fois, une finale de Coupe du monde se joue aux tirs au but.", "colors": {"première": "gold", "tirs": "red", "au": "red", "but.": "red"}}]},
+  {"id": "shoot", "beats": [
+   {"at": ["shoot", 0], "tag": "[tense]", "fr": "Baresi : au-dessus.", "colors": {"au-dessus.": "red"}},
+   {"at": ["shoot", 4], "fr": "Márcio Santos : arrêté.", "colors": {"arrêté.": "red"}},
+   {"at": ["shoot", 7], "fr": "Puis quatre buts d'affilée.", "colors": {"quatre": "lime"}},
+   {"at": ["shoot", 13], "fr": "Taffarel arrête Massaro.", "colors": {"Massaro.": "red"}},
+   {"at": ["shoot", 17], "fr": "Dunga marque."},
+   {"at": ["shoot", 19], "fr": "Trois-deux, Brésil.", "text": "3–2, Brésil.", "colors": {"3–2,": "gold"}}]},
+  {"id": "last", "beats": [
+   {"at": ["last", 0], "fr": "Dernier tir italien :"},
+   {"at": ["last", 3], "fr": "Baggio.", "colors": {"Baggio.": "gold"}},
+   {"at": ["last", 4], "fr": "Il sait que Taffarel plonge toujours... alors il vise le milieu.", "text": "Il sait que Taffarel plonge toujours, alors il vise le milieu.", "colors": {"milieu.": "gold"}},
+   {"at": ["last", 15], "fr": "Taffarel plonge."},
+   {"at": ["last", 17], "tag": "[quietly]", "fr": "Le ballon s'envole au-dessus de la barre.", "colors": {"au-dessus": "red", "barre.": "red"}}]},
+  {"id": "end", "beats": [
+   {"at": ["end", 0], "tag": "[warmly]", "fr": "Le Brésil est champion du monde pour la quatrième fois.", "colors": {"quatrième": "gold"}},
+   {"at": ["end", 8], "tag": "[quietly]", "fr": "Et Baggio reste au point de penalty...", "text": "Et Baggio reste au point de penalty,"},
+   {"at": ["end", 14], "fr": "seul...", "text": "seul,", "colors": {"seul,": "gold"}},
+   {"at": ["end", 15], "fr": "tête basse."},
+   {"at": ["end", 17], "fr": "Des années plus tard, il dira :"},
+   {"at": ["end", 21], "fr": "si je pouvais effacer un moment de ma carrière...", "text": "si je pouvais effacer un moment de ma carrière,", "colors": {"effacer": "red"}},
+   {"at": ["end", 30], "fr": "ce serait celui-là.", "colors": {"celui-là.": "gold"}}]}
+ ]
+}
