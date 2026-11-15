@@ -60,16 +60,38 @@
    }
   },
   {
+   "id": "rumor",
+   "text": "The internet even blamed a vibrating device.",
+   "say": "The internet even blamed a vibrating device.",
+   "pause": 0.2,
+   "colors": {
+    "internet": "blue",
+    "vibrating": "red",
+    "device.": "red"
+   }
+  },
+  {
+   "id": "naked",
+   "text": "Hans offered to play n*ked.",
+   "say": "Hans offered to play naked.",
+   "pause": 0.25,
+   "colors": {
+    "Hans": "blue",
+    "n*ked.": "gold"
+   }
+  },
+  {
    "id": "clue",
-   "text": "One clue: he played better when he clicked away from the board.",
-   "say": "One clue: he played better when he clicked away from the board.",
+   "text": "But Chess.com's clue was simpler: he played better when he clicked away from the board.",
+   "say": "But Chess dot com's clue was simpler: he played better when he clicked away from the board.",
    "pause": 0.15,
    "colors": {
+    "Chess.com's": "blue",
+    "simpler:": "gold",
     "better": "lime",
     "clicked": "red",
     "away": "red"
-   },
-   "take": 2
+   }
   },
   {
    "id": "bait",
@@ -151,28 +173,26 @@
   },
   {
    "id": "closed",
-   "text": "Almost 282,000 accounts closed. 97% by the algorithm alone.",
-   "say": "Almost two hundred eighty-two thousand accounts... closed. Ninety-seven percent by the algorithm alone.",
+   "text": "Almost 282,000 accounts closed.",
+   "say": "Almost two hundred eighty-two thousand accounts... closed.",
    "pause": 0.6,
    "colors": {
     "282,000": "gold",
-    "closed.": "red",
-    "97%": "gold",
-    "algorithm": "blue",
-    "alone.": "blue"
-   },
-   "take": 4
+    "closed.": "red"
+   }
   },
   {
    "id": "twist",
-   "text": "And the points a cheater took from you? Chess.com gives them back.",
-   "say": "And the points a cheater took from you? Chess dot com gives them back.",
+   "text": "And the points you lost to cheating? Chess.com gives them back.",
+   "say": "And the points you lost to cheating? Chess dot com gives them back.",
    "pause": 0.15,
    "colors": {
     "points": "gold",
-    "cheater": "red",
+    "lost": "red",
+    "cheating?": "red",
     "back.": "lime"
-   }
+   },
+   "take": 1
   },
   {
    "id": "refund",
@@ -200,17 +220,6 @@
    "take": 4
   },
   {
-   "id": "stay",
-   "text": "So next time you're losing, stay on the board.",
-   "say": "So next time you're losing... stay on the board.",
-   "pause": 0.25,
-   "colors": {
-    "losing,": "red",
-    "stay": "lime",
-    "board.": "lime"
-   }
-  },
-  {
    "id": "cta",
    "text": "How many points has Chess.com given you back?",
    "say": "How many points has Chess dot com given you back?",
@@ -222,5 +231,5 @@
    }
   }
  ],
- "_voice_notes": "Takes chosen with tools/voice_check.py --takes (15.11.2026): each reading ends in silence and is heard word for word; hook 1, clue 2, trap1 3, three 2, never 4, closed 4 (whisper writes the numbers as digits: 0.88 is only the spelling)."
+ "_voice_notes": "Takes chosen with tools/voice_check.py --takes: each reading ends in silence and is heard word for word; hook 1, clue default, trap1 3, three 2, never 4, twist 1. 'closed' reads 0.86 only because whisper writes the number as digits. 'a cheater' sounded like 'a cheetah' in every take (non-rhotic): the line now says 'lost to cheating'."
 }

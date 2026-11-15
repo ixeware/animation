@@ -992,6 +992,56 @@ function magAtBoard(g, t, { pieces, e = 'focus', under = null, over = null } = {
   tableSet(g, t, { pieces, under, over, wPlayer: false, wChair: false, bPlayer: true, black: 'magnus', eb: e, tableCol: WOODT });
   lowKey(g, { cy: H * 0.46, a: 0.04 });
 }
+// Hans at the board, the same frame as Magnus's: for the rumour (the buzz around him) and the scan (his hands up)
+function hansAtBoard(g, t, { pieces, e = 'focus', up = 0, buzz = 0 } = {}) {
+  dayRoom(g, t, {});
+  const behind = up > 0 ? g2 => {
+    chair(g2, B, 4, 9.8, { face: -1, color: CHAIR });
+    const hp = B.project(4, 3.1, 9.3), hs = hp.s / 100 * 1.05, k = ease.out(clamp(up)), sleeve = CAST.hans.suit;
+    const P = (sd, a, b) => [hp.x + lerp(a[0], b[0], k) * sd * hs, hp.y + lerp(a[1], b[1], k) * hs];
+    for (const [col, lw] of [[mix(sleeve, '#8A9AAE', 0.45), 64 * hs + 7], [mix(sleeve, '#8A9AAE', 0.08), 64 * hs]]) for (const sd of [-1, 1]) {
+      const S0 = P(sd, [140, 250], [140, 250]), E0 = P(sd, [175, 250], [236, 70]), W0 = P(sd, [165, 225], [214, -140]);
+      g2.strokeStyle = col; g2.lineWidth = lw; g2.lineCap = 'round'; g2.lineJoin = 'round'; g2.beginPath(); g2.moveTo(...S0); g2.lineTo(...E0); g2.lineTo(...W0); g2.stroke();
+    }
+    seated(g2, B, 'hans', e, t, { z: 9.3, hands: false });
+    useSkin(g2, 'hans'); for (const sd of [-1, 1]) { const [hx, hy] = P(sd, [160, 235], [206, -186]); hand(g2, hx, hy, 34 * hs); }
+  } : null;
+  tableSet(g, t, { pieces, wPlayer: false, wChair: false, bPlayer: up <= 0, bChair: up <= 0, black: 'hans', eb: e, tableCol: WOODT, behind });
+  if (buzz > 0) {  // the "vibrating device": rings and zigzags round his middle, BZZZ
+    const hp = B.project(4, 3.1, 9.3), hs = hp.s / 100 * 1.05, cx = hp.x, cy = hp.y + 230 * hs;
+    g.save(); g.globalAlpha *= buzz; g.lineCap = 'round';
+    for (let k = 0; k < 3; k++) { const ph = (t * 3.2 + k / 3) % 1; g.strokeStyle = rgba(GOLD, 1 - ph); g.lineWidth = 9 * hs * 1.6;
+      for (const sd of [-1, 1]) { g.beginPath(); g.arc(cx, cy, (160 + ph * 260) * hs, sd > 0 ? -0.5 : Math.PI - 0.5, sd > 0 ? 0.5 : Math.PI + 0.5); g.stroke(); } }
+    g.font = sans(Math.min(84, 40 * hs), 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
+    for (const [dx, dy, r] of [[-1, -150, -0.25], [1, -60, 0.22]]) { g.save(); g.translate(clamp(cx + dx * Math.min(330, 175 * hs), 190, W - 190) + Math.sin(t * 60) * 4, cy + dy * hs); g.rotate(r); g.strokeStyle = '#16120E'; g.lineWidth = 12 * hs; g.strokeText('BZZZ', 0, 0); g.fillStyle = GOLD; g.fillText('BZZZ', 0, 0); g.restore(); }
+    g.restore();
+  }
+  lowKey(g, { cy: H * 0.46, a: 0.04 });
+}
+// a security wand sweeping down in front of him (u: 0..1 down the body and back up)
+function wand(g, t, u, a = 1) {
+  if (a <= 0) return;
+  const hp = B.project(4, 3.1, 9.3), hs = hp.s / 100 * 1.05, y = hp.y + lerp(-60, 520, (1 - Math.cos(u * Math.PI * 2)) / 2) * hs, x = hp.x + 250 * hs;
+  g.save(); g.globalAlpha *= a; g.translate(x, y); g.rotate(-0.12);
+  g.fillStyle = '#1C1E24'; g.beginPath(); g.roundRect(-30 * hs, -26 * hs, 260 * hs, 52 * hs, 20 * hs); g.fill();
+  g.fillStyle = '#3A3E48'; g.beginPath(); g.roundRect(-240 * hs, -46 * hs, 230 * hs, 92 * hs, 46 * hs); g.fill();
+  g.fillStyle = rgba('#7CFC9A', 0.9); g.beginPath(); g.arc(-125 * hs, 0, 20 * hs, 0, 7); g.fill();
+  const gr = g.createLinearGradient(-500 * hs, 0, 0, 0); gr.addColorStop(0, 'rgba(124,252,154,0)'); gr.addColorStop(1, 'rgba(124,252,154,0.35)'); g.fillStyle = gr; g.fillRect(-520 * hs, -8 * hs, 300 * hs, 16 * hs);
+  g.restore();
+}
+// mini boards bursting out of the report: a hundred games
+function cardsBurst(g, t, t0, x, y, { n = 30 } = {}) {
+  const r = rng(77);
+  for (let i = 0; i < n; i++) {
+    const d0 = r() * 0.25, u = (t - t0 - d0) / 0.9, ang = -Math.PI / 2 + (r() - 0.5) * 2.6, sp = 500 + r() * 700, rot = (r() - 0.5) * 6;
+    if (u <= 0 || u > 1) continue;
+    const e = ease.out(u), px = x + Math.cos(ang) * sp * e, py = y + Math.sin(ang) * sp * e + 900 * u * u * 0.4, sz = lerp(40, 120 + r() * 60, e);
+    g.save(); g.globalAlpha *= 1 - clamp((u - 0.75) / 0.25); g.translate(px, py); g.rotate(rot * u);
+    g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(-sz / 2 + 6, -sz / 2 + 8, sz, sz); g.drawImage(MINI, -sz / 2, -sz / 2, sz, sz);
+    g.fillStyle = RED; g.beginPath(); g.arc(-sz / 2 + DOT[0] * sz, -sz / 2 + DOT[1] * sz, sz * 0.07, 0, 7); g.fill();
+    g.restore();
+  }
+}
 // his camera goes off: the picture squeezes to a line and goes black (off: 0..1)
 function camOff(g, off) {
   if (off <= 0) return;
@@ -1032,19 +1082,19 @@ export async function build(T) {
   // the cuts, in order (a shot runs to the next one)
   const carlT = w('hook', 1), resT = w('hook', 2), aftA = w('hook', 3) - 0.06, moveT = w('hook', 5);
   const repA = s('report') - 0.06, slamT = w('report', 0) + 0.1, hisA = w('report', 3) - 0.06, oppT = w('report', 4), likA = w('report', 5) - 0.06, chT = w('report', 6), hunT = w('report', 10);
-  const clueA = s('clue') - 0.06, betT = w('clue', 4), clickT = w('clue', 7);
+  const rumA = s('rumor') - 0.06, vibT = w('rumor', 5), nakA = s('naked') - 0.06, nakT = w('naked', 4), scanT = s('naked') + 0.15;
+  const clueA = s('clue') - 0.06, betT = w('clue', 7), clickT = w('clue', 10);
   const baitA = s('bait') - 0.06, cantT = w('bait', 2), leaveT = w('bait', 5), canA = w('bait', 6) - 0.06, canT = w('bait', 6);
   const t1A = s('trap1') - 0.06, oneT = w('trap1', 2), threeT = w('trap1', 5);
   const twoA = s('two') - 0.06, twoT = w('two', 0), playT = w('two', 5), bestT = w('two', 11), notA = w('two', 13) - 0.06, magT = w('two', 15), engT = w('two', 19);
   const standA = s('stand') - 0.06, moreT = w('stand', 2), outT = w('stand', 6);
   const thrA = s('three') - 0.06, thrT = w('three', 0), engMT = w('three', 2), overA = w('three', 6) - 0.06, hundT = w('three', 8), patT = w('three', 12);
   const fourA = s('four') - 0.06, fourT = w('four', 0), oppsT = w('four', 1), milT = w('four', 7);
-  const closA = T.e('four') + 0.08, numT = w('closed', 1), clT = w('closed', 3), pctA = w('closed', 4) - 0.06, pctT = w('closed', 4), algT = w('closed', 7);
+  const closA = T.e('four') + 0.08, numT = w('closed', 1), clT = w('closed', 3);
   const BURST = s('closed') - 0.02;  // the door gives way on "Almost", after the pause with "FAIR PLAY! OPEN UP!"
-  const twA = s('twist') - 0.06, ptsT = w('twist', 2), cheT = w('twist', 4), givT = w('twist', 9), backT = w('twist', 11);
+  const twA = s('twist') - 0.06, ptsT = w('twist', 2), cheT = w('twist', 4), givT = w('twist', 8), backT = w('twist', 10);
   const refA = s('refund') - 0.06, milRT = w('refund', 1), monthT = w('refund', 5);
   const nevA = s('never') - 0.06, nev2A = w('never', 5) - 0.06, neverT = w('never', 6);
-  const stayA = s('stay') - 0.06, stayT = w('stay', 5);
   const ctaA = s('cta') - 0.06, manyT = w('cta', 1);
 
   // ======================= HOOK (rules 1, 28, 42, 57): the online game, both faces; Magnus plays one move and resigns =======================
@@ -1092,19 +1142,39 @@ export async function build(T) {
   }, { kb: 0, hud: (g, lt, t) => {
     if (t < hunT - 0.08) nameTitle(g, t - oppT + 0.1, 'HANS NIEMANN', 'HIS OPPONENT', { y: 250 });
     if (t >= chT) { const q = B.project(REP.x, -0.35 + REP.th, REP.z - 0.55); stamp(g, 'LIKELY CHEATED', q.x, q.y, t, chT, { color: RED, size: 58, rot: -0.12, sub: 'CHESS.COM REPORT' }); }
-    if (t >= hunT) counter(g, '100+', 'ONLINE GAMES', { y: 330, size: 170, color: GOLD, at: [hunT, 0.22] });
+    if (t >= hunT) { const q = B.project(REP.x, -0.3, REP.z); cardsBurst(g, t, hunT - 0.05, q.x, q.y); counter(g, '100+', 'ONLINE GAMES', { y: 330, size: 170, color: GOLD, at: [hunT, 0.22] }); }
   } });
   cue(repA - 0.04, 'whoosh_fast', 0.3); cue(slamT + 0.3, 'thud', 0.9); cue(slamT + 0.3, 'boom_move', 0.5); cue(slamT + 0.38, 'sparkle_pop', 0.3);
   cue(hisA + 0.05, 'page_flip', 0.5); cue(hisA + 0.45, 'page_flip', 0.45); cue(chT, 'stamp', 0.6); cue(hunT, 'hit', 0.4);
 
-  // ======================= "ONE CLUE": the tab he clicked away to =======================
+  // ======================= THE RUMOUR: "a vibrating device"; he offered to play naked; the scan found nothing =======================
+  const HANSB = [K(0.0, 0.1, 8.9, [4, 2.95, 8.7]), K(0.0, 0.09, 8.0, [4, 3.0, 8.8])];
+  shot(rumA, (g, lt, t, sh) => {
+    rig(B, lt, [[0, HANSB[0]], [len(sh), HANSB[1]]], { t, e: glide, shake: 1.4 });
+    hansAtBoard(g, t, { pieces: piecesAt(NC, 2), e: t >= vibT ? { ...EXPR.worried, sweat: 1, look: [0.6, 0] } : EX.calm, buzz: clamp((t - vibT + 0.1) / 0.2) });
+  }, { trans: 'whip', hud: (g, lt, t) => {
+    badge(g, 'THE INTERNET:', W / 2, 240, { color: '#16161E', size: 54, ...popW(t, rumA + 0.05) });
+    if (t >= vibT) stamp(g, 'RUMOR', W / 2, 1540, t, vibT, { color: GOLD, size: 88, rot: -0.1 });
+  } });
+  shot(nakA, (g, lt, t, sh) => {
+    rig(B, lt, [[0, HANSB[1]], [len(sh), K(0.02, 0.09, 7.4, [4, 3.05, 8.9])]], { t, e: glide });
+    hansAtBoard(g, t, { pieces: piecesAt(NC, 2), e: t >= nakT ? EX.smug : EX.calm, up: clamp((t - nakA) / 0.3) });
+    wand(g, t, clamp((t - scanT) / 1.0), clamp((t - scanT) / 0.15) * (1 - clamp((t - clueA + 0.15) / 0.15)));
+  }, { kb: 0, hud: (g, lt, t) => {
+    badge(g, 'SECURITY SCAN', W / 2, 240, { color: '#16161E', size: 54, ...popW(t, scanT) });
+    if (t >= scanT + 0.9) stamp(g, 'NOTHING FOUND', W / 2, 1540, t, scanT + 0.9, { color: '#3D9A4A', size: 70, rot: -0.1 });
+  } });
+  cue(rumA - 0.04, 'whoosh_fast', 0.3); cue(vibT, 'buzz', 0.6); cue(vibT + 0.1, 'stamp', 0.45); cue(nakA, 'fabric', 0.4); cue(nakT, 'laugh', 0.25);
+  cue(scanT, 'swipe_card', 0.3); cue(scanT + 0.45, 'shimmer', 0.25); cue(scanT + 0.9, 'stamp', 0.5);
+
+  // ======================= "CHESS.COM'S CLUE": the tab he clicked away to =======================
   const MONK = [K(0.0, 0.07, 11.4, [4, 3.3, 10.6]), K(0.0, 0.06, 9.6, [4, 3.3, 10.6])];
   shot(clueA, (g, lt, t, sh) => {
     rig(B, lt, [[0, MONK[0]], [len(sh), MONK[1]]], { t, e: glide });
     const cu = clamp((t - (clickT - 0.55)) / 0.5), cur = t > clickT - 0.6 ? [lerp(1260, 560, ease.inOut(cu)), lerp(760, 58, ease.inOut(cu))] : null;
     room(g, t, { pieces: piecesAt(NC, 2), screen: browser(t, { away: t >= clickT ? 1 : 0, chart: (t - betT) / 0.55, cursor: cur }) });
   }, { kb: 0, noJump: false, hud: (g, lt, t) => {
-    badge(g, 'ONE CLUE', W / 2, 240, { color: GOLD, size: 62, ...pop(t, clueA + 0.08) });
+    badge(g, "CHESS.COM'S CLUE", W / 2, 240, { color: GOLD, size: 58, ...pop(t, clueA + 0.08) });
   } });
   cue(clueA - 0.04, 'whoosh_soft', 0.3); cue(betT, 'riser', 0.25); cue(clickT, 'swipe_card', 0.5);
 
@@ -1141,6 +1211,7 @@ export async function build(T) {
     rig(B, lt, [[0, K(0.05, 0.55, 30, [0, 0, 15])], [len(sh), K(-0.06, 0.45, 25, [0, 0, 14])]], { t, e: glide });
     arena(g, t); crowd(g, t);
   }, { trans: 'whip', noJump: false, hud: (g, lt, t) => {
+    if (t >= playT + 0.2) [3, 11, 22, 30, 41].forEach((k, i) => { const p = CROWD[k]; if (t >= playT + 0.2 + i * 0.07) plate3(g, '1200', [p.x, 3.6, p.z], { color: '#FFFFFF', size: 26, ...pop(t, playT + 0.2 + i * 0.07) }); });
     if (t < twoT + 1.1) { badge(g, 'TRAP 2', W / 2, 240, { color: RED, size: 64, ...pop(t, twoT) }); trapRow(g, 2, t, twoT); }
     else badge(g, 'PLAYERS AT YOUR RATING', W / 2, 240, { color: '#16161E', size: 50, ...popW(t, twoT + 1.1) });
   } });
@@ -1212,26 +1283,16 @@ export async function build(T) {
   }, { kb: 0, hud: (g, lt, t) => {
     if (t < BURST) { const q = B.project(0, DOOR.h + 1.4, DOOR.z); bubble(g, 'FAIR PLAY! OPEN UP!', q.x, q.y, { size: 56, scale: lerp(1.25, 1, ease.back(clamp((t - closA) / 0.2))) }); }
     if (t >= numT) counter(g, fmt(tick(t, numT, 1.1, 281992)), 'ACCOUNTS CLOSED · OCTOBER', { y: 330, size: 150, color: '#FFFFFF' });
-  } });
-  shot(pctA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.18, 0.12, 15, [0, 4.6, 22])], [len(sh), K(0.1, 0.1, 13, [0, 4.8, 22])]], { t, e: glide });
-    arena(g, t); accounts(g, t, -9);
-    // the algorithm: big gears turning in front of the wall; the agents only stand and watch
-    [[-3.2, 6.2, 1.6, 2.6, 14, '#5D8C3E'], [1.4, 5.0, 1.3, 2.0, 11, '#7CFC9A'], [4.6, 7.4, 1.2, 1.5, 9, '#4E7A3A']].forEach(([gx, gy, gz, r, n, col], i) =>
-      gear(g, B, gx, gy, ACC.z - 2 - gz, r, { teeth: n, angle: (i % 2 ? -1 : 1) * (t - pctA) * (1.6 + i * 0.3), color: col, hub: '#1E2A18' }));
-    agents(g, t, -9);
-  }, { trans: 'whip', noJump: false, hud: (g, lt, t) => {
-    counter(g, '97%', 'AUTOMATICALLY', { y: 330, size: 170, color: '#7CFC9A', at: [pctT, 0.22] });
-    if (t >= algT) badge(g, 'BY THE ALGORITHM', W / 2, 500, { color: '#16161E', size: 50, ...popW(t, algT) });
+    if (t >= clT + 0.35) badge(g, '97% BY THE ALGORITHM', W / 2, 520, { color: '#7CFC9A', size: 46, ...popW(t, clT + 0.35) });
   } });
   cue(closA, 'footsteps', 0.4); cue(BURST - 0.02, 'door_slam', 0.9); cue(BURST, 'boom_big', 0.65); cue(clT - 0.15, 'stamp', 0.45);
   for (let k = 1; k < 5; k++) cue(clT - 0.15 + k * 0.22, 'stamp', 0.25);
-  cue(pctA - 0.04, 'whoosh_fast', 0.3); cue(pctT, 'hit', 0.4); cue(algT, 'clock_tick', 0.4);
+  cue(clT + 0.35, 'clock_tick', 0.35);
 
   // ======================= TWIST (silence first): the points a cheater took from you come back =======================
   const quiet = T.e('closed') + 0.05;
   shot(twA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, 0.07, 11.2, [4, 3.3, 10.6])], [len(sh), K(0.0, 0.06, 9.4, [4, 3.3, 10.6])]], { t, e: glide });
+    rig(B, lt, [[0, K(0.0, 0.07, 12.8, [4, 3.3, 10.6])], [len(sh), K(0.0, 0.06, 11.8, [4, 3.3, 10.6])]], { t, e: glide });
     const down = tick(t, cheT, 0.5, 14), up = tick(t, givT + 0.1, 0.7, 14);
     room(g, t, { pieces: piecesAt(NC, 2), screen: profile(t, { rating: 1200 - down + up, note: (t - givT + 0.05) / 0.35 }) });
     { const a = B.project(MON.c[0] - MON.hw + 0.25, MON.c[1] + 1.95, MON.c[2]), b = B.project(MON.c[0] - MON.hw + 2.7, MON.c[1] + 0.2, MON.c[2]); qaRect(g, a.x, a.y, b.x - a.x, b.y - a.y, 'face', 'opp'); }
@@ -1265,13 +1326,6 @@ export async function build(T) {
   }, { trans: 'whip', vig: 0.65, hud: (g, lt, t) => { if (t >= neverT) stamp(g, 'NEVER RESIGNS', W / 2, 330, t, neverT, { color: '#7CFC9A', size: 84, rot: -0.1 }); } });
   cue(nevA - 0.04, 'record_scratch', 0.35); cue(w('never', 4) + 0.05, 'tvoff', 0.5); cue(nev2A - 0.04, 'whoosh_fast', 0.3); cue(neverT, 'boom_big', 0.55); cue(neverT, 'stamp', 0.5);
 
-  // ======================= "SO NEXT TIME YOU'RE LOSING, STAY ON THE BOARD" =======================
-  shot(stayA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, 0.08, 8.6, [4, 3.3, 10.6])], [len(sh), K(0.0, 0.07, 8.0, [4, 3.3, 10.6])]], { t, e: glide });
-    room(g, t, { pieces: piecesAt(NC, 2), cams: youCams(t, -760 * (1 - ease.out(clamp((t - stayA) / 0.35))), t >= stayT ? EX.sweat : EX.sly) });
-  }, { kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { if (t >= stayT) badge(g, 'STAY ON THE BOARD', W / 2, 240, { color: '#7CFC9A', size: 58, ...popW(t, stayT) }); } });
-  cue(stayA - 0.04, 'whoosh_soft', 0.3); cue(stayT, 'sparkle_pop', 0.35);
-
   // ======================= CTA (rules 10, 26, 39): the first frame again, the question with a number =======================
   shot(ctaA, (g, lt, t, sh) => {
     rig(B, lt, [[0, MAGB[1]], [len(sh), MAGB[0]]], { t, e: lin });
@@ -1285,11 +1339,11 @@ export async function build(T) {
   const music = [
     { t: 0, m: 'hook' }, { t: repA, m: 'intrigue' }, { t: baitA, m: 'tension' }, { t: canT, m: 'slam' }, { t: t1A, m: 'clockwork' },
     { t: fourA, m: 'build' }, { t: BURST, m: 'slam' }, { t: twA, m: 'void' }, { t: givT, m: 'victory' }, { t: nevA, m: 'tension' }, { t: neverT, m: 'slam' },
-    { t: stayA, m: 'digital' }, { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: T.e('bait') - 1.35, t1: canT - 0.01, kind: 'mute' }, { t0: canT, t1: t1A, kind: 'boost', db: 4 },
-    { t0: BURST - 0.32, t1: BURST - 0.01, kind: 'mute' }, { t0: BURST, t1: pctA, kind: 'boost', db: 3 },
+    { t0: BURST - 0.32, t1: BURST - 0.01, kind: 'mute' }, { t0: BURST, t1: T.e('closed'), kind: 'boost', db: 3 },
     { t0: quiet, t1: givT - 0.02, kind: 'mute' },
     { t0: neverT - 0.3, t1: neverT - 0.01, kind: 'mute' },
     { t0: ctaA, t1: T.duration, kind: 'lp', f: 900 },
