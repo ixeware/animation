@@ -322,6 +322,9 @@ r/fuckyoutubedevs). Из сессии Reddit не открывается (403), 
   то же советует автор канала на 1,7 млн подписчиков). Верно в принципе: YouTube признаёт оригиналом того, у кого
   загрузка раньше, а инструмент Copyright Match сам находит перезаливы. Но сейчас нельзя: каналы автора удалены, а
   новый канал после удаления YouTube считает обходом блокировки. Только после того, как канал вернут.
+  Автор (15.11.2026) всё же попросил версию для YouTube: «сделай вотермарку без if you see this on youtube it's stolen,
+  чтобы я залил на Ютуб приватно, потом когда он зальет кину страйк». Сделано: рендер с `--guard handle`
+  (`episodes/fairplay/build/fairplay_youtube.mp4`); риск обхода блокировки автору назван.
 - «Copyright removal request for each copied video with links to your TikTok originals and their dates; watermark;
   an on-screen line with your TikTok handle; side-by-side screenshots in the appeal» — всё это уже сделано (заявки на
   все копии, правило 70, сравнение аватаров).
