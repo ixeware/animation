@@ -301,7 +301,14 @@ impersonation по ссылке со страницы правила YouTube
 > this channel for impersonation.
 > [FULL LEGAL NAME]
 
-Если в поле есть место, добавить ссылки на кадры с сервера YouTube: гравировка —
+**Поле в форме — 300 знаков** (автор, 15.11.2026). Текст под него (284 знака; ссылку на копию, имя и почту форма
+спрашивает отдельными полями):
+
+> I'm the creator of The 64 Files: tiktok.com/@the64files. This channel uses my logo as its profile picture and
+> re-uploads all my videos with my brand inside (@THE64FILES on the board, my end card). Viewers take it for my channel:
+> even Witty Alien, the streamer in my latest video, did.
+
+Если где-то в форме есть ещё место, добавить ссылки на кадры с сервера YouTube: гравировка —
 https://i.ytimg.com/vi/RKOz8rgxtRM/oar1.jpg, плашка — https://i.ytimg.com/vi/nRx_hI8DvDs/oar3.jpg; копия последнего
 ролика залита через 39 минут после оригинала (https://www.tiktok.com/@the64files/video/7708023874599980295).
 
