@@ -272,6 +272,39 @@ UTC, через 2 ч 17 мин после выхода: «I am sorry I let you d
 - В YouTube новых писем не шлём (в трёх ветках уже по пять сообщений); комментарий героя под копией приложить, когда
   YouTube ответит.
 
+## Жалоба на канал-копию за impersonation (черновик, 15.11.2026)
+
+Автор: «напиши текст для жалобы за имперсонайшн» — после того как узнал, что его каналы удалили за impersonation
+сразу, а копию удаляют только за три страйка.
+
+**Находка, на которой держится жалоба.** Аватар канала «The 64 Stories» — тот же логотип, что у автора в TikTok:
+белый король под софитом с красной печатью «64» ([сравнение](avatar_compare_2026-11-15.png); у копии он круглый, у
+автора квадратный). По правилу YouTube об impersonation канал, который копирует профиль другого так, что выглядит его
+каналом, удаляют, и трёх страйков для этого не нужно. Остальное у копии своё: название «The 64 Stories», описание «True
+stories from the history of chess.♟️», баннер «CHECKMATE»; 6 920 подписчиков на 15.11.2026.
+
+**Где и как подаёт автор** (сам, один раз, с почты the64filestt@gmail.com — она в био TikTok): форма жалобы на
+impersonation по ссылке со страницы правила YouTube
+([Impersonation policy](https://support.google.com/youtube/answer/2801947?hl=en); по сторонним инструкциям, адрес
+формы — `support.google.com/youtube/contact/impersonation`, из сессии не проверить). Вариант — канал выдаёт себя за
+мой канал. Своего канала на YouTube у автора нет — в поле о своём канале ставить TikTok. Приложить сравнение аватаров
+и скриншот комментария Witty под копией.
+
+Текст (707 знаков; полное имя — то, что автор назвал для юридических писем):
+
+> I am the creator of The 64 Files (TikTok: https://www.tiktok.com/@the64files). The channel "The 64 Stories"
+> (https://www.youtube.com/@the64stories) poses as mine: its profile picture is my logo (the white king with a red
+> "64" stamp from my TikTok), and all 25 of its videos are my videos, re-uploaded with my brand inside: "@THE64FILES"
+> on the board and my "THE 64 FILES" end card. Viewers take it for my channel: Witty Alien, the streamer in my latest
+> video, commented under its copy as if it were mine. My own YouTube channels were removed for impersonation; I
+> believe this channel is the reason. My contact email, the64filestt@gmail.com, is in my TikTok bio. Please review
+> this channel for impersonation.
+> [FULL LEGAL NAME]
+
+Если в поле есть место, добавить ссылки на кадры с сервера YouTube: гравировка —
+https://i.ytimg.com/vi/RKOz8rgxtRM/oar1.jpg, плашка — https://i.ytimg.com/vi/nRx_hI8DvDs/oar3.jpg; копия последнего
+ролика залита через 39 минут после оригинала (https://www.tiktok.com/@the64files/video/7708023874599980295).
+
 ## Режим защиты со следующего ролика (14.11.2026)
 
 Автор: «сделай для следущих видео режим защиты, типо вотермарка прозрачная где лого тт @the64files, и снизу IF YOU SEE
