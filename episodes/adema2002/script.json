@@ -1,0 +1,127 @@
+{
+ "title": "149-0: the match where every goal was an own goal",
+ "format": "football",
+ "channel": null,
+ "lead_in": 0.05,
+ "tail": 2.2,
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v3",
+  "stability": 0.5,
+  "similarity": 0.8,
+  "timing": "alignment",
+  "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"; the settings of plea2005 (STYLE_BIBLE rule 68)",
+  "fallback": {
+   "provider": "kokoro",
+   "name": "am_michael",
+   "speed": 0.92,
+   "pitch_semitones": -1.0
+  }
+ },
+ "voice_fx": {
+  "tempo": 1.17,
+  "max_gap": 0.26
+ },
+ "mix": {
+  "engine": "v2",
+  "music_gap": 11,
+  "music_air": -1,
+  "music_lp": 7500,
+  "sfx_gap": 5,
+  "reverb": 0.32,
+  "reverb_sec": 2.0,
+  "duck": 0.5,
+  "amb_gap": 13,
+  "amb_duck": 0.4
+ },
+ "post": "Madagascar, 31 October 2002. AS Adema 149, SO l'Emyrne 0, and every single goal was an own goal: a protest against the referees that is still a world record.\n\n#football #soccer #footballhistory #madagascar #worldrecord #owngoal #footballtiktok",
+ "phrases": [
+  {
+   "id": "hook",
+   "text": "149–0. The craziest scoreline in football. And every goal was an own goal.",
+   "say": "[intrigued] One hundred and forty-nine to nil. ... The craziest scoreline in football. ... And every goal... was an own goal.",
+   "pause": 0.9,
+   "colors": {
+    "149–0.": "gold",
+    "own": "red",
+    "goal.": "red"
+   }
+  },
+  {
+   "id": "champs",
+   "text": "Stade Olympique de l'Emyrne were the defending champions. But in their previous match, a late, disputed penalty handed the title to AS Adema.",
+   "say": "Stade Olympique de l'Emyrne were the defending champions. But in their previous match... a late, disputed penalty handed the title to AS Adema.",
+   "pause": 0.8,
+   "colors": {
+    "champions.": "gold",
+    "penalty": "red",
+    "Adema.": "gold"
+   }
+  },
+  {
+   "id": "plan",
+   "text": "So for the last game, against Adema, their coach planned a protest: every time his players got the ball, they would score into their own net.",
+   "say": "[mischievously] So for the last game, against Adema... their coach planned a protest. Every time his players got the ball... they would score into their own net.",
+   "pause": 0.6,
+   "colors": {
+    "protest:": "red",
+    "own": "red",
+    "net.": "red"
+   }
+  },
+  {
+   "id": "goals",
+   "text": "Kick-off. They turn, and shoot into their own goal. Again. And again. One goal every 36 seconds.",
+   "say": "[tense] Kick-off. ... They turn... and shoot into their own goal. ... Again. ... And again. ... One goal every thirty-six seconds.",
+   "pause": 0.5,
+   "colors": {
+    "Kick-off.": "gold",
+    "own": "red",
+    "goal.": "red",
+    "Again.": "red",
+    "again.": "red",
+    "36": "gold",
+    "seconds.": "gold"
+   }
+  },
+  {
+   "id": "watch",
+   "text": "AS Adema's players just stood and watched, as the score kept climbing. 50. 100. 149.",
+   "say": "[amused] AS Adema's players just stood and watched... as the score kept climbing. Fifty. ... A hundred. ... One hundred and forty-nine.",
+   "pause": 0.8,
+   "colors": {
+    "watched,": "gold",
+    "50.": "red",
+    "100.": "red",
+    "149.": "red"
+   }
+  },
+  {
+   "id": "fans",
+   "text": "In the stands, fans went to the ticket booths and asked for their money back.",
+   "say": "In the stands... fans went to the ticket booths, and asked for their money back.",
+   "pause": 0.7,
+   "colors": {
+    "ticket": "gold",
+    "money": "gold",
+    "back.": "gold"
+   }
+  },
+  {
+   "id": "after",
+   "text": "The federation banned the coach for three years and suspended several players. And 149 own goals is still a world record.",
+   "say": "[firmly] The federation banned the coach for three years... and suspended several players. ... [quietly] And one hundred and forty-nine own goals... is still a world record.",
+   "pause": 0.0,
+   "colors": {
+    "three": "red",
+    "years": "red",
+    "suspended": "red",
+    "149": "gold",
+    "world": "gold",
+    "record.": "gold"
+   }
+  }
+ ],
+ "_take": "recorded 15 Nov 2026 on the author's second ElevenLabs account (Callum, eleven_v3, the settings of plea2005), seven phrases. The first take ran 67.74 s, over the 1:05 of rule 70: the hook and the plan were shortened and those two phrases recorded again. The film runs 64.08 s (the narration plus the 2.2 s tail), the TV switch-off at 63.03 s"
+}
