@@ -11,5 +11,6 @@
   "crowd_bed": { "prompt": "Football stadium crowd ambience during a match, 100,000 fans, steady murmur, distant chanting and drums, daytime, no music, no commentary", "duration": 20.0, "loop": true, "variants": 1, "influence": 0.4 },
   "radio_static": { "prompt": "Old 1980s AM radio static crackle and a quick tuning sweep", "duration": 1.5, "variants": 1, "influence": 0.5 },
   "studs": { "prompt": "Footsteps of football boots with metal studs on a concrete corridor floor, two players walking, clacking, echo", "duration": 2.5, "variants": 1, "influence": 0.5 },
+  "rain": { "prompt": "Heavy steady rain pouring down on an open football stadium, rain hitting wet grass and plastic seats, constant downpour, no thunder, no voices, no music", "duration": 12.0, "loop": true, "variants": 1, "influence": 0.5 },
   "market": { "prompt": "Busy outdoor street market in Mexico City, vendors calling, chatter, distant traffic, daytime ambience, no music", "duration": 12.0, "loop": true, "variants": 1, "influence": 0.4 }
 }

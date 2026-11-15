@@ -116,6 +116,12 @@ def mix_v2(b, meta, vv, n, dur, cfg):
     lm = meter.integrated_loudness(m)
     m *= 10 ** ((lv - cfg.get('music_gap', 8) - lm) / 20)
     m = music_fx(m, meta.get('musicFx', []), n)
+    # the end: the music goes down to silence over the tail of the episode instead of stopping with the file
+    # (`end_fade` seconds, by default the script's `tail`; 0 turns it off)
+    ef = cfg.get('end_fade', 2.0)
+    if ef > 0:
+        k = np.clip((dur - 0.15 - np.arange(n) / SR) / ef, 0, 1)
+        m = m * (k * k)[:, None]
     # SFX from the sample library (variants in turn), synth bank as the fallback
     bank, synth = load_samples(), sfx.render_all()
     fx = np.zeros((n, 2)); used = {}; r = np.random.default_rng(3)
@@ -130,6 +136,10 @@ def mix_v2(b, meta, vv, n, dur, cfg):
         s = int(c['t'] * SR)
         if s >= n: continue
         x = x[:n - s] * c.get('gain', 1); pan = r.uniform(-0.3, 0.3)
+        if c.get('end') is not None:  # a cue with `end` (s) dies away by then, over `fade` s: a crowd roar or a chant that
+            # would otherwise run on under the TV switch-off and be cut off with the file
+            e = max(0, int(c['end'] * SR) - s); f = max(1, int(c.get('fade', 0.6) * SR)); x = x[:e]
+            k = np.clip((e - np.arange(len(x))) / f, 0, 1); x = x * (k * k * (3 - 2 * k))[:, None]
         fx[s:s + len(x), 0] += x[:, 0] * np.sqrt(0.5 * (1 - pan)) * 1.41
         fx[s:s + len(x), 1] += x[:, 1] * np.sqrt(0.5 * (1 + pan)) * 1.41
     ir = reverb_ir(cfg.get('reverb_sec', 2.3))
@@ -196,6 +206,7 @@ def main(ep):
     cfg = script.get('mix', {})
     if cfg.get('engine') == 'v2':
         vv = np.stack([v, v], 1)
+        cfg = {'end_fade': max(0.5, script.get('tail', 2.0)), **cfg}  # the music fades out over the tail after the last word
         m, fx, amb = mix_v2(b, meta, vv, n, dur, cfg)
         mixd = vv + m + fx + amb
         sf.write(b / 'stems_voice.wav', vv, SR); sf.write(b / 'stems_music.wav', m, SR); sf.write(b / 'stems_sfx.wav', fx, SR)

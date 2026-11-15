@@ -17,6 +17,8 @@
   canvas { display: block; width: 1080px; height: 1920px; }
 </style>
 <script src="js/topojson-client.min.js"></script>
+<!-- ?ss=2: every canvas at twice the size (a 2160x3840 render); does nothing without it. Must load before the modules -->
+<script src="js/hidpi.js"></script>
 </head>
 <body>
 <canvas id="c"></canvas>

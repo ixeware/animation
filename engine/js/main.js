@@ -97,6 +97,8 @@ function dustOut(g, src, p, seed, dir) {
 // motion blur for fast camera moves (fly-arounds, dives): when the image moves more than MB_PX per frame, the shot is
 // drawn again at sub-frame times over the shutter and the samples are averaged
 const MB_PX = 12, SHUTTER = 0.8 / FPS;
+// each head's face-or-back choice made for the frame, reused by its motion-blur sub-frames (football.js)
+const HEADLOCK = globalThis.HEADLOCK = { sub: false, rec: new Map(), n: new Map() };
 const acc = makeCanvas(), actx = acc.getContext('2d'), subf = makeCanvas(), sctx = subf.getContext('2d');
 function motionBlur(s, t) {
   const px = CAM.px;
@@ -105,9 +107,11 @@ function motionBlur(s, t) {
   const n = Math.min(s.mbMax || 12, Math.ceil(px * 0.8 / (s.mbStep || 9)) + 1);  // a shot can ask for denser samples (mbStep px apart, up to mbMax)
   actx.globalAlpha = 1; actx.drawImage(layer, 0, 0);
   for (let k = 1; k < n; k++) {
+    HEADLOCK.sub = true; HEADLOCK.n = new Map();
     drawShot(s, t - SHUTTER * k / (n - 1), sctx);
     actx.globalAlpha = 1 / (k + 1); actx.drawImage(subf, 0, 0);
   }
+  HEADLOCK.sub = false;
   actx.globalAlpha = 1;
   lctx.save(); lctx.setTransform(1, 0, 0, 1, 0, 0); lctx.globalAlpha = 1; lctx.filter = 'none'; lctx.drawImage(acc, 0, 0); lctx.restore();
   return true;
@@ -118,7 +122,7 @@ function compose(t, frame) {
   // qaAllow: finding types this shot may have; an entry {t0, t1, types} allows them only in that window (a whip pan)
   QA.items = []; QA.M = null; QA.skip = false; QA.shot = s.i;
   QA.allow = (s.qaAllow || []).flatMap(x => typeof x === 'string' ? [x] : (t >= x.t0 && t <= x.t1 ? x.types : []));
-  CAM.px = 0;
+  CAM.px = 0; HEADLOCK.sub = false; HEADLOCK.rec = new Map(); HEADLOCK.n = new Map();
   drawShot(s, t, lctx);
   const items = QA.items;
   if (motionBlur(s, t)) QA.skip = true;  // a frame in a fly-around is a smear: layout is judged on the frames around it
@@ -130,8 +134,24 @@ function compose(t, frame) {
     if (prev) { drawShot(prev, t, hctx); ctx.drawImage(hold, 0, 0); }
     ctx.globalAlpha = clamp(lt / (s.transDur || 0.35));
   }
-  if (['whip', 'zoom', 'fade', 'flash', 'shatter', 'dust'].includes(tr) && lt < 0.3) QA.skip = true;
-  if (tr === 'whip' && lt < 0.22) {
+  if (['whip', 'zoom', 'fade', 'flash', 'shatter', 'dust', 'pan', 'push'].includes(tr) && lt < 0.3) QA.skip = true;
+  const td = s.transDur || 0.3, prevS = shots[s.i - 1];
+  if ((tr === 'pan' || tr === 'push') && lt < td && prevS) {
+    // transitions that hide the cut (the film feels like one take): both shots go on running through it.
+    // pan: the camera swings: the old picture slides out, the new one slides in after it, blurred at the fastest point
+    // (s.panDir: 1 to the left, -1 to the right). push: the camera flies into the old picture and comes out in the new one
+    drawShot(prevS, t, hctx);
+    const u = clamp(lt / td), e = u * u * (3 - 2 * u);
+    if (tr === 'pan') {
+      const dir = s.panDir || 1;
+      ctx.filter = `blur(${(30 * Math.sin(Math.PI * u)).toFixed(1)}px)`;
+      ctx.drawImage(hold, -dir * W * e, 0); ctx.drawImage(layer, dir * W * (1 - e), 0);
+    } else {
+      const k = u < 0.5 ? u / 0.5 : (1 - u) / 0.5, z = u < 0.5 ? 1 + 0.8 * k * k : 1 + 0.5 * k * k;
+      ctx.filter = `blur(${(22 * k).toFixed(1)}px)`;
+      ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2); ctx.drawImage(u < 0.5 ? hold : layer, 0, 0);
+    }
+  } else if (tr === 'whip' && lt < 0.22) {
     const u = 1 - lt / 0.22;
     ctx.filter = `blur(${(u * 26).toFixed(1)}px)`;
     ctx.drawImage(layer, -u * u * 380 * (s.whipDir || 1), 0);

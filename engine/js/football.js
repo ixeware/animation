@@ -106,7 +106,8 @@ const CLOTH = [['#E8E5DE', 30], ['#9DBFDB', 10], ['#B5544A', 8], ['#D3B964', 7],
   ['#C98A55', 4], ['#3A3A3E', 8], ['#8C9096', 5], ['#6A82AE', 2]];
 const SKINS = ['#E8C3A0', '#D9A77E', '#C38B62', '#A86E48', '#8A5A3A', '#F0D2B6'];
 const pick = (r, list) => { let s = list.reduce((a, [, w]) => a + w, 0) * r(); for (const [c, w] of list) { if ((s -= w) <= 0) return c; } return list[0][0]; };
-export function crowdTex(w, h, { rows = 30, seed = 3, cheer = 0, step = '#9C978C', riser = '#6E6A62', flags = 4, hats = 0.06, density = 1, flagSet = null } = {}) {
+// cloth: the crowd's colours as [[colour, weight], ...] (a home end in the club's shirts); the default is a mixed crowd
+export function crowdTex(w, h, { rows = 30, seed = 3, cheer = 0, step = '#9C978C', riser = '#6E6A62', flags = 4, hats = 0.06, density = 1, flagSet = null, cloth = CLOTH } = {}) {
   const raw = tex(w, h, (g) => {
     const r = rng(seed), rh = h / rows;
     for (let j = 0; j < rows; j++) {
@@ -121,7 +122,7 @@ export function crowdTex(w, h, { rows = 30, seed = 3, cheer = 0, step = '#9C978C
         if ([0.13, 0.5, 0.87].some(ax => Math.abs(x - w * ax) < 9) || r() < 0.05) continue;
         if (density < 1 && r() > density) continue;  // empty seats
         const up = cheer > 0 && r() < 0.55 * cheer, jump = up ? rh * 0.12 : 0;
-        const body = pick(r, CLOTH), skin = SKINS[Math.floor(r() * SKINS.length)], bw = pw * (0.7 + r() * 0.25), bh = rh * 0.5;
+        const body = pick(r, cloth), skin = SKINS[Math.floor(r() * SKINS.length)], bw = pw * (0.7 + r() * 0.25), bh = rh * 0.5;
         const by = base - bh - jump;
         if (up) {  // arms up
           g.strokeStyle = body; g.lineWidth = Math.max(1.5, pw * 0.16); g.lineCap = 'round';
@@ -168,8 +169,8 @@ const PROFILE = {
 };
 const OUTER = new Set(['top', 'outer']);
 export class Stadium {
-  constructor({ hx = 60.5, hz = 44.5, rc = 15, n = 96, rep = 12, seed = 7, sun = nrm([0.18, 1, 0.32]), haze = '#C9D6DC', density = 1, flags = 4, flagSet = null } = {}) {
-    const cr = { density, flags, flagSet };  // the crowd: how full, and whose flags
+  constructor({ hx = 60.5, hz = 44.5, rc = 15, n = 96, rep = 12, seed = 7, sun = nrm([0.18, 1, 0.32]), haze = '#C9D6DC', density = 1, flags = 4, flagSet = null, cloth = null } = {}) {
+    const cr = { density, flags, flagSet, ...(cloth ? { cloth } : {}) };  // the crowd: how full, whose flags, whose colours
     Object.assign(this, { hx, hz, rc, n, rep, sun, haze });
     const straightX = 2 * (hx - rc), straightZ = 2 * (hz - rc), arc = PI / 2 * rc, L = 2 * straightX + 2 * straightZ + 4 * arc;
     const at = s => {  // arc length -> point and outward normal on the base ring, counter-clockwise from (+hx, 0)
@@ -723,7 +724,10 @@ export function skeleton(pl, st) {
     const [fl, ab] = P.hip[i], kn = P.knee[i], hipJ = add(pel, mul(r, sd * SKEL.hipW * k));
     const dir = (a) => nrm(add(mul(add(mul(up, -Math.cos(a)), mul(f, Math.sin(a))), Math.cos(ab)), mul(r, sd * Math.sin(ab))));
     const knee = add(hipJ, mul(dir(fl), SKEL.thigh * k)), ankle = add(knee, mul(dir(fl - kn), SKEL.shin * k));
-    const ps = fl - kn, foot = nrm(add(mul(f, Math.cos(ps)), mul(up, Math.sin(ps) * 0.9)));
+    // pose.toes: [left, right], how far each foot is pointed (radians; 0: at a right angle to the shin, as when standing;
+    // about 1.6: in line with the shin). A man lying on his front has his feet pointed: at a right angle the toes dig
+    // 18 cm under the grass, and a pose set down on its lowest point then floats on them
+    const ps = fl - kn, pf = ps - (P.toes ? P.toes[i] * (P.toesW ?? 1) : 0), foot = nrm(add(mul(f, Math.cos(pf)), mul(up, Math.sin(pf) * 0.9)));
     return { hip: hipJ, knee, ankle, toe: add(add(ankle, mul(foot, 0.2 * k)), [0, -0.035 * k, 0]), heel: add(ankle, mul(foot, -0.05 * k)), sd };
   });
   if (P.ground !== false) {  // the lower foot stands on the grass
@@ -744,6 +748,13 @@ export function skeleton(pl, st) {
   const neck = add(C, mul(spine, 0.035 * k)), look = P.look || 0;
   const hdir = nrm(add(spine, mul(ft, -0.25 * look)));
   const headC = add(neck, mul(hdir, (0.085 + SKEL.headH * 0.5) * k));
+  if (P.tilt) {  // pose.tilt: the whole figure rolled about its forward axis through the pelvis (+: the head toward the
+    // player's left). A volley struck lying on one side in the air, a dive along the goal line
+    const a = P.tilt, Rp = p => add(pel, rotAxis(sub(p, pel), f, a)), Rv = v => rotAxis(v, f, a);
+    for (const L of legs) for (const key of ['hip', 'knee', 'ankle', 'toe', 'heel']) L[key] = Rp(L[key]);
+    for (const A of arms) for (const key of ['sh', 'elbow', 'wrist', 'hand']) A[key] = Rp(A[key]);
+    return { k, f, r: Rv(r), up, spine: Rv(spine), ft: Rv(ft), pel, C: Rp(C), legs, arms, neck: Rp(neck), headC: Rp(headC), pose: P };
+  }
   return { k, f, r, up, spine, ft, pel, C, legs, arms, neck, headC, pose: P };
 }
 
@@ -761,6 +772,15 @@ function capsule(g, p, q, r1, r2, col, shade = true) {
   g.arc(q.x, q.y, r2 * k, Math.atan2(ny, nx), Math.atan2(ny, nx) + PI, true); g.lineTo(p.x - nx * r1 * k, p.y - ny * r1 * k);
   g.arc(p.x, p.y, r1 * k, Math.atan2(-ny, -nx), Math.atan2(-ny, -nx) + PI, true); g.closePath(); g.fill();
   g.restore();
+}
+// the convex hull of two discs, filled: a shoulder running in to the neck, a sleeve that tapers. The tangents are exact
+// (capsule() joins ends of unequal size with a slight corner, which shows on a big shape)
+function blob(g, p, r1, q, r2, col) {
+  const dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy);
+  g.fillStyle = col; g.beginPath();
+  if (d <= Math.abs(r1 - r2) + 1e-6) { const c = r1 >= r2 ? p : q; g.arc(c.x, c.y, Math.max(r1, r2), 0, TAU); g.fill(); return; }
+  const th = Math.atan2(dy, dx), al = Math.acos((r1 - r2) / d);
+  g.arc(p.x, p.y, r1, th + al, th + TAU - al); g.arc(q.x, q.y, r2, th - al, th + al); g.closePath(); g.fill();
 }
 // a flat band between two projected points (no round ends): a sock turnover, an armband, a cuff
 function band(g, p, q, r1, r2, col) {
@@ -794,12 +814,21 @@ function backHead(g, c, x, y, s, turn = 0, tilt = 0) {
   const [fw, fh] = c.face, skin = (c.skin && c.skin.base) || SKIN2.base;
   g.save(); g.translate(x, y); g.rotate(tilt); g.scale(s, s);
   g.fillStyle = mix(skin, '#000000', 0.1);
-  for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(sd * 98 * fw + turn * 18, 10, 16, 26, 0, 0, TAU); g.fill(); }
+  for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(sd * 92 * fw + turn * 7, 10, 14, 23, 0, 0, TAU); g.fill(); }  // ears close to the head (they stood right out of it: the author asked)
   g.fillStyle = skin; g.beginPath(); g.ellipse(0, 6, 100 * fw, 122 * fh, 0, 0, TAU); g.fill();
+  if (c.backFx) { c.backFx(g, { fw, fh }); g.restore(); return; }  // a cast that draws the back of its own head (braids, a head guard)
+  if (c.hair === 'bald') {  // a shaved head: skin all round, a shade darker toward the nape, a soft light on the crown
+    const ng = g.createLinearGradient(0, 20, 0, 128 * fh); ng.addColorStop(0, rgba('#000000', 0)); ng.addColorStop(1, rgba('#000000', 0.16));
+    g.fillStyle = ng; g.beginPath(); g.ellipse(0, 6, 100 * fw, 122 * fh, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.14)'; g.beginPath(); g.ellipse(-26 * fw, -66, 46 * fw, 28, -0.4, 0, TAU); g.fill();
+    g.restore(); return;
+  }
   g.fillStyle = c.hairC;
   const big = c.hair === 'curly' || c.hair === 'messy' || c.hair === 'longcurly';
-  g.beginPath(); g.ellipse(0, -18, (big ? 116 : 104) * fw, (big ? 122 : 112) * fh, 0, 0, TAU); g.fill();
-  if (big) for (let i = 0; i < 9; i++) { const a = PI * (0.05 + i / 8 * 0.9), rr = 112 * fw; g.beginPath(); g.arc(Math.cos(a) * rr * 0.92, 40 + Math.sin(a) * 40, 26, 0, TAU); g.fill(); }
+  // the hair covers the back of the head down to the nape: it ended halfway down and left a wide band of bare skull under
+  // it (the author: «on peux parfois voire apparaitre leurs crane»). The top is where it was
+  g.beginPath(); g.ellipse(0, big ? -8 : -6, (big ? 116 : 104) * fw, (big ? 132 : 124) * fh, 0, 0, TAU); g.fill();
+  if (big) for (let i = 0; i < 9; i++) { const a = PI * (0.05 + i / 8 * 0.9), rr = 112 * fw; g.beginPath(); g.arc(Math.cos(a) * rr * 0.9, 60 + Math.sin(a) * 44, 26, 0, TAU); g.fill(); }  // the curls at the nape, along the hair's lower edge
   g.fillStyle = 'rgba(255,255,255,0.08)'; g.beginPath(); g.ellipse(-30 * fw, -70, 50 * fw, 30, -0.4, 0, TAU); g.fill();
   g.restore();
 }
@@ -818,22 +847,45 @@ function drawSkeleton(g, B, pl, st, sk) {
   const skin = (c.skin && c.skin.base) || SKIN2.base, skinD = mix(skin, '#000000', 0.12);
   const pr = p => B.project(p[0], p[1], p[2]), dp = p => depthOf(B, p), px = p => pr(p).s;
   const parts = [];
+  // Flat paint: no part of the body has shading of its own. A limb is one colour from end to end, so where its parts
+  // overlap (a knee, an elbow, a wrist, a sleeve on the shirt, the legs of the shorts on the hips) there is nothing to
+  // see: no joint marks, no shoulder showing "through" the shirt. What tells two limbs apart is tone: the arm or the leg
+  // farther from the camera is a shade darker, all of it, by how much farther it is (level with the other one: the same
+  // tone, so nothing flickers as a player turns).
+  // The author: «enlever toute marque de séparation d'articulation», «les épaules visibles à travers le maillot»
+  const cap = (p0, q0, r1, r2, col) => capsule(g, p0, q0, r1, r2, col, false);
+  const legD = sk.legs.map(L => (dp(L.hip) + dp(L.knee) + dp(L.ankle)) / 3), armD = sk.arms.map(A => (dp(A.sh) + dp(A.elbow) + dp(A.wrist)) / 3);
+  const farOf = (ds, i) => 0.1 * clamp((ds[i] - ds[1 - i]) / 0.25), tone = (col, w) => (w > 0.004 && /^#[0-9a-f]{6}$/i.test(col) ? mix(col, '#000000', w) : col);
   // legs
-  for (const L of sk.legs) {
-    const d = (dp(L.hip) + dp(L.knee) + dp(L.ankle)) / 3;
+  sk.legs.forEach((L, li) => {
+    const d = legD[li], fw = farOf(legD, li);
     parts.push({ d, draw: () => {
       const H = pr(L.hip), K = pr(L.knee), A = pr(L.ankle), S = (H.s + K.s) / 2, s2 = (K.s + A.s) / 2;
       const kneeTop = pr(lerp3(L.knee, L.ankle, 0.12)), sockTop = pr(lerp3(L.knee, L.ankle, 0.16)), shortEnd = pr(lerp3(L.hip, L.knee, 0.4));
-      const legC = kit.trousers ? kit.shorts : skin;  // kit.trousers: long trousers (medics, staff), no bare knee, no socks
-      capsule(g, H, K, 0.1 * k * S * b, 0.074 * k * K.s * b, legC);  // thigh
-      capsule(g, K, kneeTop, 0.074 * k * K.s * b, 0.07 * k * kneeTop.s * b, legC);
-      capsule(g, kit.trousers ? K : sockTop, A, 0.074 * k * s2 * b, (kit.trousers ? 0.058 : 0.054) * k * A.s * b, kit.trousers ? kit.shorts : kit.socks);  // sock over the shin pad
-      if (kit.band && !kit.trousers) band(g, sockTop, pr(lerp3(L.knee, L.ankle, 0.23)), 0.077 * k * s2 * b, 0.075 * k * s2 * b, kit.band);  // the sock's turnover
-      capsule(g, H, shortEnd, 0.108 * k * S * b, 0.098 * k * shortEnd.s * b, kit.shorts);  // the shorts' leg
-      const T = pr(L.toe), He = pr(L.heel); capsule(g, He, T, 0.062 * k * A.s, 0.052 * k * T.s, kit.boots);  // boot
-      if (T.s * k * 0.05 > 2.5) band(g, pr(lerp3(L.heel, L.toe, 0.15)), pr(lerp3(L.heel, L.toe, 0.95)), 0.012 * k * A.s, 0.012 * k * T.s, 'rgba(255,255,255,0.18)');
+      const legB = kit.trousers ? kit.shorts : skin, legC = tone(legB, fw);  // kit.trousers: long trousers (medics, staff), no bare knee, no socks
+      // trousers: the far leg takes its darker tone gradually down the thigh; at the top it is the colour of the hips
+      let thighC = legC;
+      if (kit.trousers && fw > 0.004 && Math.hypot(K.x - H.x, K.y - H.y) > 2) { thighC = g.createLinearGradient(H.x, H.y, K.x, K.y); thighC.addColorStop(0.15, legB); thighC.addColorStop(0.75, legC); }
+      const thigh = () => { cap(H, K, 0.1 * k * S * b, 0.074 * k * K.s * b, thighC);  // thigh
+        cap(K, kneeTop, 0.074 * k * K.s * b, 0.07 * k * kneeTop.s * b, legC); };
+      const shin = () => { cap(kit.trousers ? K : sockTop, A, 0.074 * k * s2 * b, (kit.trousers ? 0.058 : 0.054) * k * A.s * b, tone(kit.trousers ? kit.shorts : kit.socks, fw));  // sock over the shin pad
+      if (kit.band && !kit.trousers) band(g, sockTop, pr(lerp3(L.knee, L.ankle, 0.23)), 0.077 * k * s2 * b, 0.075 * k * s2 * b, tone(kit.band, fw)); };  // the sock's turnover
+      const shortsLeg = () => cap(H, shortEnd, 0.108 * k * S * b, 0.098 * k * shortEnd.s * b, kit.trousers ? thighC : kit.shorts);  // the shorts' leg: the colour of the hips exactly
+      const T = pr(L.toe), He = pr(L.heel);
+      const foot = () => {
+      if (kit.flipflops) {  // kit.flipflops: bare feet in sliders: a dark sole under the foot and one strap across it
+        const dn = 0.028 * k;
+        cap({ x: He.x, y: He.y + dn * A.s }, { x: T.x, y: T.y + dn * T.s }, 0.05 * k * A.s, 0.046 * k * T.s, kit.flipflops);
+        cap(He, T, 0.05 * k * A.s, 0.042 * k * T.s, tone(skin, fw));
+        band(g, pr(lerp3(L.heel, L.toe, 0.5)), pr(lerp3(L.heel, L.toe, 0.7)), 0.056 * k * A.s, 0.05 * k * T.s, kit.flipflops);
+      } else cap(He, T, 0.062 * k * A.s, 0.052 * k * T.s, tone(kit.boots, fw));  // boot
+      };
+      // a leg folded right back and seen from the knee's side (a man on his knees, from the front; a runner's heel up behind
+      // him): the shin and the foot are behind the thigh and go under it. They used to be painted over it, whatever the pose
+      const under = sk.pose.knee[li] > 1.0 && (dp(L.knee) + dp(L.ankle)) / 2 > (dp(L.hip) + dp(L.knee)) / 2 + 0.06 * k;
+      if (under) { shin(); foot(); thigh(); shortsLeg(); } else { thigh(); shin(); shortsLeg(); foot(); }
     } });
-  }
+  });
   // shorts (the pelvis) and the shirt: convex hulls of a box round the hips and round the chest
   const box = (c0, _, hw, hd) => [-1, 1].flatMap(a => [-1, 1].map(bb => add(add(c0, mul(sk.r, a * hw)), mul(sk.ft, bb * hd))));
   const pelTop = add(sk.pel, mul(sk.spine, 0.1 * k)), pelBot = add(sk.pel, mul(sk.spine, -0.04 * k));
@@ -856,17 +908,45 @@ function drawSkeleton(g, B, pl, st, sk) {
     return bb;
   };
   const pxm = pr(sk.C).s * k;  // px per (k-scaled) metre at the chest
+  // the ball of a shoulder: 3 cm along the arm from the joint, the size of the top of the sleeve
+  const RS = 0.068 * k * b, ballOf = A => add(A.sh, mul(nrm(sub(A.elbow, A.sh)), 0.03 * k));
+  const circ = (P, r, n = 18) => Array.from({ length: n }, (_, i) => ({ x: P.x + Math.cos(i / n * TAU) * r, y: P.y + Math.sin(i / n * TAU) * r }));
   parts.push({ d: dp(lerp3(chest, waist, 0.5)), kind: 'torso', draw: () => {
-    // the shirt: a box round the chest, one round the waist and the base of the neck. The shoulders are not in it: each
-    // arm brings its own shoulder (below), so a raised arm never leaves a round "pad" sticking out of the outline. A bare
-    // torso is a little narrower at the chest: its round shoulders come with the arms
-    // (the boxes are 2.5 cm inside the outline: the soft edge adds that back)
-    const pts = [...box(chest, 0, (kit.bare ? 0.185 : 0.21) * k * b, 0.115 * k), ...box(waist, 0, 0.17 * k * b, 0.1 * k), ...box(add(sk.C, mul(sk.spine, 0.01 * k)), 0, 0.125 * k * b, 0.07 * k)].map(pr);
+    // the shirt: a box round the chest, one round the waist and the base of the neck (the boxes are 2.5 cm inside the
+    // outline: the soft edge adds that back). A bare torso is a little narrower at the chest: its shoulders come with the arms.
+    // The shoulders are part of the shirt: from beside the neck a yoke runs down into a ball at each shoulder, and the
+    // sleeve grows out of that ball (below). It is one smooth line from the neck to the sleeve at any angle of the arm
+    // (the ball slides a little way along the arm, so a raised arm lifts the shoulder with it). The shoulder used to be
+    // a hull with corners of its own, on top of the shirt and beside the neck: its points stood out of the outline like
+    // pads. The author: «les épaules visibles à travers le maillot»
     g.save();
-    const bb = fillHull(pts, kit.shirt, kit.shirtD, 0.05 * pxm); if (!bb) { g.restore(); return; }
+    if (!kit.bare) for (const A of sk.arms) { const P = pr(add(add(sk.C, mul(sk.r, A.sd * 0.075 * k * b)), mul(sk.spine, 0.02 * k))), Q = pr(ballOf(A)); blob(g, P, 0.038 * k * P.s, Q, RS * Q.s, kit.shirt); }
+    const pts = [...box(chest, 0, (kit.bare ? 0.185 : 0.21) * k * b, 0.115 * k), ...box(waist, 0, 0.17 * k * b, 0.1 * k), ...box(add(sk.C, mul(sk.spine, 0.01 * k)), 0, 0.125 * k * b, 0.07 * k)].map(pr);
+    const bb = fillHull(pts, kit.shirt, null, 0.05 * pxm); if (!bb) { g.restore(); return; }  // flat: the sleeves and the shoulders are this same paint
     const [x0, y0, x1, y1] = bb;
     g.clip();
     if (kit.stripe) { g.fillStyle = kit.stripe; const w = (x1 - x0); for (const fx of [0.3, 0.62]) g.fillRect(x0 + w * fx, y0, w * 0.08, y1 - y0); }
+    if (kit.stripes) {  // kit.stripes: [colour, n]: n wide vertical stripes a stripe's width apart, on the side of the shirt we see
+      // (Barcelona's blaugrana, Juventus's black and white); they lean and turn with the body
+      const [col, n] = kit.stripes, bw = 0.42 * k * b / (2 * n - 1), sd = front >= 0 ? 1 : -1;
+      for (let i = 0; i < n; i++) { const off = (i - (n - 1) / 2) * 2 * bw;
+        const a = pr(add(add(add(sk.C, mul(sk.spine, 0.05 * k)), mul(sk.r, off)), mul(sk.ft, sd * 0.12 * k))), bq = pr(add(add(waist, mul(sk.r, off)), mul(sk.ft, sd * 0.1 * k)));
+        band(g, a, bq, bw * 0.5 * a.s, bw * 0.5 * bq.s, col); }
+    }
+    if (kit.chest) {  // a band across the chest, square to the spine (it leans and turns with the body)
+      const ca = pr(add(sk.C, mul(sk.spine, -0.1 * k))), cb = pr(add(sk.C, mul(sk.spine, -0.25 * k)));
+      band(g, ca, cb, 0.5 * k * ca.s, 0.5 * k * cb.s, kit.chest);
+    }
+    if (kit.center && front > 0.05) {  // kit.center: [colour, ...] thin stripes side by side down the middle of the front
+      const w = 0.03 * k, n = kit.center.length;
+      kit.center.forEach((col, i) => { const off = (i - (n - 1) / 2) * w;
+        const a = pr(add(add(add(sk.C, mul(sk.spine, 0.02 * k)), mul(sk.r, off)), mul(sk.ft, 0.12 * k))), bq = pr(add(add(waist, mul(sk.r, off)), mul(sk.ft, 0.1 * k)));
+        band(g, a, bq, w * 0.5 * a.s, w * 0.5 * bq.s, col); });
+    }
+    if (kit.piping && front > 0.05) {  // kit.piping: a line down each side of the front (a referee's shirt)
+      for (const sd of [-1, 1]) { const a = pr(add(add(sk.C, mul(sk.r, sd * 0.1 * k * b)), mul(sk.ft, 0.11 * k))), bq = pr(add(add(waist, mul(sk.r, sd * 0.15 * k * b)), mul(sk.ft, 0.085 * k)));
+        band(g, a, bq, 0.009 * k * a.s, 0.009 * k * bq.s, kit.piping); }
+    }
     if (kit.bare) {  // a bare torso reads as a body, not a box: soft side shading and a few lines of anatomy
       const sh = g.createLinearGradient(x0, 0, x1, 0); sh.addColorStop(0, 'rgba(80,40,20,0.18)'); sh.addColorStop(0.3, 'rgba(80,40,20,0)'); sh.addColorStop(0.7, 'rgba(80,40,20,0)'); sh.addColorStop(1, 'rgba(80,40,20,0.22)');
       g.fillStyle = sh; g.fillRect(x0, y0, x1 - x0, y1 - y0);
@@ -876,7 +956,6 @@ function drawSkeleton(g, B, pl, st, sk) {
       else { const a = P(0, 0.06, -0.13), e = P(0, 0.4, -0.12); g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(e.x, e.y); g.stroke();
         for (const sd of [-1, 1]) { const s0 = P(sd * 0.05, 0.08, -0.13), s1 = P(sd * 0.13, 0.2, -0.13), s2 = P(sd * 0.06, 0.24, -0.13); g.beginPath(); g.moveTo(s0.x, s0.y); g.quadraticCurveTo(s1.x, s1.y, s2.x, s2.y); g.stroke(); } }
     }
-    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(x0, y1 - (y1 - y0) * 0.16, x1 - x0, (y1 - y0) * 0.16);  // the hem tucked in
     g.restore();
     if (front > 0.12) {  // V-neck and the badge
       const a = pr(add(add(sk.neck, mul(sk.r, -0.07 * k)), mul(sk.ft, 0.09 * k))), bpt = pr(add(add(sk.C, mul(sk.spine, -0.13 * k)), mul(sk.ft, 0.125 * k))), c2 = pr(add(add(sk.neck, mul(sk.r, 0.07 * k)), mul(sk.ft, 0.09 * k)));
@@ -891,43 +970,83 @@ function drawSkeleton(g, B, pl, st, sk) {
       decal(g, numTex(pl.num, kit.num, kit.numEdge), back(-0.15, 0.06), back(0.15, 0.06), back(-0.15, 0.34), clamp((-front - 0.15) * 4));
     }
   } });
-  // arms. Each arm draws its own shoulder: a hull from the top and the outer edge of the shoulder into a ring round the
-  // end of the sleeve, so the sleeve grows out of the shirt at any angle (a raised arm included); the skin of the upper
-  // arm starts inside the sleeve, so no round end shows
+  // arms. The shoulder itself is the shirt's (above); each arm brings its sleeve and what shows below it
   const ring = (p, axis, r, n = 8) => { const a = nrm(axis), u = nrm(Math.abs(a[1]) < 0.9 ? [a[2], 0, -a[0]] : [1, 0, 0]), v = [a[1] * u[2] - a[2] * u[1], a[2] * u[0] - a[0] * u[2], a[0] * u[1] - a[1] * u[0]];
     return Array.from({ length: n }, (_, i) => { const t = i / n * TAU; return add(p, add(mul(u, Math.cos(t) * r), mul(v, Math.sin(t) * r))); }); };
   // Each arm is two drawables, sorted on their own: the upper arm with its shoulder, and the forearm with the hand (a
   // forearm swung across the body is in front of it, one swung back is behind it)
-  for (const A of sk.arms) {
-    const out = mul(sk.r, A.sd), upA = sub(A.elbow, A.sh);
+  sk.arms.forEach((A, ai) => {
+    const out = mul(sk.r, A.sd), upA = sub(A.elbow, A.sh), fw = kit.bare ? 0 : farOf(armD, ai);
+    // a bare arm is skin, a shade darker on the far side. A long sleeve is the shirt's own colour from the shoulder to the
+    // middle of the upper arm, so that it grows out of the shirt without a seam, and from there darkens a little down to
+    // the cuff, so that a forearm across the chest still shows. The colour runs along the arm itself (0 at the shoulder,
+    // 0.52 at the elbow, 1 at the wrist): the upper arm and the forearm meet at the elbow in the same paint
+    const sleeveC = u => mix(kit.shirt, '#000000', (0.09 + fw) * clamp((u - 0.25) / 0.75));
+    const armPaint = (P, Q, u0, u1) => { if (!kit.long) return tone(skin, fw); if (Math.hypot(Q.x - P.x, Q.y - P.y) < 2) return sleeveC((u0 + u1) / 2);
+      const gr = g.createLinearGradient(P.x, P.y, Q.x, Q.y); for (let i = 0; i <= 4; i++) gr.addColorStop(i / 4, sleeveC(u0 + (u1 - u0) * i / 4)); return gr; };
     parts.push({ d: dp(A.sh) * 0.5 + dp(A.elbow) * 0.5, kind: 'arm', draw: () => {
       const E = pr(A.elbow);
       if (kit.bare) {  // a bare shoulder is round: from the base of the neck over the deltoid into the arm, no corners
         const S0 = pr(add(add(sk.C, mul(out, 0.08 * k * b)), mul(sk.spine, 0.01 * k))), Sh = pr(A.sh);
-        capsule(g, S0, Sh, 0.07 * k * S0.s * b, 0.078 * k * Sh.s * b, skin);
-        capsule(g, Sh, E, 0.076 * k * Sh.s * b, 0.056 * k * E.s * b, skin);
+        cap(S0, Sh, 0.07 * k * S0.s * b, 0.078 * k * Sh.s * b, skin);
+        cap(Sh, E, 0.076 * k * Sh.s * b, 0.056 * k * E.s * b, skin);
         return;
       }
-      // the upper arm (in a long sleeve: the sleeve) from inside the shoulder; then the shoulder, a hull from the top and
-      // the outer edge of the shoulder into a ring round the middle of the upper arm, over it, so no round end shows. A
-      // long sleeve is the same with a sleeve-coloured arm: a hull down to the elbow went flat when the arm pointed at us
-      const a0 = pr(lerp3(A.sh, A.elbow, 0.32));
-      capsule(g, a0, E, (kit.long ? 0.068 : 0.062) * k * a0.s * b, (kit.long ? 0.061 : 0.056) * k * E.s * b, kit.long ? kit.shirt : skin);
-      const shoulder = [add(add(sk.C, mul(out, 0.12 * k * b)), mul(sk.spine, 0.045 * k)), add(add(sk.C, mul(out, 0.22 * k * b)), mul(sk.spine, 0.0)),
-        add(add(sk.C, mul(out, 0.2 * k * b)), mul(sk.spine, -0.15 * k)), add(add(sk.C, mul(out, 0.17 * k * b)), mul(sk.ft, 0.08 * k)), add(add(sk.C, mul(out, 0.17 * k * b)), mul(sk.ft, -0.08 * k))];
-      const sl = [...shoulder, ...ring(lerp3(A.sh, A.elbow, 0.5), upA, (kit.long ? 0.052 : 0.06) * k * b)].map(pr);
-      g.save(); fillHull(sl, kit.shirt, mix(kit.shirtD, kit.shirt, 0.4), 0.03 * pxm); g.restore();
-      if (!kit.long && kit.trim && kit.trim !== kit.shirt) band(g, pr(lerp3(A.sh, A.elbow, 0.46)), pr(lerp3(A.sh, A.elbow, 0.5)), 0.076 * k * E.s * b, 0.075 * k * E.s * b, kit.trim);  // sleeve hem
-      if (pl.captain && A.sd < 0) band(g, pr(lerp3(A.sh, A.elbow, 0.3)), pr(lerp3(A.sh, A.elbow, 0.42)), 0.078 * k * E.s * b, 0.077 * k * E.s * b, pl.captain);  // captain's armband
+      // The sleeve grows out of the shoulder's ball (which the shirt has already painted): a long one runs from the ball to
+      // the elbow in one tapering shape; a short one is the hull of the ball and a ring round the middle of the upper arm,
+      // and the bare arm is a hull from that ring to the elbow. An arm that comes toward the camera is in front of its
+      // sleeve (painted after it), one that goes away is behind it: with the sleeve always on top, an arm held out at the
+      // lens showed as a lump of skin standing over the shoulder
+      const Q = pr(ballOf(A)), rq = RS * Q.s;
+      const bands = () => {
+        if (pl.captain && A.sd < 0) band(g, pr(lerp3(A.sh, A.elbow, 0.3)), pr(lerp3(A.sh, A.elbow, 0.42)), 0.078 * k * E.s * b, 0.077 * k * E.s * b, pl.captain);  // captain's armband
+        if (pl.armband && A.sd === pl.armband[1]) band(g, pr(lerp3(A.sh, A.elbow, 0.38)), pr(lerp3(A.sh, A.elbow, 0.52)), 0.079 * k * E.s * b, 0.078 * k * E.s * b, pl.armband[0]);  // a plain armband: [colour, -1 left | 1 right]
+      };
+      if (kit.long) { blob(g, Q, rq, E, 0.061 * k * E.s * b, armPaint(pr(A.sh), E, 0, 0.52)); bands(); return; }
+      const mid = lerp3(A.sh, A.elbow, 0.5);
+      const sleeve = () => { g.save(); fillHull([...circ(Q, rq), ...ring(mid, upA, 0.064 * k * b, 20).map(pr)], kit.shirt, null, 0.012 * pxm); g.restore(); bands(); };
+      const bare = () => { g.save(); fillHull([...ring(mid, upA, 0.059 * k * b, 20).map(pr), ...circ(E, 0.056 * k * E.s * b)], tone(skin, fw)); g.restore(); };
+      if (dp(A.elbow) < dp(A.sh)) { sleeve(); bare(); } else { bare(); sleeve(); }
     } });
     parts.push({ d: dp(A.elbow) * 0.4 + dp(A.hand) * 0.6, kind: 'fore', draw: () => {
-      const E = pr(A.elbow), Wr = pr(A.wrist), Hd = pr(A.hand);
-      capsule(g, E, Wr, (kit.long ? 0.061 : 0.056) * k * E.s * b, (kit.long ? 0.05 : 0.046) * k * Wr.s * b, kit.long ? kit.shirt : skin);
+      const E = pr(A.elbow), Wr = pr(A.wrist), Hd = pr(A.hand), handC = kit.gloves || tone(skin, fw), dark = mix(skin, '#000000', 0.3);
+      const r = Math.max(1, (kit.gloves ? 0.075 : 0.058) * k * Hd.s), ax = Hd.x - Wr.x, ay = Hd.y - Wr.y, al = Math.hypot(ax, ay) || 1, ux = ax / al, uy = ay / al;
+      let nx = -uy, ny = ux; if (nx * (hp.x - Hd.x) + ny * (hp.y - Hd.y) < 0) { nx = -nx; ny = -ny; }  // the thumb's side: toward the head
+      const at = (f0, n0) => ({ x: Hd.x + ux * r * f0 + nx * r * n0, y: Hd.y + uy * r * f0 + ny * r * n0 });
+      // pose.fingers: an open hand. One long rounded shape past the wrist (the four fingers held together) with the thumb
+      // at its side, in the arm's own skin: nothing marks the wrist. A hand has a darker edge only where it is laid on
+      // the head (pose.handsFront; on a face of the same skin it would vanish), and that edge is painted first, under the
+      // forearm, so it goes round the hand and never across the wrist; it fades in as the hand comes on to the head
+      const open = sk.pose.fingers && !kit.gloves, P0 = at(-0.05, 0), P1 = at(1.6, 0), T0 = at(0.1, 0.42), T1 = at(0.8, 1.0);
+      const rim = sk.pose.handsFront && !kit.gloves ? clamp((SKEL.headH * k * hp.s * 0.5 * (pl.headScale || 1) + r - Math.hypot(Hd.x - hp.x, Hd.y - hp.y)) / r) : 0;
+      if (rim > 0.02) { g.save(); g.globalAlpha *= rim;
+        if (open) { cap(T0, T1, r * 0.43, r * 0.36, dark); cap(P0, P1, r * 0.9, r * 0.72, dark); }
+        g.fillStyle = dark; g.beginPath(); g.arc(Hd.x, Hd.y, r * 1.13, 0, TAU); g.fill();
+        g.restore(); }
+      cap(E, Wr, (kit.long ? 0.061 : 0.056) * k * E.s * b, (kit.long ? 0.05 : 0.046) * k * Wr.s * b, armPaint(E, Wr, 0.52, 1));
       if (kit.long) band(g, pr(lerp3(A.elbow, A.wrist, 0.82)), pr(lerp3(A.elbow, A.wrist, 0.95)), 0.052 * k * Wr.s * b, 0.052 * k * Wr.s * b, kit.trim);  // cuffs
-      g.fillStyle = kit.gloves || skin; g.beginPath(); g.arc(Hd.x, Hd.y, Math.max(1, (kit.gloves ? 0.075 : 0.058) * k * Hd.s), 0, TAU); g.fill();
-      if (kit.gloves) { g.fillStyle = 'rgba(0,0,0,0.12)'; g.beginPath(); g.arc(Hd.x + 0.02 * k * Hd.s, Hd.y + 0.02 * k * Hd.s, Math.max(1, 0.05 * k * Hd.s), 0, TAU); g.fill(); }
+      g.fillStyle = handC; g.beginPath(); g.arc(Hd.x, Hd.y, r, 0, TAU); g.fill();
+      if (open) { cap(T0, T1, r * 0.3, r * 0.23, handC); cap(P0, P1, r * 0.77, r * 0.59, handC); }
+      const pt = sk.pose.point, pv = pt === true ? true : pt ? pt[A.sd < 0 ? 0 : 1] : false;
+      if (pv && !kit.gloves) {  // pose.point: one finger out along the forearm: true, or [left, right]; 'mid' in place of true: the middle finger.
+        // The index finger leaves the fist at its thumb edge (the edge toward the head) with the thumb folded up beside it: a
+        // pointing hand. 'mid': the finger comes out of the middle of the fist, the knuckles of the folded fingers either side of it
+        g.save(); g.lineCap = 'round';
+        if (pv === 'mid') {
+          for (const [col, w, kr] of [[dark, r * 0.7, r * 0.4], [handC, r * 0.48, r * 0.27]]) { g.strokeStyle = col; g.fillStyle = col; g.lineWidth = w;
+            g.beginPath(); g.moveTo(Hd.x, Hd.y); g.lineTo(Hd.x + ux * r * 2.7, Hd.y + uy * r * 2.7); g.stroke();
+            for (const sd of [-1, 1]) { g.beginPath(); g.arc(Hd.x + ux * r * 0.82 + sd * nx * r * 0.52, Hd.y + uy * r * 0.82 + sd * ny * r * 0.52, kr, 0, TAU); g.fill(); } }
+        } else {
+          const fx = Hd.x + nx * r * 0.45, fy = Hd.y + ny * r * 0.45;
+          for (const [col, w] of [[dark, r * 0.74], [handC, r * 0.52]]) { g.strokeStyle = col; g.lineWidth = w;
+            g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx + ux * r * 2.5, fy + uy * r * 2.5); g.stroke();
+            g.beginPath(); g.moveTo(Hd.x + nx * r * 0.55 - ux * r * 0.25, Hd.y + ny * r * 0.55 - uy * r * 0.25); g.lineTo(Hd.x + nx * r * 1.3 + ux * r * 0.3, Hd.y + ny * r * 1.3 + uy * r * 0.3); g.stroke(); }
+        }
+        g.fillStyle = handC; g.beginPath(); g.arc(Hd.x, Hd.y, r, 0, TAU); g.fill();
+        g.restore();
+      }
     } });
-  }
+  });
   // something the player carries or wears over the kit: st.prop = {draw(g, sk, pr), at, depth?} is sorted with the body,
   // so it sits in the right layer. at 'hands' (held up in front): over the whole body, legs included, and under the
   // forearms and hands that hold it; 'back' / 'front' (worn): on that side of the torso; depth(sk, dp): its own depth
@@ -944,21 +1063,44 @@ function drawSkeleton(g, B, pl, st, sk) {
   // as if 0.3 m nearer: an arm beside it in 3D does not end up across the face. No collar ring at the neck: drawn round
   // a thin neck it read as a ring of rope; the shirt's own top edge and the V-neck are the collar
   const hp = pr(sk.headC), hd = dp(sk.headC), N2 = pr(sk.neck);
-  const view = nrm(sub(B.E, sk.headC)), facing = dot([sk.f[0], 0, sk.f[2]], [view[0], 0, view[2]]) / (Math.hypot(view[0], view[2]) || 1);
-  const turn = clamp(dot(sk.f, B.R) * 1.1, -0.95, 0.95), tilt = clamp(Math.atan2(hp.x - N2.x, N2.y - hp.y), -1.1, 1.1);
-  parts.push({ d: hd - 0.3 + 0.002, kind: 'head', draw: () => {
+  // a figure rolled on its side (pose.tilt) looks where its chest looks, not along its heading: lying back in the air
+  // with one shoulder down, the face is turned up and to that side
+  let fd = sk.pose.tilt ? sk.ft : null;
+  const view = nrm(sub(B.E, sk.headC));
+  // pose.watch (0..1): the head turns from where the body faces toward the camera, at most 57° either way, so the eyes
+  // follow a camera that moves round him (the author: «comme si leurs yeux suivaient la caméra du regard»). Only while
+  // his chest is turned to the camera: from 75° off it the turn fades, and past side-on it is gone, so a camera going
+  // round behind him sees the back of his head (a face kept on the camera there sat on the back of his head, an owl's)
+  if (!fd && sk.pose.watch > 0) { const a0 = Math.atan2(sk.f[2], sk.f[0]), a1 = Math.atan2(view[2], view[0]);
+    const bf = Math.cos(a1 - a0), u = clamp((bf + 0.2) / 0.45), fade = u * u * (3 - 2 * u);
+    const d = clamp(Math.atan2(Math.sin(a1 - a0), Math.cos(a1 - a0)), -1.0, 1.0) * Math.min(1, sk.pose.watch) * fade; fd = [Math.cos(a0 + d), 0, Math.sin(a0 + d)]; }
+  const facing = fd ? dot(fd, view) / (fd === sk.ft ? 1 : (Math.hypot(view[0], view[2]) || 1)) : dot([sk.f[0], 0, sk.f[2]], [view[0], 0, view[2]]) / (Math.hypot(view[0], view[2]) || 1);
+  const turn = clamp(dot(fd || sk.f, B.R) * 1.1, -0.95, 0.95), tilt = clamp(Math.atan2(hp.x - N2.x, N2.y - hp.y), sk.pose.tilt ? -1.5 : -1.1, sk.pose.tilt ? 1.5 : 1.1);
+  // the neck. From the front it stands in the collar, over the shirt; from behind it comes out from under the shirt's
+  // top edge (drawn before the shirt): over it, it was a peg of skin stuck on the back.
+  // Motion blur draws the shot again at sub-frame times and averages them: a head that turned from back to face inside
+  // one frame's shutter came out as a see-through face over the hair (rule 58), and the neck going from over the shirt to
+  // under it as a ghost disc of skin on the collar. The sub-frames keep the choices made for the frame itself (HEADLOCK,
+  // kept by main.js per player and per drawing), so each switch stays a clean cut between two frames
+  let wFace = facing > -0.1 ? 1 : 0, fromBehind = front < -0.1;
+  const HL = globalThis.HEADLOCK;
+  if (HL) { const i = HL.n.get(pl) || 0, rec = HL.rec.get(pl) || []; HL.n.set(pl, i + 1); HL.rec.set(pl, rec);
+    if (!HL.sub) rec[i] = [wFace, fromBehind]; else if (rec[i]) [wFace, fromBehind] = rec[i]; }
+  parts.push({ d: fromBehind ? dp(lerp3(chest, waist, 0.5)) + 0.01 : hd - 0.3 + 0.002, kind: fromBehind ? 'neck' : 'head', draw: () => {
     const Ch = pr(add(sk.neck, mul(sk.spine, 0.09 * k)));
     capsule(g, N2, Ch, 0.052 * k * N2.s, 0.05 * k * Ch.s, skinD, false);
   } });
   parts.push({ d: hd - 0.3, kind: 'head', draw: () => {
-    const s = SKEL.headH * k * hp.s / 250 * (pl.headScale || 1), wFace = facing > -0.1 ? 1 : 0;
+    const s = SKEL.headH * k * hp.s / 250 * (pl.headScale || 1);
     if (wFace < 1) { g.save(); g.globalAlpha *= 1 - wFace; backHead(g, c, hp.x, hp.y, s, -turn, tilt); g.restore(); }
-    if (wFace > 0) drawChar(g, pl.who, { x: hp.x, y: hp.y, s, e: { ...(typeof st.e === 'string' ? EXPR[st.e] : st.e || EXPR.neutral), turn }, t: st.t || 0, noBody: true, tilt, alpha: wFace });
+    if (wFace > 0) drawChar(g, pl.who, { x: hp.x, y: hp.y, s, e: { ...(typeof st.e === 'string' ? EXPR[st.e] : st.e || EXPR.neutral), turn }, t: st.t || 0, noBody: true, tilt, alpha: wFace, earIn: 1 });
   } });
   // the face is never under the player's own arm: a forearm raised toward the camera (arms up to celebrate) went across
   // his eyes. His own arms and hands always go behind his head; the cartoon head is big enough to read as in front
   const armMin = Math.min(...parts.filter(p => p.kind === 'arm' || p.kind === 'fore').map(p => p.d));
   for (const p of parts) if (p.kind === 'head') p.d = Math.min(p.d, armMin - 0.004 + (p.d - (hd - 0.3)));
+  // pose.handsFront: the exception, hands laid on the head: the forearms and hands go over it
+  if (sk.pose.handsFront) { const hm = Math.min(...parts.filter(p => p.kind === 'head').map(p => p.d)); for (const p of parts) if (p.kind === 'fore') p.d = hm - 0.01; }
   parts.sort((a, b2) => b2.d - a.d);
   g.save(); if (st.alpha != null) g.globalAlpha *= st.alpha;
   if (st.blur > 0.5) g.filter = `blur(${st.blur.toFixed(1)}px)`;

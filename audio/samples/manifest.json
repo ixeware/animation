@@ -418,5 +418,20 @@
   "prompt": "Busy outdoor street market in Mexico City, vendors calling, chatter, distant traffic, daytime ambience, no music",
   "source": "ElevenLabs sound generation",
   "loop": true
+ },
+ "rain": {
+  "files": [
+   "rain_0.flac"
+  ],
+  "prompt": "Heavy steady rain pouring down on an open football stadium, rain hitting wet grass and plastic seats, constant downpour, no thunder, no voices, no music",
+  "source": "ElevenLabs sound generation",
+  "loop": true
+ },
+ "siu": {
+  "files": [
+   "siu_0.flac"
+  ],
+  "prompt": "Ronaldo's \"Siu\": one short ElevenLabs take of the word (voice Callum, eleven_v3), layered with 14 lower and higher copies a little late and a big hall, as a stadium shouting it with him",
+  "source": "ElevenLabs text to speech, layered (statpad, 11 November 2026)"
  }
 }

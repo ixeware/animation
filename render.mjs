@@ -4,6 +4,8 @@
 //   node render.mjs fischer --cues                       -> build/cues.json only (sound edits: then audio/mix.py)
 //   node render.mjs fischer --qa [--step 0.1]       -> build/qa.json: text over faces / captions, text off frame, faces cut
 //   any of these with --motion 1|2: the text motion profile (LOOK.motion) for an A/B; --out name.mp4: the video's file name
+//   --scale 2 (stills and the video): render at twice the size, 2160x3840 ("4K"); see engine/js/hidpi.js. QA and the
+//   review sheets always run at 1080x1920: the picture is the same
 import { chromium } from 'playwright';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -28,8 +30,12 @@ const server = http.createServer((req, res) => {
 }).listen(0);
 const PORT = server.address().port;
 
+// --scale N: N×N device pixels behind every pixel of the film (the page draws each canvas that much larger, and the
+// screenshots of the same 1080x1920 viewport come out N times the size)
+const SS = args.includes('--qa') || args.includes('--review') ? 1 : Math.max(1, Math.min(4, Math.round(+(opt('scale') || 1)) || 1));
 async function openPage(browser, extra = '') {
-  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
+  if (SS > 1) extra += '&ss=' + SS;
+  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: SS });
   page.on('console', m => { if (m.type() === 'error') console.error('[page]', m.text()); });
   page.on('pageerror', e => console.error('[pageerror]', e.message));
   await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}${opt('motion') ? '&motion=' + opt('motion') : ''}`);

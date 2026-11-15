@@ -261,9 +261,9 @@ function body(g, c, open) {
   }
 }
 
-function hairBack(g, c, fw) {
+function hairBack(g, c, fw, turn = 0) {
   g.fillStyle = c.hairC;
-  if (c.hairFx) { c.hairFx(g, 'back', { fw, S }); return; }  // a cast that draws its own hair
+  if (c.hairFx) { c.hairFx(g, 'back', { fw, S, turn }); return; }  // a cast that draws its own hair (turn: for a ponytail that swings to the side)
   if (c.hair === 'messy') { g.beginPath(); g.ellipse(0, -20, 118 * fw, 125, 0, 0, 7); g.fill(); }
   if (c.hair === 'wavy') { g.beginPath(); g.ellipse(0, -40, 112 * fw, 105, 0, 0, 7); g.fill(); }
   if (c.hair === 'wig' || c.hair === 'tied') { g.beginPath(); g.ellipse(0, -30, 112 * fw, 112, 0, 0, 7); g.fill(); }
@@ -289,10 +289,10 @@ function hairBack(g, c, fw) {
   if (c.hair === 'updo') { g.beginPath(); g.ellipse(0, -150, 80, 62, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(0, -40, 118 * fw, 110, 0, 0, 7); g.fill(); }
 }
 
-function hairFront(g, c, fw, fh) {
+function hairFront(g, c, fw, fh, turn = 0) {
   const w = 100 * fw, h = 125 * fh;
   g.fillStyle = c.hairC;
-  if (c.hairFx) { c.hairFx(g, 'front', { fw, fh, S }); return; }
+  if (c.hairFx) { c.hairFx(g, 'front', { fw, fh, S, turn }); return; }  // turn: so a cast's hair can keep its cap on the skull
   const p = new Path2D();
   switch (c.hair) {
     case 'swept':
@@ -404,6 +404,10 @@ function hairFront(g, c, fw, fh) {
       p.moveTo(-w - 10, 30); p.bezierCurveTo(-w - 22, -10, -w - 10, -60, -w + 14, -70); p.lineTo(-w + 20, 20); p.closePath();
       p.moveTo(w + 10, 30); p.bezierCurveTo(w + 22, -10, w + 10, -60, w - 14, -70); p.lineTo(w - 20, 20); p.closePath(); break;
   }
+  // the front hair is drawn slid 9·turn toward the look (line 726) while the skull stays put: on a turned head a sliver of
+  // skull showed on the far side («on peux parfois voire apparaitre leurs crane»). The same shape held on the skull goes
+  // under it; head-on (turn 0) nothing changes. Not for the styles that are tufts or a bald crown by design
+  if (turn && !['cap', 'tuft', 'bald', 'turban', 'franklin', 'bicorne', 'receding', 'wild', 'updo'].includes(c.hair)) { g.save(); g.translate(-9 * turn, 0); g.fill(p); g.restore(); }
   g.fill(p);
   if (c.hair === 'quiff') {  // short faded sides, a sheen sweeping up into the quiff and a few strands
     for (const sd of [-1, 1]) {
@@ -544,7 +548,7 @@ function eye(g, cx, cy, e, side, t, pupilScale, iris = null) {
   g.restore();
 }
 
-export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0, tilt = 0, silhouette = false, shade = 'brightness(0)', eyeGlow = null, noBody = false, alpha = 1 } = {}) {
+export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0, tilt = 0, silhouette = false, shade = 'brightness(0)', eyeGlow = null, noBody = false, alpha = 1, earIn = null } = {}) {
   const c = CAST[who];
   const SK = LOOK.v2 ? SKIN2 : SKIN; S = c.skin ? { ...SK, ...c.skin } : SK;
   const V2 = LOOK.v2 && !silhouette;
@@ -560,11 +564,14 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
   if (!silhouette) qaRect(g, -118 * fw, -165, 236 * fw, 300, 'face', who);
   if (!noBody) { if (c.bodyScale) { g.save(); g.translate(0, 96); g.scale(c.bodyScale, c.bodyScale); g.translate(0, -96); body(g, c); g.restore(); } else body(g, c); }
   if (V2 && !noBody) { g.fillStyle = 'rgba(40,20,10,0.22)'; g.beginPath(); g.ellipse(0, 114 * fh, 52 * fw, 18, 0, 0, 7); g.fill(); }
-  hairBack(g, c, fw);
-  // ears
+  hairBack(g, c, fw, turn);
+  // ears. earIn (an option of the call, or the cast's own): how far they are brought in against the head, 0..1. 0 is how
+  // the chess casts are drawn; the football figures pass 1 (at 0 an ear stands a sixth of the head's half-width out of
+  // it, more when the head is turned: «les oreilles décollées de la tête»)
+  const ei = clamp(earIn ?? c.earIn ?? 0, 0, 1), ex = (98 - 6 * ei) * fw, esh = 10 - 6 * ei;
   g.fillStyle = V2 ? S.base : S.shade;
-  for (const sd of [-1, 1]) { const k = 1 - clamp(sd * turn, 0, 1) * 0.75; g.beginPath(); g.ellipse(sd * 98 * fw - turn * 10, 8, 18 * c.ears * k, 28 * c.ears, 0, 0, 7); g.fill();
-    if (V2) { g.fillStyle = rgba(S.deep, 0.45); g.beginPath(); g.ellipse(sd * 101 * fw - turn * 10, 10, 8 * c.ears * k, 17 * c.ears, 0, 0, 7); g.fill(); g.fillStyle = S.base; } }
+  for (const sd of [-1, 1]) { const k = 1 - clamp(sd * turn, 0, 1) * 0.75; g.beginPath(); g.ellipse(sd * ex - turn * esh, 8, (18 - 3 * ei) * c.ears * k, (28 - 4 * ei) * c.ears, 0, 0, 7); g.fill();
+    if (V2) { g.fillStyle = rgba(S.deep, 0.45); g.beginPath(); g.ellipse(sd * (ex + 3 * fw) - turn * esh, 10, (8 - 2 * ei) * c.ears * k, (17 - 3 * ei) * c.ears, 0, 0, 7); g.fill(); g.fillStyle = S.base; } }
   // head with soft side shading
   const hp = headPath(fw, fh, jaw);
   const hg = g.createLinearGradient(-110, 0, 110, 0); hg.addColorStop(0, S.base); hg.addColorStop(0.7, S.base); hg.addColorStop(1, S.shade);
@@ -597,8 +604,8 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
     g.save(); g.clip(hp); g.fillStyle = c.beard; g.beginPath(); g.moveTo(-110, 20); g.bezierCurveTo(-90, 60, -60, 50, -30, 52); g.quadraticCurveTo(0, 46, 30, 52);
     g.bezierCurveTo(60, 50, 90, 60, 110, 20); g.lineTo(110, 200); g.lineTo(-110, 200); g.closePath(); g.fill(); g.restore();
   }
-  // blink every ~3.7s unless lids already heavy
-  const bt = (t + (who.length * 0.37)) % 3.7, blink = bt < 0.12 ? Math.sin(bt / 0.12 * Math.PI) : 0;
+  // blink every ~3.7s unless lids already heavy (e.noBlink: a stare, a roar - the eyes stay open)
+  const bt = (t + (who.length * 0.37)) % 3.7, blink = !e.noBlink && bt < 0.12 ? Math.sin(bt / 0.12 * Math.PI) : 0;
   const ee = { ...e, lid: Math.max(Math.min(1, (e.lid ?? 0) + (c.lids || 0) * (1 - (e.pupil ? 1 : 0))), blink) };
   g.save(); g.translate(turn * 26 * fw, 0);  // head turn: the face slides toward the look direction
   if (silhouette) {
@@ -720,7 +727,7 @@ export function drawChar(g, who, { x = 0, y = 0, s = 1, e = EXPR.neutral, t = 0,
     }
   }
   g.restore();
-  g.save(); g.translate(turn * 9, 0); hairFront(g, c, fw, fh); g.restore();
+  g.save(); g.translate(turn * 9, 0); hairFront(g, c, fw, fh, turn); g.restore();
   if (!silhouette) {
     if (e.sweat) sweatDrop(g, 92, -70 + Math.sin(t * 2) * 4 + ((t * 30) % 30), 0.9, e.sweat);
     if (e.tear) { g.fillStyle = rgba('#7cc4f2', 0.9 * e.tear); g.beginPath(); g.ellipse(34, 24 + ((t * 40) % 60), 7, 11, 0, 0, 7); g.fill(); }
@@ -735,6 +742,16 @@ function mouth(g, e, c) {
   if (e.mouth === 'o') {
     g.fillStyle = '#5A2320'; g.beginPath(); g.ellipse(0, 4, 13 + open * 6, 10 + open * 16, 0, 0, 7); g.fill();
     g.fillStyle = '#C9605A'; g.beginPath(); g.ellipse(0, 10 + open * 8, 8, 5, 0, 0, 7); g.fill();
+  } else if (e.mouth === 'shout') {  // a roar: wide open and squarer than an "o", the upper lip drawn back off the teeth, the tongue showing
+    const sw = w - 5 + open * 5, hh = 20 + open * 34, k = -curve * 9, y0 = -6;
+    g.beginPath(); g.moveTo(-sw, y0 + k + 6); g.quadraticCurveTo(-sw, y0 + k * 0.4 - 4, -sw * 0.55, y0 - 6); g.quadraticCurveTo(0, y0 - 11, sw * 0.55, y0 - 6); g.quadraticCurveTo(sw, y0 + k * 0.4 - 4, sw, y0 + k + 6);  // the upper lip arched, its corners pulled down
+    g.bezierCurveTo(sw + 2, hh * 0.82, sw * 0.72, hh, 0, hh); g.bezierCurveTo(-sw * 0.72, hh, -sw - 2, hh * 0.82, -sw, y0 + k + 6); g.closePath();  // the jaw dropped: square, not a smile's bowl
+    g.fillStyle = '#4A1A18'; g.fill();
+    g.save(); g.clip();
+    g.fillStyle = '#FFFFFF'; g.beginPath(); g.moveTo(-sw - 4, y0 - 16); g.lineTo(sw + 4, y0 - 16); g.lineTo(sw + 4, y0 + 7 + k * 0.5); g.quadraticCurveTo(0, y0 + 12, -sw - 4, y0 + 7 + k * 0.5); g.closePath(); g.fill();  // upper teeth
+    g.fillStyle = '#C9605A'; g.beginPath(); g.ellipse(0, hh - 3, sw * 0.6, hh * 0.3, 0, 0, 7); g.fill();  // tongue
+    if (open > 0.4) { g.fillStyle = '#FFFFFF'; g.beginPath(); g.moveTo(-sw, hh + 2); g.lineTo(-sw, hh - 9); g.quadraticCurveTo(0, hh - 4, sw, hh - 9); g.lineTo(sw, hh + 2); g.closePath(); g.fill(); }  // lower teeth
+    g.restore();
   } else if (open > 0.15 && (e.mouth === 'smile' || e.mouth === 'grit')) {
     const hh = 10 + open * 26;
     g.fillStyle = '#5A2320'; g.beginPath(); g.moveTo(-w - 6, -curve * 8);
