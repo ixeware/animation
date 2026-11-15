@@ -7,6 +7,8 @@
   resigned after one move. Chess.com never resigns.», вопрос числом. 63 с, свежие цифры Chess.com за октябрь 2026.
   Факты — [SOURCES](../episodes/fairplay/SOURCES.md) (`www.chess.com` из сессии не открывается: цифры взяты из
   поисковой выдачи с цитатами страниц, сверить перед публикацией). Метка защиты теперь обходит и наши надписи.
+  Готово: `episodes/fairplay/build/fairplay.mp4` (1080p) и `fairplay_4k.mp4`, отпечатки в `business/proofs.md`. Попутно
+  движок перестал ставить резкий наезд ближе 0,7 с к концу плана (давал вспышку 0,5 с).
 - **15.11.2026 — жалоба на копию за impersonation.** Автор попросил текст. Аватар канала-копии оказался его логотипом
   из TikTok (король с печатью «64») — это и есть impersonation по правилу YouTube. Текст на 707 знаков, сравнение
   аватаров и порядок подачи — в [business/youtube_copies.md](../business/youtube_copies.md); подаёт автор сам.
