@@ -1118,20 +1118,37 @@ function camCard(g, t, who, e, { x = 838, y = 300, w = 210, label = null, closed
 }
 const youCard = (g, t, e, o = {}) => camCard(g, t, 'you', e, { label: 'YOU', ...o });
 
-// the "vibrating device" of the 2022 rumour, never shown: a pink wand under the censor's mosaic, buzzing (the hook, the
-// loop at the end; crossed out on "Chess.com's clue wasn't a vibrator")
-const VIB_SRC = tex(120, 260, (x, w, h) => {
-  const gr = x.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, '#E2559F'); gr.addColorStop(0.5, '#FF8FCB'); gr.addColorStop(1, '#C43C86'); x.fillStyle = gr;
-  x.beginPath(); x.ellipse(60, 54, 52, 50, 0, 0, 7); x.fill(); x.beginPath(); x.roundRect(36, 84, 48, 168, 22); x.fill();
-  x.fillStyle = '#8E2E66'; x.fillRect(36, 150, 48, 12); x.fillStyle = 'rgba(255,255,255,0.55)'; x.beginPath(); x.ellipse(40, 40, 13, 22, -0.4, 0, 7); x.fill();
-});
-const VIB_PIX = tex(9, 20, (x, w, h) => { x.imageSmoothingEnabled = true; x.drawImage(VIB_SRC, 0, 0, w, h); });
+// the "vibrating device" of the 2022 rumour, never shown: a pink wand drawn whole, then the block round it (it and what
+// is behind it) turned into the big squares of a censor's mosaic; buzzing (the hook, the loop at the end; crossed out on
+// "Chess.com's clue wasn't a vibrator")
+const MOS = makeCanvas(16, 16);
+function mosaic(g, x0, y0, w, h, block) {  // the rectangle as it is on the canvas now, in squares of `block` px
+  const m = g.getTransform(), px = m.a * x0 + m.c * y0 + m.e, py = m.b * x0 + m.d * y0 + m.f, pw = Math.abs(m.a) * w, ph = Math.abs(m.d) * h;
+  const nx = Math.max(2, Math.round(w / block)), ny = Math.max(2, Math.round(h / block));
+  if (MOS.width !== nx || MOS.height !== ny) { MOS.width = nx; MOS.height = ny; }
+  const c = MOS.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, nx, ny); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+  c.drawImage(g.canvas, px, py, pw, ph, 0, 0, nx, ny);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(MOS, 0, 0, nx, ny, px, py, pw, ph); g.restore();
+}
+function wandShape(g, h) {  // the device itself, centred, `h` tall: a round head on a long handle, shaded
+  const s = h / 260;
+  g.save(); g.scale(s, s);
+  const hg = g.createRadialGradient(-16, 34, 6, 0, 54, 62); hg.addColorStop(0, '#FFD3EA'); hg.addColorStop(0.45, '#FF7FC0'); hg.addColorStop(1, '#B02A72');
+  g.fillStyle = hg; g.beginPath(); g.ellipse(0, -76, 54, 50, 0, 0, 7); g.fill();
+  const bg = g.createLinearGradient(-26, 0, 26, 0); bg.addColorStop(0, '#9E2366'); bg.addColorStop(0.35, '#FF9BD0'); bg.addColorStop(1, '#A8286C');
+  g.fillStyle = bg; g.beginPath(); g.moveTo(-20, -34); g.lineTo(20, -34); g.lineTo(26, 10); g.lineTo(-26, 10); g.closePath(); g.fill();
+  g.beginPath(); g.roundRect(-26, 4, 52, 122, 24); g.fill();
+  g.fillStyle = '#F4F1F6'; for (const yy of [30, 58]) { g.beginPath(); g.arc(0, yy, 9, 0, 7); g.fill(); }
+  g.fillStyle = '#5A1238'; g.fillRect(-26, 86, 52, 8);
+  g.restore();
+}
 function pixVib(g, x, y, h, t, { a = 1, buzz = 1, rot = 0.25, both = false } = {}) {  // both: the buzz on both sides (else away from the face on its left)
   if (a <= 0) return;
-  const w = h * 120 / 260, sh = buzz ? 1 : 0;
-  g.save(); g.globalAlpha *= clamp(a); g.translate(x + Math.sin(t * 61) * h * 0.022 * sh, y + Math.cos(t * 53) * h * 0.016 * sh); g.rotate(rot + Math.sin(t * 47) * 0.05 * sh);
-  g.imageSmoothingEnabled = false; g.drawImage(VIB_PIX, -w / 2, -h / 2, w, h); g.imageSmoothingEnabled = true;
-  g.restore();
+  const sh = buzz ? 1 : 0, cx = x + Math.sin(t * 61) * h * 0.022 * sh, cy = y + Math.cos(t * 53) * h * 0.016 * sh;
+  g.save(); g.globalAlpha *= clamp(a); g.translate(cx, cy); g.rotate(rot + Math.sin(t * 47) * 0.05 * sh); wandShape(g, h); g.restore();
+  // the censor's squares over it and round it: about 8 across, 13 down
+  const bw = h * 0.68, bh = h * 1.06, blk = h / 12.5;
+  mosaic(g, Math.round(x - bw / 2), Math.round(y - bh / 2), Math.round(bw), Math.round(bh), blk);
   if (buzz <= 0) return;
   g.save(); g.globalAlpha *= clamp(a) * buzz; g.lineCap = 'round';
   for (let k = 0; k < 3; k++) { const ph = (t * 3.4 + k / 3) % 1; g.strokeStyle = rgba(GOLD, 1 - ph); g.lineWidth = Math.max(4, h * 0.035);
