@@ -124,6 +124,11 @@
   `content`; маленькие (< ~20 КБ) приходят в ответ целиком — их не брать.
 
 ## Chessnut (Stella)
+- **16.11.2026, 02:30 UTC — Стелла ответила на просьбу про копию:** «I will immediately file a Trademark Complaint with
+  YouTube on your behalf, since the unauthorized upload prominently displays our Chessnut logo and products. I'll keep
+  you posted on the outcome.» Про оплату в письме ничего. Срок оплаты по её словам — понедельник 16.11; в почте канала
+  уведомлений PayPal нет (PayPal может быть на другой почте автора). Совет автору: сегодня ответить только спасибо, про
+  $400 спросить в среду 18.11, если не придут.
 - **14.11.2026, 16:05 UTC — просьба подать заявку на удаление копии.** Автор: «отправь стелле тоже письмо чтоб они
   страйк кинули». Стелле ушло письмо в ветку про «2.13 seconds»: копия на YouTube
   (`https://www.youtube.com/watch?v=Wmz-pghiWnE`, залита 11.11 в 19:21 UTC, 174 тыс. просмотров, описание пустое),
