@@ -1,9 +1,9 @@
 {
  "title": "Chess.com will catch you anyway",
  "channel": "THE 64 FILES",
- "post": "Hans said chess speaks for itself. Chess.com was listening 🕵️ How many points did YOU get back? #chess #chesscom #hansniemann #magnuscarlsen #fairplay",
+ "post": "GothamChess told a stream sniper f6 was a very good move 🕵️ How many points did Chess.com give YOU back? #chess #chesscom #gothamchess #hansniemann #fairplay",
  "lead_in": 0.05,
- "tail": 1.6,
+ "tail": 1.4,
  "voice": {
   "provider": "elevenlabs",
   "voice_id": "N2lVS1w4EtoT3dr4eOWO",
@@ -95,28 +95,6 @@
    }
   },
   {
-   "id": "bait",
-   "text": "Hans said chess speaks for itself.",
-   "say": "Hans said: chess speaks for itself.",
-   "pause": 0.5,
-   "colors": {
-    "Hans": "blue",
-    "speaks": "gold",
-    "itself.": "gold"
-   }
-  },
-  {
-   "id": "bait2",
-   "text": "Chess.com listened.",
-   "say": "[serious] Chess dot com listened.",
-   "pause": 0.6,
-   "colors": {
-    "Chess.com": "blue",
-    "listened.": "lime"
-   },
-   "take": 8
-  },
-  {
    "id": "trap1",
    "text": "That's trap one. There are three more.",
    "say": "That's trap one. There are three more.",
@@ -166,16 +144,59 @@
   },
   {
    "id": "four",
-   "text": "Four: your opponents. In October, they sent 1.4 million reports.",
-   "say": "Four: your opponents. In October, they sent one point four million reports.",
-   "pause": 0.75,
+   "text": "Four: your opponents.",
+   "say": "Four: your opponents.",
+   "pause": 0.2,
    "colors": {
     "Four:": "gold",
-    "opponents.": "blue",
+    "opponents.": "blue"
+   },
+   "take": 3
+  },
+  {
+   "id": "gotham",
+   "text": "GothamChess caught his opponent watching his stream.",
+   "say": "Gotham Chess caught his opponent watching his stream.",
+   "pause": 0.15,
+   "colors": {
+    "GothamChess": "red",
+    "watching": "gold",
+    "stream.": "gold"
+   }
+  },
+  {
+   "id": "gotham2",
+   "text": "So he said: f6 is a very good move.",
+   "say": "So he said: eff six is a very good move.",
+   "pause": 0.45,
+   "colors": {
+    "f6": "lime",
+    "very": "lime",
+    "good": "lime",
+    "move.": "lime"
+   },
+   "take": 1
+  },
+  {
+   "id": "gotham3",
+   "text": "It wasn't.",
+   "say": "[deadpan] It wasn't.",
+   "pause": 0.45,
+   "colors": {
+    "wasn't.": "red"
+   }
+  },
+  {
+   "id": "four2",
+   "text": "In October: 1.4 million reports.",
+   "say": "In October: one point four million reports.",
+   "pause": 0.75,
+   "colors": {
     "1.4": "gold",
     "million": "gold",
     "reports.": "red"
-   }
+   },
+   "take": 2
   },
   {
    "id": "closed",

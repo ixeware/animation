@@ -15,3 +15,5 @@
 | 2026-11-15 17:58:04 | `fairplay_youtube.mp4` | 28406694 | 65.23 s | 1080×1920 | `c68a9a6de4e6d7c9188d932cf7b7dee6cc165b69ab65c481b6dd9b05b8696b6d` | fairplay v5, 1080p, YouTube version (the handle without the YouTube line) |
 | 2026-11-15 18:19:53 | `fairplay.mp4` | 28380279 | 65.23 s | 1080×1920 | `bf9c1d7f7b977cfaff80b29f88636b04bb12d19c16679361bdf384b297d40545` | fairplay v6, 1080p, TikTok (a real censor mosaic on the device) |
 | 2026-11-15 18:19:53 | `fairplay_youtube.mp4` | 28408627 | 65.23 s | 1080×1920 | `0eb157706f2a80776ffcfbfd89ae09a8cabc8f0c935044dd117f322ec1806a1c` | fairplay v6, 1080p, YouTube version (the handle without the YouTube line) |
+| 2026-11-16 10:21:40 | `fairplay.mp4` | 28813695 | 66.20 s | 1080×1920 | `71e1bd032d4eb943adea9bb8351069933a297a748ea8655db2171db951a9a151` | fairplay v7, 1080p, TikTok (GothamChess and the stream sniper in trap 4) |
+| 2026-11-16 10:21:40 | `fairplay_youtube.mp4` | 28811098 | 66.20 s | 1080×1920 | `fe88236ef9fa102c5b4485dccec377f1788d8fa13a691c4333f2e49fa3f3f5b3` | fairplay v7, 1080p, YouTube version (the handle without the YouTube line) |

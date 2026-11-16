@@ -1223,6 +1223,37 @@ function lineup(g, t, { e = [], bangs = [0, 0, 0], slate = 1, spot = 0, step = 0
     for (let b = 0; b < bangs[i]; b++) { const p = zoom === 1 ? [x, y - 205 * s - b * 60] : [zc[0] + (x - zc[0]) * zoom, zc[1] + (y - 205 * s - b * 60 - zc[1]) * zoom]; bang(g, p[0], p[1], 0.95 * zoom); } });
 }
 
+// ---- trap 4's story, the edit-bait (the author, 16.11.2026: «стримснайпить тоже нельзя, поэтому готам так наебал
+// стримснайпера»): GothamChess on stream catches his opponent watching it and says out loud "f6 is a very good move";
+// the opponent plays it and is mated, Qg6#. The board's top five ranks as on the stream; White's first two ranks are
+// drawn plausibly (the clip does not show them)
+const GB = (() => {  // [file, rank, piece, colour], from White's side
+  const L = [], put = (w, c) => { const [f, r] = [w.charCodeAt(0) - 97, +w[1] - 1]; L.push([f, r, w[2], c]); };
+  'a8r d8q e8k f8b g8n h8r d7n a7p b7p e7p f7p g7p c6p d5p h5p'.split(' ').forEach(w => put(w, 'b'));
+  'd3q g5b e5p d4p h4p a2p b2p c2p f2p g2p a1r b1n e1k f1b g1n h1r'.split(' ').forEach(w => put(w, 'w'));
+  return L;
+})();
+const STREAM = makeCanvas(1760, 990), SB = { s: 110, x: 60, y: 55 };
+function streamTex(t, { f6 = 0, mate = 0, e = 'focus' } = {}) {
+  const x = STREAM.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
+  x.fillStyle = '#17181D'; x.fillRect(0, 0, 1760, 990);
+  const { s, x: bx, y: by } = SB, sq = (f, r) => [bx + f * s, by + (7 - r) * s];
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { x.fillStyle = (i + j) % 2 ? '#769656' : '#EEEED2'; x.fillRect(bx + i * s, by + j * s, s, s); }
+  const hl = (f, r, col = 'rgba(246,246,105,0.6)') => { const [qx, qy] = sq(f, r); x.fillStyle = col; x.fillRect(qx, qy, s, s); };
+  if (mate > 0) { hl(3, 2); hl(6, 5); } else if (f6 > 0) { hl(5, 6); hl(5, 5); }
+  if (mate >= 1) hl(4, 7, 'rgba(232,65,58,0.65)');  // the mated king
+  for (const [f, r, ty, c] of GB) {
+    let ff = f, rr = r;
+    if (c === 'b' && ty === 'p' && f === 5 && r === 6) rr = 6 - ease.inOut(clamp(f6));                                  // ...f7-f6
+    if (c === 'w' && ty === 'q') { const u = ease.inOut(clamp(mate)); ff = 3 + 3 * u; rr = 2 + 3 * u; }                // Qd3-g6#
+    drawPiece(x, ty, c, bx + (ff + 0.5) * s, by + (7 - rr + 0.93) * s, s * 0.86);
+  }
+  const L = { bg: ['#5A3F3F', '#1E1616'], name: 'GOTHAMCHESS', nameColor: '#FFD6D6' };
+  webcam(x, 990, 55, 720, 640, 'levy', e, t, { bg: L.bg, zoom: 1.0, cy: 0.5, name: L.name, nameColor: L.nameColor });
+  x.fillStyle = '#E8413A'; x.beginPath(); x.roundRect(1020, 82, 136, 52, 10); x.fill(); x.fillStyle = '#FFFFFF'; x.font = sans(30, 900); x.letterSpacing = '2px'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('● LIVE', 1088, 109);
+  return STREAM;
+}
+
 // his camera goes off: the picture squeezes to a line and goes black (off: 0..1)
 function camOff(g, off) {
   if (off <= 0) return;
@@ -1266,13 +1297,14 @@ export async function build(T) {
   const magA = s('mag') - 0.06, carlT = w('mag', 1), resT = w('mag', 2), aftA = w('mag', 5) - 0.06, moveT = w('mag', 7);
   const repA = s('report') - 0.06, slamT = w('report', 0) + 0.1, hisA = w('report', 3) - 0.06, oppT = w('report', 4), likA = w('report', 5) - 0.06, chT = w('report', 6), hunT = w('report', 10);
   const clueA = s('clue') - 0.06, notVT = w('clue', 3), betT = w('clue', 8), clickT = w('clue', 11);
-  const baitA = s('bait') - 0.06, spkT = w('bait', 2), canA = s('bait2') - 0.06, canT = w('bait2', 0), lisT = w('bait2', 1);
   const t1A = s('trap1') - 0.06, oneT = w('trap1', 2), threeT = w('trap1', 5);
   const twoA = s('two') - 0.06, twoT = w('two', 0), playT = w('two', 5), bestT = w('two', 11);
   const standA = s('stand') - 0.06, moreT = w('stand', 2), outT = w('stand', 6);
   const thrA = s('three') - 0.06, thrT = w('three', 0), engMT = w('three', 2), overA = w('three', 6) - 0.06, hundT = w('three', 8), patT = w('three', 12);
-  const fourA = s('four') - 0.06, fourT = w('four', 0), oppsT = w('four', 1), milT = w('four', 7);
-  const closA = T.e('four') + 0.08, numT = w('closed', 1), clT = w('closed', 3);
+  const fourA = s('four') - 0.06, fourT = w('four', 0), oppsT = w('four', 1);
+  const gA = s('gotham') - 0.06, watT = w('gotham', 4), g2A = s('gotham2') - 0.06, f6T = w('gotham2', 3), g3A = s('gotham3') - 0.06, wasT = w('gotham3', 1);
+  const milA = s('four2') - 0.06, milT = w('four2', 2);
+  const closA = T.e('four2') + 0.08, numT = w('closed', 1), clT = w('closed', 3);
   const BURST = s('closed') - 0.02;  // the door gives way on "Almost", after the pause with "FAIR PLAY! OPEN UP!"
   const twA = s('twist') - 0.06, ptsT = w('twist', 2), cheT = w('twist', 4), givT = w('twist', 8), backT = w('twist', 10);
   const refA = s('refund') - 0.06, milRT = w('refund', 1), monthT = w('refund', 5);
@@ -1388,22 +1420,6 @@ export async function build(T) {
   cue(clueA - 0.04, 'whoosh_soft', 0.3); cue(notVT + 0.25, 'error', 0.35); cue(betT, 'riser', 0.25);
   for (let k = 0; clickT + k * TOG < T.e('clue') + 0.1; k++) cue(clickT + k * TOG, k ? 'clack' : 'swipe_card', k ? 0.22 : 0.5);
 
-  // ======================= EDIT-BAIT (the author: «эдит байт тут слабый, так как чесскому никто эдиты не делает»):
-  // Hans's own line of 2022, the one his edits are cut from, in his speech bubble; music out; then the eye: "Chess.com listened."
-  shot(baitA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, HANSB[0]], [len(sh), K(0.0, 0.09, 7.6, [4, 3.05, 8.9])]], { t, e: glide });
-    hansAtBoard(g, t, { pieces: piecesAt(NC, 2), e: t >= spkT ? { ...EXPR.smug, look: [0, -0.1] } : EX.calm });
-  }, { trans: 'whip', hud: (g, lt, t) => {
-    if (t >= spkT - 0.1) speech(g, 'HANS NIEMANN, 2022', 'THE CHESS SPEAKS FOR ITSELF.', W / 2, 360, { size: 50, tail: 0.02, scale: lerp(1.25, 1, ease.back(clamp((t - spkT + 0.1) / 0.22))) });
-  } });
-  shot(canA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.0, -0.04, 18.5, [4, 7.0, 13.4])], [len(sh), K(0.0, -0.05, 15.8, [4, 7.0, 13.4])]], { t, e: glide, bump: t > canT && t < canT + 0.45 ? 1.3 : 0 });
-    const u = ease.out(clamp((t - canT) / 0.35));
-    room(g, t, { pieces: piecesAt(NC, 2), mon: false, farSky: eyeTex(u, t, Math.sin((t - canT) * 3) * 0.5), dim: 0.25 * u });
-    g.save(); g.fillStyle = `rgba(6,10,16,${0.35 * u})`; g.fillRect(0, 0, W, H); g.restore();
-  }, { trans: 'whip', vig: 0.65, hud: (g, lt, t) => { if (t >= lisT) badge(g, 'CHESS.COM LISTENED.', W / 2, 240, { color: '#7CFC9A', size: 60, ...popW(t, lisT) }); } });
-  cue(baitA - 0.04, 'whoosh_soft', 0.25); cue(spkT - 0.1, 'sparkle_pop', 0.3); cue(canT, 'boom_big', 0.6); cue(canT + 0.05, 'heartbeat', 0.5); cue(lisT, 'dun_dun', 0.4);
-
   // ======================= TRAP 1 OF 4: the row of traps on the giant board; the first one snaps =======================
   shot(t1A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.62, 0.36, 15, [0, 0.8, 10])], [len(sh), K(-0.48, 0.32, 13, [0, 0.8, 9.5])]], { t, e: glide, bump: t > oneT && t < oneT + 0.3 ? 1 : 0 });
@@ -1474,17 +1490,48 @@ export async function build(T) {
     else badge(g, 'YOUR OPPONENTS', W / 2, 240, { color: '#16161E', size: 58, ...popW(t, fourT + 1.0) });
     youCard(g, t, { ...EXPR.paranoid, sweat: 1 });
   } });
-  shot(milT - 0.35, (g, lt, t, sh) => {
+  // GothamChess's stream on the monitor; "you" in the corner watching it (the sniper)
+  const GSK = [K(0.0, 0.07, 11.9, [4, 3.3, 10.6]), K(0.0, 0.06, 11.0, [4, 3.3, 10.6])];
+  const levyE = t => t >= wasT + 0.3 ? { ...EXPR.triumph } : t >= f6T - 0.2 ? { ...EXPR.smug, look: [0.2, -0.1] } : t >= watT ? { ...EXPR.smug, look: [1, 0], lid: 0.45 } : { ...EXPR.focus, look: [-1, 0.35] };
+  const sniperE = t => t >= wasT + 0.3 ? { ...EXPR.shock, lid: 0 } : t >= f6T ? { ...EXPR.smug, look: [-0.6, 0.2] } : { ...EXPR.smug, look: [-0.8, 0.3], lid: 0.4 };
+  const mateU = t => clamp((t - wasT - 0.02) / 0.3), f6U = t => clamp((t - g3A - 0.05) / 0.22);
+  const levyRect = g => monRect(g, 990 + 190, 55 + 40, 990 + 530, 55 + 470, 'face', 'levy');
+  shot(gA, (g, lt, t, sh) => {
+    rig(B, lt, [[0, GSK[0]], [len(sh), GSK[1]]], { t, e: glide });
+    room(g, t, { pieces: piecesAt(NC, 2), screen: streamTex(t, { e: levyE(t) }) }); levyRect(g);
+  }, { kb: 0, trans: 'whip', hud: (g, lt, t) => {
+    nameTitle(g, t - gA, 'GOTHAMCHESS', 'IM LEVY ROZMAN, ON STREAM', { y: 250 });
+    youCard(g, t, sniperE(t), { y: 330, a: clamp((t - watT + 0.1) / 0.15) });
+    if (t >= watT + 0.2) plate(g, 'STREAM SNIPER', 820, 612, { color: RED, size: 30, ...popW(t, watT + 0.2) });
+  } });
+  shot(g2A, (g, lt, t, sh) => {  // closer on his camera: "f6 is a very good move"
+    rig(B, lt, [[0, K(0.0, 0.05, 7.4, [6.0, 3.1, 10.6])], [len(sh), K(0.0, 0.05, 6.6, [6.1, 3.15, 10.6])]], { t, e: glide });
+    room(g, t, { pieces: piecesAt(NC, 2), screen: streamTex(t, { e: levyE(t) }) }); levyRect(g);
+  }, { kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => {
+    if (t >= f6T - 0.15) speech(g, 'GOTHAMCHESS', 'F6 IS A VERY GOOD MOVE.', W / 2, 330, { size: 54, tail: 0.18, scale: lerp(1.25, 1, ease.back(clamp((t - f6T + 0.15) / 0.22))) });
+    youCard(g, t, sniperE(t), { y: 560 });
+  } });
+  shot(g3A, (g, lt, t, sh) => {  // the board: he plays f6; "It wasn't." Qg6, mate
+    rig(B, lt, [[0, K(0.0, 0.05, 7.6, [2.4, 4.2, 10.6])], [len(sh), K(0.0, 0.05, 6.9, [2.6, 4.3, 10.6])]], { t, e: glide, bump: t > wasT + 0.32 && t < wasT + 0.62 ? 1.4 : 0 });
+    room(g, t, { pieces: piecesAt(NC, 2), screen: streamTex(t, { f6: f6U(t), mate: mateU(t), e: levyE(t) }) }); levyRect(g);
+  }, { kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => {
+    if (t >= wasT + 0.32) stamp(g, 'CHECKMATE', W / 2, 1540, t, wasT + 0.32, { color: RED, size: 92, rot: -0.1 });
+    youCard(g, t, sniperE(t), { y: 330 });
+  } });
+  cue(gA - 0.04, 'whoosh_fast', 0.3); cue(watT + 0.2, 'sparkle_pop', 0.35); cue(g2A - 0.04, 'whoosh_soft', 0.25); cue(f6T - 0.15, 'pen', 0.3);
+  cue(g3A + 0.05, 'move', 0.6); cue(wasT + 0.3, 'move_capture', 0.7); cue(wasT + 0.32, 'boom_move', 0.6); cue(wasT + 0.32, 'stamp', 0.6); cue(wasT + 0.4, 'gasp', 0.3);
+
+  shot(milA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.22, -0.02, 25, [0, 12.4, 22])], [len(sh), K(-0.28, -0.03, 22, [0, 12.5, 22])]], { t, e: glide });
     arena(g, t); camWall(g, t, oppsT + 0.2);
     for (let k = 0; k < 9; k++) { const [cx, cy, cz] = camAt(k), a = B.project(cx - 1.4, cy + 1.6, cz), b = B.project(cx + 1.4, cy - 1.0, cz); qaRect(g, a.x, a.y, b.x - a.x, b.y - a.y, 'face', OPPS[k]); }
-    reportsFly(g, t, milT - 0.4);
-  }, { kb: 0, qaAllow: ['text over face', 'face cut by frame'], hud: (g, lt, t) => {
-    counter(g, fmt(tick(t, milT - 0.3, 1.0, 1415111)), 'REPORTS · OCTOBER 2026', { y: 330, size: 150, color: '#FFFFFF' });
+    reportsFly(g, t, milA + 0.05);
+  }, { kb: 0, trans: 'whip', qaAllow: ['text over face', 'face cut by frame'], hud: (g, lt, t) => {
+    counter(g, fmt(tick(t, milA + 0.1, 1.0, 1415111)), 'REPORTS · OCTOBER 2026', { y: 330, size: 150, color: '#FFFFFF' });
   } });
   cue(fourA - 0.08, 'whoosh_fast', 0.3); cue(fourT, 'hit_punch', 0.7); cue(fourT, 'stamp', 0.35);
   for (let k = 0; k < 9; k++) cue(oppsT + 0.2 + k * 0.16, 'swipe_card', 0.14);
-  cue(milT - 0.3, 'riser', 0.3); cue(milT + 0.7, 'hit', 0.4);
+  cue(milA - 0.04, 'whoosh_fast', 0.3); cue(milA + 0.1, 'riser', 0.3); cue(milT + 0.7, 'hit', 0.4);
 
   // ======================= "FAIR PLAY! OPEN UP!": the door bursts; the accounts get CLOSED; 97 % by the algorithm =======================
   const DK = [K(0.0, 0.12, 19, [0, 3.8, 13.5])], DK2 = K(0.02, 0.1, 15.5, [0, 4.0, 14.5]);
@@ -1552,12 +1599,12 @@ export async function build(T) {
   cue(ctaA - 0.04, 'whoosh_fast', 0.3); cue(ctaA + 0.1, 'buzz', 0.3); cue(manyT, 'reveal_bell', 0.35);
 
   const music = [
-    { t: 0, m: 'hook' }, { t: repA, m: 'intrigue' }, { t: baitA, m: 'tension' }, { t: canT, m: 'slam' }, { t: t1A, m: 'clockwork' },
-    { t: fourA, m: 'build' }, { t: BURST, m: 'slam' }, { t: twA, m: 'void' }, { t: givT, m: 'victory' }, { t: nevA, m: 'tension' }, { t: neverT, m: 'slam' },
+    { t: 0, m: 'hook' }, { t: repA, m: 'intrigue' }, { t: t1A, m: 'clockwork' },
+    { t: fourA, m: 'build' }, { t: gA, m: 'tension' }, { t: wasT, m: 'slam' }, { t: milA, m: 'build' }, { t: BURST, m: 'slam' }, { t: twA, m: 'void' }, { t: givT, m: 'victory' }, { t: nevA, m: 'tension' }, { t: neverT, m: 'slam' },
     { t: ctaA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
-    { t0: spkT + 0.3, t1: canT - 0.01, kind: 'mute' }, { t0: canT, t1: t1A, kind: 'boost', db: 4 },
+    { t0: T.e('gotham2') - 0.05, t1: wasT - 0.01, kind: 'mute' }, { t0: wasT, t1: milA, kind: 'boost', db: 4 },
     { t0: BURST - 0.32, t1: BURST - 0.01, kind: 'mute' }, { t0: BURST, t1: T.e('closed'), kind: 'boost', db: 3 },
     { t0: quiet, t1: givT - 0.02, kind: 'mute' },
     { t0: neverT - 0.3, t1: neverT - 0.01, kind: 'mute' },

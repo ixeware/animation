@@ -8,6 +8,10 @@
 2. **Громкое прозвище героя** — как «The Grandmaster Hunter» про Леви. Два-три слова, которые можно написать плашкой
    и повторить в комментариях.
 
+4. **Знаменитый момент со стрима звезды**, перерисованный в нашем стиле (идея автора, 16.11.2026): «я придумал лучше
+   для эдит байта примерео в середине, типо стпимснайпиьь тоже нельзя, поэтому готам так наебал стримснайпера, в видео
+   этот момент» — Готэм вслух советует снайперу «f6 is a very good move», тот играет и получает мат. Клип автора —
+   источник слов и позиции; кадры не берём (правило 67). Ставим в середину ролика, в пункт, к которому он подходит.
 3. **Мем-цитата самого героя с поворотом** — как в `fairplay` v5: «Hans said chess speaks for itself. Chess.com
    listened.» Берём фразу, которую уже режут в эдиты (у Ханса — «The chess speaks for itself», 2022), и
    переворачиваем её одной строкой.
@@ -35,7 +39,8 @@
 | `witty2` | Nah, I'd win → «WITTY WON.» → разрез → «Witty lost.» (версия 6: он лежит на Марсе, отлёт до планеты); The alien can beat humans (перелёт Марс → Земля, линейка «humans» на весь кадр, как в сине-фиолетовом меме с шахматистами). But not the GOAT (камера слетает к козьей ферме в 3D, Магнус у калитки «GOAT FARM», коза блеет). Not twice.; THE KING OF CURSES; в конце реплика самого Witty из комментариев: «The goat is too good» | мем + обманка (правило 66) + метафора-противопоставление + отсылка к мему (правило 67) + игра слов GOAT / goat + прозвище | ждём статистику |
 | `woodpecker` v3 | You can surprise a human. But not a library. He has seen your position before. | метафора | ждём статистику |
 | `fairplay` v1–v4 | Your opponent can't see you leave. Chess.com can. | метафора про сайт | автор: слабый, «чесскому никто эдиты не делает» |
-| `fairplay` v5 | Hans said chess speaks for itself. Chess.com listened. (пузырь «THE CHESS SPEAKS FOR ITSELF.» → тишина → глаз в окне) | мем-цитата героя + поворот | ждём статистику |
+| `fairplay` v5–v6 | Hans said chess speaks for itself. Chess.com listened. (пузырь «THE CHESS SPEAKS FOR ITSELF.» → тишина → глаз в окне) | мем-цитата героя + поворот | автор предложил лучше (v7) |
+| `fairplay` v7 | GothamChess caught his opponent watching his stream. So he said: f6 is a very good move. — It wasn't. (стрим на мониторе, пузырь, тишина, Qg6#, CHECKMATE, «ты» в шоке) | момент стримера-звезды, перерисованный (идея автора) | ждём статистику |
 
 ## Заготовки
 - Witty против Магнуса (`witty2`): сделано — «Nah, I'd win» → «WITTY WON.» → разрез; Witty — Годжо, Магнус — Сукуна (правило 62).

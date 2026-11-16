@@ -216,6 +216,8 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
 - Версия 5 — хук с вибратора и эдит-байт на фразе Ханса (правило 72): «A vibrator has been accused of beating Magnus
   Carlsen» (`pixVib` — предмет под мозаикой), «Hans said chess speaks for itself. Chess.com listened.»; Магнус с
   «1 MOVE» теперь на 6-й секунде; финал — петля на первый кадр. 65,2 с.
+- Версия 7 — эдит-байт по идее автора: Готэм обманывает стримснайпера (ловушка 4, `streamTex`, позиция в `GB`), байт с
+  фразой Ханса убран; 66,2 с.
 - Файлы: `episodes/fairplay/build/fairplay.mp4` (1080p, TikTok) и `fairplay_youtube.mp4` (метка без строки про
   YouTube); `fairplay_4k.mp4` — устаревшая первая версия. Перед публикацией — `python3 tools/proof.py <файл>`, коммит
   и пуш (шаг 10 в CLAUDE.md).
