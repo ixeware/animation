@@ -17,3 +17,5 @@
 | 2026-11-15 18:19:53 | `fairplay_youtube.mp4` | 28408627 | 65.23 s | 1080×1920 | `0eb157706f2a80776ffcfbfd89ae09a8cabc8f0c935044dd117f322ec1806a1c` | fairplay v6, 1080p, YouTube version (the handle without the YouTube line) |
 | 2026-11-16 10:21:40 | `fairplay.mp4` | 28813695 | 66.20 s | 1080×1920 | `71e1bd032d4eb943adea9bb8351069933a297a748ea8655db2171db951a9a151` | fairplay v7, 1080p, TikTok (GothamChess and the stream sniper in trap 4) |
 | 2026-11-16 10:21:40 | `fairplay_youtube.mp4` | 28811098 | 66.20 s | 1080×1920 | `fe88236ef9fa102c5b4485dccec377f1788d8fa13a691c4333f2e49fa3f3f5b3` | fairplay v7, 1080p, YouTube version (the handle without the YouTube line) |
+| 2026-11-16 15:12:18 | `rivalry.mp4` | 31282980 | 72.01 s | 1080×1920 | `7b29c10e5106af89b7740c06212ef100c477d9e22a3aed362c2bd562cf96f4f0` | rivalry v2, TikTok: the ladder quote, more dynamics |
+| 2026-11-16 15:12:18 | `rivalry_youtube.mp4` | 31282371 | 72.01 s | 1080×1920 | `ce9ab6467099fa362e308ab4ec127cc20509c4e6596e9e6b5e6ba8af96dc2b02` | rivalry v2, YouTube: the handle only |
