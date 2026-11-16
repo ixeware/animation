@@ -195,7 +195,34 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
 
 ## 8. Состояние на 14.11.2026
 
-### Последний ролик: `fairplay`, «Chess.com will catch you anyway» (The 64 Files, 15.11.2026)
+### Последний ролик: `rivalry`, «The truth: Hikaru and Magnus» (The 64 Files, 16.11.2026)
+
+- Идея автора: «может про hikaru rivalry с магнусом, щас с этим грустные эдиты» (прислал такой эдит), потом «делай».
+- Хук — детектор лжи с Esports World Cup 2026: «Magnus asked Hikaru one question on a lie detector» → вопрос Магнуса
+  пузырём (слова с карточки EWC) → «Hikaru said yes. And it was the truth» → штамп TRUTH. Ответ Хикару дальше «yes» в
+  клипе неразборчив — не цитируем.
+- Дальше: газета 2003 («15-YEAR-OLD BREAKS FISCHER'S RECORD»), раскол экрана «Hikaru, 15 / Magnus, 13» с короной,
+  14 : 1 в классике, Бильбао 2016 в сепии, эдит-байт «Hikaru could beat the whole world. Just not the man who owns it»
+  (Магнус на земном шаре в короне), полки с пятью титулами и пустая с паутиной, последний тур претендентов 2024
+  («1 WIN TO FORCE A PLAYOFF» → DRAW), Гукеш в короне, грустный блок (серый, дождь, «5TH», «38»), поворот 5 : 5 в Speed
+  Chess и шестой кубок, Лондон в феврале 2027, петля на детектор (1.e4), вопрос «How many years have you been
+  watching Hikaru?».
+- Новое в коде (`episodes/rivalry/scenes.js`, набор взят из `fairplay`): `lieDetector` (`polygraph`, `wired`),
+  `newspaper`, `vsKids`, `crown`, `scoreSet`, `globeScene` (Земля из `witty2`), `shelves`, `rain`, `speedSet`; мальчики
+  `hikaru15`, `magnus14`, взрослый `gukesh18`. Сборка обеих версий: `scratchpad/scripts/build_ep.sh rivalry rivalry`.
+- **Версия 2** (автор прислал скрин комментария: «добавь эту цитату с визуализацией и побольше динамики в видео на
+  каждый момент», правило 73): после «He's 38» — цитата «A man will spend his whole life building a ladder to reach
+  the sky. Just to find out that someone else was born with wings» (фразы `ladder`, `wings`; дубли 1 и 3): мальчик у
+  подножия лестницы, наплыв из его лица в 38; взрослый строит последние перекладины (годы 2003…2026 на плашках),
+  выходит за облака, свет на лице на «sky»; Магнус взлетает мимо на крыльях и зависает выше, перья падают на Хикару;
+  перо падает на шахматные часы поворота (`ladderWorld`, `climber`, `wings`, `flyer`, `feathers`, `chessClock`).
+  Динамика: 38 планов на 72 с (было 20 на 66), у плоских сцен своя камера (`view2`, `cam2`), удары на словах
+  (`zoom: kicks(...)` — новый параметр плана в `engine/js/main.js`), кубки и числа по одному. Вырезка из газеты 1958
+  с настоящим фото Фишера (United Press, 1956, public domain). Фраза про Лондон стала плашкой.
+- Факты — [SOURCES](episodes/rivalry/SOURCES.md). Файлы: `episodes/rivalry/build/rivalry.mp4` (TikTok) и
+  `rivalry_youtube.mp4` (метка без строки про YouTube).
+
+### Предыдущий ролик: `fairplay`, «Chess.com will catch you anyway» (The 64 Files, 15.11.2026)
 
 - Заказ автора: «почему чесс ком в любом случае словит на тебя на читерстве, используя все наши приемы». Собран по
   чек-листу [memory/retention.md](memory/retention.md); 63 с, без спонсора; первый ролик с меткой защиты (правило 70). Сейчас 65,5 с (версия 3).

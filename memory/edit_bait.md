@@ -12,6 +12,10 @@
    для эдит байта примерео в середине, типо стпимснайпиьь тоже нельзя, поэтому готам так наебал стримснайпера, в видео
    этот момент» — Готэм вслух советует снайперу «f6 is a very good move», тот играет и получает мат. Клип автора —
    источник слов и позиции; кадры не берём (правило 67). Ставим в середину ролика, в пункт, к которому он подходит.
+5. **Цитата из комментариев под эдитами** (автор прислал 16.11.2026): «A man will spend his whole life building a
+   ladder to reach the sky, just to find out that someone else was born with wings». Такие строки фанаты сами пишут
+   под грустными эдитами — значит, их и режут. Ставим целиком, двумя фразами, в самой грустной точке, и рисуем
+   буквально (лестница из лет, крылья, перья — `rivalry` v2, правило 73).
 3. **Мем-цитата самого героя с поворотом** — как в `fairplay` v5: «Hans said chess speaks for itself. Chess.com
    listened.» Берём фразу, которую уже режут в эдиты (у Ханса — «The chess speaks for itself», 2022), и
    переворачиваем её одной строкой.
@@ -40,6 +44,8 @@
 | `woodpecker` v3 | You can surprise a human. But not a library. He has seen your position before. | метафора | ждём статистику |
 | `fairplay` v1–v4 | Your opponent can't see you leave. Chess.com can. | метафора про сайт | автор: слабый, «чесскому никто эдиты не делает» |
 | `fairplay` v5–v6 | Hans said chess speaks for itself. Chess.com listened. (пузырь «THE CHESS SPEAKS FOR ITSELF.» → тишина → глаз в окне) | мем-цитата героя + поворот | автор предложил лучше (v7) |
+| `rivalry` v2 | A man will spend his whole life building a ladder to reach the sky. Just to find out that someone else was born with wings. (лестница из лет 2003…2026 до облаков, Магнус на крыльях, перья падают на Хикару) | цитата из комментариев под грустными эдитами, присланная автором | ждём статистику |
+| `rivalry` | Hikaru could beat the whole world. Just not the man who owns it. (Хикару на фоне Земли, камера поднимается — Магнус в короне сидит на шаре; плашки THE WHOLE WORLD → EXCEPT ONE) | метафора-противопоставление о звезде из грустных эдитов | ждём статистику |
 | `fairplay` v7 | GothamChess caught his opponent watching his stream. So he said: f6 is a very good move. — It wasn't. (стрим на мониторе, пузырь, тишина, Qg6#, CHECKMATE, «ты» в шоке) | момент стримера-звезды, перерисованный (идея автора) | ждём статистику |
 
 ## Заготовки

@@ -171,7 +171,8 @@ function compose(t, frame) {
     const kb = s.flat ? 0 : s.info ? 0.01 : s.kb ?? 0.04, a = s.flat ? 0 : shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
     // dense editing: long shots get hard punch-in jump cuts every `every` seconds (film.jumpCut)
     const J = film.jumpCut, [jz, jx, jy] = J && !s.noJump && !s.info && !s.flat ? jumpAt(J, lt, s.b - s.a, s.i) : [1, 0, 0];
-    const z = (1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + a * 0.0015) * jz;
+    // s.zoom(lt, t): the shot's own punch-ins on the beat (the hud stays put)
+    const z = (1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + a * 0.0015) * jz * (s.zoom ? s.zoom(lt, t) : 1);
     ctx.translate(W / 2 + sx + jx, H / 2 + sy + jy); if (s.roll) ctx.rotate(typeof s.roll === 'function' ? s.roll(lt, t) : s.roll);  // a dutch angle
     ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
     { const m = ctx.getTransform(); QA.M = [m.a, m.b, m.c, m.d, m.e, m.f]; }

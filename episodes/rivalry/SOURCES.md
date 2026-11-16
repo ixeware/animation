@@ -1,0 +1,44 @@
+# The truth: Hikaru and Magnus — sources
+
+Own channel (The 64 Files), no sponsor. Made 16 November 2026 at the author's request: «делай видео про хикару и
+магнуса», after he sent a sad edit about them (TikTok 7705419674376277300) and said «щас с этим грустные эдиты».
+Retention checklist: [memory/retention.md](../../memory/retention.md); rules 71, 72 and 73 of the style bible.
+Version 2 (the same day): the author sent a comment from TikTok and asked «добавь эту цитату с визуализацией и побольше
+динамики в видео на каждый момент» — the quote below, more cuts and camera moves; the London line became a plate.
+
+Wikipedia does not open from the cloud session, so the facts below come from the news sites and databases linked.
+
+| Claim in the video | Status | Source |
+|---|---|---|
+| Magnus asked Hikaru one question on a lie detector: "Are you jealous of anything I've achieved?" Hikaru said yes. And it was the truth | Esports World Cup video (posted on the EWC channel, August 2026): both hooked up to a lie detector, asking each other questions. The question is on screen in the author's clip, on the EWC26 card: "ARE YOU JEALOUS OF ANYTHING I HAVE ACHIEVED?"; Hikaru answers "Yes"/"Yeah" and the examiner gives the TRUTH verdict (thumbs up). The rest of his answer is unclear in the clip (we hear "probably the world-…"), so the video does not quote it | the author's clip; [EWC on X](https://x.com/EWC_EN/status/2088192632988025039), [Rook Review](https://rookreview.com/news/do-i-believe-that-im-the-greatest-player-of-all-time-magnus-and-hikaru-took-a-lie-detector-test), [Dexerto](https://www.dexerto.com/youtube/magnus-carlsen-and-hikaru-reveal-how-they-really-feel-about-youtuber-gothamchess-3398667/), [YouTube Short](https://www.youtube.com/shorts/1EWDl2-Vzjo) |
+| In 2003 he became America's youngest grandmaster. Younger than Bobby Fischer (the 1958 cutting) | the cutting is ours; its photo is real: young Fischer in April 1956, United Press, public domain (the photo of `episodes/fischer`), credited on the cutting. The record in the headline — Fischer, 15, youngest grandmaster, 1958 — is the claim of this row | [ChessBase](https://en.chessbase.com/post/hikaru-nakamura-breaks-fischer-s-record) |
+| In 2003 he became America's youngest grandmaster. Younger than Bobby Fischer | February 2003, aged 15 (15 years and 79 days by Chess.com's count), he broke Fischer's record of 1958 (15 years, 6 months). The record later went to Caruana, Robson and Sevian; the video says "became", which was true then | [ChessBase](https://en.chessbase.com/post/hikaru-nakamura-breaks-fischer-s-record), [US Chess, 2003](https://www.uschess.org/archive/news/press/uspr0306.html) |
+| "MAGNUS, 13" on the split screen at "Then Magnus showed up" | Carlsen became a grandmaster in 2004 at 13 (13 years, 4 months) | [Chess.com, Carlsen](https://www.chess.com/players/magnus-carlsen) |
+| He was supposed to be the next world champion | a figure of speech for what was expected of him: "Chess Champ Hikaru Nakamura: Next Bobby Fischer?" (NPR, 2012); he called the world title his main goal (2014) | [NPR](https://www.northcountrypublicradio.org/news/npr/152511647/chess-champ-hikaru-nakamura-next-bobby-fischer), [St. Louis Public Radio](https://www.stlpr.org/arts/2014-11-19/on-chess-seven-questions-with-hikaru-nakamura) |
+| In classical chess, Magnus has beaten him 14 times. Hikaru won once | classical head-to-head 2005–2025: Carlsen 14 wins, Nakamura 1, 25–26 draws (the count of draws differs by a game between databases). No classical game between them in 2026 that we could find (Norway Chess 2026 was played without Nakamura) | [database](https://ramachess.com/grandmasters/magnus/vs-nakamura-hi/), [Chess.com blog](https://www.chess.com/blog/Fanime2026/who-is-better-hikaru-nakamura-or-magnus-carlsen), [Norway Chess 2026](https://kingdomofchess.com/norway-chess-2026/) |
+| Once. In 2016 | Bilbao Masters, round 1, 13 July 2016: his first classical win over Carlsen, after 12 losses and 18 draws; still the only one | [Chess.com](https://www.chess.com/news/view/nakamura-finally-beats-carlsen-leads-in-bilbao-9124), [ChessBase](https://en.chessbase.com/post/bilbao-nakamura-beats-carlsen) |
+| Hikaru could beat the whole world. Just not the man who owns it | the edit-bait: a figure of speech (metaphor and contrast, `memory/edit_bait.md`) | — |
+| Magnus won five World Championship matches. Hikaru never got to play in one | Carlsen won the matches of 2013, 2014, 2016, 2018 and 2021 (he did not defend in 2023). Nakamura played the Candidates in 2016, 2022, 2024 and 2026 and never won it, so never played a title match | [Chess.com, Carlsen](https://www.chess.com/players/magnus-carlsen), [Chess.com, Candidates 2026](https://www.chess.com/news/view/2026-fide-candidates-tournament-round-14) |
+| In 2024, one win against Gukesh would have forced a playoff for a shot at the title. It was a draw | Candidates 2024, Toronto, last round: Gukesh 8.5, Nakamura, Nepomniachtchi and Caruana 8. Nakamura (White) needed a win to tie Gukesh and force a tiebreak; the game was drawn, Gukesh won with 9, Nakamura was second on tiebreak | [ESPN](https://www.espn.com/chess/story/_/id/39991714/fide-candidates-2024-india-gukesh-wins-draw-nakamura-round-14-youngest-chess-history-challenge-world-championship), [FIDE](https://www.fide.com/gukesh-d-and-tan-zhongyi-are-world-championship-challengers/) |
+| Gukesh became world champion that year | he beat Ding Liren in Singapore in December 2024 | [FIDE](https://www.fide.com/gukesh-d-and-tan-zhongyi-are-world-championship-challengers/) and the match coverage |
+| A man will spend his whole life building a ladder to reach the sky. Just to find out that someone else was born with wings | a saying fans write under sad edits; the author sent it from the comments (16.11.2026). A figure of speech, not a quote of either player; the commenter is not named | the author's screenshot |
+| This year, he finished fifth. He's 38 | Candidates 2026, Cyprus: Sindarov 10/14 won; Nakamura fifth on 6.5. Born 9 December 1987 | [Chess.com](https://www.chess.com/news/view/2026-fide-candidates-tournament-round-14), [Lichess statistics](https://lichess.org/@/tpr/blog/candidates-2026-statistics/iygJf9Rx) |
+| But there's one title where it's still five to five. Speed chess. Five for Magnus. Five for Hikaru | Speed Chess Championship: Carlsen won 2016, 2017, 2023, 2024 and 2025/26 (final over Firouzja in London, February 2026); Nakamura won 2018–2022 | [DAZN, 5 November 2026](https://www.dazn.com/en-US/news/chess/magnus-carlsen-hikaru-nakamura-chess-championship-rivalry-t3r/1dvvumhyamkpc1occxouuld4wd), [ChessBase, 2026 final](https://en.chessbase.com/newsroom/post/speed-chess-ch-2025-26-finals?page=0) |
+| This month, they started playing for number six. Plate: FINALS · LONDON · FEB 2027 (v1 said it aloud) | Speed Chess Championship XI, $250,000: starts in November 2026, live finals in London, 5–7 February 2027; both chase a record sixth title (whether they meet depends on the knockout) | [Chess.com](https://www.chess.com/news/view/announcing-speed-chess-championship-2026), [DAZN](https://www.dazn.com/en-US/news/chess/magnus-carlsen-hikaru-nakamura-chess-championship-rivalry-t3r/1dvvumhyamkpc1occxouuld4wd) |
+| Hikaru told the truth on a lie detector. Now the board gets to answer | figure of speech closing the loop with the hook | — |
+
+## Drawn, not documented
+
+- The lie detector is ours: Hikaru at a board with a breathing tube across his chest and wires to a machine whose pens
+  draw; no examiner is shown. Magnus asks the question in a speech bubble with the words of the EWC card.
+- The newspaper of 2003 is ours (its title is made up, the headline says what happened). Hikaru at 15 and Magnus at 13
+  are drawn as boys.
+- The boards are illustrations, not the games: at the Candidates of 2024 it is a middlegame from another
+  Nakamura–Gukesh game in our data; on the lie detector table, 1.e4.
+- The globe with Magnus sitting on top, the trophy shelves, the rain in the sad part and the London skyline are
+  pictures of the words, not events.
+- The quote (v2): the ladder, the years on its rungs (2003…2026, one per rung, not events), Hikaru as a boy at the
+  bottom and a man at the top, the clouds, Magnus with wings and the falling feathers are a picture of the saying.
+- The blitz clock of the turn shows the score of the titles (5 and 5), not a game; the cups under the cards are the
+  five titles each.
+- At "for a shot at the title" a dashed crown hangs over Hikaru: the title he could have played for, not an object.
