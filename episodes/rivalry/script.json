@@ -82,7 +82,7 @@
       "id": "next",
       "text": "He was supposed to be the next world champion. Then Magnus showed up.",
       "say": "He was supposed to be the next world champion. Then Magnus showed up.",
-      "pause": 0.25,
+      "pause": 0.75,
       "colors": {
         "next": "gold",
         "champion.": "gold",
@@ -142,13 +142,23 @@
     },
     {
       "id": "c2024",
-      "text": "In 2024, one win against Gukesh would have forced a playoff for a shot at the title.",
-      "say": "In twenty twenty-four, one win against Gukesh would have forced a playoff for a shot at the title.",
+      "text": "In 2024, it came down to the last round.",
+      "say": "In twenty twenty-four, it came down to the last round.",
+      "pause": 0.2,
+      "colors": {
+        "2024,": "gold",
+        "last": "gold",
+        "round.": "gold"
+      }
+    },
+    {
+      "id": "must",
+      "text": "Hikaru had to beat Gukesh.",
+      "say": "Hikaru had to beat Gukesh.",
       "pause": 0.7,
       "colors": {
-        "one": "gold",
-        "win": "gold",
-        "Gukesh": "blue"
+        "beat": "red",
+        "Gukesh.": "blue"
       }
     },
     {
@@ -168,6 +178,26 @@
       "colors": {
         "Gukesh": "blue",
         "champion": "gold"
+      }
+    },
+    {
+      "id": "toss",
+      "text": "The next year, Hikaru checkmated the world champion in a stadium.",
+      "say": "The next year, Hikaru checkmated the world champion in a stadium.",
+      "pause": 0.15,
+      "colors": {
+        "checkmated": "red",
+        "stadium.": "gold"
+      }
+    },
+    {
+      "id": "toss2",
+      "text": "And threw his king into the crowd.",
+      "say": "And threw his king into the crowd!",
+      "pause": 0.4,
+      "colors": {
+        "king": "gold",
+        "crowd.": "gold"
       }
     },
     {

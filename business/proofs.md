@@ -19,3 +19,5 @@
 | 2026-11-16 10:21:40 | `fairplay_youtube.mp4` | 28811098 | 66.20 s | 1080×1920 | `fe88236ef9fa102c5b4485dccec377f1788d8fa13a691c4333f2e49fa3f3f5b3` | fairplay v7, 1080p, YouTube version (the handle without the YouTube line) |
 | 2026-11-16 15:12:18 | `rivalry.mp4` | 31282980 | 72.01 s | 1080×1920 | `7b29c10e5106af89b7740c06212ef100c477d9e22a3aed362c2bd562cf96f4f0` | rivalry v2, TikTok: the ladder quote, more dynamics |
 | 2026-11-16 15:12:18 | `rivalry_youtube.mp4` | 31282371 | 72.01 s | 1080×1920 | `ce9ab6467099fa362e308ab4ec127cc20509c4e6596e9e6b5e6ba8af96dc2b02` | rivalry v2, YouTube: the handle only |
+| 2026-11-16 16:05:59 | `rivalry.mp4` | 34541116 | 79.51 s | 1080×1920 | `d1898c7070cd1080828d4e75394e131f0dfeb8b0ae16a4af1cb8206ff2c1b546` | rivalry v3, TikTok: stadium, wings, scales, two photo memes |
+| 2026-11-16 16:05:59 | `rivalry_youtube.mp4` | 34547042 | 79.51 s | 1080×1920 | `174002037deb0dcf2d9e4d1acf1171ef4dfd3ea7a2e5fe5e05897c96a392b231` | rivalry v3, YouTube: the handle only |

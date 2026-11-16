@@ -219,6 +219,14 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
   Динамика: 38 планов на 72 с (было 20 на 66), у плоских сцен своя камера (`view2`, `cam2`), удары на словах
   (`zoom: kicks(...)` — новый параметр плана в `engine/js/main.js`), кубки и числа по одному. Вырезка из газеты 1958
   с настоящим фото Фишера (United Press, 1956, public domain). Фраза про Лондон стала плашкой.
+- **Версия 3** (автор: «на моменте с гукешом я бы перелистнул…», «в моменте где крылья сделай получше…», перо —
+  переходом на весы; потом два фото, «сделай еще отсылки на эти фото»; правило 74): кусок с Гукешем переписан — «In
+  2024, it came down to the last round. Hikaru had to beat Gukesh» (старое «would have forced a playoff» было неверно),
+  ROUND 14, MUST WIN, лица с часами (`faceOff`), рукопожатие (`handshake`), корона с конфетти и плашкой про Женеву,
+  потом стадион в Арлингтоне 2025 (`stadium`, `kingThrow`): «The next year, Hikaru checkmated the world champion in a
+  stadium. And threw his king into the crowd». Крылья — 4 вида (надежда, взлёт от подножия мимо лет, тень, перо);
+  перо через склейку садится на весы (`balance` на шахматных часах, `heroF`). Мемы: плакаты «I ♥ Magnus»
+  (`signsMeme`) на «Then Magnus showed up», пьедестал блица 2019 (`podiumMeme`) на «who owns it». 79,5 с.
 - Факты — [SOURCES](episodes/rivalry/SOURCES.md). Файлы: `episodes/rivalry/build/rivalry.mp4` (TikTok) и
   `rivalry_youtube.mp4` (метка без строки про YouTube).
 

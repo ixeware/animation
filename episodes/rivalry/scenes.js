@@ -11,7 +11,12 @@
 // find out that someone else was born with wings." — as a picture: Hikaru builds his ladder of years into the clouds,
 // Magnus flies up past him; a feather from his wings lands on the blitz clock of the turn. Every beat is cut into views
 // (about 32 cuts a minute), every flat scene has a camera (`view2`, `cam2`), key words get punch-ins (`kicks`); the
-// spoken London line is now a plate. Rules 28, 55, 57, 63, 71, 72, 73 and memory/retention.md. Sources: SOURCES.md.
+// spoken London line is now a plate. v3 (the author: the Gukesh part is dull, make the wings scene much better, let the
+// feather fall onto the scales across the cut; then two photos to reference): the last round as a face-off, the
+// handshake, the crown with confetti and the king thrown into the crowd at the Arlington stadium (2025); the wings in
+// four views (the launch from the foot of the ladder past the years, the shadow, one feather); the feather lands on a
+// balance standing on the blitz clock; the «I ♥ Magnus» signs and the 2019 blitz podium redrawn. Rules 28, 55, 57, 63,
+// 67, 71–74 and memory/retention.md. Sources: SOURCES.md.
 // The toolkit below comes from `fairplay`.
 import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect } from '../../engine/js/core.js';
 import { Board, sqXZ, piecesAt } from '../../engine/js/board.js';
@@ -1463,34 +1468,6 @@ function rain(g, t, a = 1) {
   g.restore();
 }
 
-// "Five to five": both cards, a blitz clock between them, five small cups under each (popping from tM / tH), the sixth in
-// the middle, London at the bottom
-function speedSet(g, t, { tM = Infinity, tH = Infinity, six = 0, eM, eH, london = 0, clock = {}, feather = null } = {}) {
-  { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#13233F'); gr.addColorStop(1, '#070B16'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
-  for (const [x, col] of [[180, '255,226,176'], [900, '207,224,255']]) { const gr = g.createRadialGradient(x, 0, 30, x, 300, 700); gr.addColorStop(0, `rgba(${col},0.32)`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(0, 0, W, 1100); }
-  if (london > 0) {  // the skyline: a clock tower and a wheel
-    g.save(); g.globalAlpha = clamp(london); g.fillStyle = '#26345E';
-    g.fillRect(0, 1700, W, 220); g.fillRect(130, 1430, 70, 280); g.beginPath(); g.moveTo(120, 1430); g.lineTo(165, 1350); g.lineTo(210, 1430); g.fill(); g.fillStyle = '#F5D27A'; g.beginPath(); g.arc(165, 1480, 20, 0, 7); g.fill();
-    g.strokeStyle = '#26345E'; g.lineWidth = 8; const wr = t * 0.25; g.beginPath(); g.arc(860, 1560, 150, 0, 7); g.stroke(); for (let k = 0; k < 12; k++) { const a = wr + k * Math.PI / 6; g.beginPath(); g.moveTo(860, 1560); g.lineTo(860 + Math.cos(a) * 150, 1560 + Math.sin(a) * 150); g.stroke(); }
-    g.fillStyle = '#26345E'; for (const [x0, w0, h0] of [[300, 120, 160], [440, 90, 110], [560, 140, 190], [990, 90, 130]]) g.fillRect(x0, 1700 - h0, w0, h0);
-    g.fillStyle = 'rgba(255,214,120,0.8)'; for (let k = 0; k < 26; k++) { const wx = 310 + (k * 37) % 420, wy = 1560 + Math.floor(k / 11) * 40; g.fillRect(wx, wy, 10, 14); }
-    g.restore();
-  }
-  camCard(g, t, 'magnus', eM, { x: 50, y: 380, w: 250, label: 'MAGNUS' }); camCard(g, t + 1.3, 'hikaru', eH, { x: 780, y: 380, w: 250, label: 'HIKARU' });
-  for (let i = 0; i < 5; i++) for (const [t0, x0] of [[tM, 80], [tH, 800]]) {
-    const k = clamp((t - t0 - i * 0.1) / 0.18); if (k <= 0) continue; const x = x0 + i * 47;
-    g.save(); g.translate(x, 790); g.scale(ease.back(k), ease.back(k)); trophy(g, 0, 0, 0.27, {}); g.restore();
-  }
-  chessClock(g, 540, 590, 0.82, t, clock);
-  if (feather) feather(g);
-  if (six > 0) {
-    const k = ease.back(clamp(six)), gr = g.createRadialGradient(W / 2, 1060, 20, W / 2, 1060, 420); gr.addColorStop(0, 'rgba(255,236,170,0.45)'); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.fillRect(0, 600, W, 900);
-    g.save(); g.globalCompositeOperation = 'screen'; g.translate(W / 2, 1000); g.rotate(t * 0.4); for (let k2 = 0; k2 < 12; k2++) { g.rotate(Math.PI / 6); g.fillStyle = `rgba(255,230,160,${0.12 * clamp(six)})`; g.beginPath(); g.moveTo(0, 0); g.lineTo(-40, -620); g.lineTo(40, -620); g.closePath(); g.fill(); } g.restore();
-    g.save(); g.translate(W / 2, 1080 + (1 - clamp(six)) * 200); g.scale(k, k); trophy(g, 0, 0, 1.25, {}); g.restore();
-    g.fillStyle = '#16161E'; g.font = sans(80, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('6', W / 2, 1080 - 130 * k + (1 - clamp(six)) * 200);
-  }
-}
-
 // ======================= v2 (16.11.2026). The author: «добавь эту цитату с визуализацией и побольше динамики в видео
 // на каждый момент». Every flat scene now has its own camera, key words get punch-ins, long beats are cut into views
 // (wide → close → the other face), and the quote from the comments gets its picture: the ladder and the wings =======================
@@ -1579,10 +1556,10 @@ function climber(g, t, who, p, e) {
   return P;
 }
 // big white wings behind a bust (x, y: its head; s: its scale), beating
-function wings(g, x, y, s, t, { beat = 7.5, amp = 1 } = {}) {
-  const fl = Math.sin(t * beat);
+function wings(g, x, y, s, t, { beat = 7.5, amp = 1, spread = 1 } = {}) {
+  const fl = Math.sin(t * beat), sp = clamp(spread);
   for (const sd of [-1, 1]) {
-    g.save(); g.translate(x + sd * 112 * s, y + 215 * s); g.scale(sd * s, s); g.rotate(-0.12 - 0.34 * fl * amp);
+    g.save(); g.translate(x + sd * 112 * s, y + 215 * s); g.scale(sd * s, s); g.rotate(lerp(1.15, -0.12 - 0.34 * fl * amp, sp)); g.scale(lerp(0.38, 1, sp), 1);
     const feather = (x0, y0, ang, len, wd, c0, c1) => {
       g.save(); g.translate(x0, y0); g.rotate(ang);
       const gr = g.createLinearGradient(0, 0, len, 0); gr.addColorStop(0, c0); gr.addColorStop(1, c1); g.fillStyle = gr;
@@ -1596,15 +1573,18 @@ function wings(g, x, y, s, t, { beat = 7.5, amp = 1 } = {}) {
     for (let i = 0; i < 9; i++) { const u = i / 8; feather(wx * u, wy * u, lerp(1.42, 1.02, u), lerp(250, 330, u), 70, '#FFFFFF', '#E6EBF3'); }  // secondaries
     for (let i = 0; i < 8; i++) { const u = 0.08 + i / 8; feather(wx * u, wy * u, lerp(1.25, 0.75, u), 170, 82, '#FFFFFF', '#EEF2F8'); }  // coverts
     g.strokeStyle = '#FFFFFF'; g.lineWidth = 46; g.lineCap = 'round'; g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(wx * 0.45, wy * 0.75, wx + 20, wy - 8); g.stroke();
+    g.strokeStyle = 'rgba(255,214,120,0.8)'; g.lineWidth = 9; g.beginPath(); g.moveTo(8, -20); g.quadraticCurveTo(wx * 0.45, wy * 0.75 - 22, wx + 30, wy - 30); g.stroke();  // the sun on the leading edge
     g.restore();
   }
 }
 // Magnus flying: a gold halo, the wings, the bust over a little trail of cloud
-function flyer(g, t, x, y, s, e, { trail = 1 } = {}) {
+function flyer(g, t, x, y, s, e, { trail = 1, spread = 1, streak = 0 } = {}) {
   { const gr = g.createRadialGradient(x, y + 120 * s, 40 * s, x, y + 120 * s, 760 * s); gr.addColorStop(0, 'rgba(255,240,190,0.6)'); gr.addColorStop(1, 'rgba(255,240,190,0)'); g.fillStyle = gr; g.fillRect(x - 800 * s, y - 680 * s, 1600 * s, 1600 * s); }
-  wings(g, x, y, s, t);
+  if (streak > 0) { const gr = g.createLinearGradient(0, y + 300 * s, 0, y + 2200 * s); gr.addColorStop(0, `rgba(255,246,220,${0.7 * streak})`); gr.addColorStop(1, 'rgba(255,246,220,0)'); g.fillStyle = gr; g.fillRect(x - 150 * s, y + 300 * s, 300 * s, 1900 * s); }
+  wings(g, x, y, s, t, { spread });
   drawChar(g, 'magnus', { x, y, s, e, t: t + 0.7 });
   for (let i = 0; i < 4; i++) cloud(g, x + Math.sin(i * 2.1 + t * 3) * 60 * s, y + (500 + i * 110) * s, s * (0.75 - i * 0.12), trail * (1 - i * 0.2));
+  if (trail < 1) { const gr = g.createRadialGradient(x, y + 470 * s, 20 * s, x, y + 470 * s, 300 * s); gr.addColorStop(0, `rgba(255,250,232,${0.95 * (1 - trail)})`); gr.addColorStop(0.5, `rgba(255,244,214,${0.6 * (1 - trail)})`); gr.addColorStop(1, 'rgba(255,244,214,0)'); g.fillStyle = gr; g.fillRect(x - 300 * s, y + 170 * s, 600 * s, 600 * s); }
 }
 // feathers drifting down from where he passed
 const FEATH = (() => { const r = rng(91), o = []; for (let i = 0; i < 18; i++) o.push([r() * 760 - 380, r() * 600 - 300, r() * 0.9, 110 + r() * 90, r() * 7, 0.7 + r() * 0.6]); return o; })();
@@ -1619,18 +1599,20 @@ function feathers(g, t, t0, ox, oy) {
   }
 }
 // the whole world through its own camera [cx, cy, z]; mag: { x, y, s, e } Magnus with wings; feath: when feathers fall
-function ladderWorld(g, t, [cx, cy, z], { p = 3, who = 'hikaru', eH = EXPR.focus, mag = null, feath = -9, featherAt = [700, 2100], glow = 0 } = {}) {
+function ladderWorld(g, t, [cx, cy, z], { p = 3, who = 'hikaru', eH = EXPR.focus, mag = null, feath = -9, featherAt = [700, 2100], glow = 0, rays = 0, shade = 0 } = {}) {
   g.fillStyle = '#151B38'; g.fillRect(0, 0, W, H);
   g.save(); g.translate(W / 2, H / 2); g.scale(z, z); g.translate(-cx, -cy);
   { const gr = g.createLinearGradient(0, 0, 0, LG); gr.addColorStop(0, '#FFE6A8'); gr.addColorStop(0.2, '#FFC07C'); gr.addColorStop(0.42, '#E2876C'); gr.addColorStop(0.6, '#6E4E88'); gr.addColorStop(0.8, '#2C3466'); gr.addColorStop(1, '#151B38'); g.fillStyle = gr; g.fillRect(-3000, -2400, 7100, LG + 2400); }
   { const gr = g.createRadialGradient(540, 600, 60, 540, 600, 1500); gr.addColorStop(0, 'rgba(255,252,230,0.95)'); gr.addColorStop(0.35, 'rgba(255,236,170,0.4)'); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.fillRect(-1000, -900, 3100, 3000); }
   for (const [sx, sy, rr, ph] of STARS) { const a = 0.35 + 0.3 * Math.sin(t * 2.5 + ph); g.fillStyle = `rgba(230,238,255,${a.toFixed(3)})`; g.beginPath(); g.arc(sx * 2.6 - 900, 3500 + sy * 0.62, rr, 0, 7); g.fill(); }
+  if (rays > 0) { const rx = mag ? mag.x : 540, ry = mag ? mag.y : 700; g.save(); g.globalCompositeOperation = 'screen'; g.translate(rx, ry); g.rotate(t * 0.15); for (let k = 0; k < 14; k++) { g.rotate(Math.PI / 7); g.fillStyle = `rgba(255,236,170,${0.16 * rays})`; g.beginPath(); g.moveTo(0, 0); g.lineTo(-90, -2600); g.lineTo(90, -2600); g.closePath(); g.fill(); } g.restore(); }
   for (const [x, y, s] of CLOUD_BACK) cloud(g, x, y, s, 0.85);
   g.fillStyle = '#0A0E1C'; g.beginPath(); g.moveTo(-3000, LG + 60); g.quadraticCurveTo(540, LG - 70, 4100, LG + 60); g.lineTo(4100, LG + 3000); g.lineTo(-3000, LG + 3000); g.closePath(); g.fill();
   g.fillStyle = 'rgba(255,214,120,0.75)'; for (let k = 0; k < 40; k++) { const wx = -900 + ((k * 197) % 2900), wy = LG + 40 + ((k * 53) % 90); g.fillRect(wx, wy, 8, 10); }
   const P = climber(g, t, who, p, eH);
   if (glow > 0) { g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createRadialGradient(540, P.hy - 60, 30, 540, P.hy - 60, 520); gr.addColorStop(0, `rgba(255,226,150,${0.55 * glow})`); gr.addColorStop(1, 'rgba(255,226,150,0)'); g.fillStyle = gr; g.fillRect(0, P.hy - 600, W, 1100); g.restore(); }
-  if (mag) flyer(g, t, mag.x, mag.y, mag.s, mag.e, { trail: mag.trail ?? 1 });
+  if (shade > 0) { g.save(); const gr = g.createRadialGradient(560, P.hy + 40, 60, 560, P.hy + 40, 620); gr.addColorStop(0, `rgba(24,18,46,${0.5 * shade})`); gr.addColorStop(0.55, `rgba(24,18,46,${0.32 * shade})`); gr.addColorStop(1, 'rgba(24,18,46,0)'); g.fillStyle = gr; g.fillRect(-100, P.hy - 700, W + 200, 1400); g.restore(); }  // his wings' shadow on Hikaru
+  if (mag) flyer(g, t, mag.x, mag.y, mag.s, mag.e, { trail: mag.trail ?? 1, spread: mag.spread ?? 1, streak: mag.streak ?? 0 });
   feathers(g, t, feath, ...featherAt);
   for (const [x, y, s] of CLOUD_FRONT) cloud(g, x + Math.sin(t * 0.3 + x) * 20, y, s, 0.96);
   g.restore();
@@ -1638,14 +1620,14 @@ function ladderWorld(g, t, [cx, cy, z], { p = 3, who = 'hikaru', eH = EXPR.focus
 }
 
 // a blitz clock: a dark wedge, two green displays, two buttons (press: -1 / 1, the one going down)
-function chessClock(g, x, y, s, t, { l = '', r = '', on = 1, press = 0 } = {}) {
+function chessClock(g, x, y, s, t, { l = '', r = '', on = 1, press = 0, fs = 96 } = {}) {
   g.save(); g.translate(x, y); g.scale(s, s);
   g.fillStyle = 'rgba(0,0,0,0.45)'; g.beginPath(); g.ellipse(0, 132, 240, 28, 0, 0, 7); g.fill();
   for (const sd of [-1, 1]) { const dn = press === sd ? 16 : 0; g.fillStyle = press === sd ? '#F5C451' : '#545A68'; g.beginPath(); g.roundRect(sd * 98 - 68, -104 + dn, 136, 44 - dn, 8); g.fill(); }
   { const gr = g.createLinearGradient(0, -70, 0, 128); gr.addColorStop(0, '#343946'); gr.addColorStop(1, '#16181E'); g.fillStyle = gr; g.beginPath(); g.moveTo(-222, 128); g.lineTo(-198, -70); g.lineTo(198, -70); g.lineTo(222, 128); g.closePath(); g.fill(); }
   for (const [sd, txt] of [[-1, l], [1, r]]) {
     const dx = sd * 98; g.fillStyle = '#0B120E'; g.beginPath(); g.roundRect(dx - 82, -36, 164, 122, 10); g.fill();
-    if (on > 0 && txt) { g.save(); g.globalAlpha *= clamp(on); g.fillStyle = '#C6FF5E'; g.shadowColor = '#B8F04A'; g.shadowBlur = 22; g.font = sans(96, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, dx, 28); g.restore(); }
+    if (on > 0 && txt) { g.save(); g.globalAlpha *= clamp(on); g.fillStyle = '#C6FF5E'; g.shadowColor = '#B8F04A'; g.shadowBlur = 22; g.font = sans(fs, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, dx, 28); g.restore(); }
   }
   g.restore();
 }
@@ -1663,6 +1645,228 @@ function oldClip(g, img, { x = W / 2, y = 900, s = 1, rot = 0 } = {}) {
   g.strokeStyle = '#2B2116'; g.lineWidth = 4; g.strokeRect(px, py, pw, ph);
   g.fillStyle = '#5A4A36'; g.font = sans(20, 700); g.letterSpacing = '1px'; g.fillText('Photo: United Press, 1956 · public domain', 0, py + ph + 30);
   g.restore();
+}
+
+// ======================= v3 (16.11.2026). The author: «на моменте с гукешом я бы перелистнул из-за отсутствия
+// динамики и интересного чего то актуального, и в моменте где крылья сделай получше эту сцену… и сделай чтоб падающее
+// перо которое на весы падает было переходом с сцены с лестницей на сцену с весами», then two photos: «сделай еще
+// отсылки на эти фото». So: the stadium and the king thrown into the crowd (Checkmate: USA vs India, 2025), the wings
+// scene rebuilt (the launch from the foot of the ladder, the years flying past, his shadow over Hikaru, one feather), the
+// feather crossing the cut onto a balance that stands on the blitz clock, and the two photos redrawn (rule 67) =======================
+
+Object.assign(CAST, {
+  hikaruSuit: { ...CAST.hikaru, suit: '#1C1F26', suitD: '#121419', shirt: 'open' },
+  magnusSuit: { ...CAST.magnus, suit: '#1F242D', suitD: '#151921', shirt: 'open' },
+  girl1: { ...KID, hair: 'longcurly', hairC: '#6A4A2E', brow: '#4E3626', suit: '#ECE8E0', suitD: '#D4CEC2', shirt: 'tee', female: true },
+  girl2: { ...KID, hair: 'longcurly', hairC: '#C2945E', brow: '#8A6440', suit: '#F4F0E8', suitD: '#DAD4C8', shirt: 'tee', female: true },
+});
+
+// ---------- photo 1: Hikaru, in a suit with a badge, walks past two girls holding «I ♥ Magnus» signs ----------
+function heart(g, x, y, s, col = '#F26A2E') {
+  g.save(); g.translate(x, y); g.scale(s, s); g.fillStyle = col; g.beginPath();
+  g.moveTo(0, 26); g.bezierCurveTo(-46, -4, -34, -46, 0, -24); g.bezierCurveTo(34, -46, 46, -4, 0, 26); g.fill(); g.restore();
+}
+function loveSign(g, x, y, w, h, rot, two = true) {
+  g.save(); g.translate(x, y); g.rotate(rot);
+  g.fillStyle = 'rgba(0,0,0,0.22)'; g.fillRect(-w / 2 + 8, -h / 2 + 10, w, h);
+  g.fillStyle = '#FBF9F3'; g.fillRect(-w / 2, -h / 2, w, h); g.strokeStyle = '#D6CFC0'; g.lineWidth = 3; g.strokeRect(-w / 2, -h / 2, w, h);
+  g.fillStyle = '#1E1A16'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = sans(Math.round(h * 0.27), 700); g.letterSpacing = '1px';
+  if (two) { g.fillText('I', -w * 0.3, -h * 0.2); heart(g, w * 0.08, -h * 0.2, h / 160, '#F26A2E'); g.fillText('Magnus', 0, h * 0.24); }
+  else { heart(g, 0, -h * 0.2, h / 170, '#F26A2E'); g.fillText('Magnus', 0, h * 0.24); }
+  g.restore();
+}
+function signsMeme(g, t, { hx = 800, eH, eG = EXPR.happy } = {}) {
+  { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#CFC8BA'); gr.addColorStop(0.55, '#ABA497'); gr.addColorStop(1, '#7A7468'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+  g.fillStyle = '#E9E3D6'; g.fillRect(0, 0, W, 170); g.fillStyle = 'rgba(255,250,235,0.6)'; for (let i = 0; i < 6; i++) g.fillRect(60 + i * 180, 40, 110, 22);  // ceiling lights
+  for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) { g.fillStyle = (i + j) % 2 ? '#5E8A44' : '#D8C25A'; g.fillRect(30 + i * 74, 240 + j * 74, 74, 74); }  // the checked wall
+  g.fillStyle = '#23272F'; g.fillRect(830, 250, 210, 110); g.fillStyle = '#F1F3F5'; g.font = sans(60, 800); g.textAlign = 'center'; g.textBaseline = 'middle'; g.letterSpacing = '2px'; g.fillText('03:5' + (Math.floor(t * 0.5) % 10), 935, 306);
+  for (let i = 0; i < 9; i++) { const x = 420 + i * 70 + Math.sin(i * 3.1) * 20, y = 560 + Math.sin(i * 1.7) * 18; g.fillStyle = ['#8E8A84', '#7A766F', '#A39E95', '#6E6A64'][i % 4]; g.beginPath(); g.arc(x, y, 30, 0, 7); g.fill(); g.fillRect(x - 40, y + 26, 80, 120); }  // people far behind
+  g.fillStyle = '#BDB4A3'; g.fillRect(0, 1080, W, H - 1080);
+  drawChar(g, 'girl1', { x: 250, y: 700, s: 1.05, e: eG, t });
+  drawChar(g, 'girl2', { x: 560, y: 770, s: 0.98, e: { ...eG, look: [-0.5, 0] }, t: t + 0.6 });
+  // Hikaru walks past, a little bob in his step, the green lanyard and the badge
+  const bob = -Math.abs(Math.sin(t * 6.5)) * 9;
+  drawChar(g, 'hikaruSuit', { x: hx, y: 560 + bob, s: 1.18, e: eH, t: t + 1.3 });
+  g.strokeStyle = '#2E8B57'; g.lineWidth = 12; g.beginPath(); g.moveTo(hx - 52, 560 + bob + 175); g.lineTo(hx - 8, 560 + bob + 420); g.lineTo(hx + 30, 560 + bob + 175); g.stroke();
+  g.fillStyle = '#F4F4F0'; g.fillRect(hx - 40, 560 + bob + 418, 64, 84); g.fillStyle = '#2E8B57'; g.fillRect(hx - 40, 560 + bob + 418, 64, 18);
+  // the signs, in front of the girls
+  loveSign(g, 250, 960, 330, 260, -0.06, true);
+  loveSign(g, 585, 1015, 300, 220, 0.07, false);
+  // the glass rail with its orange band across the front
+  g.fillStyle = 'rgba(225,235,240,0.62)'; g.fillRect(0, 1150, W, 470); g.fillStyle = '#E8823A'; g.fillRect(0, 1150, W, 26);
+  g.fillStyle = '#B9BEC4'; g.fillRect(700, 1150, 20, 560); g.fillStyle = '#9AA0A8'; g.fillRect(0, 1610, W, 16);
+}
+
+// ---------- photo 2: the podium of the World Blitz, Moscow 2019 — Hikaru with silver and his eyes shut, Magnus with the
+// cup and gold ----------
+function medal(g, x, y, s, col) {
+  g.save(); g.translate(x, y); g.scale(s, s);
+  g.strokeStyle = '#2F7D4E'; g.lineWidth = 26; g.beginPath(); g.moveTo(-70, 0); g.lineTo(0, 210); g.lineTo(70, 0); g.stroke();
+  const gr = g.createRadialGradient(-14, 220, 6, 0, 236, 58); gr.addColorStop(0, col === 'gold' ? '#FFF1B0' : '#FFFFFF'); gr.addColorStop(1, col === 'gold' ? '#C9962A' : '#9AA3AE'); g.fillStyle = gr;
+  g.beginPath(); g.arc(0, 238, 52, 0, 7); g.fill(); g.strokeStyle = col === 'gold' ? '#8A6418' : '#6E7680'; g.lineWidth = 6; g.stroke();
+  g.restore();
+}
+function bigCup(g, x, y, s) {  // the tall cup of the blitz
+  g.save(); g.translate(x, y); g.scale(s, s);
+  const gold = (y0, y1) => { const gr = g.createLinearGradient(-60, 0, 60, 0); gr.addColorStop(0, '#9A6B1C'); gr.addColorStop(0.45, '#FFE39A'); gr.addColorStop(1, '#8A5E16'); return gr; };
+  g.fillStyle = '#2A2420'; g.fillRect(-55, 150, 110, 50); g.fillStyle = gold(); g.fillRect(-18, 60, 36, 95);
+  g.beginPath(); g.moveTo(-70, -120); g.quadraticCurveTo(-78, 40, 0, 66); g.quadraticCurveTo(78, 40, 70, -120); g.closePath(); g.fill();
+  g.beginPath(); g.ellipse(0, -120, 72, 16, 0, 0, 7); g.fill(); g.beginPath(); g.moveTo(-40, -130); g.quadraticCurveTo(0, -230, 40, -130); g.fill(); g.beginPath(); g.arc(0, -232, 16, 0, 7); g.fill();
+  g.restore();
+}
+function podiumMeme(g, t, { eH, eM } = {}) {
+  { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#1C2126'); gr.addColorStop(1, '#0E1114'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+  g.strokeStyle = '#3E6A4E'; g.lineWidth = 34; g.beginPath(); g.arc(150, 250, 230, 0, 7); g.stroke();  // the round logo of the event, cut by the frame
+  g.strokeStyle = '#B9A06A'; g.lineWidth = 8; g.beginPath(); g.arc(150, 250, 190, 0, 7); g.stroke();
+  g.fillStyle = 'rgba(170,180,170,0.6)'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '600 38px Cinzel'; g.letterSpacing = '4px'; g.fillText('WORLD BLITZ · MOSCOW 2019', 600, 400);
+  drawChar(g, 'hikaruSuit', { x: 300, y: 820, s: 1.3, e: eH, t });
+  medal(g, 300, 820 + 210, 1.0, 'silver');
+  drawChar(g, 'magnusSuit', { x: 810, y: 700, s: 1.32, e: eM, t: t + 0.7 });
+  medal(g, 810, 700 + 222, 1.0, 'gold');
+  bigCup(g, 560, 860 + Math.sin(t * 1.4) * 4, 1.1);
+  hand(g, 590, 960, 40, skinOf('magnus').base);
+  g.fillStyle = '#F2F2EE'; g.fillRect(0, 1420, W, H - 1420); g.fillStyle = '#C9CCD0'; for (let i = 0; i < 6; i++) g.fillRect(40 + i * 180, 1480, 120, 36);  // the sponsors' board
+}
+
+// ---------- the stadium (Checkmate: USA vs India, Arlington, 4 October 2025): crowd, lights, two giant screens with
+// the players' faces, the stage table; the king thrown into the crowd ----------
+const FANS = (() => { const r = rng(61), o = []; for (let row = 0; row < 4; row++) for (let i = 0; i < 16; i++) o.push([i * 74 - 40 + (row % 2) * 37 + r() * 20, 1460 + row * 120 + r() * 20, 0.8 + row * 0.18 + r() * 0.12, r() * 7, r() < 0.35]); return o; })();
+function stadium(g, t, { lit = 0, eH, eG, cheer = 0, flash = -9 } = {}) {
+  { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#0A0A18'); gr.addColorStop(0.6, '#140F2A'); gr.addColorStop(1, '#05050B'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+  // light beams sweeping from the rig
+  g.save(); g.globalCompositeOperation = 'screen';
+  for (let k = 0; k < 6; k++) { const a = Math.sin(t * 0.9 + k * 1.3) * 0.5 + (k - 2.5) * 0.18, x0 = 120 + k * 170; g.save(); g.translate(x0, 0); g.rotate(a);
+    const gr = g.createLinearGradient(0, 0, 0, 1500); gr.addColorStop(0, `rgba(${k % 2 ? '120,170,255' : '255,120,200'},${0.32 + 0.25 * lit})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr;
+    g.beginPath(); g.moveTo(-12, 0); g.lineTo(12, 0); g.lineTo(150, 1500); g.lineTo(-150, 1500); g.closePath(); g.fill(); g.restore(); }
+  g.restore();
+  // the LED wall over the stage
+  g.fillStyle = '#05060A'; g.fillRect(170, 330, 740, 190); g.strokeStyle = '#3B3F55'; g.lineWidth = 6; g.strokeRect(170, 330, 740, 190);
+  g.save(); g.textAlign = 'center'; g.textBaseline = 'middle';
+  if (lit > 0.5) { g.fillStyle = '#FF3B3B'; g.shadowColor = '#FF3B3B'; g.shadowBlur = 30; g.font = sans(92, 900); g.letterSpacing = '6px'; g.fillText('CHECKMATE', 540, 428); }
+  else { g.fillStyle = '#E8E8F2'; g.font = sans(54, 900); g.letterSpacing = '5px'; g.fillText('USA  vs  INDIA', 540, 428); }
+  g.restore();
+  // the two giant screens: Hikaru left, Gukesh right
+  for (const [x, who, e, col] of [[30, 'hikaru', eH, '#3A5FBF'], [770, 'gukesh18', eG, '#E07A2E']]) {
+    g.fillStyle = '#0B0C12'; g.fillRect(x - 6, 560, 292, 372); webcam(g, x, 566, 280, 360, who, e, t + (who === 'hikaru' ? 1.3 : 0), { bg: [col, '#141824'], zoom: 1.1 });
+  }
+  // the stage: a glowing table with the board, two small players at it
+  g.fillStyle = '#1C1C2C'; g.beginPath(); g.moveTo(300, 1180); g.lineTo(780, 1180); g.lineTo(860, 1260); g.lineTo(220, 1260); g.closePath(); g.fill();
+  g.fillStyle = '#E6E6F0'; g.fillRect(220, 1260, 640, 30);
+  { const gr = g.createRadialGradient(540, 1150, 20, 540, 1150, 360); gr.addColorStop(0, 'rgba(255,240,200,0.5)'); gr.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = gr; g.fillRect(180, 900, 720, 420); }
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 3; j++) { g.fillStyle = (i + j) % 2 ? '#769656' : '#EEEED2'; const x0 = 440 + i * 25 - j * 6, y0 = 1186 + j * 14; g.fillRect(x0, y0, 25 + 0.75 * j, 14); }
+  drawChar(g, 'hikaru', { x: 360, y: 1080, s: 0.36, e: eH, t: t + 1.3 }); drawChar(g, 'gukesh18', { x: 720, y: 1080, s: 0.36, e: eG, t });
+  // the crowd: heads and shoulders, phone lights, hands up when it cheers
+  for (const [x, y, s, ph, phone] of FANS) {
+    const up = cheer * clamp(0.6 + 0.4 * Math.sin(t * 9 + ph)), jump = cheer * Math.abs(Math.sin(t * 7 + ph)) * 16;
+    g.fillStyle = '#07070D'; g.beginPath(); g.arc(x, y - jump, 44 * s, 0, 7); g.fill(); g.beginPath(); g.ellipse(x, y + 92 * s - jump, 90 * s, 60 * s, 0, 0, 7); g.fill();
+    if (up > 0.05 || phone) { const hx2 = x + 50 * s, hy2 = y - jump - 60 * s - up * 120 * s; g.strokeStyle = '#07070D'; g.lineWidth = 22 * s; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 40 * s, y + 50 * s - jump); g.lineTo(hx2, hy2); g.stroke();
+      if (phone) { g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createRadialGradient(hx2, hy2, 2, hx2, hy2, 40 * s); gr.addColorStop(0, 'rgba(255,255,240,0.95)'); gr.addColorStop(1, 'rgba(255,255,240,0)'); g.fillStyle = gr; g.fillRect(hx2 - 40 * s, hy2 - 40 * s, 80 * s, 80 * s); g.restore(); } }
+  }
+  if (t >= flash) { const a = clamp(1 - (t - flash) / 0.35); if (a > 0) { g.fillStyle = `rgba(255,255,255,${0.55 * a})`; g.fillRect(0, 0, W, H); } }
+}
+// close on the stage: Hikaru throws the king — the arm goes up, the king leaves his hand and flies over the crowd
+function kingThrow(g, t, t0, { e, cheer = 1 } = {}) {
+  { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#120C28'); gr.addColorStop(1, '#05050B'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+  g.save(); g.globalCompositeOperation = 'screen';
+  for (let k = 0; k < 5; k++) { const a = Math.sin(t * 1.4 + k * 1.7) * 0.6, x0 = 140 + k * 200; g.save(); g.translate(x0, -40); g.rotate(a);
+    const gr = g.createLinearGradient(0, 0, 0, 1700); gr.addColorStop(0, `rgba(${k % 2 ? '255,200,120' : '160,120,255'},0.5)`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr;
+    g.beginPath(); g.moveTo(-14, 0); g.lineTo(14, 0); g.lineTo(170, 1700); g.lineTo(-170, 1700); g.closePath(); g.fill(); g.restore(); }
+  g.restore();
+  const x = 540, y = 700, s = 1.25, u = clamp((t - t0) / 0.35);  // u: the throw
+  // the arm: up and back with the king, then flung forward; the other arm rises after
+  const sh = [x + 150 * s, y + 230 * s], hand1 = u < 1 ? [lerp(x + 230 * s, x + 120 * s, ease.inOut(u)), lerp(y - 40 * s, y - 330 * s, ease.out(u))] : [x + 120 * s, y - 330 * s];
+  drawChar(g, 'hikaru', { x, y, s, e, t: t + 1.3 });
+  limb(g, sh[0], sh[1], hand1[0], hand1[1], 230 * s, 230 * s, 1, CAST.hikaru.suit, 66 * s); hand(g, hand1[0], hand1[1], 40 * s, skinOf('hikaru').base);
+  const k2 = clamp((t - t0 - 0.25) / 0.3), h2 = [lerp(x - 230 * s, x - 150 * s, ease.out(k2)), lerp(y + 380 * s, y - 300 * s, ease.out(k2))];
+  if (k2 > 0) { limb(g, x - 150 * s, y + 230 * s, h2[0], h2[1], 230 * s, 230 * s, -1, CAST.hikaru.suit, 66 * s); hand(g, h2[0], h2[1], 40 * s, skinOf('hikaru').base); }
+  // the king: in his hand, then over the crowd toward us, spinning, bigger as it comes
+  const f = clamp((t - t0 - 0.3) / 1.0);
+  if (f <= 0) drawPiece(g, 'k', 'b', hand1[0], hand1[1] - 40 * s, 130, {});
+  else { const kx = lerp(hand1[0], 220, f) , ky = hand1[1] - 40 * s - Math.sin(Math.PI * f) * 380 + f * f * 1300, ks = lerp(130, 330, f);
+    drawPiece(g, 'k', 'b', kx, ky, ks, { rot: f * 9 }); }
+  // the crowd in front, hands up, lit from the stage behind them
+  { const gr = g.createLinearGradient(0, 1380, 0, H); gr.addColorStop(0, 'rgba(255,170,120,0)'); gr.addColorStop(0.35, 'rgba(255,170,120,0.35)'); gr.addColorStop(1, 'rgba(120,90,200,0.25)'); g.fillStyle = gr; g.fillRect(0, 1380, W, H - 1380); }
+  for (const [cx, cy, cs, ph, phone] of FANS) {
+    const up = cheer * clamp(0.5 + 0.5 * Math.sin(t * 9 + ph)), jump = cheer * Math.abs(Math.sin(t * 7 + ph)) * 18, y0 = cy + 120;
+    g.fillStyle = '#05050A'; g.beginPath(); g.arc(cx, y0 - jump, 52 * cs, 0, 7); g.fill(); g.beginPath(); g.ellipse(cx, y0 + 108 * cs - jump, 104 * cs, 70 * cs, 0, 0, 7); g.fill();
+    const hx3 = cx + 60 * cs, hy3 = y0 - jump - 80 * cs - up * 140 * cs; g.strokeStyle = '#05050A'; g.lineWidth = 26 * cs; g.lineCap = 'round'; g.beginPath(); g.moveTo(cx + 46 * cs, y0 + 60 * cs - jump); g.lineTo(hx3, hy3); g.stroke();
+    if (phone) { g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createRadialGradient(hx3, hy3, 2, hx3, hy3, 44 * cs); gr.addColorStop(0, 'rgba(255,255,240,0.95)'); gr.addColorStop(1, 'rgba(255,255,240,0)'); g.fillStyle = gr; g.fillRect(hx3 - 44 * cs, hy3 - 44 * cs, 88 * cs, 88 * cs); g.restore(); }
+  }
+}
+
+// ---------- the turn: a balance standing on the blitz clock (the author called the clock «весы»). Five cups a pan;
+// the sixth hangs over the beam ----------
+const PIV = [540, 640], BEAM = 380, CHAIN = 250;
+function balance(g, t, { tilt = 0, nL = 0, nR = 0, tL = -9, tR = -9, glintL = -9, glintR = -9, clock = {}, eM, eH, six = 0, london = 0, feather = false } = {}) {
+  { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#15254A'); gr.addColorStop(1, '#060A15'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+  for (const [x, col] of [[175, '255,226,176'], [905, '207,224,255']]) { const gr = g.createRadialGradient(x, 0, 30, x, 300, 760); gr.addColorStop(0, `rgba(${col},0.3)`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(0, 0, W, 1200); }
+  if (london > 0) {  // the skyline: a clock tower and a wheel
+    g.save(); g.globalAlpha = clamp(london); g.fillStyle = '#26345E';
+    g.fillRect(0, 1700, W, 220); g.fillRect(130, 1430, 70, 280); g.beginPath(); g.moveTo(120, 1430); g.lineTo(165, 1350); g.lineTo(210, 1430); g.fill(); g.fillStyle = '#F5D27A'; g.beginPath(); g.arc(165, 1480, 20, 0, 7); g.fill();
+    g.strokeStyle = '#26345E'; g.lineWidth = 8; const wr = t * 0.25; g.beginPath(); g.arc(860, 1560, 150, 0, 7); g.stroke(); for (let k = 0; k < 12; k++) { const a = wr + k * Math.PI / 6; g.beginPath(); g.moveTo(860, 1560); g.lineTo(860 + Math.cos(a) * 150, 1560 + Math.sin(a) * 150); g.stroke(); }
+    g.fillStyle = '#26345E'; for (const [x0, w0, h0] of [[300, 120, 160], [440, 90, 110], [560, 140, 190], [990, 90, 130]]) g.fillRect(x0, 1700 - h0, w0, h0);
+    g.fillStyle = 'rgba(255,214,120,0.8)'; for (let k = 0; k < 26; k++) { const wx = 310 + (k * 37) % 420, wy = 1560 + Math.floor(k / 11) * 40; g.fillRect(wx, wy, 10, 14); }
+    g.restore();
+  }
+  camCard(g, t, 'magnus', eM, { x: 55, y: 150, w: 240, label: 'MAGNUS' }); camCard(g, t + 1.3, 'hikaru', eH, { x: 785, y: 150, w: 240, label: 'HIKARU' });
+  if (six > 0) {  // the sixth cup comes down over the beam, rays behind it
+    const k = clamp(six), cy = lerp(-200, 430, ease.out(k));
+    g.save(); g.globalCompositeOperation = 'screen'; g.translate(540, cy - 40); g.rotate(t * 0.4); for (let r = 0; r < 12; r++) { g.rotate(Math.PI / 6); g.fillStyle = `rgba(255,230,160,${0.13 * k})`; g.beginPath(); g.moveTo(0, 0); g.lineTo(-40, -620); g.lineTo(40, -620); g.closePath(); g.fill(); } g.restore();
+    trophy(g, 540, cy + 60, 0.75, {}); g.fillStyle = '#16161E'; g.font = sans(60, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('6', 540, cy - 20);
+  }
+  const brass = (x0, x1) => { const gr = g.createLinearGradient(x0, 0, x1, 0); gr.addColorStop(0, '#7A5A1E'); gr.addColorStop(0.5, '#F2CF7A'); gr.addColorStop(1, '#7A5A1E'); return gr; };
+  g.fillStyle = brass(526, 554); g.fillRect(526, PIV[1], 28, 1000 - PIV[1]);  // the post down to the clock
+  chessClock(g, 540, 1090, 0.95, t, clock);
+  const ends = [-1, 1].map(sd => [PIV[0] + sd * BEAM * Math.cos(tilt), PIV[1] + sd * BEAM * Math.sin(tilt)]);
+  for (const [i, [ex, ey]] of ends.entries()) {  // chains, pans, cups
+    const py = ey + CHAIN; g.strokeStyle = '#C9A55A'; g.lineWidth = 4; for (const dx of [-110, 0, 110]) { g.beginPath(); g.moveTo(ex, ey); g.lineTo(ex + dx, py); g.stroke(); }
+    const n = i ? nR : nL, t0 = i ? tR : tL, gl = i ? glintR : glintL;
+    for (let c = 0; c < 5; c++) { if (c >= n) continue; const k = clamp((t - t0 - c * 0.08) / 0.2); const cx = ex - 96 + c * 48;
+      g.save(); g.translate(cx, py); g.scale(ease.back(k), ease.back(k)); trophy(g, 0, -2, 0.3, {}); g.restore();
+      const gk = (t - gl - c * 0.1) / 0.25; if (gk > 0 && gk < 1) { g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createRadialGradient(cx, py - 40, 2, cx, py - 40, 70); gr.addColorStop(0, `rgba(255,248,210,${Math.sin(Math.PI * gk)})`); gr.addColorStop(1, 'rgba(255,248,210,0)'); g.fillStyle = gr; g.fillRect(cx - 70, py - 110, 140, 140); g.restore(); } }
+    g.fillStyle = brass(ex - 135, ex + 135); g.beginPath(); g.moveTo(ex - 135, py); g.lineTo(ex + 135, py); g.quadraticCurveTo(ex, py + 70, ex - 135, py); g.fill();
+  }
+  g.save(); g.translate(...PIV); g.rotate(tilt); g.fillStyle = brass(-BEAM, BEAM); g.beginPath(); g.roundRect(-BEAM - 14, -12, 2 * BEAM + 28, 24, 12); g.fill(); g.restore();
+  g.fillStyle = brass(510, 570); g.beginPath(); g.arc(PIV[0], PIV[1], 30, 0, 7); g.fill(); g.beginPath(); g.arc(PIV[0], PIV[1] - 40, 12, 0, 7); g.fill();
+  if (feather) featherAt(g, PIV[0] + 10, PIV[1] - 56, 1.1, 1.35);
+}
+// a single feather (x, y its middle)
+function featherAt(g, x, y, s, rot = 0) {
+  g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s);
+  g.fillStyle = '#FFFFFF'; g.shadowColor = 'rgba(255,255,255,0.6)'; g.shadowBlur = 14; g.beginPath(); g.moveTo(0, -60); g.quadraticCurveTo(26, -10, 4, 56); g.quadraticCurveTo(-24, -6, 0, -60); g.fill(); g.shadowBlur = 0;
+  g.strokeStyle = 'rgba(96,108,140,0.75)'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(0, -60); g.quadraticCurveTo(26, -10, 4, 56); g.quadraticCurveTo(-24, -6, 0, -60); g.stroke();
+  g.strokeStyle = 'rgba(150,160,182,0.85)'; g.lineWidth = 3; g.beginPath(); g.moveTo(0, -56); g.quadraticCurveTo(4, 0, 2, 72); g.stroke();
+  g.strokeStyle = 'rgba(190,198,214,0.6)'; g.lineWidth = 1.5; for (let k = -4; k <= 4; k++) { g.beginPath(); g.moveTo(1, k * 11); g.lineTo(k % 2 ? 16 : -14, k * 11 - 8); g.stroke(); }
+  g.restore();
+}
+
+// the last round: the two faces and the clock between them, ticking
+function faceOff(g, t, { eH, eG, secs = 41, t0 = 0 } = {}) {
+  { const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, '#13213F'); gr.addColorStop(0.5, '#0B0B12'); gr.addColorStop(1, '#3A1F10'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+  webcam(g, 30, 250, 500, 580, 'hikaru', eH, t + 1.3, { bg: CAMLOOK.hikaru.bg, name: 'NAKAMURA', nameColor: '#CFE0FF', zoom: 1.08, shake: 0.12 });
+  webcam(g, 550, 250, 500, 580, 'gukesh18', eG, t, { bg: ['#B97A3E', '#3A2614'], name: 'GUKESH', nameColor: '#FFE2B0', zoom: 1.08 });
+  g.save(); g.font = sans(110, 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#FFFFFF'; g.shadowColor = '#E8413A'; g.shadowBlur = 30; g.fillText('VS', W / 2, 560); g.restore();
+  const left = Math.max(0, secs - Math.floor((t - t0) * 2)), fmtT = s => `0:${String(s).padStart(2, '0')}`;
+  chessClock(g, 540, 950, 0.85, t, { l: fmtT(left), r: '1:12', on: 1, press: 1, fs: 62 });
+}
+// "It was a draw": two hands meet over the board
+function handshake(g, t, t0) {
+  { const gr = g.createRadialGradient(540, 900, 100, 540, 900, 1100); gr.addColorStop(0, '#6E4E30'); gr.addColorStop(1, '#2A1C10'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+  g.save(); g.translate(540, 980); g.rotate(-0.12); const sq = 104;
+  for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { g.fillStyle = (i + j) % 2 ? '#769656' : '#EEEED2'; g.fillRect(-4 * sq + i * sq, -4 * sq + j * sq, sq, sq); }
+  g.strokeStyle = '#15151C'; g.lineWidth = 14; g.strokeRect(-4 * sq, -4 * sq, 8 * sq, 8 * sq);
+  for (const [tp, c, i, j] of [['k', 'w', 6, 7], ['r', 'w', 5, 7], ['p', 'w', 5, 6], ['p', 'w', 6, 6], ['p', 'w', 7, 5], ['k', 'b', 6, 0], ['r', 'b', 2, 0], ['p', 'b', 5, 1], ['p', 'b', 6, 1], ['p', 'b', 7, 2], ['b', 'w', 3, 4], ['n', 'b', 4, 2]])
+    drawPiece(g, tp, c, -4 * sq + (i + 0.5) * sq, -4 * sq + (j + 0.8) * sq, 120, {});
+  g.restore();
+  const u = clamp((t - t0 + 0.25) / 0.35), k = ease.out(u), shake = t > t0 + 0.1 ? Math.sin((t - t0) * 22) * 14 * Math.exp(-(t - t0) * 2.2) : 0;
+  const hL = [lerp(60, 470, k), lerp(1080, 900, k) + shake], hR = [lerp(1020, 610, k), lerp(720, 900, k) + shake];
+  g.lineCap = 'round';
+  g.strokeStyle = '#2B2E36'; g.lineWidth = 130; g.beginPath(); g.moveTo(-200, 1160); g.lineTo(hL[0] - 70, hL[1] + 20); g.stroke();
+  g.strokeStyle = '#8A8F99'; g.lineWidth = 40; g.beginPath(); g.moveTo(hL[0] - 96, hL[1] + 26); g.lineTo(hL[0] - 60, hL[1] + 16); g.stroke();
+  g.strokeStyle = '#3C5A8C'; g.lineWidth = 130; g.beginPath(); g.moveTo(1280, 640); g.lineTo(hR[0] + 70, hR[1] - 20); g.stroke();
+  g.strokeStyle = '#F2F2EE'; g.lineWidth = 40; g.beginPath(); g.moveTo(hR[0] + 96, hR[1] - 26); g.lineTo(hR[0] + 60, hR[1] - 16); g.stroke();
+  hand(g, hR[0], hR[1], 84, BROWN.base); hand(g, hL[0], hL[1], 84, skinOf('hikaru').base);
+  if (t > t0) shockwave(g, 540, 900, t, t0, { r0: 30, r1: 260, life: 0.45, color: '#FFFFFF', lw: 8, squash: 1 });
 }
 
 export async function build(T) {
@@ -1697,12 +1901,13 @@ export async function build(T) {
   const onA = s('once') - 0.06, y16T = w('once', 2);
   const btA = s('bait') - 0.06, worldT = w('bait', 4), bt2A = s('bait2') - 0.06, ownT = w('bait2', 5);
   const tiA = s('titles') - 0.06, fiveT = w('titles', 2), hikT = w('titles', 6), neverT = w('titles', 7);
-  const cA = s('c2024') - 0.06, oneT = w('c2024', 2), winT = w('c2024', 3), gukT = w('c2024', 5), forcT = w('c2024', 8), shotT = w('c2024', 13), titleT = w('c2024', 16);
+  const cA = s('c2024') - 0.06, lastT = w('c2024', 7), mustA = s('must') - 0.06, beatT = w('must', 1), gukT = w('must', 4), faceT = gukT - 0.05;
   const drA = s('draw') - 0.06, drawT = w('draw', 3);
   const chA = s('champ') - 0.06, chmpT = w('champ', 3);
+  const tsA = s('toss') - 0.06, ckT = w('toss', 4), ts2A = s('toss2') - 0.06, thT = w('toss2', 1), kingT = w('toss2', 3), crowdT = w('toss2', 6);
   const nwA = s('now') - 0.06, fifthT = w('now', 4), hesT = w('now', 5), ageT = w('now', 6);
   const ldA = s('ladder') - 0.06, lifeT = w('ladder', 6), bldT = w('ladder', 7), ladT = w('ladder', 9), skyT = w('ladder', 13);
-  const wgA = s('wings') - 0.06, someT = w('wings', 5), wasT = w('wings', 7), bornT = w('wings', 8), wingT = w('wings', 10);
+  const wgA = s('wings') - 0.06, thatT = w('wings', 4), someT = w('wings', 5), wasT = w('wings', 7), bornT = w('wings', 8), wingT = w('wings', 10);
   const twA = s('twist') - 0.06, ffT = w('twist', 7), ff2T = w('twist', 9);
   const spA = s('speed') - 0.06, fM = w('speed', 2), fH = w('speed', 5);
   const sxA = s('six') - 0.06, sixT = w('six', 7);
@@ -1770,8 +1975,13 @@ export async function build(T) {
   }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { if (t >= nxtT - 0.1) badge(g, 'THE NEXT CHAMPION?', W / 2, 230, { color: GOLD, size: 54, ...popW(t, nxtT - 0.1) }); } });
   shot(magT - 0.05, (g, lt, t, sh) => {  // the screen splits, Magnus at 13 slides in, the crown flies over to him
     g.save(); view2(g, cam2(lt, [[0, [540, 900, 1.2, -0.03]], [len(sh), [540, 960, 1.0, 0]]]));
-    vsKids(g, t, clamp((t - magT + 0.05) / 0.45), kidH(t), { ...EXPR.smug, look: [-1, 0] }, clamp((t - magT - 0.35) / 0.6)); g.restore();
+    vsKids(g, t, clamp((t - magT + 0.05) / 0.4), kidH(t), { ...EXPR.smug, look: [-1, 0] }, clamp((t - magT - 0.15) / 0.45)); g.restore();
   }, { kb: 0, zoom: kicks([[magT, 0.1]]), qaAllow: ['face cut by frame'] });
+  shot(magT + 0.7, (g, lt, t, sh) => {  // the photo the author sent (rule 67, drawn): everyone has a sign for Magnus; Hikaru walks past
+    g.save(); view2(g, cam2(lt, [[0, [540, 880, 1.04, 0.01]], [len(sh), [560, 820, 1.14, -0.01]]]));
+    signsMeme(g, t, { hx: lerp(880, 790, clamp(lt / len(sh))), eH: { ...EXPR.sad, look: [-0.7, 0.5], lid: 0.35 }, eG: { ...EXPR.happy, lid: 0.05, look: [-0.6, -0.1] } }); g.restore();
+  }, { trans: 'whip', kb: 0 });
+  cue(magT + 0.66, 'whoosh_fast', 0.25); cue(magT + 0.75, 'murmur', 0.3);
   cue(nxA - 0.04, 'whoosh_fast', 0.3); cue(nxtT, 'shimmer', 0.3); cue(magT, 'boom_big', 0.5); cue(magT + 0.4, 'whoosh_soft', 0.3);
 
   // ======================= 14 : 1 =======================
@@ -1802,12 +2012,16 @@ export async function build(T) {
     const u = glide(clamp(lt / len(sh)));
     globeScene(g, t, lerp(1440, 1560, u), lerp(1.0, 1.14, u), { eH: { ...EXPR.triumph, look: [0, -0.1] }, eM: EX.smug, fly: worldT - 0.35 });
   }, { trans: 'whip', kb: 0, zoom: kicks([[worldT, 0.08]]), hud: (g, lt, t) => { if (t >= worldT) badge(g, 'THE WHOLE WORLD', W / 2, 230, { color: GOLD, size: 56, ...popW(t, worldT) }); } });
-  shot(bt2A, (g, lt, t, sh) => {
-    const u = ease.inOut(clamp(lt / 0.8));
+  shot(bt2A, (g, lt, t, sh) => {  // "Just not the man...": up the globe to the man sitting on it
+    const u = ease.inOut(clamp(lt / 0.7));
     globeScene(g, t, lerp(1500, 68, u), lerp(1, 0.665, u), { eH: { ...EXPR.sad, look: [0, -1] }, eM: { ...EXPR.smug, look: [0, 0.6] } });
-  }, { kb: 0, zoom: kicks([[ownT, 0.07]]), qaAllow: ['face cut by frame'], hud: (g, lt, t) => { if (t >= ownT) badge(g, 'EXCEPT ONE', W / 2, 200, { color: RED, size: 56, ...popW(t, ownT) }); } });
+  }, { kb: 0, qaAllow: ['face cut by frame'] });
+  shot(ownT - 0.1, (g, lt, t, sh) => {  // "...who owns it.": the podium of the World Blitz 2019, the author's photo drawn (rule 67)
+    g.save(); view2(g, cam2(lt, [[0, [580, 880, 1.06, 0]], [len(sh), [420, 860, 1.24, 0.01]]]));
+    podiumMeme(g, t, { eH: { ...EXPR.neutral, lid: 1, curve: -0.15, look: [0, 0.3] }, eM: { ...EXPR.happy, lid: 0.1, look: [-0.2, 0] } }); g.restore();
+  }, { trans: 'whip', kb: 0, zoom: kicks([[ownT, 0.06]]), hud: (g, lt, t) => { badge(g, 'EXCEPT ONE', W / 2, 200, { color: RED, size: 56, ...popW(t, ownT) }); } });
   cue(btA - 0.04, 'whoosh_deep', 0.3); cue(worldT - 0.3, 'scatter', 0.45); cue(worldT, 'boom_move', 0.4);
-  cue(bt2A, 'whoosh_soft', 0.35); cue(ownT, 'boom_big', 0.55);
+  cue(bt2A, 'whoosh_soft', 0.35); cue(ownT - 0.14, 'whoosh_fast', 0.3); cue(ownT, 'boom_big', 0.55); cue(ownT + 0.1, 'camera', 0.35);
 
   // ======================= five title matches; none =======================
   shot(tiA, (g, lt, t, sh) => {  // along Magnus's shelf as the cups pop up
@@ -1820,42 +2034,67 @@ export async function build(T) {
   }, { kb: 0, hud: (g, lt, t) => { if (t >= neverT + 0.2) stamp(g, '0', 760, 1060, t, neverT + 0.2, { color: '#9AA0A8', size: 150, rot: -0.1 }); } });
   cue(tiA - 0.04, 'whoosh_fast', 0.3); for (let k = 0; k < 5; k++) cue(fiveT + k * 0.16, 'sparkle_pop', 0.22); cue(hikT - 0.09, 'whoosh_soft', 0.25); cue(neverT + 0.2, 'dun_dun', 0.35);
 
-  // ======================= the Candidates of 2024: one win would have forced a playoff; a draw =======================
+  // ======================= 2024: the last round against Gukesh, the draw, his crown; 2025: the stadium (v3) =======================
   const cand = (g, t, eH) => { dayRoom(g, t, {}); tableSet(g, t, { pieces: P24, white: 'hikaru', bPlayer: false, bChair: false, ew: eH, tableCol: WOODT }); lowKey(g, { cy: H * 0.46, a: 0.04 }); };
-  const wHead = () => { const hp = B.project(4, 3.1, -1.4); return { x: hp.x, y: hp.y, s: hp.s / 100 * 1.05 }; };
-  shot(cA, (g, lt, t, sh) => {  // the hall, orbiting
-    rig(B, lt, [[0, K(Math.PI + 0.42, 0.2, 14.2, [4, 2.3, 0.4])], [len(sh), K(Math.PI + 0.02, 0.16, 11.6, [4, 2.55, -0.5])]], { t, e: glide });
+  shot(cA, (g, lt, t, sh) => {  // "In 2024, it came down to the last round.": flying into the hall
+    rig(B, lt, [[0, K(Math.PI + 0.55, 0.3, 17.5, [4, 1.8, 1.5])], [len(sh), K(Math.PI + 0.05, 0.14, 10.2, [4, 2.6, -0.6])]], { t, e: glide });
     cand(g, t, EX.calm);
-  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'CANDIDATES 2024 · LAST ROUND', W / 2, 200, { color: '#16161E', size: 40, ...popW(t, cA + 0.05) }); } });
-  shot(oneT - 0.05, (g, lt, t, sh) => {  // "one win against Gukesh": close on him; Gukesh's card comes in
-    rig(B, lt, [[0, K(Math.PI + 0.16, 0.1, 7.6, [4, 2.95, -0.9])], [len(sh), K(Math.PI - 0.04, 0.09, 5.9, [4, 3.0, -1.1])]], { t, e: glide });
-    cand(g, t, { ...EXPR.focus, sweat: t >= gukT ? 1 : 0 });
-  }, { kb: 0, zoom: kicks([[winT, 0.07]]), hud: (g, lt, t) => {
-    if (t >= winT) counter(g, '1 WIN', 'AGAINST GUKESH', { y: 380, size: 150, color: GOLD, at: [winT, 0.25] });
-    camCard(g, t, 'gukesh18', t >= gukT ? { ...EXPR.focus, lid: 0.35 } : EX.calm, { x: 820, y: 620, w: 220, label: 'GUKESH', a: clamp((t - gukT + 0.3) / 0.2) });
-  } });
-  shot(forcT - 0.05, (g, lt, t, sh) => {  // "...would have forced a playoff": over the board, turning
-    rig(B, lt, [[0, K(Math.PI - 0.32, 0.62, 7.4, [4, 0.6, 3.6])], [len(sh), K(Math.PI + 0.18, 0.5, 6.0, [4, 0.8, 3.0])]], { t, e: glide });
+  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'CANDIDATES 2024 · TORONTO', W / 2, 200, { color: '#16161E', size: 40, ...popW(t, cA + 0.05) }); } });
+  shot(lastT - 0.05, (g, lt, t, sh) => {  // "...the last round.": over the board, turning; the clock beside it
+    rig(B, lt, [[0, K(Math.PI - 0.34, 0.62, 7.6, [4, 0.6, 3.6])], [len(sh), K(Math.PI + 0.2, 0.5, 6.0, [4, 0.8, 3.0])]], { t, e: glide });
     cand(g, t, { ...EXPR.focus, sweat: 1 });
-  }, { kb: 0, hud: (g, lt, t) => { counter(g, 'PLAYOFF', 'ONE WIN AWAY', { y: 1590, size: 120, color: GOLD, at: [forcT, 0.25] }); } });
-  shot(shotT - 0.05, (g, lt, t, sh) => {  // "...for a shot at the title": the crown he could have played for, dashed, over him; silence
-    rig(B, lt, [[0, K(Math.PI + 0.05, 0.08, 7.0, [4, 3.3, -1.0])], [len(sh), K(Math.PI, 0.08, 5.5, [4, 3.25, -1.2])]], { t, e: lin });
-    cand(g, t, { ...EXPR.focus, sweat: 1, look: [0, -0.5] });
-    const h = wHead(); crown(g, h.x, h.y - 250 * h.s + Math.sin(t * 2.2) * 8, h.s * 1.1, { dashed: true, a: clamp((t - titleT + 0.2) / 0.3) });
-  }, { kb: 0 });
-  shot(drA, (g, lt, t, sh) => {  // "It was a draw.": the camera falls back from him
-    rig(B, lt, [[0, K(Math.PI, 0.08, 5.4, [4, 3.05, -1.2])], [len(sh), K(Math.PI - 0.08, 0.14, 8.8, [4, 2.75, -0.7])]], { t, e: glide });
-    cand(g, t, t >= drawT + 0.1 ? { ...EXPR.sad, look: [0, 0.6], lid: 0.45 } : { ...EXPR.focus, sweat: 1 });
-    if (t < drawT + 0.3) { const h = wHead(); crown(g, h.x, h.y - 250 * h.s, h.s * 1.1, { dashed: true, a: 1 - clamp((t - drawT) / 0.3) }); }
-  }, { kb: 0, zoom: kicks([[drawT, 0.06]]), hud: (g, lt, t) => { if (t >= drawT) stamp(g, 'DRAW', W / 2, 1560, t, drawT, { color: '#9AA0A8', size: 116, rot: -0.08 }); } });
-  shot(chA, (g, lt, t, sh) => {  // Gukesh, world champion that year: the crown comes down, the camera with it
-    rig(B, lt, [[0, K(0.0, -0.06, 9.4, [4, 4.5, 8.8])], [len(sh), K(0.12, 0.1, 6.6, [4, 3.0, 8.9])]], { t, e: glide });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[lastT, 0.07]]), hud: (g, lt, t) => { counter(g, 'ROUND 14', 'THE LAST ONE', { y: 1590, size: 120, color: GOLD, at: [lastT, 0.25] }); } });
+  shot(mustA, (g, lt, t, sh) => {  // "Hikaru had to beat Gukesh.": close on him, Gukesh's card, MUST WIN
+    rig(B, lt, [[0, K(Math.PI + 0.2, 0.1, 7.8, [4, 2.95, -0.9])], [len(sh), K(Math.PI - 0.06, 0.08, 5.6, [4, 3.0, -1.1])]], { t, e: glide });
+    cand(g, t, { ...EXPR.focus, sweat: t >= beatT ? 1 : 0 });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[beatT, 0.08]]), hud: (g, lt, t) => {
+    if (t >= beatT) stamp(g, 'MUST WIN', W / 2, 330, t, beatT, { color: RED, size: 100, rot: -0.08 });
+  } });
+  shot(faceT, (g, lt, t, sh) => {  // the silence before it: the two of them, the clock running, the heart
+    g.save(); view2(g, cam2(lt, [[0, [540, 760, 1.04, 0]], [len(sh), [540, 720, 1.2, 0]]]));
+    faceOff(g, t, { t0: faceT, eH: { ...EXPR.focus, sweat: 1, look: [0.6, 0.3] }, eG: { ...EXPR.focus, lid: 0.35, look: [-0.6, 0.3] } }); g.restore();
+  }, { trans: 'whip', kb: 0, zoom: kicks([[faceT + 0.12, 0.035, 0.3], [faceT + 0.5, 0.035, 0.3], [faceT + 0.88, 0.035, 0.3]]) });
+  shot(drA, (g, lt, t, sh) => {  // "It was a...": two hands meet over the board
+    handshake(g, t, drA + 0.22);
+  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { if (t >= drawT) stamp(g, 'DRAW', W / 2, 330, t, drawT, { color: '#3A3F48', size: 116, rot: -0.08 }); } });
+  shot(drawT + 0.12, (g, lt, t, sh) => {  // "...draw.": his face; the colour drains, the camera falls back
+    rig(B, lt, [[0, K(Math.PI, 0.08, 5.4, [4, 3.05, -1.2])], [len(sh), K(Math.PI - 0.1, 0.14, 8.8, [4, 2.75, -0.7])]], { t, e: glide });
+    cand(g, t, { ...EXPR.sad, look: [0, 0.6], lid: 0.45 }); grey(g, clamp((t - drawT) / 0.4) * 0.8);
+  }, { kb: 0, zoom: kicks([[drawT, 0.06]]), hud: (g, lt, t) => { if (t >= drawT) stamp(g, 'DRAW', W / 2, 330, t, drawT, { color: '#3A3F48', size: 116, rot: -0.08 }); } });
+  shot(chA, (g, lt, t, sh) => {  // Gukesh, world champion that year: the crown comes down, confetti
+    rig(B, lt, [[0, K(0.0, -0.06, 9.4, [4, 4.5, 8.8])], [len(sh), K(0.16, 0.1, 6.4, [4, 3.0, 8.9])]], { t, e: glide });
     atBoard(g, t, 'gukesh18', { pieces: P24, e: t >= chmpT ? { ...EXPR.triumph } : { ...EXPR.happy, lid: 0.1, look: [0, -0.6] } });
-    const h = headAt(), cu = ease.out(clamp((t - chA - 0.1) / 0.7)); crown(g, h.x, lerp(h.y - 900, h.y - 205 * h.s, cu), h.s * 0.95, {});
-  }, { trans: 'whip', kb: 0, zoom: kicks([[chmpT, 0.07]]), hud: (g, lt, t) => { nameTitle(g, t - chA, 'GUKESH', 'WORLD CHAMPION · 2024', { y: 230 }); } });
-  cue(cA - 0.04, 'whoosh_fast', 0.3); cue(oneT - 0.05, 'whoosh_soft', 0.2); cue(winT, 'hit', 0.4); cue(gukT, 'clock_tick', 0.3);
-  cue(forcT - 0.05, 'whoosh_soft', 0.2); cue(titleT, 'shimmer', 0.25); cue(drawT, 'stamp', 0.5);
-  cue(chA + 0.1, 'shimmer', 0.35); cue(chmpT, 'applause', 0.3);
+    const h = headAt(), cu = ease.out(clamp((t - chA - 0.1) / 0.6)); crown(g, h.x, lerp(h.y - 900, h.y - 205 * h.s, cu), h.s * 0.95, {});
+    confetti(g, t, chA + 0.2, { n: 110, seed: 12 });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[chmpT, 0.07]]), hud: (g, lt, t) => {
+    nameTitle(g, t - chA, 'GUKESH', 'WORLD CHAMPION · 2024', { y: 230 });
+    if (t >= chmpT + 0.35) badge(g, 'NOV 24: DEFENDS IT IN GENEVA', W / 2, 1560, { color: '#16161E', size: 34, ...popW(t, chmpT + 0.35) });
+  } });
+  const stad = (g, t) => { const won = t >= ckT + 0.25;
+    stadium(g, t, { lit: won ? 1 : 0, cheer: clamp((t - ckT - 0.2) / 0.3), flash: ckT + 0.2, eH: won ? { ...EXPR.triumph } : { ...EXPR.focus, look: [0.3, 0.5] }, eG: won ? { ...EXPR.shock, sweat: 0 } : { ...EXPR.focus, look: [-0.3, 0.5] } }); };
+  shot(tsA, (g, lt, t, sh) => {  // "The next year, Hikaru...": Arlington, over the crowd toward the stage
+    g.save(); view2(g, cam2(lt, [[0, [540, 1240, 1.0, 0]], [len(sh), [540, 1000, 1.18, 0]]])); stad(g, t); g.restore();
+  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'ARLINGTON, TEXAS · OCT 2025', W / 2, 200, { color: '#16161E', size: 38, ...popW(t, tsA + 0.05) }); } });
+  shot(ckT - 0.05, (g, lt, t, sh) => {  // "...checkmated the world champion": CHECKMATE on the wall, the screens, the crowd up
+    g.save(); view2(g, cam2(lt, [[0, [540, 760, 1.45, 0.02]], [len(sh), [540, 740, 1.3, -0.01]]])); stad(g, t); g.restore();
+  }, { trans: 'whip', kb: 0, zoom: kicks([[ckT + 0.2, 0.09]]), qaAllow: ['face cut by frame'] });
+  shot(w('toss', 8) - 0.05, (g, lt, t, sh) => {  // "...in a stadium.": back over the whole room going wild
+    g.save(); view2(g, cam2(lt, [[0, [540, 1000, 1.12, -0.02]], [len(sh), [540, 1100, 1.0, 0.01]]])); stad(g, t); g.restore();
+  }, { trans: 'whip', kb: 0 });
+  shot(ts2A, (g, lt, t, sh) => {  // "And threw his king into the crowd."
+    g.save(); view2(g, cam2(lt, [[0, [540, 860, 1.12, 0.02]], [len(sh), [540, 960, 1.0, -0.02]]]));
+    kingThrow(g, t, thT, { e: { ...EXPR.triumph } }); g.restore();
+  }, { trans: 'whip', kb: 0, zoom: kicks([[kingT, 0.06]]), qaAllow: ['face cut by frame'] });
+  shot(crowdT + 0.15, (g, lt, t, sh) => {  // the world champion's face on the big screen
+    g.fillStyle = '#05050B'; g.fillRect(0, 0, W, H);
+    webcam(g, 80, 330, 920, 1180, 'gukesh18', { ...EXPR.neutral, brow: 0.35, browY: -6, lid: 0.15, look: [0.3, 0.1], mouth: 'line', curve: -0.1 }, t, { bg: ['#E07A2E', '#141824'], name: 'GUKESH · WORLD CHAMPION', nameColor: '#FFE2B0', zoom: 1.05 });
+  }, { kb: 0, zoom: (lt) => 1 + 0.08 * clamp(lt / 0.6) });
+  cue(cA - 0.04, 'whoosh_fast', 0.3); cue(lastT, 'hit', 0.35); cue(mustA - 0.04, 'whoosh_fast', 0.25); cue(beatT, 'stamp', 0.45);
+  cue(faceT - 0.04, 'whoosh_fast', 0.25); for (let k = 0; k < 3; k++) cue(faceT + 0.12 + k * 0.38, 'heartbeat', 0.4); cue(faceT + 0.1, 'clock_tick', 0.3);
+  cue(drA - 0.04, 'whoosh_soft', 0.25); cue(drA + 0.22, 'fabric', 0.45); cue(drawT, 'stamp', 0.5);
+  cue(chA + 0.1, 'shimmer', 0.35); cue(chmpT, 'confetti', 0.35); cue(chmpT + 0.05, 'applause', 0.3);
+  cue(tsA - 0.04, 'whoosh_deep', 0.3); cue(tsA + 0.1, 'murmur', 0.35); cue(ckT - 0.09, 'whoosh_fast', 0.25); cue(w('toss', 8) - 0.09, 'whoosh_soft', 0.25); cue(ckT + 0.2, 'boom_big', 0.55); cue(ckT + 0.25, 'applause', 0.55);
+  cue(ts2A - 0.04, 'whoosh_fast', 0.3); cue(thT + 0.3, 'whoosh_fast', 0.45); cue(kingT + 0.1, 'applause', 0.5); cue(crowdT + 0.15, 'record_scratch', 0.25);
 
   // ======================= the sad part: fifth this year, 38 =======================
   shot(nwA, (g, lt, t, sh) => {
@@ -1880,56 +2119,73 @@ export async function build(T) {
     const p = Math.min(13, 11 + 2 * clamp((t - bldT) / 1.25)), hy = rungY(13) + 126;
     ladderWorld(g, t, cam2(lt, [[0, [540, 3250, 0.62]], [len(sh) * 0.62, [540, hy - 120, 1.1]], [len(sh), [540, hy - 70, 1.55]]]), { p, who: 'hikaru', eH: t >= skyT ? hope : { ...EXPR.focus, look: [0, -1], sweat: 1 }, glow: clamp((t - skyT + 0.2) / 0.4) });
   }, { kb: 0 });
-  shot(wgA, (g, lt, t, sh) => {  // "Just to find out that someone else...": Magnus shoots up past him
-    const hy = rungY(13) + 126, u = clamp((t - someT + 0.2) / 0.9);
-    const e = t >= someT ? { ...EXPR.shock, look: [0.7, -1] } : hope;
-    ladderWorld(g, t, cam2(lt, [[0, [560, hy - 90, 1.3]], [len(sh), [600, hy - 200, 1.12]]]), { p: 13, who: 'hikaru', eH: e, glow: 1,
-      mag: u > 0 ? { x: lerp(860, 750, ease.out(u)), y: lerp(hy + 1000, hy - 760, ease.out(u)) + Math.sin(t * 2.4) * 14 * u, s: 0.72, e: { ...EXPR.smug, look: [-0.6, 0.4] } } : null, feath: someT, featherAt: [800, hy - 420] });
-    speedLines(g, W * 0.72, H * 0.45, t, someT - 0.1, { life: 0.6, seed: 9 });
-  }, { kb: 0, zoom: kicks([[someT, 0.06]]), qaAllow: ['captions over face'] });
-  shot(wasT - 0.05, (g, lt, t, sh) => {  // "...was born with wings.": Magnus above in the light, Hikaru below; feathers fall on him
-    const hy = rungY(13) + 126;
-    ladderWorld(g, t, cam2(lt, [[0, [600, hy - 140, 0.85]], [len(sh) * 0.35, [600, hy - 140, 0.88]], [len(sh), [550, hy - 70, 1.4]]]), { p: 13, who: 'hikaru', eH: t >= wingT ? { ...EXPR.sad, look: [0.3, -1], lid: 0.3 } : { ...EXPR.shock, look: [0.3, -1] }, glow: 0.6,
-      mag: { x: 740, y: hy - 980 + Math.sin(t * 2.4) * 18, s: 0.72, e: { ...EXPR.smug, look: [-0.5, 0.6] }, trail: 0 }, feath: someT, featherAt: [800, hy - 420] });
-  }, { kb: 0, qaAllow: ['face cut by frame'] });
+  // the wings (v3, the author: «в моменте где крылья сделай получше эту сцену, прям поработай над ней хорошенько»)
+  const HY = rungY(13) + 126;
+  const fT0 = wingT + 0.3, fLand = twA + 0.75, LAND = [556, 870];
+  const heroF = (g, t) => {  // one feather, drawn on the screen across the cut: it falls past his face, then onto the scales
+    if (t < fT0 || t >= fLand) return;
+    const ph = (t - fT0) * 2.3, damp = t < twA ? 1 : 1 - ease.inOut(clamp((t - twA) / (fLand - twA)));
+    const y = t < twA ? lerp(-90, 620, (t - fT0) / (twA - fT0)) : lerp(620, LAND[1], ease.out(clamp((t - twA) / (fLand - twA))));
+    featherAt(g, lerp(LAND[0], 540 + Math.sin(ph) * 80, damp), y, lerp(1.76, 2.3, damp), lerp(1.35, Math.sin(ph + 0.6) * 0.7, damp));
+  };
+  shot(wgA, (g, lt, t, sh) => {  // "Just to find out": at the top, in the gold, hoping
+    ladderWorld(g, t, cam2(lt, [[0, [560, HY - 60, 1.3]], [len(sh), [548, HY - 30, 1.48]]]), { p: 13, who: 'hikaru', eH: hope, glow: 1, rays: 0.5 });
+  }, { kb: 0 });
+  shot(thatT - 0.05, (g, lt, t, sh) => {  // "...that someone else": at the foot of the ladder Magnus opens his wings and shoots up past the years
+    const op = clamp((t - someT + 0.05) / 0.14), u = clamp((t - someT - 0.1) / 0.55), my = lerp(LG - 560, HY + 700, ease.in(u));
+    ladderWorld(g, t, [600, Math.min(LG - 600, my + 40), 1.0], { p: 13, who: 'hikaru', eH: hope,
+      mag: { x: 760, y: my, s: 0.72, e: u > 0 ? { ...EXPR.smug, look: [0, -0.8] } : { ...EXPR.smug, look: [-0.4, 0.1] }, spread: op, trail: u > 0 ? 0 : 1, streak: u > 0 ? 1 : 0 } });
+    if (u > 0) speedLines(g, W / 2, H / 2, t, someT + 0.1, { life: 0.55, seed: 13, n: 40 });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[someT, 0.06]]) });
+  shot(wasT - 0.05, (g, lt, t, sh) => {  // "...was born with": he bursts up past Hikaru and hangs over him in the sun; his shadow falls on him
+    const u = clamp(lt / 0.55), my = lerp(HY + 900, HY - 950, ease.out(u)) + Math.sin(t * 2.4) * 14 * u, gust = clamp(1 - Math.abs(lt - 0.18) / 0.25);
+    ladderWorld(g, t, cam2(lt, [[0, [600, HY - 180, 0.95]], [len(sh), [590, HY - 230, 0.9]]]), { p: 13, who: 'hikaru', eH: { ...EXPR.shock, look: [0.5, -1], shake: gust * 0.8 }, glow: 0.3, rays: u,
+      mag: { x: lerp(830, 740, ease.out(u)), y: my, s: 0.78, e: { ...EXPR.smug, look: [-0.5, 0.6] }, trail: 0, streak: 1 - u }, shade: u, feath: wasT + 0.2, featherAt: [760, HY - 500] });
+  }, { kb: 0, zoom: kicks([[wasT + 0.1, 0.07]]), qaAllow: ['captions over face', 'face cut by frame'] });
+  shot(wingT + 0.15, (g, lt, t, sh) => {  // "...wings.": close, in his shadow; one feather comes down in front of his face, the camera goes down with it
+    const d = sh.b - sh.a;
+    ladderWorld(g, t, [550, lerp(HY - 30, HY + 190, ease.in(clamp((lt - 0.25) / Math.max(0.3, d - 0.25)))), lerp(2.1, 1.85, clamp(lt / d))], { p: 13, who: 'hikaru', eH: { ...EXPR.sad, look: [0.1, lt < 0.4 ? -1 : 0.6], lid: 0.35 }, shade: 1, glow: 0.2,
+      mag: { x: 740, y: HY - 950, s: 0.78, e: EX.smug, trail: 0 } });
+  }, { kb: 0, hud: (g, lt, t) => heroF(g, t), qaAllow: ['face cut by frame'] });
   cue(ldA - 0.1, 'whoosh_soft', 0.3); cue(ldA + 0.4, 'knock', 0.35); cue(ldA + 1.15, 'knock', 0.3); cue(lifeT, 'creak', 0.25);
   cue(bldT - 0.08, 'whoosh_deep', 0.3); cue(bldT + 0.1, 'knock', 0.3); cue(bldT + 0.72, 'knock', 0.3); cue(skyT, 'shimmer', 0.4);
-  cue(someT - 0.6, 'riser', 0.3); cue(someT - 0.1, 'whoosh_deep', 0.55); cue(someT, 'boom_move', 0.35); cue(wasT, 'fabric', 0.3); cue(wingT, 'reveal_bell', 0.25);
+  cue(thatT - 0.08, 'whoosh_fast', 0.25); cue(someT - 0.05, 'fabric', 0.5); cue(someT + 0.1, 'whoosh_deep', 0.6); cue(someT + 0.12, 'boom_move', 0.35);
+  cue(wasT - 0.05, 'whoosh_fast', 0.5); cue(wasT + 0.1, 'boom_big', 0.35); cue(wingT, 'reveal_bell', 0.25); cue(wingT + 0.3, 'shimmer', 0.2);
 
-  // ======================= the turn: five to five, and the sixth now =======================
-  const featherFall = t => g => { const u = clamp((t - twA) / 0.75), x = 540 + Math.sin(u * 5) * 50 * (1 - u), y = lerp(-80, 505, ease.out(u));
-    g.save(); g.translate(x, y); g.rotate(Math.sin(u * 5) * 0.8 * (1 - u) + (u >= 1 ? 1.3 : 0)); g.fillStyle = '#FFFFFF'; g.beginPath(); g.moveTo(0, -42); g.quadraticCurveTo(17, -6, 0, 40); g.quadraticCurveTo(-17, -6, 0, -42); g.fill(); g.restore(); };
-  const lit = t => clamp((t - twA - 0.75) / 0.2);
-  shot(twA, (g, lt, t, sh) => {  // a feather comes down onto a blitz clock; it lights up
-    g.save(); const d = sh.b - sh.a; view2(g, cam2(lt, [[0, [540, 560, 2.3, 0]], [d * 0.5, [540, 600, 1.95, 0.01]], [d * 0.85, [540, 700, 1.0, 0]]]));
-    speedSet(g, t, { eM: EX.calm, eH: t >= twA + 0.9 ? { ...EXPR.focus, look: [-0.4, 0.4], curve: 0.1 } : { ...EXPR.sad, look: [0, 0.6] }, clock: { l: '–', r: '–', on: lit(t) }, feather: featherFall(t) }); g.restore();
-  }, { trans: 'fade', transDur: 0.35, kb: 0, qaAllow: ['face cut by frame'] });
-  shot(ffT - 0.1, (g, lt, t, sh) => {  // "...five to five": the displays slam to 5 and 5
-    g.save(); view2(g, cam2(lt, [[0, [540, 700, 1.06, 0]], [len(sh), [540, 900, 1.0, 0]]]));
-    speedSet(g, t, { eM: { ...EXPR.smug, look: [0.6, 0.3] }, eH: { ...EXPR.smug, look: [-0.6, 0.3] }, clock: { l: '5', r: t >= ff2T ? '5' : '–', on: 1, press: t < ff2T ? -1 : 1 } }); g.restore();
-  }, { kb: 0, zoom: kicks([[ffT, 0.08], [ff2T, 0.08]]) });
-  shot(spA, (g, lt, t, sh) => {  // "Speed chess.": the buttons slapped back and forth
-    g.save(); view2(g, cam2(lt, [[0, [540, 600, 2.3, -0.03]], [len(sh), [540, 600, 2.0, 0.03]]]));
+  // ======================= the turn: the feather lands on the scales; five to five; the sixth (v3: the balance) =======================
+  shot(twA, (g, lt, t, sh) => {  // the feather goes on falling — onto a balance that stands on the blitz clock
+    const landed = t >= fLand, d = sh.b - sh.a, wob = landed ? 0.045 * Math.sin((t - fLand) * 14) * Math.exp(-(t - fLand) * 3) : 0;
+    g.save(); view2(g, landed ? cam2(t - fLand, [[0, [540, 640, 1.6, 0]], [Math.max(0.3, d - (fLand - twA)), [540, 760, 1.0, 0]]]) : [540, 640, 1.6, 0]);
+    balance(g, t, { tilt: wob, eM: EX.calm, eH: landed ? { ...EXPR.focus, look: [-0.5, 0.5], curve: 0.1 } : { ...EXPR.sad, look: [0, 0.6] }, clock: { on: 0 }, feather: landed }); g.restore();
+  }, { trans: 'fade', transDur: 0.3, kb: 0, hud: (g, lt, t) => heroF(g, t), qaAllow: ['face cut by frame'] });
+  const tiltFF = t => t < ffT ? 0 : t < ff2T ? -0.13 * ease.out(clamp((t - ffT) / 0.25)) : -0.13 * (1 - ease.back(clamp((t - ff2T) / 0.35)));
+  shot(ffT - 0.1, (g, lt, t, sh) => {  // "...five to five": five cups drop on his pan, five on Hikaru's — level
+    g.save(); view2(g, cam2(lt, [[0, [540, 760, 1.05, 0]], [len(sh), [540, 800, 1.0, 0]]]));
+    balance(g, t, { tilt: tiltFF(t), nL: 5, nR: 5, tL: ffT, tR: ff2T, eM: { ...EXPR.smug, look: [0.6, 0.6] }, eH: t >= ff2T ? { ...EXPR.smug, look: [-0.6, 0.6] } : { ...EXPR.worried, look: [-0.6, 0.6] }, clock: { l: '5', r: t >= ff2T ? '5' : '–', on: 1 }, feather: true }); g.restore();
+  }, { kb: 0, zoom: kicks([[ffT, 0.07], [ff2T, 0.08]]) });
+  shot(spA, (g, lt, t, sh) => {  // "Speed chess.": the clock under it slapped back and forth, the beam rocking
+    g.save(); view2(g, cam2(lt, [[0, [540, 900, 1.75, -0.03]], [len(sh), [540, 880, 1.5, 0.03]]]));
     const pr = Math.floor((t - spA) / 0.11) % 2 ? 1 : -1;
-    speedSet(g, t, { eM: { ...EXPR.focus, look: [0.6, 0.4] }, eH: { ...EXPR.focus, look: [-0.6, 0.4] }, clock: { l: '5', r: '5', on: 1, press: pr } }); g.restore();
-    speedLines(g, W / 2, H * 0.36, t, spA, { life: 0.7, seed: 4 });
-  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'SPEED CHESS CHAMPIONSHIP', W / 2, 230, { color: '#7CFC9A', size: 44, ...popW(t, spA + 0.05) }); } });
-  shot(fM - 0.08, (g, lt, t, sh) => {  // "Five for Magnus."
-    g.save(); view2(g, cam2(lt, [[0, [260, 640, 1.75, 0]], [len(sh), [220, 660, 1.95, -0.02]]]));
-    speedSet(g, t, { tM: fM, eM: { ...EXPR.smug, look: [0.2, 0.5] }, eH: EX.calm, clock: { l: '5', r: '5', on: 1 } }); g.restore();
+    balance(g, t, { tilt: 0.1 * Math.sin((t - spA) * 28.5), nL: 5, nR: 5, eM: { ...EXPR.focus, look: [0.6, 0.6] }, eH: { ...EXPR.focus, look: [-0.6, 0.6] }, clock: { l: '5', r: '5', on: 1, press: pr }, feather: true }); g.restore();
+    speedLines(g, W / 2, H * 0.55, t, spA, { life: 0.7, seed: 4 });
+  }, { trans: 'whip', kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { badge(g, 'SPEED CHESS CHAMPIONSHIP', W / 2, 230, { color: '#7CFC9A', size: 44, ...popW(t, spA + 0.05) }); } });
+  shot(fM - 0.08, (g, lt, t, sh) => {  // "Five for Magnus.": his card and his pan, the cups catching the light one by one
+    g.save(); view2(g, cam2(lt, [[0, [230, 560, 1.6, 0]], [len(sh), [200, 590, 1.75, -0.02]]]));
+    balance(g, t, { nL: 5, nR: 5, glintL: fM, eM: { ...EXPR.smug, look: [0.2, 0.6] }, eH: EX.calm, clock: { l: '5', r: '5', on: 1 }, feather: true }); g.restore();
   }, { trans: 'whip', whipDir: 1, kb: 0 });
   shot(fH - 0.08, (g, lt, t, sh) => {  // "Five for Hikaru."
-    g.save(); view2(g, cam2(lt, [[0, [820, 640, 1.75, 0]], [len(sh), [860, 660, 1.95, 0.02]]]));
-    speedSet(g, t, { tM: -9, tH: fH, eM: EX.smug, eH: { ...EXPR.smug, look: [-0.2, 0.5], curve: 0.7 }, clock: { l: '5', r: '5', on: 1 } }); g.restore();
+    g.save(); view2(g, cam2(lt, [[0, [850, 560, 1.6, 0]], [len(sh), [880, 590, 1.75, 0.02]]]));
+    balance(g, t, { nL: 5, nR: 5, glintR: fH, eM: EX.smug, eH: { ...EXPR.smug, look: [-0.2, 0.6], curve: 0.7 }, clock: { l: '5', r: '5', on: 1 }, feather: true }); g.restore();
   }, { trans: 'whip', whipDir: -1, kb: 0 });
-  shot(sxA, (g, lt, t, sh) => {  // "This month, they started playing for number six.": the sixth cup rises between them; London
+  shot(sxA, (g, lt, t, sh) => {  // "This month, they started playing for number six.": the sixth cup comes down over the beam; London
     g.save(); view2(g, cam2(lt, [[0, [540, 820, 1.12, 0]], [len(sh), [540, 960, 1.0, 0]]]));
-    speedSet(g, t, { tM: -9, tH: -9, six: (t - sxA - 0.1) / 0.6, eM: { ...EXPR.focus, look: [1, 0.6] }, eH: { ...EXPR.focus, look: [-1, 0.6] }, clock: { l: '5', r: '5', on: 1 }, london: (t - sixT) / 0.4 }); g.restore();
+    balance(g, t, { tilt: 0.014 * Math.sin(t * 30) * clamp((t - sxA - 0.3) / 0.3), nL: 5, nR: 5, six: (t - sxA - 0.1) / 0.8, eM: { ...EXPR.focus, look: [0.8, -0.6] }, eH: { ...EXPR.focus, look: [-0.8, -0.6] }, clock: { l: '5', r: '5', on: 1 }, london: (t - sixT) / 0.4, feather: true }); g.restore();
   }, { trans: 'whip', kb: 0, zoom: kicks([[sixT, 0.07]]), hud: (g, lt, t) => {
-    if (t >= sixT) badge(g, 'NUMBER SIX', W / 2, 230, { color: GOLD, size: 56, ...popW(t, sixT) });
-    if (t >= sixT + 0.45) badge(g, 'FINALS · LONDON · FEB 2027', W / 2, 330, { color: '#16161E', size: 34, ...popW(t, sixT + 0.45) });
+    if (t >= sixT) badge(g, 'NUMBER SIX', W / 2, 1480, { color: GOLD, size: 56, ...popW(t, sixT) });
+    if (t >= sixT + 0.45) badge(g, 'FINALS · LONDON · FEB 2027', W / 2, 1580, { color: '#16161E', size: 34, ...popW(t, sixT + 0.45) });
   } });
-  cue(twA + 0.05, 'whoosh_soft', 0.2); cue(twA + 0.75, 'beep', 0.3); cue(ffT, 'hit_punch', 0.45); cue(ff2T, 'hit_punch', 0.5);
+  cue(twA + 0.05, 'whoosh_soft', 0.2); cue(fLand, 'sparkle_pop', 0.3); cue(fLand + 0.02, 'creak', 0.3);
+  cue(ffT, 'coins', 0.35); cue(ffT, 'hit_punch', 0.4); cue(ff2T, 'coins', 0.35); cue(ff2T, 'hit_punch', 0.45);
   cue(spA - 0.04, 'whoosh_fast', 0.3); for (let k = 0; k < 9; k++) cue(spA + k * 0.11, 'clock_press', 0.22);
   cue(fM - 0.1, 'whoosh_fast', 0.25); cue(fH - 0.1, 'whoosh_fast', 0.25);
   for (let k = 0; k < 5; k++) { cue(fM + k * 0.1, 'sparkle_pop', 0.18); cue(fH + k * 0.1, 'sparkle_pop', 0.18); }
@@ -1957,13 +2213,14 @@ export async function build(T) {
   const music = [
     { t: 0, m: 'hook' }, { t: qA, m: 'tension' }, { t: prA, m: 'glory' }, { t: magT, m: 'slam' }, { t: scA, m: 'tension' },
     { t: onA, m: 'void' }, { t: btA, m: 'build' }, { t: bt2A, m: 'slam' }, { t: tiA, m: 'tension' }, { t: cA, m: 'build' },
-    { t: drA, m: 'void' }, { t: nwA, m: 'elegy' }, { t: twA, m: 'glory' }, { t: sxA, m: 'victory' }, { t: lpA, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: drA, m: 'void' }, { t: tsA, m: 'victory' }, { t: nwA, m: 'elegy' }, { t: twA, m: 'glory' }, { t: sxA, m: 'victory' }, { t: lpA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: truT - 0.45, t1: truT - 0.01, kind: 'mute' },
     { t0: bt2A - 0.35, t1: bt2A - 0.01, kind: 'mute' },
-    { t0: T.e('c2024') + 0.05, t1: drawT - 0.01, kind: 'mute' },
+    { t0: T.e('must') + 0.05, t1: drawT - 0.01, kind: 'mute' },
     { t0: someT - 0.35, t1: someT - 0.02, kind: 'mute' },
+    { t0: ckT - 0.25, t1: ckT + 0.18, kind: 'mute' },
     { t0: ctaA, t1: T.duration, kind: 'lp', f: 900 },
   ];
   return { shots, cues, music, musicFx, duration: T.duration, autoWhoosh: false, jumpCut: { every: 1.4, zooms: [1, 1.1, 1.04], shift: 30 } };
