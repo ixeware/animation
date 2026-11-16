@@ -22,7 +22,7 @@ import { W, H, C, clamp, lerp, ease, seg, rgba, rng, mix, makeCanvas, qaRect } f
 import { Board, sqXZ, piecesAt } from '../../engine/js/board.js';
 import { EXPR, CAST, drawChar, exprAt, hand } from '../../engine/js/characters.js';
 import { badge, nameTitle, placeStamp, stamp, counter, score, vsLabel, plate, sans, mono, popIn } from '../../engine/js/hud.js';
-import { rig, seated, CAM } from '../../engine/js/stage.js';
+import { rig, seated, actor, CAM } from '../../engine/js/stage.js';
 import { table, chair, FLOOR_Y, texTri, pool, gear } from '../../engine/js/env.js';
 import { useLookV2, SKIN2 } from '../../engine/js/look.js';
 import { lowKey, spotCone } from '../../engine/js/light.js';
@@ -1850,14 +1850,14 @@ function faceOff(g, t, { eH, eG, secs = 41, t0 = 0 } = {}) {
   chessClock(g, 540, 950, 0.85, t, { l: fmtT(left), r: '1:12', on: 1, press: 1, fs: 62 });
 }
 // "It was a draw": two hands meet over the board
-function handshake(g, t, t0) {
-  { const gr = g.createRadialGradient(540, 900, 100, 540, 900, 1100); gr.addColorStop(0, '#6E4E30'); gr.addColorStop(1, '#2A1C10'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
-  g.save(); g.translate(540, 980); g.rotate(-0.12); const sq = 104;
+function handshake(g, t, t0, { flat = true } = {}) {
+  if (flat) { const gr = g.createRadialGradient(540, 900, 100, 540, 900, 1100); gr.addColorStop(0, '#6E4E30'); gr.addColorStop(1, '#2A1C10'); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+  if (flat) { g.save(); g.translate(540, 980); g.rotate(-0.12); const sq = 104;
   for (let i = 0; i < 8; i++) for (let j = 0; j < 8; j++) { g.fillStyle = (i + j) % 2 ? '#769656' : '#EEEED2'; g.fillRect(-4 * sq + i * sq, -4 * sq + j * sq, sq, sq); }
   g.strokeStyle = '#15151C'; g.lineWidth = 14; g.strokeRect(-4 * sq, -4 * sq, 8 * sq, 8 * sq);
   for (const [tp, c, i, j] of [['k', 'w', 6, 7], ['r', 'w', 5, 7], ['p', 'w', 5, 6], ['p', 'w', 6, 6], ['p', 'w', 7, 5], ['k', 'b', 6, 0], ['r', 'b', 2, 0], ['p', 'b', 5, 1], ['p', 'b', 6, 1], ['p', 'b', 7, 2], ['b', 'w', 3, 4], ['n', 'b', 4, 2]])
     drawPiece(g, tp, c, -4 * sq + (i + 0.5) * sq, -4 * sq + (j + 0.8) * sq, 120, {});
-  g.restore();
+  g.restore(); }
   const u = clamp((t - t0 + 0.25) / 0.35), k = ease.out(u), shake = t > t0 + 0.1 ? Math.sin((t - t0) * 22) * 14 * Math.exp(-(t - t0) * 2.2) : 0;
   const hL = [lerp(60, 470, k), lerp(1080, 900, k) + shake], hR = [lerp(1020, 610, k), lerp(720, 900, k) + shake];
   g.lineCap = 'round';
@@ -1867,6 +1867,255 @@ function handshake(g, t, t0) {
   g.strokeStyle = '#F2F2EE'; g.lineWidth = 40; g.beginPath(); g.moveTo(hR[0] + 96, hR[1] - 26); g.lineTo(hR[0] + 60, hR[1] - 16); g.stroke();
   hand(g, hR[0], hR[1], 84, BROWN.base); hand(g, hL[0], hL[1], 84, skinOf('hikaru').base);
   if (t > t0) shockwave(g, 540, 900, t, t0, { r0: 30, r1: 260, life: 0.45, color: '#FFFFFF', lw: 8, squash: 1 });
+}
+
+// ======================= v4 (16.11.2026). The author: «по моему качество как то упало, раньше ты больше делал 3д сцен и
+// больше деталей в энвайроменте, а щас как то слабо». Rule 68 again: the flat scenes of v2–v3 go back into 3D sets —
+// the score at the table under a scoreboard, a trophy room, the newspaper on a desk, the face-off over the shoulder, the
+// stadium with its stage, screens, light rig and crowd, the scales on a desk in a night studio, the two photos as sets =======================
+
+// a webcam picture drawn into its own canvas, to hang on a screen or in a frame in the world
+const SCR = {};
+function camTex(key, who, e, t, { bg = ['#2A2440', '#120F1E'], name = '', nameColor = CREAM, w = 600, h = 760 } = {}) {
+  const c = SCR[key] || (SCR[key] = makeCanvas(w, h)), x = c.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, w, h);
+  webcam(x, 0, 0, w, h, who, e, t, { bg, name, nameColor, zoom: 1.05, cy: 0.47 });
+  return c;
+}
+// a screen on a stand: the panel at c (half sizes hw, hh, turned ry), a post and a foot on the floor
+function screen3(g, img, c, hw, hh, ry = 0, { stand = true, frame = '#0B0B10', glow = null } = {}) {
+  if (stand) { const back = ry === 0 ? 1 : -1; ab(g, [c[0] - 0.22, FLOOR_Y, c[2] + back * 0.1 - 0.2], [c[0] + 0.22, c[1] - hh, c[2] + back * 0.1 + 0.2], '#17171D'); ab(g, [c[0] - 1.3, FLOOR_Y, c[2] - 0.7], [c[0] + 1.3, FLOOR_Y + 0.14, c[2] + 0.7], '#17171D'); }
+  camPanel(g, img, c, hw, hh, ry, { frame, glow });
+}
+const trophy3 = (g, x, y, z, hgt, a = 1) => { const q = B.project(x, y, z); if (q.z > 0.5) trophy(g, q.x, q.y, hgt * q.s / 170, { a }); return q; };
+
+// ---------- 14 : 1 at the table: Magnus across the board, Hikaru with his back to us (or the reverse), the score lit on
+// a screen behind whoever faces us ----------
+const SCORE_T = makeCanvas(1280, 720);
+function scoreTex(m, h) {
+  const x = SCORE_T.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
+  x.fillStyle = '#06070B'; x.fillRect(0, 0, 1280, 720); ledGrid(x, 1280, 720, 10);
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = sans(58, 900); x.letterSpacing = '10px'; x.fillStyle = GOLD; x.fillText('CLASSICAL GAMES', 640, 96);
+  x.font = sans(300, 900); x.letterSpacing = '0px'; x.shadowBlur = 40;
+  x.shadowColor = RED; x.fillStyle = '#FF6A5E'; x.fillText(String(m), 330, 390);
+  x.shadowColor = '#7CFC9A'; x.fillStyle = h === null ? 'rgba(124,252,154,0.22)' : '#9CFFB4'; x.fillText(h === null ? '0' : String(h), 950, 390);
+  x.shadowBlur = 0; x.fillStyle = '#F4EFE6'; x.fillText(':', 640, 370);
+  x.font = sans(56, 900); x.letterSpacing = '8px'; x.fillStyle = '#FFE2B0'; x.fillText('MAGNUS', 330, 620); x.fillStyle = '#CFE0FF'; x.fillText('HIKARU', 950, 620);
+  return SCORE_T;
+}
+const PSC = piecesAt(GNG, 24);
+function scoreTable(g, t, { m = 0, h = null, eM, eH, wall = 'far' } = {}) {
+  dayRoom(g, t, {});
+  const img = scoreTex(m, h);
+  if (wall === 'far') screen3(g, img, [4, 6.7, 12.3], 3.6, 2.03, 0, { glow: '#FFD9A0' });
+  else screen3(g, img, [4, 6.7, -5.4], 3.6, 2.03, Math.PI, { glow: '#CFE0FF' });
+  tableSet(g, t, { pieces: PSC, white: 'hikaru', black: 'magnus', ew: eH, eb: eM, tableCol: WOODT });
+  lowKey(g, { cy: H * 0.46, a: 0.04 });
+}
+
+// ---------- the trophy room: a panelled wall, two oak shelves, a portrait in a gilt frame by each; Magnus's shelf fills
+// with five cups under five spotlights, Hikaru's stays empty: dust and a cobweb ----------
+const CUPY = 5.0, LOWY = 1.0;
+function trophyRoom(g, t, { t5 = Infinity, empty = -9, eM, eH } = {}) {
+  g.fillStyle = '#140E0A'; g.fillRect(0, 0, W, H);
+  if (B.E[1] > FLOOR_Y) tiled(g, [-16, FLOOR_Y, -14], [36, 0, 0], [0, 0, 23.2], { color: '#3A2618', grout: 'rgba(0,0,0,0.3)', tu: 1.1, tv: 23.2, light: g2 => pool(g2, B, 4, FLOOR_Y + 0.02, 5, 10, '#FFD9A0', 0.2) });
+  tiled(g, [-16, FLOOR_Y, 9.2], [36, 0, 0], [0, 17, 0], { color: '#22352A', grout: 'rgba(0,0,0,0.28)', tu: 3, tv: 3.4 });
+  ab(g, [-16, FLOOR_Y, 8.9], [20, FLOOR_Y + 1.1, 9.2], '#4A3020'); ab(g, [-16, 12.4, 8.9], [20, 13.0, 9.2], '#4A3020');
+  for (const y of [CUPY, LOWY]) { ab(g, [-1.4, y - 0.3, 7.0], [11.4, y, 9.2], '#7A5232', { spec: 0.25 }); for (const bx of [-0.8, 5, 10.8]) ab(g, [bx - 0.12, y - 1.1, 8.7], [bx + 0.12, y - 0.3, 9.2], '#4A3020'); }
+  camPanel(g, camTex('pM', 'magnus', eM, t, { bg: ['#B9A27E', '#4A3A28'], name: 'MAGNUS', nameColor: '#FFE2B0' }), [-3.9, CUPY + 1.5, 9.05], 1.6, 2.02, 0, { frame: '#B8913E' });
+  camPanel(g, camTex('pH', 'hikaru', eH, t + 1.3, { bg: CAMLOOK.hikaru.bg, name: 'HIKARU', nameColor: '#CFE0FF' }), [-3.9, LOWY + 1.5, 9.05], 1.6, 2.02, 0, { frame: '#B8913E' });
+  ['2013', '2014', '2016', '2018', '2021'].forEach((yr, i) => {
+    const x = 0.5 + i * 2.4, z = 8.1, k = clamp((t - t5 - i * 0.16) / 0.22);
+    spotCone(g, B, { top: [x, 12.4, 7.8], base: [x, CUPY, z], r0: 0.25, r1: 1.05, color: '#FFE7B0', a: 0.08 + 0.16 * k, dust: 6, t, seed: i + 3 });
+    if (k > 0) trophy3(g, x, CUPY, z, 1.55 * ease.back(k));
+    const q = B.project(x, CUPY - 0.15, 7.0); if (q.z > 0.5 && k > 0.4) plate(g, yr, q.x, q.y, { color: '#C9A055', size: clamp(q.s * 0.24, 16, 40), qa: false });
+  });
+  // the empty shelf: dust in the air, a cobweb in its far corner
+  const cw = [11.4, LOWY + 1.9, 9.18], base = [11.4, LOWY + 0.01, 7.6];
+  g.save(); g.strokeStyle = 'rgba(235,235,235,0.6)'; g.lineWidth = 1.6; g.beginPath();
+  for (let k = 0; k <= 6; k++) { const u = k / 6, p = [lerp(cw[0] - 2.2, base[0], u), lerp(cw[1], base[1], u), lerp(cw[2], base[2], u)]; line3(g, [11.4, LOWY + 0.01, 9.18], p); }
+  for (let r = 1; r <= 4; r++) { const f = r / 4.5; let prev = null; for (let k = 0; k <= 6; k++) { const u = k / 6, p = [lerp(11.4, lerp(cw[0] - 2.2, base[0], u), f), lerp(LOWY + 0.01, lerp(cw[1], base[1], u), f), lerp(9.18, lerp(cw[2], base[2], u), f)]; if (prev) line3(g, prev, p); prev = p; } }
+  g.stroke(); g.restore();
+  if (t >= empty) spotCone(g, B, { top: [5, 12.4, 7.8], base: [5, LOWY, 8.1], r0: 0.4, r1: 2.6, color: '#FFF1D6', a: 0.16 * clamp((t - empty) / 0.3), dust: 26, t, seed: 21 });
+  for (let k = 0; k < 26; k++) { const x = -0.8 + (k * 0.47) % 11.6, y = LOWY + 0.4 + ((t * 0.18 + k * 0.137) % 1) * 3.2, z = 7.4 + (k % 4) * 0.4, q = B.project(x, y, z); if (q.z > 0.5) { g.fillStyle = 'rgba(230,220,200,0.5)'; g.beginPath(); g.arc(q.x, q.y, Math.max(1.2, q.s * 0.025), 0, 7); g.fill(); } }
+}
+
+// ---------- the newspaper on a desk in the day room: the paper drops onto the desk; the cutting of 1958 beside it ----------
+const PAPER_T = makeCanvas(940, 1240), CLIP_T = makeCanvas(760, 900);
+function deskScene(g, t, { paper = null, clip = null, kid = EXPR.happy } = {}) {
+  dayRoom(g, t, {});
+  ab(g, [-3.5, -0.55, -2.2], [11.5, 0, 9.6], '#B0855A', { spec: 0.15 });  // the desk
+  for (const [x, z] of [[-3, -1.7], [11, -1.7], [-3, 9.1], [11, 9.1]]) ab(g, [x - 0.25, FLOOR_Y, z - 0.25], [x + 0.25, -0.55, z + 0.25], '#7A5634');
+  pool(g, B, 9.2, 0.02, 6.6, 4.5, '#FFE7B8', 0.35);
+  lathe(g, 9.6, 7.6, [[0, 0.7, 0.7], [0.18, 0.7, 0.7], [0.22, 0.12, 0.12]], '#2A2A30', { spec: 0.4 });  // a desk lamp: foot, arm, shade
+  cylinder(g, [9.6, 0.2, 7.6], [9.0, 4.0, 7.0], 0.08, '#2A2A30'); cylinder(g, [9.0, 4.0, 7.0], [7.8, 3.6, 6.2], 0.08, '#2A2A30');
+  lathe(g, 7.6, 6.0, [[2.7, 0.9, 0.9], [3.4, 0.5, 0.5], [3.7, 0.2, 0.2]], '#2F6B4E', { spec: 0.4 });
+  lathe(g, -1.8, 0.6, [[0, 0.5, 0.5], [1.1, 0.55, 0.55]], '#F2EEE6', { spec: 0.3 });  // a mug
+  for (const [tp, c, x, z] of [['k', 'w', 10.2, 1.0], ['q', 'b', 10.9, 1.6], ['n', 'w', 9.6, 0.4]]) { const q = B.project(x, 0, z); if (q.z > 0.5) drawPiece(g, tp, c, q.x, q.y, 1.2 * q.s, {}); }
+  const lay = (img, { x, z, w, h, rot = 0, y = 0.02 }) => {  // a sheet lying on the desk, its top away from us
+    const P = (u, v) => [x + Math.cos(rot) * u - Math.sin(rot) * v, y, z + Math.sin(rot) * u + Math.cos(rot) * v];
+    texQuad(g, img, P(-w, h), P(w, h), P(-w, -h));
+  };
+  if (clip) { const x = CLIP_T.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); oldClip(x, FISCHER13, { x: 380, y: 450, s: 1, rot: 0 }); lay(CLIP_T, clip); }
+  if (paper) { const x = PAPER_T.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); newspaper(x, t, { x: 470, y: 620, s: 1, rot: 0, e: kid }); shadow3(g, paper.x, 0.015, paper.z, paper.w * 1.05, paper.h * 1.05, paper.y > 0.1 ? 0.25 / (1 + paper.y) : 0.22); lay(PAPER_T, paper); }
+}
+
+// ---------- the stadium (Checkmate: USA vs India, Esports Stadium Arlington, 4 October 2025) in 3D: a dark hall, the
+// stage, the LED wall, two giant screens, the light rig, the crowd between us and the stage ----------
+const LEDW = makeCanvas(1600, 700);
+function ledWallTex(lit, t) {
+  const x = LEDW.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
+  x.fillStyle = '#05060A'; x.fillRect(0, 0, 1600, 700); x.textAlign = 'center'; x.textBaseline = 'middle';
+  if (lit) { x.fillStyle = '#FF3B3B'; x.shadowColor = '#FF3B3B'; x.shadowBlur = 50; x.font = sans(230, 900); x.letterSpacing = '12px'; x.fillText('CHECKMATE', 800, 360); }
+  else { x.fillStyle = '#E8E8F2'; x.shadowColor = '#8FA8FF'; x.shadowBlur = 30; x.font = sans(170, 900); x.letterSpacing = '14px'; x.fillText('USA  vs  INDIA', 800, 360); }
+  x.shadowBlur = 0; ledGrid(x, 1600, 700, 12);
+  return LEDW;
+}
+const FANS3 = (() => { const r = rng(64), o = []; for (let row = 0; row < 6; row++) for (let i = 0; i < 20; i++) o.push({ x: -14 + i * 1.6 + (row % 2) * 0.8 + (r() - 0.5) * 0.4, z: -7.5 - row * 1.8 + (r() - 0.5) * 0.4, rise: row * 0.55, ph: r() * 7, phone: r() < 0.3 }); return o; })();
+function fans3(g, t, cheer = 0) {
+  const list = FANS3.map(p => ({ p, q: B.project(p.x, FLOOR_Y + 2.7 + p.rise, p.z) })).filter(o => o.q.z > 0.7).sort((a, b) => b.q.z - a.q.z);
+  for (const { p, q } of list) {
+    const s = q.s, y = q.y - cheer * Math.abs(Math.sin(t * 7 + p.ph)) * 0.25 * s, up = cheer * clamp(0.55 + 0.45 * Math.sin(t * 9 + p.ph));
+    g.fillStyle = '#0B0A14'; g.beginPath(); g.arc(q.x, y, 0.42 * s, 0, 7); g.fill(); g.beginPath(); g.ellipse(q.x, y + 0.98 * s, 0.86 * s, 0.62 * s, 0, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(160,140,255,0.4)'; g.lineWidth = Math.max(1, 0.06 * s); g.beginPath(); g.arc(q.x, y, 0.42 * s, Math.PI * 1.08, Math.PI * 1.92); g.stroke();
+    if (up > 0.05 || p.phone) {
+      const hx = q.x + 0.5 * s, hy = y - (0.35 + up * 1.0) * s; g.strokeStyle = '#0B0A14'; g.lineWidth = 0.24 * s; g.lineCap = 'round'; g.beginPath(); g.moveTo(q.x + 0.45 * s, y + 0.6 * s); g.lineTo(hx, hy); g.stroke();
+      if (p.phone) { g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createRadialGradient(hx, hy, 1, hx, hy, 0.45 * s); gr.addColorStop(0, 'rgba(255,255,240,0.95)'); gr.addColorStop(1, 'rgba(255,255,240,0)'); g.fillStyle = gr; g.fillRect(hx - 0.45 * s, hy - 0.45 * s, 0.9 * s, 0.9 * s); g.restore(); }
+    }
+  }
+}
+const PST = piecesAt(GNG, 60);
+function arena3(g, t, { lit = 0, cheer = 0, eH, eG, flash = -9, crowd = true, pieces = PST } = {}) {
+  g.fillStyle = '#06060E'; g.fillRect(0, 0, W, H);
+  tiled(g, [-26, FLOOR_Y, -28], [60, 0, 0], [0, 0, 52], { color: '#12121C', grout: 'rgba(120,120,200,0.08)', tu: 3, tv: 3, light: g2 => pool(g2, B, 4, FLOOR_Y + 0.02, 4, 12, '#9A8CFF', 0.22) });
+  ab(g, [-12, FLOOR_Y, 20], [20, FLOOR_Y + 18, 21], '#0A0A14');  // the back of the hall
+  texQuad(g, ledWallTex(lit > 0.5, t), [-7, 12.5, 18.4], [15, 12.5, 18.4], [-7, 3.0, 18.4]);
+  ab(g, [-7.4, 2.6, 18.5], [15.4, 2.95, 19], '#20202C'); ab(g, [-7.4, 12.5, 18.5], [15.4, 12.9, 19], '#20202C');
+  pool(g, B, 4, 7, 18, 12, lit > 0.5 ? '#FF4A4A' : '#8FA8FF', 0.22, true);
+  screen3(g, camTex('aH', 'hikaru', eH, t + 1.3, { bg: ['#3A5FBF', '#141824'], name: 'NAKAMURA', nameColor: '#CFE0FF' }), [-8.5, 7.2, 12], 2.7, 3.42, 0.35, { glow: '#6F8FFF' });
+  screen3(g, camTex('aG', 'gukesh18', eG, t, { bg: ['#E07A2E', '#141824'], name: 'GUKESH', nameColor: '#FFE2B0' }), [16.5, 7.2, 12], 2.7, 3.42, -0.35, { glow: '#FF9A50' });
+  ab(g, [-3.5, FLOOR_Y, -4.2], [11.5, FLOOR_Y + 0.3, 12.2], '#1C1C2C');  // the stage
+  for (const [a, b] of [[[-3.6, FLOOR_Y + 0.3, -4.3], [11.6, FLOOR_Y + 0.42, -4.1]], [[-3.6, FLOOR_Y + 0.3, -4.3], [-3.4, FLOOR_Y + 0.42, 12.3]], [[11.4, FLOOR_Y + 0.3, -4.3], [11.6, FLOOR_Y + 0.42, 12.3]]]) ab(g, a, b, `hsl(${(t * 60) % 360},90%,62%)`, { amb: 1 });
+  for (let k = 0; k < 6; k++) spotCone(g, B, { top: [-8 + k * 4, 20, 6 + Math.sin(t * 0.7 + k) * 3], base: [4 + Math.sin(t * 0.9 + k * 1.3) * 7, FLOOR_Y, 4 + Math.cos(t * 0.8 + k) * 5], r0: 0.3, r1: 3.0, color: k % 2 ? '#8FA8FF' : '#FF8FD0', a: 0.12 + 0.1 * lit, dust: 10, t, seed: k + 7 });
+  const fansBehind = B.E[2] > 2;
+  if (crowd && fansBehind) fans3(g, t, cheer);
+  tableSet(g, t, { pieces, white: 'gukesh18', black: 'hikaru', ew: eG, eb: eH, tableCol: ['#2C2C38', '#18181F', '#22222C'] });
+  if (crowd && !fansBehind) fans3(g, t, cheer);
+  if (t >= flash) { const a = clamp(1 - (t - flash) / 0.35); if (a > 0) { g.fillStyle = `rgba(255,255,255,${0.5 * a})`; g.fillRect(0, 0, W, H); } }
+}
+// the throw, on top of the 3D stage: Hikaru's arm goes up with the king, the king flies over us into the crowd
+function throw3(g, t, t0) {
+  const hp = B.project(4, 3.1, 9.3), s = hp.s / 100 * 1.05, x = hp.x, y = hp.y, u = clamp((t - t0) / 0.35);
+  const sh = [x + 150 * s, y + 230 * s], h1 = [lerp(x + 230 * s, x + 120 * s, ease.inOut(u)), lerp(y - 40 * s, y - 330 * s, ease.out(u))];
+  limb(g, sh[0], sh[1], h1[0], h1[1], 230 * s, 230 * s, 1, CAST.hikaru.suit, 66 * s); hand(g, h1[0], h1[1], 40 * s, skinOf('hikaru').base);
+  const k2 = clamp((t - t0 - 0.25) / 0.3), h2 = [lerp(x - 230 * s, x - 150 * s, ease.out(k2)), lerp(y + 380 * s, y - 300 * s, ease.out(k2))];
+  if (k2 > 0) { limb(g, x - 150 * s, y + 230 * s, h2[0], h2[1], 230 * s, 230 * s, -1, CAST.hikaru.suit, 66 * s); hand(g, h2[0], h2[1], 40 * s, skinOf('hikaru').base); }
+  const f = clamp((t - t0 - 0.3) / 1.0);
+  if (f <= 0) { drawPiece(g, 'k', 'b', h1[0], h1[1] - 40 * s, 300 * s, {}); return; }
+  const p = [lerp(4.6, -1.2, f), lerp(6.2, 2.6, f) + Math.sin(Math.PI * f) * 1.4, lerp(9.0, -11, f)], q = B.project(...p);  // low, straight at us
+  if (q.z > 0.6) drawPiece(g, 'k', 'b', q.x, q.y, 1.5 * q.s, { rot: f * 9 });
+}
+
+// ---------- the turn in 3D: a night studio, a desk, the balance standing on a blitz clock; the two of them on screens on
+// the back wall; London through the window when the sixth cup comes ----------
+const CLK = {}, PIVY = 6.0, BEAM3 = 3.6, CH3 = 2.4;
+function digitTex(txt) { return once(`dg:${txt}`, 300, 220, (x, w, h) => { x.fillStyle = '#0B120E'; x.fillRect(0, 0, w, h); if (txt) { x.fillStyle = '#C6FF5E'; x.shadowColor = '#B8F04A'; x.shadowBlur = 24; x.font = sans(txt.length > 2 ? 110 : 170, 900); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(txt, w / 2, h / 2 + 6); } }); }
+const LONDON_T = tex(1400, 800, (x, w, h) => {
+  const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#0C1430'); gr.addColorStop(1, '#2A2E5A'); x.fillStyle = gr; x.fillRect(0, 0, w, h);
+  x.fillStyle = 'rgba(255,255,255,0.7)'; for (let k = 0; k < 60; k++) x.fillRect((k * 197) % w, (k * 89) % (h * 0.5), 2, 2);
+  x.fillStyle = '#121A38'; x.fillRect(0, 600, w, 200); x.fillRect(170, 250, 90, 360); x.beginPath(); x.moveTo(160, 250); x.lineTo(215, 150); x.lineTo(270, 250); x.fill();
+  x.fillStyle = '#F5D27A'; x.beginPath(); x.arc(215, 310, 26, 0, 7); x.fill();
+  x.strokeStyle = '#121A38'; x.lineWidth = 10; x.beginPath(); x.arc(1080, 450, 190, 0, 7); x.stroke(); for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6; x.beginPath(); x.moveTo(1080, 450); x.lineTo(1080 + Math.cos(a) * 190, 450 + Math.sin(a) * 190); x.stroke(); }
+  x.fillStyle = '#121A38'; for (const [x0, w0, h0] of [[360, 150, 210], [540, 110, 150], [690, 170, 250], [1290, 110, 170]]) x.fillRect(x0, 600 - h0, w0, h0);
+  x.fillStyle = 'rgba(255,214,120,0.85)'; for (let k = 0; k < 40; k++) x.fillRect(372 + (k * 41) % 480, 440 + Math.floor(k / 12) * 40, 12, 16);
+  x.strokeStyle = '#F4EFE6'; x.lineWidth = 24; x.strokeRect(0, 0, w, h); x.lineWidth = 12; x.beginPath(); x.moveTo(w / 2, 0); x.lineTo(w / 2, h); x.stroke();
+});
+function studio(g, t, { eM, eH, london = 0 } = {}) {
+  g.fillStyle = '#0B1020'; g.fillRect(0, 0, W, H);
+  if (B.E[1] > FLOOR_Y) tiled(g, [-16, FLOOR_Y, -16], [36, 0, 0], [0, 0, 28], { color: '#1A2238', grout: 'rgba(255,255,255,0.05)', tu: 2, tv: 2, light: g2 => pool(g2, B, 4, FLOOR_Y + 0.02, 4, 9, '#9FB4FF', 0.2) });
+  tiled(g, [-16, FLOOR_Y, 12], [36, 0, 0], [0, 18, 0], { color: '#141C33', grout: 'rgba(255,255,255,0.04)', tu: 4, tv: 4 });
+  ab(g, [-1.6, 3.2, 11.7], [9.6, 11.4, 12], '#2A3150');
+  texQuad(g, LONDON_T, [-1.3, 11.1, 11.68], [9.3, 11.1, 11.68], [-1.3, 3.5, 11.68]);
+  if (london < 1) { const a = 1 - clamp(london); const p0 = B.project(-1.3, 11.1, 11.66), p1 = B.project(9.3, 3.5, 11.66); g.fillStyle = `rgba(6,10,24,${0.4 * a})`; g.fillRect(Math.min(p0.x, p1.x), Math.min(p0.y, p1.y), Math.abs(p1.x - p0.x), Math.abs(p1.y - p0.y)); }
+  if (london > 0) pool(g, B, 4, 7.3, 11.5, 7, '#FFD27A', 0.25 * clamp(london), true);
+  tiled(g, [-3.5, FLOOR_Y + 0.02, -1.5], [15, 0, 0], [0, 0, 11], { color: '#5A2E38', grout: 'rgba(255,255,255,0.06)', tu: 15, tv: 0.9 });  // a rug
+  cylinder(g, [-5.2, FLOOR_Y, 6.5], [-5.2, 5.2, 6.5], 0.1, '#2A2A30'); lathe(g, -5.2, 6.5, [[4.6, 1.0, 1.0], [5.6, 0.5, 0.5], [5.8, 0.3, 0.3]], '#E9C27A', { amb: 0.9 });  // a floor lamp
+  pool(g, B, -5.2, FLOOR_Y + 0.03, 6.5, 4.5, '#FFD9A0', 0.3); pool(g, B, -4.5, 3.2, 8, 5, '#FFD9A0', 0.18, true);
+  lathe(g, 13.2, 5.6, [[FLOOR_Y, 0.7, 0.7], [FLOOR_Y + 1.6, 0.9, 0.9]], '#B65A3A');  // a plant in a pot
+  for (let k = 0; k < 9; k++) { const a = k * 0.7, q0 = B.project(13.2, FLOOR_Y + 1.6, 5.6), q1 = B.project(13.2 + Math.cos(a) * 1.4, FLOOR_Y + 3.6 + Math.sin(k) * 0.6, 5.6 + Math.sin(a) * 1.0); if (q0.z > 0.5 && q1.z > 0.5) { g.strokeStyle = '#3E7A46'; g.lineWidth = Math.max(3, 0.28 * q1.s); g.lineCap = 'round'; g.beginPath(); g.moveTo(q0.x, q0.y); g.quadraticCurveTo((q0.x + q1.x) / 2, q1.y - 0.5 * q1.s, q1.x, q1.y); g.stroke(); } }
+  screen3(g, camTex('sM', 'magnus', eM, t, { bg: ['#B9A27E', '#4A3A28'], name: 'MAGNUS', nameColor: '#FFE2B0' }), [-3.2, 7.4, 10.6], 1.75, 2.2, 0.18, { glow: '#FFD9A0' });
+  screen3(g, camTex('sH', 'hikaru', eH, t + 1.3, { bg: CAMLOOK.hikaru.bg, name: 'HIKARU', nameColor: '#CFE0FF' }), [11.2, 7.4, 10.6], 1.75, 2.2, -0.18, { glow: '#9FC0FF' });
+  ab(g, [-1.5, -0.45, 1.2], [9.5, 0, 7.0], '#4A3424', { spec: 0.2 }); pool(g, B, 4, 0.02, 4, 5.5, '#FFE7B8', 0.28);  // the desk, lit from above
+  for (const [x, z] of [[-1, 1.7], [9, 1.7], [-1, 6.5], [9, 6.5]]) ab(g, [x - 0.2, FLOOR_Y, z - 0.2], [x + 0.2, -0.45, z + 0.2], '#241A14');
+}
+function balance3(g, t, { tilt = 0, nL = 0, nR = 0, tL = -9, tR = -9, glintL = -9, glintR = -9, clock = {}, six = 0, feather = false } = {}) {
+  const brass = '#D9B060', press = clock.press || 0;
+  shadow3(g, 4, 0.01, 4, 2.4, 1.2, 0.3);
+  ab(g, [2.3, 0, 3.4], [5.7, 1.1, 4.6], '#20242C', { spec: 0.3 });  // the clock under it
+  for (const [sd, x0] of [[-1, 2.6], [1, 4.3]]) { const dn = press === sd ? 0.12 : 0; ab(g, [x0, 1.1, 3.7], [x0 + 1.1, 1.38 - dn, 4.3], press === sd ? '#F5C451' : '#545A68'); }
+  if (B.E[2] < 3.4) { texQuad(g, digitTex(clock.l ?? ''), [2.5, 0.95, 3.38], [3.9, 0.95, 3.38], [2.5, 0.15, 3.38]); texQuad(g, digitTex(clock.r ?? ''), [4.1, 0.95, 3.38], [5.5, 0.95, 3.38], [4.1, 0.15, 3.38]); }
+  cylinder(g, [4, 1.1, 4], [4, PIVY, 4], 0.11, brass, { spec: 0.5 });
+  const ends = [-1, 1].map(sd => [4 + sd * BEAM3 * Math.cos(tilt), PIVY + 0.15 + sd * BEAM3 * Math.sin(tilt), 4]);
+  for (const [i, e] of ends.entries()) {
+    const py = e[1] - CH3, n = i ? nR : nL, t0 = i ? tR : tL, gl = i ? glintR : glintL;
+    g.save(); g.strokeStyle = '#C9A55A'; g.lineWidth = Math.max(1.5, B.project(...e).s * 0.03); g.beginPath(); for (const [dx, dz] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) line3(g, e, [e[0] + dx * 1.05, py + 0.12, 4 + dz * 1.05]); g.stroke(); g.restore();
+    lathe(g, e[0], 4, [[py - 0.28, 0.35, 0.35], [py - 0.1, 0.95, 0.95], [py + 0.12, 1.15, 1.15]], brass, { spec: 0.6, n: 30 });
+    for (let c = 0; c < 5; c++) { if (c >= n) continue; const k = clamp((t - t0 - c * 0.08) / 0.2); if (k <= 0) continue; const cx = e[0] - 0.72 + c * 0.36, cz = 4 + (c % 2 ? 0.25 : -0.2); const q = trophy3(g, cx, py + 0.1, cz, 0.62 * ease.back(k));
+      const gk = (t - gl - c * 0.1) / 0.25; if (gk > 0 && gk < 1 && q.z > 0.5) { g.save(); g.globalCompositeOperation = 'screen'; const r = 0.9 * q.s, gr = g.createRadialGradient(q.x, q.y - 0.4 * q.s, 1, q.x, q.y - 0.4 * q.s, r); gr.addColorStop(0, `rgba(255,248,210,${Math.sin(Math.PI * gk)})`); gr.addColorStop(1, 'rgba(255,248,210,0)'); g.fillStyle = gr; g.fillRect(q.x - r, q.y - 0.4 * q.s - r, 2 * r, 2 * r); g.restore(); } }
+  }
+  obox(g, [4, PIVY + 0.15, 4], [BEAM3 + 0.15, 0.1, 0.1], brass, { rz: tilt }, { spec: 0.6 });
+  lathe(g, 4, 4, [[PIVY - 0.05, 0.28, 0.28], [PIVY + 0.3, 0.32, 0.32], [PIVY + 0.5, 0.12, 0.12]], brass, { spec: 0.6 });
+  if (six > 0) { const k = clamp(six), y = lerp(13, 7.0, ease.out(k)), q = B.project(4, y, 4);
+    if (q.z > 0.5) { g.save(); g.globalCompositeOperation = 'screen'; g.translate(q.x, q.y - 0.8 * q.s); g.rotate(t * 0.4); for (let r = 0; r < 12; r++) { g.rotate(Math.PI / 6); g.fillStyle = `rgba(255,230,160,${0.12 * k})`; g.beginPath(); g.moveTo(0, 0); g.lineTo(-0.5 * q.s, -9 * q.s); g.lineTo(0.5 * q.s, -9 * q.s); g.closePath(); g.fill(); } g.restore();
+      trophy3(g, 4, y, 4, 1.8); g.fillStyle = '#16161E'; g.font = sans(Math.max(18, 0.5 * q.s), 900); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('6', q.x, q.y - 1.2 * q.s); } }
+  if (feather) { const q = B.project(4.05, PIVY + 0.62, 4); if (q.z > 0.5) featherAt(g, q.x, q.y, FEATH3 * q.s, 1.35); }
+}
+const FEATH3 = 0.0105;  // the feather's size against the world: drawn at FEATH3 · scale (px per unit)
+
+// ---------- the two photos as sets ----------
+// photo 1: a hall, the checked wall and the clock screen, people far behind, two girls with signs behind a glass rail,
+// Hikaru walking past with his badge
+const CHECK_T = tex(500, 500, (x, w, h) => { for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) { x.fillStyle = (i + j) % 2 ? '#5E8A44' : '#D8C25A'; x.fillRect(i * 100, j * 100, 100, 100); } });
+const CLOCK_T = makeCanvas(420, 220);
+const SIGN1_T = tex(660, 520, (x, w, h) => loveSign(x, w / 2, h / 2, w - 20, h - 20, 0, true)), SIGN2_T = tex(600, 440, (x, w, h) => loveSign(x, w / 2, h / 2, w - 20, h - 20, 0, false));
+function signs3(g, t, { hx = 9, eH, eG } = {}) {
+  g.fillStyle = '#B8B0A2'; g.fillRect(0, 0, W, H);
+  if (B.E[1] > FLOOR_Y) tiled(g, [-14, FLOOR_Y, -14], [34, 0, 0], [0, 0, 30], { color: '#C2B8A6', grout: 'rgba(0,0,0,0.08)', tu: 2.4, tv: 2.4, light: g2 => pool(g2, B, 4, FLOOR_Y + 0.02, 6, 10, '#FFF4DE', 0.25) });
+  tiled(g, [-14, FLOOR_Y, 16], [34, 0, 0], [0, 16, 0], { color: '#D6CEC0', grout: 'rgba(0,0,0,0.05)', tu: 6, tv: 6 });
+  ab(g, [-14, 11.5, -14], [20, 12, 16], '#E9E3D6');  // the ceiling slab edge
+  texQuad(g, CHECK_T, [-6, 10.5, 15.9], [0, 10.5, 15.9], [-6, 4.5, 15.9]);
+  { const x = CLOCK_T.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.fillStyle = '#23272F'; x.fillRect(0, 0, 420, 220); x.fillStyle = '#F1F3F5'; x.font = sans(130, 800); x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('03:5' + (Math.floor(t * 0.5) % 10), 210, 116); }
+  camPanel(g, CLOCK_T, [12, 9.2, 15.6], 2.0, 1.05, 0, { frame: '#15171C' });
+  for (let i = 0; i < 9; i++) { const q = B.project(1 + i * 1.6, FLOOR_Y + 3.4, 13.5 + (i % 3)); if (q.z > 0.5) { g.fillStyle = ['#8E8A84', '#7A766F', '#A39E95', '#6E6A64'][i % 4]; g.beginPath(); g.arc(q.x, q.y, 0.45 * q.s, 0, 7); g.fill(); g.fillRect(q.x - 0.6 * q.s, q.y + 0.4 * q.s, 1.2 * q.s, 2.2 * q.s); } }
+  actor(g, B, 'hikaruSuit', { x: hx, y: FLOOR_Y + 6.3 - Math.abs(Math.sin(t * 6.5)) * 0.08, z: 6, k: 1.15, e: eH, t: t + 1.3, face: -1 });
+  { const hp = B.project(hx, FLOOR_Y + 6.3, 6), s = hp.s / 100 * 1.05 * 1.15; g.strokeStyle = '#2E8B57'; g.lineWidth = 12 * s; g.beginPath(); g.moveTo(hp.x - 52 * s, hp.y + 175 * s); g.lineTo(hp.x - 8 * s, hp.y + 420 * s); g.lineTo(hp.x + 30 * s, hp.y + 175 * s); g.stroke(); g.fillStyle = '#F4F4F0'; g.fillRect(hp.x - 40 * s, hp.y + 418 * s, 64 * s, 84 * s); }
+  actor(g, B, 'girl1', { x: 1.6, y: FLOOR_Y + 4.3, z: 3.6, k: 1.0, e: eG, t, face: -1 });
+  actor(g, B, 'girl2', { x: 4.4, y: FLOOR_Y + 4.0, z: 3.9, k: 0.95, e: { ...eG, look: [-0.5, 0] }, t: t + 0.6, face: -1 });
+  texQuad(g, SIGN1_T, [-0.3, FLOOR_Y + 3.7, 3.0], [3.5, FLOOR_Y + 3.6, 3.0], [-0.3, FLOOR_Y + 0.75, 3.0]);
+  texQuad(g, SIGN2_T, [2.9, FLOOR_Y + 3.4, 3.2], [6.1, FLOOR_Y + 3.5, 3.2], [2.9, FLOOR_Y + 1.15, 3.2]);
+  // the glass rail in front: a frosted pane, the orange band, a steel post
+  { const p = [B.project(-8, FLOOR_Y + 2.2, 2.2), B.project(16, FLOOR_Y + 2.2, 2.2), B.project(16, FLOOR_Y, 2.2), B.project(-8, FLOOR_Y, 2.2)]; if (p.every(q => q.z > 0.4)) { g.fillStyle = 'rgba(225,235,240,0.6)'; g.beginPath(); p.forEach((q, i) => i ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y)); g.closePath(); g.fill(); } }
+  ab(g, [-8, FLOOR_Y + 2.2, 2.1], [16, FLOOR_Y + 2.45, 2.3], '#E8823A'); ab(g, [6.2, FLOOR_Y, 2.1], [6.45, FLOOR_Y + 2.45, 2.35], '#B9BEC4', { spec: 0.6 });
+}
+// photo 2: the stage of the blitz podium — a backdrop with the round logo, a white board in front, the two of them
+const BACKDROP_T = tex(1600, 900, (x, w, h) => {
+  const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#1E2328'); gr.addColorStop(1, '#101316'); x.fillStyle = gr; x.fillRect(0, 0, w, h);
+  x.strokeStyle = '#3E6A4E'; x.lineWidth = 50; x.beginPath(); x.arc(260, 300, 260, 0, 7); x.stroke(); x.strokeStyle = '#B9A06A'; x.lineWidth = 12; x.beginPath(); x.arc(260, 300, 205, 0, 7); x.stroke();
+  x.fillStyle = 'rgba(175,185,175,0.75)'; x.textAlign = 'left'; x.textBaseline = 'middle'; x.font = '600 70px Cinzel'; x.letterSpacing = '6px'; x.fillText('WORLD RAPID & BLITZ', 600, 230); x.fillText('CHAMPIONSHIP', 600, 330); x.font = '600 60px Cinzel'; x.fillText('Moscow 2019', 600, 440);
+});
+const BOARD_T = tex(1600, 300, (x, w, h) => { x.fillStyle = '#F2F2EE'; x.fillRect(0, 0, w, h); x.fillStyle = '#C9CCD0'; for (let i = 0; i < 7; i++) x.fillRect(60 + i * 220, 110, 150, 70); });
+function podium3(g, t, { eH, eM } = {}) {
+  g.fillStyle = '#0E1114'; g.fillRect(0, 0, W, H);
+  if (B.E[1] > FLOOR_Y) tiled(g, [-14, FLOOR_Y, -12], [32, 0, 0], [0, 0, 22], { color: '#1A1E22', grout: 'rgba(255,255,255,0.04)', tu: 2.5, tv: 2.5 });
+  texQuad(g, BACKDROP_T, [-6, 13, 10], [14, 13, 10], [-6, 1.75, 10]);
+  pool(g, B, 4, 6, 9.8, 9, '#FFF2D8', 0.18, true);
+  spotCone(g, B, { top: [2, 16, 2], base: [2, FLOOR_Y, 5], r0: 0.4, r1: 3.2, color: '#FFF2D8', a: 0.12, dust: 14, t, seed: 4 });
+  spotCone(g, B, { top: [6.4, 16, 2], base: [6.4, FLOOR_Y, 5], r0: 0.4, r1: 3.2, color: '#FFF2D8', a: 0.14, dust: 14, t, seed: 5 });
+  const hH = actor(g, B, 'hikaruSuit', { x: 2.0, y: 4.7, z: 5, k: 1.15, e: eH, t, face: -1 });
+  const hM = actor(g, B, 'magnusSuit', { x: 6.4, y: 5.25, z: 5, k: 1.18, e: eM, t: t + 0.7, face: -1 });
+  if (hH) { const s = hH.s / 100 * 1.05 * 1.15; medal(g, hH.x, hH.y + 210 * s, s, 'silver'); }
+  if (hM) { const s = hM.s / 100 * 1.05 * 1.18; medal(g, hM.x, hM.y + 222 * s, s, 'gold'); bigCup(g, hM.x - 230 * s, hM.y + 160 * s + Math.sin(t * 1.4) * 4 * s, 1.1 * s); hand(g, hM.x - 200 * s, hM.y + 260 * s, 40 * s, skinOf('magnus').base); }
+  ab(g, [-3, FLOOR_Y, 2.4], [11, -0.2, 3.0], '#E6E6E2'); texQuad(g, BOARD_T, [-2.9, -0.4, 2.38], [10.9, -0.4, 2.38], [-2.9, FLOOR_Y + 0.3, 2.38]);
 }
 
 export async function build(T) {
@@ -1948,21 +2197,21 @@ export async function build(T) {
   cue(yesT, 'heartbeat', 0.45); cue(andT - 0.05, 'whoosh_soft', 0.2); cue(truT, 'stamp', 0.6); cue(truT + 0.05, 'beep', 0.3);
 
   // ======================= 2003: America's youngest grandmaster, younger than Fischer =======================
-  const paperBg = g => { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#5A3E28'); gr.addColorStop(1, '#2E1E12'); g.fillStyle = gr; g.fillRect(0, 0, W, H); };
   const kidE = t => t >= youT ? { ...EXPR.happy, lid: 0.1 } : { ...EXPR.happy, curve: 0.5, open: 0.1 };
-  shot(prA, (g, lt, t, sh) => {  // the paper spins in
-    paperBg(g); g.save(); view2(g, cam2(lt, [[0, [540, 960, 1.0, 0.04]], [len(sh), [540, 760, 1.18, -0.01]]]));
-    const u = ease.out(clamp(lt / 0.55)); newspaper(g, t, { x: W / 2, y: 880, s: lerp(0.06, 1, u), rot: lerp(-6.6, -0.035, u), e: kidE(t) }); g.restore();
+  const PAPER = { x: 4.2, z: 3.6, w: 3.0, h: 3.96 };
+  shot(prA, (g, lt, t, sh) => {  // the paper drops onto the desk in the day room
+    rig(B, lt, [[0, K(0.2, 1.0, 15.5, [4.2, 0, 3.8])], [len(sh), K(0.05, 0.92, 11.5, [4.2, 0, 3.8])]], { t, e: glide });
+    const u = ease.out(clamp(lt / 0.55));
+    deskScene(g, t, { paper: { ...PAPER, y: lerp(7, 0.02, u), rot: lerp(-2.4, -0.06, u) }, kid: kidE(t) });
   }, { trans: 'whip', kb: 0 });
-  shot(amT - 0.05, (g, lt, t, sh) => {  // down the page to his photo: he grins on "youngest"
-    paperBg(g); g.save(); view2(g, cam2(lt, [[0, [540, 560, 1.15, 0.02]], [len(sh), [350, 1010, 1.75, -0.03]]]));
-    newspaper(g, t, { x: W / 2, y: 880, s: 1, rot: -0.035, e: kidE(t) }); g.restore();
+  shot(amT - 0.05, (g, lt, t, sh) => {  // down onto his photo: he grins on "youngest"
+    rig(B, lt, [[0, K(0.05, 0.92, 10.5, [4.2, 0, 3.6])], [len(sh), K(-0.1, 0.8, 5.2, [3.1, 0, 2.5])]], { t, e: glide });
+    deskScene(g, t, { paper: { ...PAPER, y: 0.02, rot: -0.06 }, kid: kidE(t) });
   }, { kb: 0, zoom: kicks([[youT, 0.07]]) });
-  shot(ygT - 0.05, (g, lt, t, sh) => {  // "Younger than Bobby Fischer": the 1958 cutting, and 2003 slams down over it
-    paperBg(g); g.save(); view2(g, cam2(lt, [[0, [470, 760, 1.35, 0.02]], [len(sh), [560, 960, 1.04, 0]]]));
-    oldClip(g, FISCHER13, { x: 430, y: 760, s: 0.92, rot: -0.05 });
-    const u = clamp((t - fishT + 0.25) / 0.28); if (u > 0) newspaper(g, t, { x: lerp(1500, 660, ease.out(u)), y: lerp(2300, 1300, ease.out(u)), s: 0.62, rot: lerp(0.6, 0.07, ease.out(u)), e: { ...EXPR.triumph } });
-    g.restore();
+  shot(ygT - 0.05, (g, lt, t, sh) => {  // "Younger than Bobby Fischer": his 1958 cutting on the desk; 2003 slides in over its corner
+    rig(B, lt, [[0, K(0.25, 0.95, 9.5, [2.4, 0, 4.4])], [len(sh), K(0.06, 0.95, 12.5, [3.8, 0, 3.6])]], { t, e: glide });
+    const u = ease.out(clamp((t - fishT + 0.25) / 0.28));
+    deskScene(g, t, { clip: { x: 2.1, z: 4.6, w: 2.45, h: 2.9, rot: 0.08 }, paper: u > 0 ? { x: lerp(13, 6.1, u), z: lerp(-4, 2.3, u), y: lerp(2.5, 0.06, u), rot: lerp(0.9, 0.12, u), w: 2.4, h: 3.17 } : null, kid: { ...EXPR.triumph } });
   }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { if (t >= fishT + 0.1) stamp(g, 'RECORD BROKEN', W / 2 + 110, 250, t, fishT + 0.1, { color: RED, size: 72, rot: -0.12 }); } });
   cue(prA, 'paper', 0.5); cue(prA + 0.5, 'thud', 0.5); cue(amT - 0.05, 'whoosh_soft', 0.2); cue(youT, 'sparkle_pop', 0.3);
   cue(ygT - 0.05, 'page_flip', 0.4); cue(fishT, 'whoosh_fast', 0.3); cue(fishT + 0.05, 'thud', 0.55); cue(fishT + 0.1, 'stamp', 0.5);
@@ -1977,25 +2226,24 @@ export async function build(T) {
     g.save(); view2(g, cam2(lt, [[0, [540, 900, 1.2, -0.03]], [len(sh), [540, 960, 1.0, 0]]]));
     vsKids(g, t, clamp((t - magT + 0.05) / 0.4), kidH(t), { ...EXPR.smug, look: [-1, 0] }, clamp((t - magT - 0.15) / 0.45)); g.restore();
   }, { kb: 0, zoom: kicks([[magT, 0.1]]), qaAllow: ['face cut by frame'] });
-  shot(magT + 0.7, (g, lt, t, sh) => {  // the photo the author sent (rule 67, drawn): everyone has a sign for Magnus; Hikaru walks past
-    g.save(); view2(g, cam2(lt, [[0, [540, 880, 1.04, 0.01]], [len(sh), [560, 820, 1.14, -0.01]]]));
-    signsMeme(g, t, { hx: lerp(880, 790, clamp(lt / len(sh))), eH: { ...EXPR.sad, look: [-0.7, 0.5], lid: 0.35 }, eG: { ...EXPR.happy, lid: 0.05, look: [-0.6, -0.1] } }); g.restore();
-  }, { trans: 'whip', kb: 0 });
+  shot(magT + 0.7, (g, lt, t, sh) => {  // the photo the author sent, as a set (rules 67, 68): the girls' signs for Magnus; Hikaru walks past
+    rig(B, lt, [[0, K(0.2, 0.05, 15, [4.6, -0.2, 4.4])], [len(sh), K(0.06, 0.04, 12.5, [4.8, 0.3, 4.6])]], { t, e: glide });
+    signs3(g, t, { hx: lerp(8.8, 7.2, clamp(lt / len(sh))), eH: { ...EXPR.sad, look: [-0.7, 0.5], lid: 0.35 }, eG: { ...EXPR.happy, lid: 0.05, look: [-0.6, -0.1] } });
+  }, { trans: 'whip', kb: 0, qaAllow: ['face cut by frame'] });
   cue(magT + 0.66, 'whoosh_fast', 0.25); cue(magT + 0.75, 'murmur', 0.3);
   cue(nxA - 0.04, 'whoosh_fast', 0.3); cue(nxtT, 'shimmer', 0.3); cue(magT, 'boom_big', 0.5); cue(magT + 0.4, 'whoosh_soft', 0.3);
 
   // ======================= 14 : 1 =======================
   const m14 = t => Math.min(14, Math.floor(14.99 * clamp((t - mgT) / (sc14T + 0.1 - mgT))));
   const hikS = t => t >= sc14T ? { ...EXPR.worried, sweat: 1, look: [-0.8, 0.1] } : { ...EXPR.worried, sweat: 0, look: [-0.8, 0.1] };
-  shot(scA, (g, lt, t, sh) => {  // Magnus's camera first, pulling back as the wins pile up; Hikaru flinches at each
-    g.save(); view2(g, cam2(lt, [[0, [280, 690, 1.5, -0.02]], [len(sh), [540, 900, 1.0, 0]]]));
-    const k = m14(t), since = t - (mgT + (k - 0.5) * (sc14T + 0.1 - mgT) / 14);
-    scoreSet(g, t, { eM: t >= sc14T ? EX.smug : EX.calm, eH: hikS(t), shakeH: k > 0 && since < 0.12 ? 0.6 : 0 }); g.restore();
-  }, { trans: 'whip', kb: 0, zoom: kicks([[sc14T, 0.08]]), qaAllow: ['face cut by frame'], hud: (g, lt, t) => { if (t >= mgT) counter(g, String(m14(t)), 'WINS', { x: 280, y: 250, size: 170, color: RED }); } });
-  shot(hkT - 0.05, (g, lt, t, sh) => {  // "Hikaru won once": his camera
-    g.save(); view2(g, cam2(lt, [[0, [830, 620, 1.8, 0.02]], [len(sh), [840, 650, 1.95, 0]]]));
-    scoreSet(g, t, { eM: EX.smug, eH: t >= onceT ? { ...EXPR.sad, look: [0, 0.3], curve: 0.1 } : { ...EXPR.worried, sweat: 1 } }); g.restore();
-  }, { trans: 'whip', whipDir: -1, kb: 0, hud: (g, lt, t) => { if (t >= onceT) counter(g, '1', 'WIN', { x: 800, y: 250, size: 170, color: '#7CFC9A', at: [onceT, 0.25] }); } });
+  shot(scA, (g, lt, t, sh) => {  // over Hikaru's shoulder: Magnus, the score lighting up behind him
+    rig(B, lt, [[0, K(0.42, 0.14, 14.5, [4, 3.6, 6.5])], [len(sh), K(0.1, 0.1, 11.5, [4, 4.0, 8])]], { t, e: glide });
+    scoreTable(g, t, { m: m14(t), h: null, eM: t >= sc14T ? EX.smug : EX.calm, eH: hikS(t), wall: 'far' });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[sc14T, 0.08]]) });
+  shot(hkT - 0.05, (g, lt, t, sh) => {  // the reverse, over Magnus's shoulder: Hikaru, and the "1" behind him
+    rig(B, lt, [[0, K(Math.PI - 0.38, 0.12, 12.5, [4, 3.4, 0.8])], [len(sh), K(Math.PI - 0.12, 0.1, 10.5, [4, 3.7, -0.5])]], { t, e: glide });
+    scoreTable(g, t, { m: 14, h: t >= onceT ? 1 : null, eM: EX.smug, eH: t >= onceT ? { ...EXPR.sad, look: [0, 0.3], curve: 0.1 } : { ...EXPR.worried, sweat: 1 }, wall: 'near' });
+  }, { trans: 'whip', whipDir: -1, kb: 0, zoom: kicks([[onceT, 0.07]]) });
   shot(onA, (g, lt, t, sh) => {  // "Once. In 2016." — the one win, an old photograph; the camera rushes in
     rig(B, lt, [[0, K(0.32, 0.12, 9.6, [4.5, 2.85, 8.7])], [len(sh), K(-0.1, 0.08, 6.2, [4.3, 3.0, 8.9])]], { t, e: glide });
     atBoard(g, t, 'hikaru', { pieces: piecesAt(GNG, 40), e: { ...EXPR.triumph } });
@@ -2016,22 +2264,22 @@ export async function build(T) {
     const u = ease.inOut(clamp(lt / 0.7));
     globeScene(g, t, lerp(1500, 68, u), lerp(1, 0.665, u), { eH: { ...EXPR.sad, look: [0, -1] }, eM: { ...EXPR.smug, look: [0, 0.6] } });
   }, { kb: 0, qaAllow: ['face cut by frame'] });
-  shot(ownT - 0.1, (g, lt, t, sh) => {  // "...who owns it.": the podium of the World Blitz 2019, the author's photo drawn (rule 67)
-    g.save(); view2(g, cam2(lt, [[0, [580, 880, 1.06, 0]], [len(sh), [420, 860, 1.24, 0.01]]]));
-    podiumMeme(g, t, { eH: { ...EXPR.neutral, lid: 1, curve: -0.15, look: [0, 0.3] }, eM: { ...EXPR.happy, lid: 0.1, look: [-0.2, 0] } }); g.restore();
+  shot(ownT - 0.1, (g, lt, t, sh) => {  // "...who owns it.": the podium of the World Blitz 2019 (the author's photo) as a stage
+    rig(B, lt, [[0, K(0.25, 0.05, 15, [4.2, 5.0, 5])], [len(sh), K(-0.08, 0.04, 10.5, [2.8, 5.0, 5])]], { t, e: glide });
+    podium3(g, t, { eH: { ...EXPR.neutral, lid: 1, curve: -0.15, look: [0, 0.3] }, eM: { ...EXPR.happy, lid: 0.1, look: [-0.2, 0] } });
   }, { trans: 'whip', kb: 0, zoom: kicks([[ownT, 0.06]]), hud: (g, lt, t) => { badge(g, 'EXCEPT ONE', W / 2, 200, { color: RED, size: 56, ...popW(t, ownT) }); } });
   cue(btA - 0.04, 'whoosh_deep', 0.3); cue(worldT - 0.3, 'scatter', 0.45); cue(worldT, 'boom_move', 0.4);
   cue(bt2A, 'whoosh_soft', 0.35); cue(ownT - 0.14, 'whoosh_fast', 0.3); cue(ownT, 'boom_big', 0.55); cue(ownT + 0.1, 'camera', 0.35);
 
   // ======================= five title matches; none =======================
-  shot(tiA, (g, lt, t, sh) => {  // along Magnus's shelf as the cups pop up
-    g.save(); view2(g, cam2(lt, [[0, [330, 760, 1.55, 0]], [fiveT - tiA + 0.2, [400, 740, 1.5, 0]], [len(sh), [800, 720, 1.4, -0.02]]]));
-    shelves(g, t, { t5: fiveT, eM: t >= fiveT ? EX.smug : EX.calm, eH: EX.calm }); g.restore();
-  }, { trans: 'whip', kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { badge(g, 'WORLD CHAMPIONSHIP MATCHES', W / 2, 230, { color: GOLD, size: 44 }); } });
-  shot(hikT - 0.05, (g, lt, t, sh) => {  // down to his: dust, a cobweb, nothing
-    g.save(); view2(g, cam2(lt, [[0, [540, 1250, 1.1, 0.02]], [len(sh), [520, 1480, 1.16, 0]]]));
-    shelves(g, t, { t5: -9, eM: EX.smug, eH: t >= neverT ? { ...EXPR.sad, look: [0.8, 0.3] } : EX.calm, empty: neverT }); g.restore();
-  }, { kb: 0, hud: (g, lt, t) => { if (t >= neverT + 0.2) stamp(g, '0', 760, 1060, t, neverT + 0.2, { color: '#9AA0A8', size: 150, rot: -0.1 }); } });
+  shot(tiA, (g, lt, t, sh) => {  // along Magnus's shelf as the cups come up, one under each light
+    rig(B, lt, [[0, K(-0.3, 0.06, 10.5, [-2.2, CUPY + 1.0, 8])], [len(sh), K(0.25, 0.05, 9.5, [8.4, CUPY + 0.6, 8])]], { t, e: glide });
+    trophyRoom(g, t, { t5: fiveT, eM: t >= fiveT ? EX.smug : EX.calm, eH: EX.calm });
+  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'WORLD CHAMPIONSHIP MATCHES', W / 2, 230, { color: GOLD, size: 44 }); } });
+  shot(hikT - 0.05, (g, lt, t, sh) => {  // down to his shelf: nothing on it, dust, a cobweb
+    rig(B, lt, [[0, K(-0.25, 0.08, 10, [-2.2, LOWY + 1.2, 8])], [len(sh), K(0.18, 0.05, 9.5, [7.6, LOWY + 0.8, 8])]], { t, e: glide });
+    trophyRoom(g, t, { t5: -9, empty: neverT, eM: EX.smug, eH: t >= neverT ? { ...EXPR.sad, look: [0.8, 0.3] } : EX.calm });
+  }, { kb: 0, hud: (g, lt, t) => { if (t >= neverT + 0.2) stamp(g, '0', 760, 1060, t, neverT + 0.2, { color: '#F2EEE6', size: 150, rot: -0.1 }); } });
   cue(tiA - 0.04, 'whoosh_fast', 0.3); for (let k = 0; k < 5; k++) cue(fiveT + k * 0.16, 'sparkle_pop', 0.22); cue(hikT - 0.09, 'whoosh_soft', 0.25); cue(neverT + 0.2, 'dun_dun', 0.35);
 
   // ======================= 2024: the last round against Gukesh, the draw, his crown; 2025: the stadium (v3) =======================
@@ -2050,13 +2298,21 @@ export async function build(T) {
   }, { trans: 'whip', kb: 0, zoom: kicks([[beatT, 0.08]]), hud: (g, lt, t) => {
     if (t >= beatT) stamp(g, 'MUST WIN', W / 2, 330, t, beatT, { color: RED, size: 100, rot: -0.08 });
   } });
-  shot(faceT, (g, lt, t, sh) => {  // the silence before it: the two of them, the clock running, the heart
-    g.save(); view2(g, cam2(lt, [[0, [540, 760, 1.04, 0]], [len(sh), [540, 720, 1.2, 0]]]));
-    faceOff(g, t, { t0: faceT, eH: { ...EXPR.focus, sweat: 1, look: [0.6, 0.3] }, eG: { ...EXPR.focus, lid: 0.35, look: [-0.6, 0.3] } }); g.restore();
-  }, { trans: 'whip', kb: 0, zoom: kicks([[faceT + 0.12, 0.035, 0.3], [faceT + 0.5, 0.035, 0.3], [faceT + 0.88, 0.035, 0.3]]) });
-  shot(drA, (g, lt, t, sh) => {  // "It was a...": two hands meet over the board
-    handshake(g, t, drA + 0.22);
-  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { if (t >= drawT) stamp(g, 'DRAW', W / 2, 330, t, drawT, { color: '#3A3F48', size: 116, rot: -0.08 }); } });
+  const cand2 = (g, t, eH, eG) => { dayRoom(g, t, {}); tableSet(g, t, { pieces: P24, white: 'hikaru', black: 'gukesh18', ew: eH, eb: eG, tableCol: WOODT,
+    clock: { names: ['NAKAMURA', 'GUKESH'], cols: ['#CFE0FF', '#FFE2B0'], l: Math.max(1, 41 - Math.floor((t - faceT) * 2)), r: 72, run: 1 } }); lowKey(g, { cy: H * 0.46, a: 0.04 }); };
+  const eFH = { ...EXPR.focus, sweat: 1, look: [0.2, 0.3] }, eFG = { ...EXPR.focus, lid: 0.35, look: [-0.2, 0.3] }, fMid = faceT + (drA - 0.06 - faceT) / 2;
+  shot(faceT, (g, lt, t, sh) => {  // the silence before it: over Gukesh's shoulder, Hikaru sweating; the clock running
+    rig(B, lt, [[0, K(Math.PI - 0.42, 0.1, 12.5, [4, 3.0, 0.2])], [len(sh), K(Math.PI - 0.3, 0.08, 11.2, [4, 3.1, -0.4])]], { t, e: glide });
+    cand2(g, t, eFH, eFG);
+  }, { trans: 'whip', kb: 0, zoom: kicks([[faceT + 0.12, 0.035, 0.3], [faceT + 0.5, 0.035, 0.3]]) });
+  shot(fMid, (g, lt, t, sh) => {  // the reverse: over Hikaru's shoulder, Gukesh calm
+    rig(B, lt, [[0, K(0.42, 0.1, 12.5, [4, 3.0, 8.0])], [len(sh), K(0.3, 0.08, 11.2, [4, 3.1, 8.6])]], { t, e: glide });
+    cand2(g, t, eFH, eFG);
+  }, { kb: 0, zoom: kicks([[fMid + 0.1, 0.035, 0.3]]) });
+  shot(drA, (g, lt, t, sh) => {  // "It was a...": from above the board, two hands meet over it
+    rig(B, lt, [[0, K(0.0, 1.25, 10.5, [4, 0, 4])], [len(sh), K(0.12, 1.2, 9.6, [4, 0, 4])]], { t, e: glide });
+    cand2(g, t, eFH, eFG); handshake(g, t, drA + 0.22, { flat: false });
+  }, { trans: 'whip', kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { if (t >= drawT) stamp(g, 'DRAW', W / 2, 330, t, drawT, { color: '#3A3F48', size: 116, rot: -0.08 }); } });
   shot(drawT + 0.12, (g, lt, t, sh) => {  // "...draw.": his face; the colour drains, the camera falls back
     rig(B, lt, [[0, K(Math.PI, 0.08, 5.4, [4, 3.05, -1.2])], [len(sh), K(Math.PI - 0.1, 0.14, 8.8, [4, 2.75, -0.7])]], { t, e: glide });
     cand(g, t, { ...EXPR.sad, look: [0, 0.6], lid: 0.45 }); grey(g, clamp((t - drawT) / 0.4) * 0.8);
@@ -2070,30 +2326,33 @@ export async function build(T) {
     nameTitle(g, t - chA, 'GUKESH', 'WORLD CHAMPION · 2024', { y: 230 });
     if (t >= chmpT + 0.35) badge(g, 'NOV 24: DEFENDS IT IN GENEVA', W / 2, 1560, { color: '#16161E', size: 34, ...popW(t, chmpT + 0.35) });
   } });
-  const stad = (g, t) => { const won = t >= ckT + 0.25;
-    stadium(g, t, { lit: won ? 1 : 0, cheer: clamp((t - ckT - 0.2) / 0.3), flash: ckT + 0.2, eH: won ? { ...EXPR.triumph } : { ...EXPR.focus, look: [0.3, 0.5] }, eG: won ? { ...EXPR.shock, sweat: 0 } : { ...EXPR.focus, look: [-0.3, 0.5] } }); };
+  const stad3 = (g, t) => { const won = t >= ckT + 0.25;
+    arena3(g, t, { lit: won ? 1 : 0, cheer: clamp((t - ckT - 0.2) / 0.3), flash: ckT + 0.2, eH: won ? { ...EXPR.triumph } : { ...EXPR.focus, look: [0.3, 0.5] }, eG: won ? { ...EXPR.shock, sweat: 0 } : { ...EXPR.focus, look: [-0.3, 0.5] } }); };
   shot(tsA, (g, lt, t, sh) => {  // "The next year, Hikaru...": Arlington, over the crowd toward the stage
-    g.save(); view2(g, cam2(lt, [[0, [540, 1240, 1.0, 0]], [len(sh), [540, 1000, 1.18, 0]]])); stad(g, t); g.restore();
+    rig(B, lt, [[0, K(0.0, 0.22, 31, [4, 2.4, 4])], [len(sh), K(0.07, 0.12, 21, [4, 3.0, 6])]], { t, e: glide });
+    stad3(g, t);
   }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'ARLINGTON, TEXAS · OCT 2025', W / 2, 200, { color: '#16161E', size: 38, ...popW(t, tsA + 0.05) }); } });
-  shot(ckT - 0.05, (g, lt, t, sh) => {  // "...checkmated the world champion": CHECKMATE on the wall, the screens, the crowd up
-    g.save(); view2(g, cam2(lt, [[0, [540, 760, 1.45, 0.02]], [len(sh), [540, 740, 1.3, -0.01]]])); stad(g, t); g.restore();
+  shot(w('toss', 3) - 0.05, (g, lt, t, sh) => {  // "...Hikaru checkmated the world champion": CHECKMATE on the wall, the screens, the hall up
+    rig(B, lt, [[0, K(0.3, 0.08, 13, [4, 3.6, 8])], [len(sh), K(0.1, 0.07, 10.8, [4, 3.6, 8.6])]], { t, e: glide });
+    stad3(g, t);
   }, { trans: 'whip', kb: 0, zoom: kicks([[ckT + 0.2, 0.09]]), qaAllow: ['face cut by frame'] });
-  shot(w('toss', 8) - 0.05, (g, lt, t, sh) => {  // "...in a stadium.": back over the whole room going wild
-    g.save(); view2(g, cam2(lt, [[0, [540, 1000, 1.12, -0.02]], [len(sh), [540, 1100, 1.0, 0.01]]])); stad(g, t); g.restore();
-  }, { trans: 'whip', kb: 0 });
+  shot(w('toss', 8) - 0.05, (g, lt, t, sh) => {  // "...in a stadium.": out over the whole hall going wild
+    rig(B, lt, [[0, K(-0.35, 0.22, 24, [4, 3, 5])], [len(sh), K(0.15, 0.27, 30, [4, 4, 5])]], { t, e: glide });
+    stad3(g, t);
+  }, { trans: 'whip', kb: 0, qaAllow: ['face cut by frame'] });
   shot(ts2A, (g, lt, t, sh) => {  // "And threw his king into the crowd."
-    g.save(); view2(g, cam2(lt, [[0, [540, 860, 1.12, 0.02]], [len(sh), [540, 960, 1.0, -0.02]]]));
-    kingThrow(g, t, thT, { e: { ...EXPR.triumph } }); g.restore();
+    rig(B, lt, [[0, K(0.14, 0.06, 7.0, [4, 4.0, 8.8])], [len(sh), K(0.06, 0.1, 9.0, [4, 3.8, 8.6])]], { t, e: glide });  // in front of Gukesh: his back never covers Hikaru
+    stad3(g, t); throw3(g, t, thT);
   }, { trans: 'whip', kb: 0, zoom: kicks([[kingT, 0.06]]), qaAllow: ['face cut by frame'] });
-  shot(crowdT + 0.15, (g, lt, t, sh) => {  // the world champion's face on the big screen
-    g.fillStyle = '#05050B'; g.fillRect(0, 0, W, H);
-    webcam(g, 80, 330, 920, 1180, 'gukesh18', { ...EXPR.neutral, brow: 0.35, browY: -6, lid: 0.15, look: [0.3, 0.1], mouth: 'line', curve: -0.1 }, t, { bg: ['#E07A2E', '#141824'], name: 'GUKESH · WORLD CHAMPION', nameColor: '#FFE2B0', zoom: 1.05 });
-  }, { kb: 0, zoom: (lt) => 1 + 0.08 * clamp(lt / 0.6) });
+  shot(crowdT + 0.15, (g, lt, t, sh) => {  // the world champion's face, the cheering hall behind him
+    rig(B, lt, [[0, K(Math.PI + 0.2, 0.05, 8.2, [4, 3.0, -1.2])], [len(sh), K(Math.PI + 0.1, 0.05, 7.2, [4, 3.1, -1.3])]], { t, e: glide });
+    stad3(g, t);
+  }, { kb: 0 });
   cue(cA - 0.04, 'whoosh_fast', 0.3); cue(lastT, 'hit', 0.35); cue(mustA - 0.04, 'whoosh_fast', 0.25); cue(beatT, 'stamp', 0.45);
   cue(faceT - 0.04, 'whoosh_fast', 0.25); for (let k = 0; k < 3; k++) cue(faceT + 0.12 + k * 0.38, 'heartbeat', 0.4); cue(faceT + 0.1, 'clock_tick', 0.3);
   cue(drA - 0.04, 'whoosh_soft', 0.25); cue(drA + 0.22, 'fabric', 0.45); cue(drawT, 'stamp', 0.5);
   cue(chA + 0.1, 'shimmer', 0.35); cue(chmpT, 'confetti', 0.35); cue(chmpT + 0.05, 'applause', 0.3);
-  cue(tsA - 0.04, 'whoosh_deep', 0.3); cue(tsA + 0.1, 'murmur', 0.35); cue(ckT - 0.09, 'whoosh_fast', 0.25); cue(w('toss', 8) - 0.09, 'whoosh_soft', 0.25); cue(ckT + 0.2, 'boom_big', 0.55); cue(ckT + 0.25, 'applause', 0.55);
+  cue(tsA - 0.04, 'whoosh_deep', 0.3); cue(tsA + 0.1, 'murmur', 0.35); cue(w('toss', 3) - 0.09, 'whoosh_fast', 0.25); cue(w('toss', 8) - 0.09, 'whoosh_soft', 0.25); cue(ckT + 0.2, 'boom_big', 0.55); cue(ckT + 0.25, 'applause', 0.55);
   cue(ts2A - 0.04, 'whoosh_fast', 0.3); cue(thT + 0.3, 'whoosh_fast', 0.45); cue(kingT + 0.1, 'applause', 0.5); cue(crowdT + 0.15, 'record_scratch', 0.25);
 
   // ======================= the sad part: fifth this year, 38 =======================
@@ -2121,12 +2380,12 @@ export async function build(T) {
   }, { kb: 0 });
   // the wings (v3, the author: «в моменте где крылья сделай получше эту сцену, прям поработай над ней хорошенько»)
   const HY = rungY(13) + 126;
-  const fT0 = wingT + 0.3, fLand = twA + 0.75, LAND = [556, 870];
-  const heroF = (g, t) => {  // one feather, drawn on the screen across the cut: it falls past his face, then onto the scales
+  const fT0 = wingT + 0.3, fLand = twA + 0.75;
+  const heroF = (g, t, land = { x: 556, y: 870, s: 1.76 }) => {  // one feather, drawn on the screen across the cut: it falls past his face, then onto the scales
     if (t < fT0 || t >= fLand) return;
     const ph = (t - fT0) * 2.3, damp = t < twA ? 1 : 1 - ease.inOut(clamp((t - twA) / (fLand - twA)));
-    const y = t < twA ? lerp(-90, 620, (t - fT0) / (twA - fT0)) : lerp(620, LAND[1], ease.out(clamp((t - twA) / (fLand - twA))));
-    featherAt(g, lerp(LAND[0], 540 + Math.sin(ph) * 80, damp), y, lerp(1.76, 2.3, damp), lerp(1.35, Math.sin(ph + 0.6) * 0.7, damp));
+    const y = t < twA ? lerp(-90, 620, (t - fT0) / (twA - fT0)) : lerp(620, land.y, ease.out(clamp((t - twA) / (fLand - twA))));
+    featherAt(g, lerp(land.x, 540 + Math.sin(ph) * 80, damp), y, lerp(land.s, 2.3, damp), lerp(1.35, Math.sin(ph + 0.6) * 0.7, damp));
   };
   shot(wgA, (g, lt, t, sh) => {  // "Just to find out": at the top, in the gold, hoping
     ladderWorld(g, t, cam2(lt, [[0, [560, HY - 60, 1.3]], [len(sh), [548, HY - 30, 1.48]]]), { p: 13, who: 'hikaru', eH: hope, glow: 1, rays: 0.5 });
@@ -2153,33 +2412,41 @@ export async function build(T) {
   cue(wasT - 0.05, 'whoosh_fast', 0.5); cue(wasT + 0.1, 'boom_big', 0.35); cue(wingT, 'reveal_bell', 0.25); cue(wingT + 0.3, 'shimmer', 0.2);
 
   // ======================= the turn: the feather lands on the scales; five to five; the sixth (v3: the balance) =======================
-  shot(twA, (g, lt, t, sh) => {  // the feather goes on falling — onto a balance that stands on the blitz clock
-    const landed = t >= fLand, d = sh.b - sh.a, wob = landed ? 0.045 * Math.sin((t - fLand) * 14) * Math.exp(-(t - fLand) * 3) : 0;
-    g.save(); view2(g, landed ? cam2(t - fLand, [[0, [540, 640, 1.6, 0]], [Math.max(0.3, d - (fLand - twA)), [540, 760, 1.0, 0]]]) : [540, 640, 1.6, 0]);
-    balance(g, t, { tilt: wob, eM: EX.calm, eH: landed ? { ...EXPR.focus, look: [-0.5, 0.5], curve: 0.1 } : { ...EXPR.sad, look: [0, 0.6] }, clock: { on: 0 }, feather: landed }); g.restore();
-  }, { trans: 'fade', transDur: 0.3, kb: 0, hud: (g, lt, t) => heroF(g, t), qaAllow: ['face cut by frame'] });
+  const PCAM = K(0.0, 0.06, 6.4, [4, PIVY + 0.3, 4]), WIDE = K(0.22, 0.14, 16, [4, 4.0, 4]);
+  const landAt = () => { const q = B.project(4.05, PIVY + 0.62, 4); return { x: q.x, y: q.y, s: FEATH3 * q.s }; };
+  shot(twA, (g, lt, t, sh) => {  // the feather goes on falling — onto the balance standing on the blitz clock
+    const landed = t >= fLand, wob = landed ? 0.045 * Math.sin((t - fLand) * 14) * Math.exp(-(t - fLand) * 3) : 0;
+    rig(B, lt, [[0, PCAM], [fLand - twA, PCAM], [Math.max(fLand - twA + 0.3, len(sh)), WIDE]], { t, e: glide });
+    studio(g, t, { eM: EX.calm, eH: landed ? { ...EXPR.focus, look: [-0.5, 0.5], curve: 0.1 } : { ...EXPR.sad, look: [0, 0.6] } });
+    balance3(g, t, { tilt: wob, clock: {}, feather: landed });
+  }, { trans: 'fade', transDur: 0.3, kb: 0, hud: (g, lt, t) => { if (t < fLand) heroF(g, t, landAt()); }, qaAllow: ['face cut by frame'] });
   const tiltFF = t => t < ffT ? 0 : t < ff2T ? -0.13 * ease.out(clamp((t - ffT) / 0.25)) : -0.13 * (1 - ease.back(clamp((t - ff2T) / 0.35)));
   shot(ffT - 0.1, (g, lt, t, sh) => {  // "...five to five": five cups drop on his pan, five on Hikaru's — level
-    g.save(); view2(g, cam2(lt, [[0, [540, 760, 1.05, 0]], [len(sh), [540, 800, 1.0, 0]]]));
-    balance(g, t, { tilt: tiltFF(t), nL: 5, nR: 5, tL: ffT, tR: ff2T, eM: { ...EXPR.smug, look: [0.6, 0.6] }, eH: t >= ff2T ? { ...EXPR.smug, look: [-0.6, 0.6] } : { ...EXPR.worried, look: [-0.6, 0.6] }, clock: { l: '5', r: t >= ff2T ? '5' : '–', on: 1 }, feather: true }); g.restore();
+    rig(B, lt, [[0, WIDE], [len(sh), K(0.1, 0.12, 14.5, [4, 4.2, 4])]], { t, e: glide });
+    studio(g, t, { eM: { ...EXPR.smug, look: [0.6, 0.6] }, eH: t >= ff2T ? { ...EXPR.smug, look: [-0.6, 0.6] } : { ...EXPR.worried, look: [-0.6, 0.6] } });
+    balance3(g, t, { tilt: tiltFF(t), nL: 5, nR: 5, tL: ffT, tR: ff2T, clock: { l: '5', r: t >= ff2T ? '5' : '–' }, feather: true });
   }, { kb: 0, zoom: kicks([[ffT, 0.07], [ff2T, 0.08]]) });
   shot(spA, (g, lt, t, sh) => {  // "Speed chess.": the clock under it slapped back and forth, the beam rocking
-    g.save(); view2(g, cam2(lt, [[0, [540, 900, 1.75, -0.03]], [len(sh), [540, 880, 1.5, 0.03]]]));
+    rig(B, lt, [[0, K(-0.42, 0.32, 7.6, [4, 1.5, 4])], [len(sh), K(0.35, 0.26, 6.9, [4, 1.7, 4])]], { t, e: glide });
     const pr = Math.floor((t - spA) / 0.11) % 2 ? 1 : -1;
-    balance(g, t, { tilt: 0.1 * Math.sin((t - spA) * 28.5), nL: 5, nR: 5, eM: { ...EXPR.focus, look: [0.6, 0.6] }, eH: { ...EXPR.focus, look: [-0.6, 0.6] }, clock: { l: '5', r: '5', on: 1, press: pr }, feather: true }); g.restore();
+    studio(g, t, { eM: { ...EXPR.focus, look: [0.6, 0.6] }, eH: { ...EXPR.focus, look: [-0.6, 0.6] } });
+    balance3(g, t, { tilt: 0.1 * Math.sin((t - spA) * 28.5), nL: 5, nR: 5, clock: { l: '5', r: '5', press: pr }, feather: true });
     speedLines(g, W / 2, H * 0.55, t, spA, { life: 0.7, seed: 4 });
-  }, { trans: 'whip', kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { badge(g, 'SPEED CHESS CHAMPIONSHIP', W / 2, 230, { color: '#7CFC9A', size: 44, ...popW(t, spA + 0.05) }); } });
-  shot(fM - 0.08, (g, lt, t, sh) => {  // "Five for Magnus.": his card and his pan, the cups catching the light one by one
-    g.save(); view2(g, cam2(lt, [[0, [230, 560, 1.6, 0]], [len(sh), [200, 590, 1.75, -0.02]]]));
-    balance(g, t, { nL: 5, nR: 5, glintL: fM, eM: { ...EXPR.smug, look: [0.2, 0.6] }, eH: EX.calm, clock: { l: '5', r: '5', on: 1 }, feather: true }); g.restore();
+  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'SPEED CHESS CHAMPIONSHIP', W / 2, 230, { color: '#7CFC9A', size: 44, ...popW(t, spA + 0.05) }); } });
+  shot(fM - 0.08, (g, lt, t, sh) => {  // "Five for Magnus.": his pan, his face on the screen behind it, the cups catching the light
+    rig(B, lt, [[0, K(-0.6, 0.12, 10, [0.4, 4.6, 5])], [len(sh), K(-0.45, 0.1, 9, [0.3, 5.0, 5.5])]], { t, e: glide });
+    studio(g, t, { eM: { ...EXPR.smug, look: [0.2, 0.6] }, eH: EX.calm });
+    balance3(g, t, { nL: 5, nR: 5, glintL: fM, clock: { l: '5', r: '5' }, feather: true });
   }, { trans: 'whip', whipDir: 1, kb: 0 });
   shot(fH - 0.08, (g, lt, t, sh) => {  // "Five for Hikaru."
-    g.save(); view2(g, cam2(lt, [[0, [850, 560, 1.6, 0]], [len(sh), [880, 590, 1.75, 0.02]]]));
-    balance(g, t, { nL: 5, nR: 5, glintR: fH, eM: EX.smug, eH: { ...EXPR.smug, look: [-0.2, 0.6], curve: 0.7 }, clock: { l: '5', r: '5', on: 1 }, feather: true }); g.restore();
+    rig(B, lt, [[0, K(0.6, 0.12, 10, [7.6, 4.6, 5])], [len(sh), K(0.45, 0.1, 9, [7.7, 5.0, 5.5])]], { t, e: glide });
+    studio(g, t, { eM: EX.smug, eH: { ...EXPR.smug, look: [-0.2, 0.6], curve: 0.7 } });
+    balance3(g, t, { nL: 5, nR: 5, glintR: fH, clock: { l: '5', r: '5' }, feather: true });
   }, { trans: 'whip', whipDir: -1, kb: 0 });
   shot(sxA, (g, lt, t, sh) => {  // "This month, they started playing for number six.": the sixth cup comes down over the beam; London
-    g.save(); view2(g, cam2(lt, [[0, [540, 820, 1.12, 0]], [len(sh), [540, 960, 1.0, 0]]]));
-    balance(g, t, { tilt: 0.014 * Math.sin(t * 30) * clamp((t - sxA - 0.3) / 0.3), nL: 5, nR: 5, six: (t - sxA - 0.1) / 0.8, eM: { ...EXPR.focus, look: [0.8, -0.6] }, eH: { ...EXPR.focus, look: [-0.8, -0.6] }, clock: { l: '5', r: '5', on: 1 }, london: (t - sixT) / 0.4, feather: true }); g.restore();
+    rig(B, lt, [[0, K(0.0, 0.2, 18.5, [4, 6.5, 4])], [len(sh), K(0.0, 0.1, 16, [4, 7.0, 4])]], { t, e: glide });
+    studio(g, t, { eM: { ...EXPR.focus, look: [0.8, -0.6] }, eH: { ...EXPR.focus, look: [-0.8, -0.6] }, london: (t - sixT) / 0.4 });
+    balance3(g, t, { tilt: 0.014 * Math.sin(t * 30) * clamp((t - sxA - 0.3) / 0.3), nL: 5, nR: 5, six: (t - sxA - 0.1) / 0.8, clock: { l: '5', r: '5' }, feather: true });
   }, { trans: 'whip', kb: 0, zoom: kicks([[sixT, 0.07]]), hud: (g, lt, t) => {
     if (t >= sixT) badge(g, 'NUMBER SIX', W / 2, 1480, { color: GOLD, size: 56, ...popW(t, sixT) });
     if (t >= sixT + 0.45) badge(g, 'FINALS · LONDON · FEB 2027', W / 2, 1580, { color: '#16161E', size: 34, ...popW(t, sixT + 0.45) });

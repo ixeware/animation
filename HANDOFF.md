@@ -227,6 +227,10 @@ python3 tools/sheet.py <файл>.mp4 sheet.jpg 9.7 10.0 27.8 --cols 4   # от�
   stadium. And threw his king into the crowd». Крылья — 4 вида (надежда, взлёт от подножия мимо лет, тень, перо);
   перо через склейку садится на весы (`balance` на шахматных часах, `heroF`). Мемы: плакаты «I ♥ Magnus»
   (`signsMeme`) на «Then Magnus showed up», пьедестал блица 2019 (`podiumMeme`) на «who owns it». 79,5 с.
+- **Версия 4** (автор: «качество как то упало… больше 3д сцен и деталей в энвайроменте»; правило 68): плоские
+  сцены — снова 3D-декорации: `scoreTable` (табло за спиной соперника, кадры через плечо), `trophyRoom`, `deskScene`,
+  `cand2` (лицом к лицу через плечо, часы на столе), `arena3` + `fans3` + `throw3` (стадион), `studio` + `balance3`
+  (весы на часах в ночной студии), `signs3`, `podium3`. Лица на экранах и в рамах — `camTex`.
 - Факты — [SOURCES](episodes/rivalry/SOURCES.md). Файлы: `episodes/rivalry/build/rivalry.mp4` (TikTok) и
   `rivalry_youtube.mp4` (метка без строки про YouTube).
 

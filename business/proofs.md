@@ -21,3 +21,5 @@
 | 2026-11-16 15:12:18 | `rivalry_youtube.mp4` | 31282371 | 72.01 s | 1080×1920 | `ce9ab6467099fa362e308ab4ec127cc20509c4e6596e9e6b5e6ba8af96dc2b02` | rivalry v2, YouTube: the handle only |
 | 2026-11-16 16:05:59 | `rivalry.mp4` | 34541116 | 79.51 s | 1080×1920 | `d1898c7070cd1080828d4e75394e131f0dfeb8b0ae16a4af1cb8206ff2c1b546` | rivalry v3, TikTok: stadium, wings, scales, two photo memes |
 | 2026-11-16 16:05:59 | `rivalry_youtube.mp4` | 34547042 | 79.51 s | 1080×1920 | `174002037deb0dcf2d9e4d1acf1171ef4dfd3ea7a2e5fe5e05897c96a392b231` | rivalry v3, YouTube: the handle only |
+| 2026-11-16 18:15:35 | `rivalry.mp4` | 34449849 | 79.51 s | 1080×1920 | `afd503b6963ba52c59517f461c41757a2b60bd7e48cdd0949a24a43dfa70d262` | rivalry v4, TikTok: the flat scenes rebuilt as 3D sets |
+| 2026-11-16 18:15:35 | `rivalry_youtube.mp4` | 34445351 | 79.51 s | 1080×1920 | `f30bd6ecbc62fa7cff216c90e2de7d0aaa3c55daad31077868d488dd2a7e93b4` | rivalry v4, YouTube: the handle only |
