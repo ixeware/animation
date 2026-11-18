@@ -17,7 +17,8 @@
 - `README.md` — строка сборки каждого ролика и устройство проекта.
 - Ближайший похожий ролик: `episodes/<имя>/scenes.js` — образец кода, `SOURCES.md` — факты и фото.
 - `IDEAS.md` — идеи следующих роликов с проверенными фактами; статистика и комментарии канала —
-  `python3 tools/tiktok.py stats the64files` и `python3 tools/tiktok.py comments the64files <папка>`.
+  `python3 tools/tiktok.py stats the64files` и `python3 tools/tiktok.py comments the64files <папка>`; что сейчас залетает у
+  больших шахматных аккаунтов — `python3 tools/tiktok.py trends`.
 
 ## Каналы
 - The 64 Files (@the64files) — свой канал автора, английский, аудитория США, ролики длиннее 61 с.

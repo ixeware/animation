@@ -4,7 +4,47 @@
 (драма — один поворот внутри интересной самой по себе истории). Факты ниже проверены по источникам в конце каждого
 пункта; перед сценарием всё равно собрать `SOURCES.md`.
 
-## Chessigma: 4 ролика по сделке 18.11.2026 — идеи
+## Chessigma: 4 ролика — версия на широких мемах (18.11.2026, вечер)
+Автор на первые версии: «да не нужно такие нишевые темы, нужно что то кто сразу узнает в чем прикол, типо блять подключи
+себе какой то скилл чтобы ты мог тт листать». Ленту TikTok скрипту не отдают (поиск, хэштеги и «For You» — только
+залогиненному браузеру; обходить защиту не стали), поэтому тренды — по последним роликам больших шахматных аккаунтов:
+`python3 tools/tiktok.py trends`.
+
+**Что залетает сейчас (18.11.2026):**
+- **GTA 6 выходит 19.11.2026** (Rockstar перенесла с 26.05 на 19.11.2026, Take-Two подтвердил дату:
+  [TechRadar](https://www.techradar.com/gaming/grand-theft-auto-6-release-date-confirmed-but-its-been-delayed-heres-why),
+  [PCWorld](https://www.pcworld.com/article/3052217/gta-6s-release-date-confirmed-for-real-this-time-seriously.html)).
+  Под роликами Магнуса: «Hello Magnus, will you visit the shoe store in GTA6» (20 тыс.), «Magnus will you mate Lucia?»
+  (6,8 тыс.), «imagine us getting a new world champion before GTA 6».
+- **Магнус и «Свинка Пеппа»**: «Daddy pig's prep is finally revealed» (09.11, 4,6 млн, 640 тыс. лайков) — он смеётся у
+  телевизора. Комментарии: «#1 player in the world btw» (112 тыс.), «he can finish the movie in 3 moves» (78 тыс.), «He
+  is laughing from a joke that will be 3 minutes ahead» (59 тыс.), «omg Peppa to d5 takes Georgie» (9,6 тыс.).
+- **Chess.com**: «NOBODY has been this close to Magnus in YEARS» (14.11, 1,1 млн) — Фабиано у первого места; «When your
+  lowest is their best.» (19 тыс.), «magnus lock in please». «Hikaru notices SO QUICKLY that the chess game is over»
+  (12.11, 1,1 млн): «me and Hikaru's reaction when we realized it's over» (6,7 тыс.).
+- **chessbrah**: «Bro thinks he is Magnesium Calcification (Bro is 676 elo)» (210 тыс.), «Bro thought it's a checkmate»
+  под «What I've Done».
+- Магнуса в комментариях зовут «washed»: «"washed" and he is a world champion in chess 😭» (4,4 тыс.).
+
+**Четыре ролика на этих мемах** (рисуем своим стилем, без ассетов Rockstar и «Пеппы», правило 67):
+1. **Brilliant — «Bro thinks he's Magnus».** Хук: Магнус смеётся у телевизора — «Magnus laughs at Peppa Pig jokes three
+   minutes before they happen». Потом: «This bro is rated 527. He just played a brilliant move» — 23...Rf1+, на экране
+   GTA-плашка «MISSION PASSED. RESPECT +». «Mate was two moves away.» Он повторяет шахи — ничья — серый экран «WASTED».
+   Подпись: «Bro thinks he's Magnus. (Bro is 527 elo.)» Финал: разбор Chessigma показывает и «бриллиант» (Sigma), и мат,
+   который он не увидел; бесплатно. Вопрос: «What's your rating?»
+2. **Дебюты — «Follow the damn train».** К выходу GTA 6: «All we had to do was follow the damn train, CJ!» → «All you had
+   to do was follow the damn opening.» Эдит-байт: «Daddy Pig's prep is finally revealed. Magnus can prep with Peppa Pig.
+   You can't.» Новичок уходит из линии на 4-м ходу и попадает в ловушку → «WASTED». Финал: Opening Trainer — выучи свою
+   линию. Вопрос: «What's your opening?»
+3. **Принципы — «Ah shit, here we go again».** Каждую партию одно и то же: ферзь на втором ходу, король гуляет — и каждый раз
+   фраза CJ. «Magnus can Bongcloud. Bro is 676 elo.» Финал: модуль принципов — какое правило стоит тебе больше всего, в %.
+   Вопрос: «Which rule do you break every game?»
+4. **Разбор партии — «WASTED».** В каждой проигранной партии есть ход, после которого экран должен стать серым и написать
+   WASTED; разбор находит этот ход. «Hikaru knows it's over in two seconds. You need the game review.» Финал: каждый ход с
+   оценкой, бесплатно и без лимита. Вопрос: «Drop your accuracy.»
+Сроки: волна GTA 6 — ближайшие две недели, поэтому ролики 1 и 2 — как можно раньше.
+
+## Chessigma: 4 ролика по сделке 18.11.2026 — первые идеи (автор: «нишевые»)
 Методом автора (правило 75): актуальное, пасхалки и референсы, одна уместная метафора, которая рисуется буквально.
 Окно актуальности — матч за корону Гукеш — Синдаров в Женеве: FIDE — 22.11–13.12.2026, 1-я партия 24.11
 ([FIDE](https://www.fide.com/salesforce-fide-world-championship-match-2026-schedule-format-and-prize-fund-confirmed/),
