@@ -4,6 +4,75 @@
 (драма — один поворот внутри интересной самой по себе истории). Факты ниже проверены по источникам в конце каждого
 пункта; перед сценарием всё равно собрать `SOURCES.md`.
 
+## Chessigma: 4 ролика по сделке 18.11.2026 — идеи
+Методом автора (правило 75): актуальное, пасхалки и референсы, одна уместная метафора, которая рисуется буквально.
+Окно актуальности — матч за корону Гукеш — Синдаров в Женеве: FIDE — 22.11–13.12.2026, 1-я партия 24.11
+([FIDE](https://www.fide.com/salesforce-fide-world-championship-match-2026-schedule-format-and-prize-fund-confirmed/),
+[World Chess](https://worldchess.com/news/gukesh-vs-sindarov-everything-you-need-to-know-about-the-2026-world-chess-championship));
+обоим по 20 лет. Chessigma — только в конце (правило 61), в начале — намёк. Все экраны — запись приложения на телефоне.
+
+### 1. Brilliant moves — «He found the key» (делать сейчас)
+- **Хук.** Светлая комната, новичок, над ним «527». «This player is rated 527. And he just played a brilliant move.»
+- **История — настоящая партия из бенчмарка Chessigma** (блиц 2+1, 04.08.2025,
+  [партия](https://www.chess.com/game/live/141467642198), чёрные): 23...Rf1+ — у Chess.com «!!». Stockfish (глубина 22):
+  после Rf1+ у чёрных +5,4, дальше 24.Kh2 Rxh1+ 25.Kxh1 Nf2+ с вилкой. А он дал шах ещё раз, и ещё — ничья повторением.
+- **Метафора (главная).** «He found the key. He never opened the door.» Ладья — ключ, поворачивается в замке; за дверью
+  — комната с короной; он уходит по коридору одинаковых дверей Rf1+, Rf2+, Rf1+.
+- **Эдит-байт со звездой.** «Magnus finds the key and walks through. He found it — and walked away.» Сравнение со
+  звездой в хуке: у Хикару больше 5000 «бриллиантов» (наш факт 2021 из `brilliant`), у этого — один.
+- **Пасхалки.** В том же бенчмарке «бриллиант» нашёл и игрок с 3097: Kxf1 в партии на 3 минуты
+  ([партия](https://www.chess.com/game/live/171093760062)); игроки там от ~450 до ~3200 — «Brilliance doesn't check
+  your rating». Мем для комментариев: разборы, которые ставят «!!» на всё, — «That's not a review. That's your mom
+  putting your drawing on the fridge» (холодильник, зевок с «!!» и штампом MASTERPIECE; конкурентов не называем).
+  Мост к спонсору: «If a tree falls in a forest and no one hears it…» — четыре бесплатных разбора из пяти этот ход не
+  заметили (лес из фигур, падает дерево-ладья, тишина).
+- **Финал.** «Chess.com calls it Brilliant. Chessigma calls it… Sigma.» — фигура медленно оборачивается и поднимает
+  бровь (сигма-мем нашим стилем). Его ход Chessigma увидел; из 100 «бриллиантов» Chess.com — 93; бесплатно.
+- **Вопрос.** «What's your rating — and have you ever played a brilliant? Comment both.»
+
+### 2. Дебюты → Opening Trainer — «The script» (выпустить 23–24.11, к 1-й партии)
+- **Хук.** Сцена в Женеве, два стула, над доской «20». «Tomorrow, two 20-year-olds play for the world title. Both
+  already know their first 20 moves.» («20 ходов» — фигура речи про подготовку, строкой в `SOURCES.md`.)
+- **Метафора (главная).** Театр: «An opening is a script. A World Championship is two actors, each waiting for the
+  other to forget his lines.» В суфлёрской будке — секунданты с ноутбуком; «out of book» — гаснет значок книги.
+- **Эдит-байт (Магнус).** В глубине сцены пустой трон с короной: «Magnus didn't lose this crown. He left it on the
+  chair.» Он отказался от матча 20.07.2022: «I am not motivated to play another match»
+  ([OPB/NPR](https://opb.org/article/2022/07/20/magnus-carlsen-done-with-chess-world-championships)). Его прогноз «I
+  think Sindarov will win» (16.09.2026) уже есть в `tablebang`.
+- **Пасхалка.** «You don't need 20 moves. You need 5. Or someone will say "Oh no, my queen" — and mean it.» —
+  фраза Эрика Розена из ловушек гамбита Стаффорда.
+- **Финал.** Opening Trainer: выучить свою линию, пока не перестанешь «забывать текст».
+- **Вопрос.** «Gukesh or Sindarov? Comment your pick.» — комментарии на весь матч.
+
+### 3. Принципы — «Break them like an artist» (после релиза модуля; к партии матча)
+- **Хук.** Магнус и Хикару, двойной Bongcloud 2021 (наша сцена из `bongcloud` — колбэк для своих) или ход из идущего
+  матча, где чемпион нарушил принцип и выиграл/проиграл.
+- **Референс.** «Learn the rules like a pro, so you can break them like an artist» (приписывают Пикассо, не
+  подтверждено — говорить «they say»). Музей: «картины» Магнуса — позиции, где он нарушил правила и выиграл.
+- **Эдит-байт.** «Magnus breaks the rules. The rules break you.»
+- **Продукт.** Новый модуль: какой принцип ты нарушил и сколько шансов на победу это стоило — ценник на каждой
+  «картине» зрителя (цифры — из записи приложения). Колбэк: рисунок с холодильника из ролика 1 висит в музее.
+- **Вопрос.** «Which rule do you break the most?»
+
+### 4. Разбор партии — «The black box» (в основном про Chessigma; к концу матча, до 13.12)
+- **Метафора (главная).** Бортовой самописец: «After every plane crash, investigators find the black box. After every
+  lost game, you have one too.» График оценки — высота полёта, зевок — падение. Пасхалка-факт: «Fun fact: black boxes
+  are orange» — открывается оранжевый ящик, внутри разбор.
+- **Эдит-байт.** Дин Лижэнь, 14-я партия 2024: «Ding flew 13 games without a crash. One move, and the crown fell.» —
+  запись «самописца» обрывается на одном ходе, Гукеш — чемпион в 18. Если в нынешнем матче будет решающий зевок —
+  брать его: актуальнее.
+- **Продукт.** Каждый ход с оценкой, точность, лучший ход, Sigma, принципы, которые стоили дороже всего, твой дебют;
+  бесплатно и без лимита. У Chess.com бесплатный аккаунт — один разбор в день
+  ([Chess.com](https://www.chess.com/article/view/chesscom-features)) — «a black box that opens once a day»;
+  формулировку сравнения согласовать с Элиотом.
+- **Вопрос.** «What was your worst crash? Drop your accuracy.»
+
+**Факты для всех четырёх** (бенчмарк — [chessigma.com/benchmarks/brilliant](https://www.chessigma.com/benchmarks/brilliant),
+партии — `/data`): Chessigma находит 93 из 100 «бриллиантов» Chess.com, Chessiro 90, Wintrchess 45, Chessitup 41,
+Chesskit 23; лишний «бриллиант» у Chessigma — раз в 20 партий, у других — раз в 3–6; ярлыки: Chess.com «Brilliant»,
+Chessigma «Sigma», Chessiro «Genius». Цитату «You have to be merciless» (её приписывают Магнусу) не берём: первоисточник
+не найден.
+
 ## Следующий ролик: Хикару и Магнус, «The truth» (16.11.2026)
 **Сделан 16.11.2026** — [`episodes/rivalry`](episodes/rivalry/SOURCES.md); версия 3 (стадион, мемы, весы) — 79,5 с.
 **Идея автора:** «может про hikaru rivalry с магнусом, щас с этим грустные эдиты» — прислал такой эдит (TikTok
