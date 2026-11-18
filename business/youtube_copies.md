@@ -352,6 +352,49 @@ THIS ON YOUTUBE IT'S STOLEN и типо вотермарка перемещае�
 Чего это не даёт: закрыть метку вручную можно, если тратить на каждый ролик время (маска на каждом прыжке); скачать
 ролик без водяного знака TikTok он сможет по-прежнему.
 
+## Третий запрос «need more info» и ответ с документами (17–18.11.2026)
+
+**17.11.2026, 18:48–18:50 UTC** во всех трёх ветках (`U63E3AMUL5GS55AJG4EAC5MXE4` — 4 ролика,
+`QHJR7OU565D37IRZDSHLVUXQOI` — 10, `AZ47HRX6F5TTNNJ2JTCTCWMBFQ` — 10; вместе все 24) одно и то же: «We remain concerned
+that your claim… may not be valid… a copyright registration certificate (if the works are registered) or any supporting
+documentation… if you don't respond within 7 days, or respond with no additional substantive information, your YouTube
+account may be terminated». Срок — **24.11.2026**. Отзыв — фразой «I hereby retract my claim of copyright infringement».
+В цитате у них — уведомление от 13.11 с прежней подписью (имя двоюродного брата), хотя исправление было 14.11.
+
+**Что нашлось 18.11.2026 около 00:40 UTC.**
+- Копия № 1 (`Wmz-pghiWnE`, ролик для Chessnut) **удалена**: oEmbed отвечает 404, кадров на i.ytimg.com нет. Причина не
+  видна; Chessnut 16.11 обещала подать жалобу по товарному знаку. Остальные 23 копии и копия `witty2` на месте.
+- Био TikTok сейчас: `chessigma.com / chessnutech.com / Youtube: @the64filesofficial YT-64F-1114 / @the64stories IS
+  FAKE !!! ⚠️ / Collab: the64filestt@gmail.com` — строка `YT-64F-1114` и почта стоят.
+- 15.11 в 00:29 UTC YouTube прислал на the64filestt «Thank you for reporting this channel on November 14» — жалоба на
+  канал (по всей видимости, за impersonation) принята.
+- Чего нет: регистрации в Бюро авторских прав США; файлов роликов на Google Диске до публикации (там только
+  `woodpecker`, `witty2` и записи экрана Chessigma); история ElevenLabs по API хранит только 13–16.11 и без текстов.
+- **Папка `episodes/records` — другой ролик** («The Craziest Chess World Records», рекорды Гиннесса), а в TikTok и в
+  копии `CPzplLt64VY` — «Top 5 Chess WORLD Records» (269 ходов, ничья и т. д.). Код этой папки к копии не прикладывать.
+  Ролика про Mittens в репозитории нет.
+
+**Новое доказательство — сам проект.** Для каждой копии: кадр с сервера YouTube (`frame0`, `oar1`–`oar3`) и строка
+нашего `scenes.js`, которая рисует надпись в этом кадре, плюс строка `script.json`, которая звучит в этот момент (у 21 из
+23 копий; например, `coverTitle(g, 'THE MAN WHO INVENTED', 'BRILLIANTS', …)` — `episodes/talbrill/scenes.js:1119`).
+Обложка ролика в TikTok у 17 копий — тот же кадр, что `frame0` (или `oar2`) копии. Гравировку `@THE64FILES` рисуют
+`engine/js/look.js:14` и `engine/js/board.js:107`, добавлена коммитом `7c873fb` 22.10.2026 в 22:29 UTC; на кадрах с
+сервера YouTube она читается у `J14e_O5V-TQ` (`oar1`), `WLywVcbK5FY` (`oar2`), `NwbQCns0Bl4` и `A_MNOn0hvck`
+(`frame0`). Плашка «FOLLOW FOR MORE / THE 64 FILES» — `episodes/levy/scenes.js:409`, `episodes/solve/scenes.js:332`.
+
+**18.11.2026, 00:56–00:57 UTC — отправлено** (автор: «ответь ютубу») в три ветки с the64filestt, к каждому письму PDF
+на свою ветку (`The64Files_documentation_<первые 8 знаков обращения>.pdf`, 5, 7 и 6 страниц; в хранилище не кладём —
+в них полное имя автора). В письме: регистрации нет, вместо неё документы; что в документе — исходники по каждому
+ролику, гравировка и плашка в копиях с кодом и датой, оригиналы со временем публикации и обложками, почта в био TikTok и
+предложение вписать в био любое слово или код от YouTube; по каждому ролику ветки — копия, оригинал и время публикации;
+`Wmz-pghiWnE` — удалена, по ней ничего не нужно; про имя — подпись в уведомлении 13.11 была именем двоюродного брата,
+исправлено 14.11; оба обязательных заявления; подпись — полное имя автора, как в исправлении 14.11.
+
+**Дальше.** Если YouTube пришлёт слово или код — автору вписать его в био TikTok в тот же день и ответить в ветке. Если
+снова откажут, выбор за автором: отозвать заявки фразой выше (тогда аккаунт the64filestt вне риска) или идти дальше.
+Сильнее всего добавили бы экраны TikTok Studio (список роликов и аналитика из аккаунта автора) — их может сделать
+только он.
+
 ## Все 24 копии
 
 Время — UTC. «Жалоба»: «подана» — заявка на удаление за нарушение авторских прав в YouTube Studio (первые шесть;
@@ -386,7 +429,7 @@ infringement».
 
 | № | Копия на YouTube | Залита | Просмотры | Оригинал в TikTok | Вышел | Папка | Жалоба |
 |---|---|---|---|---|---|---|---|
-| 1 | [Hikaru realized Magnus is losing](https://www.youtube.com/shorts/Wmz-pghiWnE) | 11.11 19:21 | 146 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7706690840965582132) | 10.11 23:36 | `hikaru213` | письмо 13.11 |
+| 1 | [Hikaru realized Magnus is losing](https://www.youtube.com/shorts/Wmz-pghiWnE) | 11.11 19:21 | 146 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7706690840965582132) | 10.11 23:36 | `hikaru213` | письмо 13.11; **удалена** (18.11) |
 | 2 | [Bobby Fischer - The Fischerman](https://www.youtube.com/shorts/rUg2CLvelHg) | 09.11 18:44 | 490 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7705900508925398279) | 08.11 20:29 | `biggerfish` | подана |
 | 3 | [Is Bobby Fischer the GOAT?](https://www.youtube.com/shorts/Lm9o3BTdFAA) | 07.11 19:14 | 239 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7695912005613407489) («Bobby Fischer's paranoia») | 12.10 22:29 | `fischer` | подана |
 | 4 | [Who has the most Brilliant moves?](https://www.youtube.com/shorts/bCMlxBvqwXg) | 06.11 18:59 | 386 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7696399796298353928) | 14.10 06:02 | `brilliant` | подана |
