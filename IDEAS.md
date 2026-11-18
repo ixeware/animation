@@ -11,6 +11,54 @@
 [World Chess](https://worldchess.com/news/gukesh-vs-sindarov-everything-you-need-to-know-about-the-2026-world-chess-championship));
 обоим по 20 лет. Chessigma — только в конце (правило 61), в начале — намёк. Все экраны — запись приложения на телефоне.
 
+### Что говорят комментарии (18.11.2026: 4360 комментариев под 30 роликами)
+Автор: «можешь использовать комментари под моими роликами чтобы уловить эту волну». Скачано `tools/tiktok.py`
+(до 1000 комментариев на ролик и ответы в больших ветках), разобрано по лайкам. Главное:
+- **Зрители продолжают наши метафоры своими словами — это самые залайканные комментарии.** Миттенс: «No human or alien
+  beat Mittens 😂» (40 тыс.); Готэм: «not a grandmaster cause he hunts them» (22,5 тыс.), «the hunter cant become a prey»
+  (13,4 тыс.); первый Witty: «from herding goats to playing them» (20 тыс.); Fischerman: «nah gang, I'm the worm😭»
+  (3,7 тыс.), «i'm the bait bro»; `rivalry`: «Above millions below one» (8,1 тыс.). Лестницу с крыльями повторили
+  15 раз. Вывод: метафора должна оставлять зрителю место, куда вставить себя (червяк, наживка, добыча).
+- **У канала уже своя вселенная персонажей.** Чаще всего зовут Магнуса (197), «alien»/Witty (177), Миттенс (151),
+  Stockfish (132), Хикару (110), Фишера (86). Зрители сами связывают ролики: «Bobby Fischerman fished up Stock Fish,
+  and gave it to his cat Mittens» (1,8 тыс.), «but Magnus lost to an alien» (2,6 тыс.), «2.13 sec guy». Камео Witty,
+  Миттенс и «рыбы» Stockfish в новых роликах — пасхалки, которые узнают.
+- **Witty — главный любимец, его Alien Gambit — мем.** «Alien gambit, MY GAMBIT!!!!!» (234), «MY GAMBIT MY LEGACY»
+  (136, 94…), «caro-kan?? bring witty bro» (536), «Witty is destroyer of Caro-Kann», «we shouldve played the alien
+  gambit» (75). Alien Gambit — это 6.Nxf7 против Каро-Канн (`episodes/witty2/SOURCES.md`).
+- **Спор, который зрители ведут сами: «50 бриллиантов за партию».** Под `brilliant` (мы сказали «27 brilliant moves in a
+  single game» у Witty) десяток комментариев: «witty 50 brilliant in one game» (42), «Its witty alien 50 brilliant one
+  game» (40), «ocean of brilliants» (44) — и ответы: «repetitive brilliant that doesn't count», «only… a single brilliant
+  move, due to its repetitive nature». Источника на 50 у Witty нет; у Chess.com есть статья «The Brilliant Moves Cheat
+  Code» — серия «бриллиантов» одной и той же ладьёй, «the only catch is that you don't get to win the game».
+- **Боль «нашёл, но не добил» — их собственными словами.** «Remember if you get a brilliant BUT doesn't play it out, it's a
+  bright blue colored blunder»; «I just sacrificed my rook but I missed the mate» (122); «at first I was witty
+  screaming brilliant then when I checked the review I was FUMING that I missed mate». «Brilliant cause I said so»,
+  «They gave my brilliant a blunder…» — ярлык «!!» кажется им случайным.
+- **Аудитория — новички.** 86 зрителей назвали рейтинг: медиана 400, половина — от 200 до 800. Любят писать про себя
+  числом: «I'm rated 2 ez win» (925), «102 😭» про IQ (1,6 тыс.), «I have 7 brilliant move in one week» (130).
+- **Футбольные сравнения:** «Hikaru is the mbappe of chess» (2,7 тыс.), «The neymar of chess» про Готэма (3,9 тыс.),
+  «gukesh is literally olise». **Гукеш знаком** по нашим роликам: «gukesh a chill guy» (1,2 тыс.), «Gukesh literally
+  studies magnus games all day» (1,1 тыс.). Синдарова в комментариях нет ни разу.
+- **Мем-слова почти не встречаются:** sigma — 0, aura — 3, 67 — 4, Gojo — 6. «Sigma» в финале — только как название
+  ярлыка Chessigma, не как мем ролика. Органика: «tried chessigma, it actually works very well».
+
+**Поправки к идеям по комментариям**
+- **Ролик 1.** Хук — их же спор: на экране их комментарии «witty 50 brilliant in one game» → «Is that even possible?
+  Yes. One trick: sacrifice the same rook again and again» (статья Chess.com) → «The only catch: you don't win» → история
+  527: Rf1+, Rf2+, Rf1+ — ключ крутят туда-обратно в замке, дверь так и не открылась. Бриллиант Witty не утверждаем —
+  только «you say». Вопрос в конце: «Witty's 50: real or fake?» + «What's your rating?». Камео Witty с криком
+  «BRILLIANT» — на ударе.
+- **Ролик 2.** Witty и Alien Gambit — внутри «сценария»: «Champions learn the script. Witty throws a knight at it» (6.Nxf7
+  против Каро-Канн — «bring witty»). Зрители скандируют «MY GAMBIT, MY LEGACY» — показать плашкой как их кричалку, не как
+  слова Witty, пока не найден источник. Вопрос: «Caro-Kann or Alien Gambit?» вместе с «Gukesh or Sindarov?».
+- **Ролик 3.** Их же шутка-оправдание («Magnus didn't blunder his knight, he just sacrificed it» — 1,6 тыс.) и реакция
+  «Kasparov:» (1,7 тыс. под Bongcloud) — лицо Каспарова на каждое нарушенное правило; модуль показывает цену —
+  «That wasn't a sacrifice. That was a donation.»
+- **Ролик 4.** Их канон: «Bobby Fischerman fished up Stock Fish, and gave it to his cat Mittens» — в «чёрном ящике» сидит
+  Stockfish: рыба, которую поймал наш Фишер, а рядом Миттенс. Гукеш — «studies Magnus games all day»: чемпион читает
+  чёрные ящики каждый день.
+
 ### 1. Brilliant moves — «He found the key» (делать сейчас)
 - **Хук.** Светлая комната, новичок, над ним «527». «This player is rated 527. And he just played a brilliant move.»
 - **История — настоящая партия из бенчмарка Chessigma** (блиц 2+1, 04.08.2025,

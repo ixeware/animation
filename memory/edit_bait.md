@@ -20,6 +20,12 @@
    listened.» Берём фразу, которую уже режут в эдиты (у Ханса — «The chess speaks for itself», 2022), и
    переворачиваем её одной строкой.
 
+6. **Канон из комментариев** (разбор 4360 комментариев, 18.11.2026): лучшие комментарии — продолжение нашей метафоры
+   своими словами («not a grandmaster cause he hunts them», «the hunter cant become a prey», «from herding goats to
+   playing them», «nah gang, I'm the worm») и кроссоверы наших персонажей («Bobby Fischerman fished up Stock Fish, and
+   gave it to his cat Mittens»). Метафору выбирать открытую — чтобы зритель мог вставить в неё себя; их кроссовер
+   рисовать в следующем ролике как пасхалку.
+
 Не байт: просто сильная фраза без образа («He has seen your position before» в `woodpecker` v2 автор байтом не счёл).
 Не байт: фраза про компанию или сайт. Автор (15.11.2026) про «Your opponent can't see you leave. Chess.com can.»:
 «эдит байт тут слабый, так как чесскому никто эдиты не делает, посмотри сейчас акутальные эдиты». Байт — про человека,
