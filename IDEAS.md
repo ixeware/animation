@@ -52,12 +52,14 @@
 - **Ролик 2.** Witty и Alien Gambit — внутри «сценария»: «Champions learn the script. Witty throws a knight at it» (6.Nxf7
   против Каро-Канн — «bring witty»). Зрители скандируют «MY GAMBIT, MY LEGACY» — показать плашкой как их кричалку, не как
   слова Witty, пока не найден источник. Вопрос: «Caro-Kann or Alien Gambit?» вместе с «Gukesh or Sindarov?».
-- **Ролик 3.** Их же шутка-оправдание («Magnus didn't blunder his knight, he just sacrificed it» — 1,6 тыс.) и реакция
-  «Kasparov:» (1,7 тыс. под Bongcloud) — лицо Каспарова на каждое нарушенное правило; модуль показывает цену —
-  «That wasn't a sacrifice. That was a donation.»
-- **Ролик 4.** Их канон: «Bobby Fischerman fished up Stock Fish, and gave it to his cat Mittens» — в «чёрном ящике» сидит
-  Stockfish: рыба, которую поймал наш Фишер, а рядом Миттенс. Гукеш — «studies Magnus games all day»: чемпион читает
-  чёрные ящики каждый день.
+- **Ролик 3.** Их же шутка-оправдание («Magnus didn't blunder his knight, he just sacrificed it» — 1,6 тыс.); модуль
+  показывает цену — «That wasn't a sacrifice. That was a donation.» (Было ещё «лицо Каспарова» — снято: автор такого
+  мема не знает. Комментарий «Kasparov:» под `bongcloud` — стикер про нашу же сцену, где Каспаров не оценил шутку,
+  а не мем.)
+- **Ролик 4.** «Чёрный ящик» автор не считал («какие еще черные ящики о чем речь») — заменён на VAR (ниже): зрители
+  сами сравнивают шахматистов с футболистами, а их комментарий «at first I was witty screaming brilliant then when I
+  checked the review I was FUMING that I missed mate» — ровно гол, который отменил VAR. Канон зрителей «Bobby
+  Fischerman fished up Stock Fish, and gave it to his cat Mittens» — запасная пасхалка (Stockfish в комнате VAR).
 
 ### 1. Brilliant moves — «He found the key» (делать сейчас)
 - **Хук.** Светлая комната, новичок, над ним «527». «This player is rated 527. And he just played a brilliant move.»
@@ -102,18 +104,20 @@
   «картине» зрителя (цифры — из записи приложения). Колбэк: рисунок с холодильника из ролика 1 висит в музее.
 - **Вопрос.** «Which rule do you break the most?»
 
-### 4. Разбор партии — «The black box» (в основном про Chessigma; к концу матча, до 13.12)
-- **Метафора (главная).** Бортовой самописец: «After every plane crash, investigators find the black box. After every
-  lost game, you have one too.» График оценки — высота полёта, зевок — падение. Пасхалка-факт: «Fun fact: black boxes
-  are orange» — открывается оранжевый ящик, внутри разбор.
-- **Эдит-байт.** Дин Лижэнь, 14-я партия 2024: «Ding flew 13 games without a crash. One move, and the crown fell.» —
-  запись «самописца» обрывается на одном ходе, Гукеш — чемпион в 18. Если в нынешнем матче будет решающий зевок —
-  брать его: актуальнее.
+### 4. Разбор партии — «VAR» (в основном про Chessigma; к концу матча, до 13.12)
+Было «The black box» (бортовой самописец) — автор не считал метафору с первого раза, заменено.
+- **Метафора (главная).** VAR в футболе: «You scream BRILLIANT. You celebrate. Then VAR checks the replay.» Игрок бежит
+  праздновать, судья рисует в воздухе экран, на табло «VAR CHECKING…», повтор хода по кадрам — «NO BRILLIANT. MISSED
+  MATE.» Разбор партии — это VAR для твоих партий: после игры пересматривает каждый ход и выносит решение.
+- **Почему это:** зрители сами сравнивают шахматистов с футболистами («Hikaru is the mbappe of chess» — 2,7 тыс., «The
+  neymar of chess»), а их комментарий про проверку разбора («I was FUMING that I missed mate») — ровно отменённый гол.
+- **Эдит-байт.** Решающий момент нынешнего матча, если будет (актуальнее всего), или Дин, 14-я партия 2024: «Thirteen
+  games, no goal conceded. Then one move — and VAR gave the crown away.» Гукеш — чемпион в 18.
 - **Продукт.** Каждый ход с оценкой, точность, лучший ход, Sigma, принципы, которые стоили дороже всего, твой дебют;
   бесплатно и без лимита. У Chess.com бесплатный аккаунт — один разбор в день
-  ([Chess.com](https://www.chess.com/article/view/chesscom-features)) — «a black box that opens once a day»;
-  формулировку сравнения согласовать с Элиотом.
-- **Вопрос.** «What was your worst crash? Drop your accuracy.»
+  ([Chess.com](https://www.chess.com/article/view/chesscom-features)) — «VAR that works once a day»; формулировку
+  сравнения согласовать с Элиотом.
+- **Вопрос.** «Has VAR ever cancelled your brilliant? Drop your accuracy.»
 
 **Факты для всех четырёх** (бенчмарк — [chessigma.com/benchmarks/brilliant](https://www.chessigma.com/benchmarks/brilliant),
 партии — `/data`): Chessigma находит 93 из 100 «бриллиантов» Chess.com, Chessiro 90, Wintrchess 45, Chessitup 41,
