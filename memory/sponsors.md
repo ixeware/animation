@@ -206,6 +206,12 @@
   `content`; маленькие (< ~20 КБ) приходят в ответ целиком — их не брать.
 
 ## Chessnut (Stella)
+- **20.11.2026 — ответ Стелле отправлен** (автор на вопрос, чьё имя в договоре: «ну брата»): понятно, спасибо; наши ролики
+  можно строить и вокруг настоящих съёмок доски; договор на этот ролик пришлём подписанным в ближайшие пару дней, или
+  подпишем их шаблон. Договор подготовлен: одна страница, Chessnut Technology Limited (так в их Terms of Service) и брат
+  как Creator (имя и адрес — как в счетах), ролик, $400 по PayPal, права (авторское право у нас, их репост с отметкой,
+  платная реклама — отдельно). Лежит в рабочей папке сессии (`scratchpad/contract/`), в хранилище не кладём. Подписать
+  должен сам брат; потом — отправить Стелле.
 - **20.11.2026, 02:43 UTC — ответ Стеллы:** «Thanks, but we'll pass for now. We're focusing on ads shot with the actual
   product, and I'll reach out if we need something in the future.» И: «do you have a contract on your side? The payment
   has already gone through, but I need to complete our internal paperwork, so if you have one, please sign it and send
