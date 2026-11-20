@@ -2276,8 +2276,8 @@ function hallSet(g, t, { board = null, ...o } = {}) {
 }
 // the clock's times (seconds) from the broadcast PGN: Martirosyan 6:23 – Magnus 1:37 before 39...Qd5, 0:46 after;
 // Magnus 19:46 – Artemiev 1:37 before 29...Qc2, 0:37 after
-const clockMC = (u) => ({ names: ['MARTIROSYAN', 'CARLSEN'], cols: ['#CFE0FF', '#FFE2B0'], l: 383, r: lerp(58, 46, clamp(u)), run: u >= 1 ? 1 : 2 });
-const clockCA = (u) => ({ names: ['CARLSEN', 'ARTEMIEV'], cols: ['#FFE2B0', '#CFE0FF'], l: 1186, r: lerp(49, 37, clamp(u)), run: u >= 1 ? 1 : 2 });
+const clockMC = (sec) => ({ names: ['MARTIROSYAN', 'CARLSEN'], cols: ['#CFE0FF', '#FFE2B0'], l: 383, r: sec, run: 2 });
+const clockCA = (sec) => ({ names: ['CARLSEN', 'ARTEMIEV'], cols: ['#FFE2B0', '#CFE0FF'], l: 1186, r: sec, run: 2 });
 
 // ---------- GTA lines in our own lettering (rule 62): WASTED over a grey frame; MISSION PASSED / RESPECT + ----------
 function gtaText(g, text, x, y, size, fill, { a = 1, scale = 1, sx = 1.0 } = {}) {
@@ -2299,6 +2299,18 @@ function missionPassed(g, t, t0) {
   const k = ease.back(clamp(u / 0.35));
   gtaText(g, 'MISSION PASSED!', W / 2, H * 0.2, 96, '#F2B33D', { a: clamp(u / 0.15), scale: lerp(0.6, 1, k) });
   if (u > 0.45) gtaText(g, 'RESPECT +', W / 2, H * 0.2 + 125, 74, '#FFFFFF', { a: clamp((u - 0.45) / 0.15), scale: lerp(1.3, 1, ease.out(clamp((u - 0.45) / 0.3))) });
+}
+
+// ---------- a face cam over the scene: the other player's face in game shots and on the review screens (rule 69) ----------
+const CAMBG = { magnusSuit: ['#B9A27E', '#4A3A28'], magnus: ['#B9A27E', '#4A3A28'], haik: ['#5A6E8A', '#1E2633'], art: ['#6A8A7A', '#1E2E26'], fab: ['#5A6E9A', '#1E2640'] };
+function faceCam(g, who, e, t, name, { x = 690, y = 330, w = 340, h = 420, a = 1, t0 = -9 } = {}) {
+  if (a <= 0) return;
+  const k = t0 > -9 ? ease.back(clamp((t - t0) / 0.25)) : 1; if (k <= 0) return;
+  g.save(); g.globalAlpha *= a; g.translate(x + w / 2, y + h / 2); g.scale(k, k); g.translate(-(x + w / 2), -(y + h / 2));
+  g.fillStyle = 'rgba(8,8,14,0.45)'; g.fillRect(x + 8, y + 10, w, h);
+  webcam(g, x, y, w, h, who, e, t, { bg: CAMBG[who] || ['#2A2440', '#120F1E'], name, nameColor: CREAM, zoom: 1.12, cy: 0.47 });
+  g.strokeStyle = '#F4EFE6'; g.lineWidth = 6; g.strokeRect(x, y, w, h);
+  g.restore();
 }
 
 // ---------- a comment as on TikTok: avatar, the text, a heart and its likes; `label` above it in small capitals ----------
@@ -2363,8 +2375,8 @@ function clubSet(g, t, { eM = 'smug', eF = 'sad', eH = 'worried', board = null }
     for (let k = 0; k <= 10; k++) { const u = k / 10, p = [lerp(x0, x1, u), FLOOR_Y + 3.2 - Math.sin(Math.PI * u) * 0.9, lerp(z0, z1, u)], q = B.project(...p); if (prev && q.z > 0.5) { g.lineWidth = Math.max(3, q.s * 0.14); g.beginPath(); g.moveTo(prev.x, prev.y); g.lineTo(q.x, q.y); g.stroke(); } prev = q.z > 0.5 ? q : null; } }
   g.restore();
   ab(g, [7.3, FLOOR_Y, 6.0], [7.5, FLOOR_Y + 5.6, 6.2], '#2A2A30'); texQuad(g, CLUB_T, [5.6, FLOOR_Y + 8.0, 5.96], [9.2, FLOOR_Y + 8.0, 5.96], [5.6, FLOOR_Y + 6.3, 5.96]);
-  actor(g, B, 'fab', { x: -0.6, y: 2.8, z: 3.2, k: 1.1, e: eF, t: t + 0.8, face: -1 });
-  actor(g, B, 'hikaruSuit', { x: 8.8, y: 2.8, z: 3.0, k: 1.1, e: eH, t: t + 1.6, face: -1 });
+  actor(g, B, 'fab', { x: 0.2, y: 2.3, z: 1.6, k: 1.1, e: eF, t: t + 0.8, face: -1 });
+  actor(g, B, 'hikaruSuit', { x: 7.8, y: 2.3, z: 1.4, k: 1.1, e: eH, t: t + 1.6, face: -1 });
   lowKey(g, { cy: H * 0.46, a: 0.04 });
   return hm;
 }
@@ -2430,12 +2442,11 @@ export async function build(T) {
   const alA = s('almost') - 0.06, almostT = w('almost', 4), lostT = w('almost', 5);
   const fvA = s('five') - 0.06, ptsT = w('five', 1), closeT = w('five', 4), caruT = w('five', 5);
   const loA = s('lowest') - 0.06, lowT = w('lowest', 2), bestT = w('lowest', 5);
-  const hwA = s('how') - 0.06, goatT = w('how', 4), hereT = w('how', 7);
   const buA = s('budapest') - 0.06, tenT = w('budapest', 1), zeroT = w('budapest', 4), winsT = w('budapest', 5);
   const ckA = s('clock') - 0.06, minT = w('clock', 6), walkT = w('clock', 10), mateT = w('clock', 13);
   const r1A = s('review1') - 0.06, cgT = w('review1', 1), belT = w('review1', 6);
   const waA = s('washed') - 0.06, washT = w('washed', 4);
-  const dyA = s('day') - 0.06, novT = w('day', 1), dayT = w('day', 3), dropT = w('day', 7);
+  const dyA = s('day') - 0.06, novT = w('day', 0), dayT = w('day', 2), dropT = w('day', 6);
   const muA = s('must') - 0.06, beatT = w('must', 3), drawT = w('must', 6), belowT = w('must', 9), firstT = w('must', 13);
   const arA = s('art') - 0.06, secT = w('art', 4), plaT = w('art', 6), qc2T = w('art', 8);
   const r2A = s('review2') - 0.06, heldT = w('review2', 6), na4T = w('review2', 7);
@@ -2443,7 +2454,7 @@ export async function build(T) {
   const paA = s('passed') - 0.06;
   const stA = s('still') - 0.06, st2T = w('still', 3), onlyT = w('still', 5), aboveT = w('still', 7);
   const g7A = s('gta7') - 0.06, rateT = w('gta7', 2), g7T = w('gta7', 9);
-  const adA = s('ad') - 0.06, teamT = w('ad', 4), youA = w('ad', 9) - 0.06, freeT = w('ad', 12), unlT = w('ad', 13), CLOSE = freeT - 0.05;
+  const adA = s('ad') - 0.06, teamT = w('ad', 4), youA = w('ad', 9) - 0.06, freeT = w('ad', 12), unlT = w('ad', 13), CLOSE = w('ad', 16) - 0.05, linkT = w('ad', 23);
   const ctaA = s('cta') - 0.06, ratT = w('cta', 3), magT = w('cta', 4);
 
   // ======================= HOOK (rules 1, 28, 57, 72): GTA 6 is out; Magnus, number one since before GTA 5 =======================
@@ -2459,7 +2470,7 @@ export async function build(T) {
     rig(B, lt, [[0, K(-0.12, 0.04, 7.2, [4, 3.6, 4.6])], [len(sh), K(0.06, 0.04, 5.6, [4, 3.7, 4.6])]], { t, e: glide });
     homeSet(g, t, { tv: TV6, e: EX.smug });
   }, { trans: 'whip', kb: 0, zoom: kicks([[sinceT, 0.07]]), hud: (g, lt, t) => {
-    badge(g, 'MAGNUS CARLSEN', W / 2, 240, { color: CREAM, size: 50, ...popW(t, h2A + 0.05) });
+    scrim(g, 0.9); nameTitle(g, lt, 'Magnus Carlsen', 'WORLD NO. 1', { y: 230, t0: 0.05 });
     if (t >= sinceT) counter(g, '2011', 'NUMBER ONE SINCE', { y: 1560, size: 150, color: GOLD, at: [sinceT, 0.3] });
   } });
   shot(beforeT - 0.05, (g, lt, t, sh) => {  // the TV goes back to 2013: GTA 5; he was already number one
@@ -2475,28 +2486,30 @@ export async function build(T) {
   const slip = t => clamp((t - lostT + 0.05) / 0.5);
   shot(alA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.1, 0.05, 8.5, [4, 3.4, 4.6])], [len(sh), K(-0.05, 0.05, 6.4, [4, 3.6, 4.6])]], { t, e: glide, bump: t > lostT && t < lostT + 0.3 ? 1 : 0 });
+    homeSet(g, t, { tv: TV6, e: t >= almostT ? { ...EXPR.worried, sweat: 1 } : EX.calm, crown: { rot: Math.sin(t * 9) * 0.06 * clamp((t - almostT) / 0.3) } });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[almostT, 0.06]]) });
+  shot(lostT - 0.05, (g, lt, t, sh) => {  // close: the crown slides off his curls
+    rig(B, lt, [[0, K(0.18, 0.06, 5.2, [4.2, 4.2, 4.6])], [len(sh), K(0.28, 0.04, 4.6, [4.4, 4.0, 4.6])]], { t, e: glide, bump: t > lostT && t < lostT + 0.3 ? 1 : 0 });
     const u = slip(t);
-    homeSet(g, t, { tv: TV6, e: t >= lostT ? { ...EXPR.shock, sweat: 1 } : t >= almostT ? { ...EXPR.worried, sweat: 1 } : EX.calm,
-      crown: { rot: lerp(0, 0.9, ease.inOut(u)), dy: 260 * ease.in(u), dx: 120 * u, a: 1 - clamp((u - 0.85) / 0.15) * 0.4 } });
-  }, { trans: 'whip', kb: 0, zoom: kicks([[almostT, 0.06], [lostT, 0.1]]), hud: (g, lt, t) => { if (t >= lostT) stamp(g, 'ALMOST', W / 2, 330, t, lostT, { color: RED, size: 110, rot: -0.1 }); } });
+    homeSet(g, t, { tv: TV6, e: { ...EXPR.shock, sweat: 1, look: [0.6, -0.6] }, crown: { rot: lerp(0, 0.9, ease.inOut(u)), dy: 260 * ease.in(u), dx: 120 * u } });
+  }, { kb: 0, zoom: kicks([[lostT, 0.1]]), hud: (g, lt, t) => { if (t >= lostT) stamp(g, 'ALMOST', W / 2, 330, t, lostT, { color: RED, size: 110, rot: -0.1 }); } });
   cue(alA - 0.04, 'whoosh_fast', 0.3); cue(almostT, 'heartbeat', 0.45); cue(lostT, 'glass', 0.35); cue(lostT + 0.05, 'boom_big', 0.45);
 
   // ======================= Five points: Caruana's block rises to Magnus =======================
   const fUp = t => lerp(-2.2, 0.0, ease.inOut(clamp((t - fvA) / (caruT + 0.3 - fvA))));
-  const gapV = t => lerp(40, 5.4, ease.out(clamp((t - fvA) / (caruT + 0.3 - fvA))));
-  const RB = (t) => ratingTex([['#1', 'CARLSEN', '2804.0', '#FFD27A'], ['#2', 'CARUANA', t >= caruT ? '2798.6' : '2783.0', '#9CFFB4']], { gap: t >= caruT ? 'GAP: 5.4' : 'GAP: 21.0' });
+  const RB = () => ratingTex([['#1', 'CARLSEN', '2804.0', '#FFD27A'], ['#2', 'CARUANA', '2798.6', '#9CFFB4']], { head: 'LIVE RATINGS · 14 NOV', gap: 'GAP: 5.4' });
   shot(fvA, (g, lt, t, sh) => {  // wide: the two blocks, the board
     rig(B, lt, [[0, K(0.25, 0.04, 23, [4, 0.6, 6])], [len(sh), K(0.05, 0.04, 19, [4, 0.9, 6])]], { t, e: glide });
-    raceSet(g, t, { fTop: fUp(t), board: RB(t), eM: { ...EXPR.worried, look: [1, 0] }, eF: t >= closeT ? EXPR.triumph : EX.calm });
+    raceSet(g, t, { fTop: fUp(t), board: RB(), eM: { ...EXPR.worried, look: [1, 0] }, eF: t >= closeT ? EXPR.triumph : EX.calm });
   }, { trans: 'whip', kb: 0, zoom: kicks([[ptsT, 0.07]]), hud: (g, lt, t) => {
-    counter(g, gapV(t).toFixed(1), 'POINTS BETWEEN THEM', { y: 1560, size: 170, color: t >= caruT ? RED : CREAM });
+    if (t >= ptsT) counter(g, '5.4', 'POINTS BETWEEN THEM', { y: 1560, size: 170, color: RED, at: [ptsT, 0.25] });
   } });
   shot(caruT - 0.05, (g, lt, t, sh) => {  // the two heads, almost level
-    rig(B, lt, [[0, K(0.0, 0.03, 10.5, [4, 3.4, 4.8])], [len(sh), K(0.0, 0.03, 9.0, [4, 3.4, 4.8])]], { t, e: glide });
-    raceSet(g, t, { fTop: 0.0, board: RB(t), eM: { ...EXPR.worried, sweat: 1, look: [1, 0] }, eF: { ...EXPR.triumph, look: [-1, 0] } });
+    rig(B, lt, [[0, K(0.0, 0.03, 13.5, [4, 3.4, 4.8])], [len(sh), K(0.0, 0.03, 12.0, [4, 3.4, 4.8])]], { t, e: glide });
+    raceSet(g, t, { fTop: 0.0, board: RB(), eM: { ...EXPR.worried, sweat: 1, look: [1, 0] }, eF: { ...EXPR.triumph, look: [-1, 0] } });
   }, { kb: 0, zoom: kicks([[caruT, 0.08]]), hud: (g, lt, t) => {
-    badge(g, 'FABIANO CARUANA', W / 2 + 230, 1640, { color: '#9CFFB4', size: 40, ...popW(t, caruT) });
-    badge(g, 'CLOSEST SINCE 2018', W / 2, 260, { color: GOLD, size: 52, ...popW(t, caruT + 0.3) });
+    scrim(g, 0.9); nameTitle(g, lt, 'Fabiano Caruana', 'WORLD NO. 2', { y: 230, t0: 0.08 });
+    badge(g, 'CLOSEST SINCE 2018', W / 2, 1560, { color: GOLD, size: 52, ...popW(t, caruT + 0.3) });
   } });
   cue(fvA - 0.04, 'whoosh_deep', 0.35); cue(fvA + 0.1, 'riser', 0.3); for (let k = 0; k < 8; k++) cue(fvA + 0.2 + k * (caruT - fvA) / 8, 'clock_tick', 0.25);
   cue(ptsT, 'hit', 0.3); cue(caruT, 'boom_move', 0.45); cue(caruT + 0.3, 'reveal_bell', 0.3);
@@ -2504,34 +2517,30 @@ export async function build(T) {
   // ======================= EDIT-BAIT: "When your lowest... is their best." (the top comment, 20K likes) =======================
   shot(loA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(-0.18, 0.05, 12.5, [4, 3.0, 5])], [len(sh), K(0.1, 0.05, 10.0, [4, 3.2, 5])]], { t, e: glide });
-    raceSet(g, t, { fTop: 0.0, board: RB(caruT + 1), eM: { ...EXPR.sad, look: [0, 0.5] }, eF: t >= bestT ? { ...EXPR.happy, lid: 0.1 } : EX.calm, gray: t < bestT ? 0.85 : 0.85 * (1 - clamp((t - bestT) / 0.3)) });
-  }, { trans: 'flash', kb: 0, vig: 0.8, zoom: kicks([[lowT, 0.06], [bestT, 0.09]]), hud: (g, lt, t) => {
-    commentCard(g, 'When your lowest is their best.', '20K', W / 2, 1600, { label: 'TOP COMMENT', size: 46, w: 940, ...popW(t, loA + 0.1) });
+    raceSet(g, t, { fTop: 0.0, board: RB(), eM: { ...EXPR.sad, look: [0, 0.5] }, eF: t >= bestT ? { ...EXPR.happy, lid: 0.1 } : EX.calm, gray: t < bestT ? 0.85 : 0.85 * (1 - clamp((t - bestT) / 0.3)) });
+  }, { trans: 'cut', kb: 0, vig: 0.8, zoom: kicks([[lowT, 0.06]]), hud: (g, lt, t) => {
+    commentCard(g, 'When your lowest is their best.', '20K', W / 2, 1600, { label: 'TOP COMMENT', size: 44, w: 860, ...popW(t, loA + 0.1) });
     if (t >= lowT) badge(g, 'HIS LOWEST', 300, 1380, { color: CREAM, size: 44, ...popW(t, lowT) });
-    if (t >= bestT) badge(g, 'THEIR BEST', 790, 1380, { color: '#9CFFB4', size: 44, ...popW(t, bestT) });
+  } });
+  shot(bestT - 0.05, (g, lt, t, sh) => {  // "...their best": on Caruana, the colour back
+    rig(B, lt, [[0, K(0.22, 0.04, 8.5, [6.2, 3.3, 4.8])], [len(sh), K(0.3, 0.04, 7.4, [6.4, 3.3, 4.8])]], { t, e: glide });
+    raceSet(g, t, { fTop: 0.0, board: RB(), eM: { ...EXPR.sad, look: [0, 0.5] }, eF: { ...EXPR.happy, lid: 0.1 }, gray: 0.85 * (1 - clamp((t - bestT) / 0.3)) });
+  }, { kb: 0, vig: 0.6, zoom: kicks([[bestT, 0.09]]), hud: (g, lt, t) => {
+    commentCard(g, 'When your lowest is their best.', '20K', W / 2, 1600, { label: 'TOP COMMENT', size: 44, w: 860 });
+    badge(g, 'THEIR BEST', W / 2, 1380, { color: '#9CFFB4', size: 48, ...popW(t, bestT) });
   } });
   cue(loA, 'notify', 0.4); cue(lowT, 'heartbeat', 0.45); cue(bestT, 'boom_big', 0.55);
-
-  // ======================= "So how did the GOAT end up here?": a goat with a crown on the second step =======================
-  shot(hwA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.3, 0.1, 12, [6.8, 0.2, 4.8])], [len(sh), K(0.12, 0.08, 8.5, [6.8, 0.0, 4.8])]], { t, e: glide });
-    raceSet(g, t, { fTop: -1.0, board: RB(caruT + 1), fab: false, mag: false, goat: true, eM: EX.calm });
-  }, { trans: 'whip', kb: 0, zoom: kicks([[goatT, 0.08]]), hud: (g, lt, t) => {
-    if (t >= goatT) badge(g, 'THE GOAT', W / 2, 260, { color: GOLD, size: 64, ...popW(t, goatT) });
-    if (t >= hereT) stamp(g, '#2 ?!', W / 2, 1560, t, hereT, { color: RED, size: 110, rot: -0.1 });
-  } });
-  cue(hwA - 0.04, 'whoosh_fast', 0.3); cue(goatT, 'goat', 0.5); cue(hereT, 'stamp', 0.45);
 
   // ======================= Budapest: ten classical games, zero wins =======================
   const P0 = piecesAt(MC, 0), PM = piecesAt(MC, 77);
   shot(buA, (g, lt, t, sh) => {  // into the hall: the Parliament across the Danube
     rig(B, lt, [[0, K(0.32, 0.1, 22, [4, 4.6, 7])], [len(sh), K(0.12, 0.07, 17, [4, 4.8, 8])]], { t, e: glide });
     hallSet(g, t, { pieces: P0, white: 'magnusSuit', black: 'haik', wPlayer: false, wChair: false, bPlayer: false, bChair: true });
-  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { placeStamp(g, lt, 'BUDAPEST', 'NOV 2026', { y: 230, t0: 0.1 }); } });
+  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'BUDAPEST · NOV 2026', W / 2, 240, { color: '#9FD3FF', size: 54, ...popW(t, buA + 0.1) }); } });
   const nTiles = t => Math.min(10, Math.floor(10.99 * clamp((t - tenT) / (zeroT - tenT))));
   shot(tenT - 0.05, (g, lt, t, sh) => {  // the board on the wall fills, ½ by ½; Magnus at the table under it
     rig(B, lt, [[0, K(-0.5, 0.1, 16, [6.6, 4.4, 8.6])], [len(sh), K(-0.4, 0.08, 13.5, [7.2, 4.8, 9])]], { t, e: glide });
-    hallSet(g, t, { board: tilesTex(nTiles(t), t >= winsT), pieces: PM, white: 'haik', black: 'magnusSuit', eb: t >= zeroT ? { ...EXPR.sad, look: [-0.5, 0.4] } : EX.calm, ew: EX.calm });
+    hallSet(g, t, { wPlayer: false, board: tilesTex(nTiles(t), t >= winsT), pieces: PM, white: 'haik', black: 'magnusSuit', eb: t >= zeroT ? { ...EXPR.sad, look: [-0.5, 0.4] } : EX.calm, ew: EX.calm });
   }, { trans: 'whip', kb: 0, zoom: kicks([[zeroT, 0.08]]), hud: (g, lt, t) => {
     counter(g, String(nTiles(t)), 'CLASSICAL GAMES', { y: 300, size: 150, color: CREAM });
     if (t >= winsT) stamp(g, '0 WINS', W / 2, 1600, t, winsT, { color: RED, size: 120, rot: -0.1 });
@@ -2541,21 +2550,22 @@ export async function build(T) {
 
   // ======================= Martirosyan – Carlsen: under a minute, 39...Qd5, mate. WASTED =======================
   const qd5 = walkT + 0.15, rh8 = mateT - 0.05;
-  const cU = t => clamp((t - ckA) / (qd5 - ckA));
+  const magC = t => Math.ceil(lerp(58.9, 46, clamp((t - ckA) / (qd5 - ckA))));  // his clock ran from 1:37 down past these to 0:16 (+30 s: 0:46 after the move)
   shot(ckA, (g, lt, t, sh) => {  // Magnus facing us, the clock beside the board: his side red
     rig(B, lt, [[0, K(0.85, 0.2, 13, [7, 1.8, 6.8])], [len(sh), K(0.75, 0.16, 10.5, [7, 1.9, 7])]], { t, e: glide });
-    hallSet(g, t, { pieces: PM, white: 'haik', black: 'magnusSuit', eb: { ...EXPR.worried, sweat: t >= minT ? 1 : 0, look: [0.8, 0.3] }, ew: EX.calm, clock: clockMC(cU(t) * 0.8) });
+    hallSet(g, t, { pieces: PM, white: 'haik', black: 'magnusSuit', eb: { ...EXPR.worried, sweat: t >= minT ? 1 : 0, look: [0.8, 0.3] }, ew: EX.calm, clock: clockMC(magC(t)) });
   }, { trans: 'whip', kb: 0, zoom: kicks([[minT, 0.08]]), hud: (g, lt, t) => {
     badge(g, 'MARTIROSYAN vs CARLSEN', W / 2, 230, { color: CREAM, size: 44, ...popW(t, ckA + 0.05) });
-    if (t >= minT) counter(g, '0:' + String(Math.round(lerp(58, 50, clamp((t - minT) / 1.2)))).padStart(2, '0'), 'ON HIS CLOCK', { y: 1560, size: 150, color: RED, at: [minT, 0.25] });
+    if (t >= minT) counter(g, '0:' + String(magC(t)).padStart(2, '0'), 'ON HIS CLOCK', { y: 1560, size: 150, color: RED, at: [minT, 0.25] });
   } });
   shot(walkT - 0.08, (g, lt, t, sh) => {  // over the board: queen d5, rook h8 check
     rig(B, lt, [[0, K(0.15, 0.85, 12.5, [4, 0, 4])], [len(sh), K(0.0, 0.95, 10.5, [4, 0, 4])]], { t, e: glide, bump: t > rh8 + 0.3 && t < rh8 + 0.6 ? 1.2 : 0 });
     const r = runTo(MC, 77, [qd5, rh8 + 0.3], t), fx = moveFx(r);
-    hallSet(g, t, { wPlayer: false, pieces: r.pieces, white: 'haik', black: 'magnusSuit', eb: t >= rh8 ? { ...EXPR.shock, sweat: 1 } : EX.calm, ew: EX.calm, under: fx.under, over: g2 => { fx.over(g2); impact(g2, 'h8', t, rh8 + 0.3); }, clock: clockMC(1) });
+    hallSet(g, t, { wPlayer: false, pieces: r.pieces, white: 'haik', black: 'magnusSuit', eb: t >= rh8 ? { ...EXPR.shock, sweat: 1 } : EX.calm, ew: EX.calm, under: fx.under, over: g2 => { fx.over(g2); impact(g2, 'h8', t, rh8 + 0.3); if (t >= rh8 + 0.35) { const u = clamp((t - rh8 - 0.35) / 0.25); pieceRing(g2, B, 'h7', RED, 1, u); for (const sq of ['g6', 'g8', 'h6']) squareFrame(g2, B, sq, RED, u * 0.8); } }, clock: clockMC(46) });
     wasted(g, t, mateT + 0.2);
   }, { kb: 0, zoom: kicks([[qd5, 0.06], [rh8 + 0.3, 0.1]]), hud: (g, lt, t) => {
     if (t >= qd5 && t < mateT + 0.2) moveTag(g, '...Qd5??', W / 2, 1560, RED, 70);
+    if (t < mateT + 0.2) faceCam(g, 'haik', t >= rh8 + 0.3 ? EXPR.triumph : EX.calm, t, 'MARTIROSYAN', { t0: walkT });
   } });
   cue(ckA - 0.04, 'whoosh_fast', 0.3); for (let k = 0; k < 6; k++) cue(minT + k * 0.5, 'clock_tick', 0.3); cue(qd5, 'move', 0.6);
   cue(rh8 + 0.3, 'move_capture', 0.5); cue(rh8 + 0.32, 'boom_big', 0.5); cue(mateT + 0.2, 'boom_cine', 0.6); cue(mateT + 0.4, 'dun_dun', 0.35);
@@ -2564,9 +2574,10 @@ export async function build(T) {
   shot(r1A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.62, 0.05, 13, [13.0, 6.3, 11.0])], [len(sh), K(0.52, 0.03, 8.0, [13.4, 6.4, 11.3])]], { t, e: glide });
     hallSet(g, t, { board: cgImg('mart_078'), pieces: piecesAt(MC, 78), white: 'haik', black: 'magnusSuit', eb: { ...EXPR.sad, look: [0.6, -0.3] }, ew: EX.smug });
-  }, { trans: 'whip', kb: 0, zoom: kicks([[belT, 0.07]]), hud: (g, lt, t) => {
+  }, { trans: 'whip', kb: 0, noGuard: true, zoom: kicks([[belT, 0.07]]), hud: (g, lt, t) => {
     badge(g, 'CHESSIGMA · FREE GAME REVIEW', W / 2, 230, { color: '#F2B33D', size: 40, ...popW(t, cgT) });
-    if (t >= belT) badge(g, '39...Qd5', W / 2, 1620, { color: RED, size: 64, ...popW(t, belT) });
+    faceCam(g, 'magnusSuit', t >= belT ? { ...EXPR.shock, sweat: 1 } : { ...EXPR.sad, look: [0, 0.4] }, t, 'CARLSEN', { x: 40, y: 1380, w: 300, h: 360, t0: r1A + 0.15 });
+    if (t >= belT) badge(g, '39...Qd5', 700, 1560, { color: RED, size: 64, ...popW(t, belT) });
   } });
   cue(r1A - 0.04, 'whoosh_soft', 0.3); cue(cgT, 'swipe_card', 0.35); cue(belT, 'error', 0.35);
 
@@ -2575,71 +2586,77 @@ export async function build(T) {
     rig(B, lt, [[0, K(0.2, 0.08, 13, [4, -0.4, 6])], [len(sh), K(0.0, 0.05, 9.5, [4, -0.6, 6])]], { t, e: glide });
     washSet(g, t, { spin: t >= washT - 0.1 ? (t - washT + 0.1) * 9 : 0, e: t >= washT ? { ...EXPR.shock, sweat: 1 } : EXPR.worried });
   }, { trans: 'whip', kb: 0, zoom: kicks([[washT, 0.1]]), hud: (g, lt, t) => {
-    const C = [['he’s washed 😭', 300, waA + 0.1], ['it’s over for unc', 520, waA + 0.45], ['magnus lock in', 1560, washT - 0.1], ['washed fr', 1740, washT + 0.2]];
-    C.forEach(([txt, y, t0], i) => { if (t >= t0) commentCard(g, txt, null, W / 2 + (i % 2 ? 90 : -90), y, { size: 42, w: 640, ...popW(t, t0) }); });
+    // real comments (SOURCES.md): under Magnus's "The Internet is a really mean place" (30 Oct) and under @chess (14 Nov)
+    const C = [['“washed” and he is a world champion 😭', 300, waA + 0.1, '4.5K'], ['magnus lock in please 😭', 500, waA + 0.5, '5K'], ['Yo Magnus don’t bottle that number 1 spot', 1620, washT - 0.1, null]];
+    C.forEach(([txt, y, t0, lk], i) => { if (t >= t0) commentCard(g, txt, lk, W / 2 + (i % 2 ? 40 : -40), y, { size: 32, w: 880, ...popW(t, t0) }); });
   } });
   cue(waA - 0.04, 'whoosh_fast', 0.3); cue(waA + 0.1, 'notify', 0.3); cue(waA + 0.45, 'notify', 0.3); cue(washT - 0.1, 'notify', 0.3); cue(washT, 'whoosh_deep', 0.45);
 
   // ======================= November 19th: the day GTA 6 dropped =======================
   shot(dyA, (g, lt, t, sh) => {  // the calendar: October torn away, the 19th ringed
-    rig(B, lt, [[0, K(0.32, 0.04, 9.5, [-7.4, 6.9, 12])], [len(sh), K(0.2, 0.03, 7.8, [-7.4, 6.9, 12])]], { t, e: glide });
-    homeSet(g, t, { tv: TV6, e: EX.calm, cal: clamp((t - novT + 0.1) / 0.5) });
-  }, { trans: 'whip', kb: 0, zoom: kicks([[novT + 0.4, 0.07]]), hud: (g, lt, t) => { if (t >= novT + 0.3) stamp(g, 'NOV 19', W / 2, 1600, t, novT + 0.3, { color: RED, size: 110, rot: -0.1 }); } });
+    rig(B, lt, [[0, K(0.34, 0.04, 10.5, [-6.4, 5.6, 12])], [len(sh), K(0.22, 0.03, 8.8, [-6.6, 5.8, 12])]], { t, e: glide });
+    homeSet(g, t, { who: null, tv: TV6, cal: clamp((t - novT + 0.1) / 0.5) });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[novT + 0.4, 0.07]]), hud: (g, lt, t) => { if (t >= novT + 0.3) stamp(g, 'NOV 19', 700, 1600, t, novT + 0.3, { color: RED, size: 110, rot: -0.1 }); faceCam(g, 'magnusSuit', t >= novT + 0.3 ? { ...EXPR.focus, sweat: 1 } : EX.calm, t, 'CARLSEN', { x: 40, y: 1380, w: 300, h: 360, t0: dyA + 0.1 }); } });
   shot(dayT - 0.05, (g, lt, t, sh) => {  // the TV: OUT NOW, confetti
     rig(B, lt, [[0, K(-0.06, 0.02, 8.6, [4, 6.2, 9.6])], [len(sh), K(0.06, 0.02, 7.2, [4, 6.2, 9.8])]], { t, e: glide });
     homeSet(g, t, { who: null, tv: TV6, cal: 1 });
     confetti(g, t, dropT, { n: 90, seed: 9 });
-  }, { trans: 'whip', kb: 0, zoom: kicks([[dropT, 0.08]]), hud: (g, lt, t) => { badge(g, 'GTA 6 RELEASE DAY', W / 2, 250, { color: '#FF8FB0', size: 54, ...popW(t, dayT) }); } });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[dropT, 0.08]]), hud: (g, lt, t) => { badge(g, 'GTA 6 RELEASE DAY', W / 2, 250, { color: '#FF8FB0', size: 54, ...popW(t, dayT) }); faceCam(g, 'magnusSuit', t >= dropT ? { ...EXPR.focus, sweat: 1 } : { ...EXPR.happy, lid: 0.1 }, t, 'CARLSEN', { x: 40, y: 1380, w: 300, h: 360 }); } });
   cue(dyA - 0.04, 'whoosh_fast', 0.3); cue(novT, 'page_flip', 0.45); cue(novT + 0.3, 'stamp', 0.45); cue(dayT - 0.09, 'whoosh_fast', 0.25); cue(dropT, 'confetti', 0.4); cue(dropT + 0.05, 'boom_move', 0.35);
 
   // ======================= Carlsen – Artemiev: must win; a draw = below 2800 =======================
   const PA = piecesAt(CA, 57);
   shot(muA, (g, lt, t, sh) => {  // Magnus facing us, Artemiev's back
     rig(B, lt, [[0, K(Math.PI - 0.82, 0.2, 13, [3.4, 2.2, 0.8])], [len(sh), K(Math.PI - 0.7, 0.16, 10.5, [3.6, 2.4, 0.4])]], { t, e: glide });
-    hallSet(g, t, { pieces: PA, white: 'magnusSuit', black: 'art', ew: { ...EXPR.focus, sweat: t >= beatT ? 1 : 0 }, eb: EX.calm, clock: clockCA(0) });
+    hallSet(g, t, { pieces: PA, white: 'magnusSuit', black: 'art', ew: { ...EXPR.focus, sweat: t >= beatT ? 1 : 0 }, eb: EX.calm, clock: clockCA(49) });
   }, { trans: 'whip', kb: 0, zoom: kicks([[beatT, 0.08]]), hud: (g, lt, t) => {
     badge(g, 'CARLSEN vs ARTEMIEV', W / 2, 230, { color: CREAM, size: 44, ...popW(t, muA + 0.05) });
     if (t >= beatT) stamp(g, 'MUST WIN', W / 2, 1600, t, beatT, { color: RED, size: 110, rot: -0.08 });
   } });
-  const rDraw = t => lerp(2804.0, 2799, ease.out(clamp((t - drawT) / (belowT + 0.3 - drawT))));
+  const rDraw = t => lerp(2801.2, 2799.0, ease.out(clamp((t - drawT) / (belowT + 0.3 - drawT))));  // live before the game; a draw: -2.2
   shot(drawT - 0.05, (g, lt, t, sh) => {  // the board on the wall: if he draws
     rig(B, lt, [[0, K(0.62, 0.05, 12.5, [13.0, 6.4, 11.0])], [len(sh), K(0.52, 0.04, 9.5, [13.4, 6.4, 11.3])]], { t, e: glide });
-    hallSet(g, t, { board: ratingTex([['IF', 'DRAW', rDraw(t).toFixed(1), rDraw(t) < 2800 ? '#FF5A4F' : '#FFD27A']], { head: 'CARLSEN · LIVE', gap: t >= belowT ? 'BELOW 2800' : 'LINE: 2800' }), pieces: PA, white: 'magnusSuit', black: 'art', ew: EX.calm, eb: EX.calm, clock: clockCA(0) });
+    hallSet(g, t, { board: ratingTex([['', 'LIVE NOW', '2801.2', '#FFD27A'], ['', 'IF A DRAW', rDraw(t).toFixed(1), rDraw(t) < 2800 ? '#FF5A4F' : '#FFD27A']], { head: 'CARLSEN', gap: t >= belowT ? 'BELOW 2800' : 'LINE: 2800' }), pieces: PA, white: 'magnusSuit', black: 'art', ew: EX.calm, eb: EX.calm, clock: clockCA(49) });
   }, { trans: 'whip', kb: 0, zoom: kicks([[belowT, 0.08]]), hud: (g, lt, t) => {
     counter(g, rDraw(t).toFixed(1), 'IF IT’S A DRAW', { y: 330, size: 150, color: rDraw(t) < 2800 ? RED : CREAM });
+    faceCam(g, 'magnusSuit', t >= belowT ? { ...EXPR.worried, sweat: 1 } : EX.calm, t, 'CARLSEN', { x: 40, y: 1380, w: 300, h: 360, t0: drawT });
   } });
   shot(firstT - 0.05, (g, lt, t, sh) => {  // close on him: first time in 17 years
     rig(B, lt, [[0, K(Math.PI + 0.12, 0.06, 7.0, [4, 3.1, -1.4])], [len(sh), K(Math.PI - 0.04, 0.05, 5.6, [4, 3.1, -1.4])]], { t, e: glide });
-    hallSet(g, t, { pieces: PA, white: 'magnusSuit', black: 'art', ew: { ...EXPR.focus, sweat: 1 }, eb: EX.calm, clock: clockCA(0) });
-  }, { kb: 0, hud: (g, lt, t) => { badge(g, 'FIRST TIME IN 17 YEARS', W / 2, 1640, { color: RED, size: 52, ...popW(t, firstT) }); } });
+    hallSet(g, t, { pieces: PA, white: 'magnusSuit', black: 'art', ew: t >= w('must', 16) ? { ...EXPR.worried, sweat: 1, look: [0, 0.4] } : { ...EXPR.focus, sweat: 1 }, eb: EX.calm, clock: clockCA(49) });
+  }, { kb: 0, zoom: kicks([[w('must', 16), 0.08]]), hud: (g, lt, t) => { badge(g, 'FIRST TIME IN 17 YEARS', W / 2, 1640, { color: RED, size: 52, ...popW(t, firstT) }); } });
   cue(muA - 0.04, 'whoosh_deep', 0.35); cue(beatT, 'stamp', 0.5); cue(drawT - 0.09, 'whoosh_fast', 0.3); for (let k = 0; k < 5; k++) cue(drawT + 0.1 + k * 0.25, 'clack', 0.2); cue(belowT + 0.3, 'error', 0.4); cue(firstT, 'heartbeat', 0.45);
 
   // ======================= The mirror: Artemiev with 37 seconds; 29...Qc2 =======================
   const qc2 = qc2T + 0.1;
+  const artC = t => Math.ceil(lerp(45.9, 37, clamp((t - arA) / (secT + 0.25 - arA))));  // his clock as he thought (from 1:37 down past these); 0:37 after 29...Qc2 with the increment
   shot(arA, (g, lt, t, sh) => {  // Artemiev facing us now, his side of the clock red
     rig(B, lt, [[0, K(0.85, 0.2, 13, [7, 1.8, 6.8])], [len(sh), K(0.75, 0.16, 10.5, [7, 1.9, 7])]], { t, e: glide });
-    hallSet(g, t, { pieces: PA, white: 'magnusSuit', black: 'art', eb: { ...EXPR.worried, sweat: t >= secT ? 1 : 0, look: [0.8, 0.3] }, ew: EX.calm, clock: clockCA(clamp((t - arA) / (qc2 - arA)) * 0.9) });
+    hallSet(g, t, { pieces: PA, white: 'magnusSuit', black: 'art', eb: { ...EXPR.worried, sweat: t >= secT ? 1 : 0, look: [0.8, 0.3] }, ew: EX.calm, clock: clockCA(artC(t)) });
   }, { trans: 'whip', kb: 0, zoom: kicks([[secT, 0.08]]), hud: (g, lt, t) => {
-    badge(g, 'THIS TIME', W / 2, 230, { color: GOLD, size: 50, ...popW(t, arA + 0.05) });
-    if (t >= secT) counter(g, '0:' + String(Math.round(lerp(45, 38, clamp((t - secT) / 1.2)))).padStart(2, '0'), 'ON ARTEMIEV’S CLOCK', { y: 1560, size: 150, color: RED, at: [secT, 0.25] });
+    scrim(g, 0.9); nameTitle(g, lt, 'Vladislav Artemiev', 'THIS TIME, HIS CLOCK', { y: 230, t0: 0.05 });
+    if (t >= secT) counter(g, '0:' + String(artC(t)).padStart(2, '0'), 'ON ARTEMIEV’S CLOCK', { y: 1560, size: 150, color: RED, at: [secT, 0.25] });
   } });
   shot(plaT - 0.05, (g, lt, t, sh) => {  // over the board: queen c2
     rig(B, lt, [[0, K(0.15, 0.85, 12, [4, 0, 4])], [len(sh), K(0.02, 0.95, 10, [4, 0, 3.6])]], { t, e: glide });
     const r = runTo(CA, 57, [qc2], t), fx = moveFx(r);
-    hallSet(g, t, { wPlayer: false, pieces: r.pieces, white: 'magnusSuit', black: 'art', ew: EX.calm, eb: { ...EXPR.worried, sweat: 1 }, under: fx.under, over: fx.over, clock: clockCA(t >= qc2 ? 1 : 0.9) });
-  }, { kb: 0, zoom: kicks([[qc2, 0.07]]), hud: (g, lt, t) => { if (t >= qc2) moveTag(g, '...Qc2?', W / 2, 1560, RED, 70); } });
+    hallSet(g, t, { wPlayer: false, pieces: r.pieces, white: 'magnusSuit', black: 'art', ew: EX.calm, eb: { ...EXPR.worried, sweat: 1 }, under: fx.under, over: fx.over, clock: clockCA(37) });
+  }, { kb: 0, zoom: kicks([[qc2, 0.07]]), hud: (g, lt, t) => { if (t >= qc2) moveTag(g, '...Qc2?', W / 2, 1560, RED, 70); faceCam(g, 'magnusSuit', t >= qc2 + 0.2 ? EX.smug : EX.calm, t, 'CARLSEN', { t0: plaT }); } });
   cue(arA - 0.04, 'whoosh_fast', 0.3); for (let k = 0; k < 5; k++) cue(secT + k * 0.5, 'clock_tick', 0.3); cue(qc2, 'move', 0.6); cue(qc2 + 0.05, 'dun_dun', 0.3);
 
   // ======================= Chessigma's review shows the move that held: knight a4 =======================
   shot(r2A, (g, lt, t, sh) => {  // the screen on the wall
     rig(B, lt, [[0, K(0.62, 0.05, 12, [13.0, 6.3, 11.0])], [len(sh), K(0.52, 0.03, 8.0, [13.4, 6.4, 11.3])]], { t, e: glide });
     hallSet(g, t, { board: cgImg('art_057'), pieces: piecesAt(CA, 58), white: 'magnusSuit', black: 'art', ew: EX.calm, eb: EX.sad });
-  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { badge(g, 'CHESSIGMA · GAME REVIEW', W / 2, 230, { color: '#F2B33D', size: 44, ...popW(t, r2A + 0.05) }); } });
+  }, { trans: 'whip', kb: 0, noGuard: true, hud: (g, lt, t) => {
+    badge(g, 'CHESSIGMA · GAME REVIEW', W / 2, 230, { color: '#F2B33D', size: 44, ...popW(t, r2A + 0.05) });
+    faceCam(g, 'art', t >= heldT ? { ...EXPR.sad, look: [0, 0.5] } : { ...EXPR.worried, sweat: 1 }, t, 'ARTEMIEV', { x: 40, y: 1380, w: 300, h: 360, t0: r2A + 0.15 });
+  } });
   shot(na4T - 0.1, (g, lt, t, sh) => {  // back on the board: the knight's way, c5 to a4, in green
     rig(B, lt, [[0, K(0.1, 0.92, 11, [3, 0, 3.6])], [len(sh), K(0.0, 0.95, 9.5, [2.8, 0, 3.6])]], { t, e: glide });
     const u = clamp((t - na4T) / 0.4);
     hallSet(g, t, { wPlayer: false, bPlayer: false, pieces: piecesAt(CA, 57), white: 'magnusSuit', black: 'art', ew: EX.calm, eb: EX.sad, over: g2 => { boardArrow(g2, B, 'c5', 'a4', 1, u); squareFrame(g2, B, 'a4', LIME, u); } });
-  }, { kb: 0, zoom: kicks([[na4T, 0.07]]), hud: (g, lt, t) => { if (t >= na4T) moveTag(g, '...Na4!', W / 2, 300, LIME, 70); } });
+  }, { kb: 0, zoom: kicks([[na4T, 0.07]]), hud: (g, lt, t) => { if (t >= na4T) moveTag(g, '...Na4!', W / 2, 1560, LIME, 70); faceCam(g, 'art', { ...EXPR.sad, look: [0, 0.5], lid: 0.3 }, t, 'ARTEMIEV', { t0: na4T - 0.1 }); } });
   cue(r2A - 0.04, 'whoosh_soft', 0.3); cue(r2A + 0.05, 'swipe_card', 0.35); cue(na4T, 'sparkle_pop', 0.4);
 
   // ======================= "Magnus never let go." The game runs to its end; MISSION PASSED =======================
@@ -2647,14 +2664,17 @@ export async function build(T) {
   shot(wiA, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(Math.PI - 0.8, 0.2, 12.5, [3.4, 2.0, 0.6])], [len(sh), K(Math.PI - 0.7, 0.16, 10.0, [3.6, 2.2, 0.2])]], { t, e: glide });
     const r = runTo(CA, 93, ends, t, 0.22), fx = moveFx(r, 0.22, 0.2, false);
-    hallSet(g, t, { pieces: r.pieces, white: 'magnusSuit', black: 'art', ew: { ...EXPR.focus, lid: 0.2 }, eb: { ...EXPR.sad, look: [0, 0.5] }, under: fx.under, over: fx.over, clock: clockCA(1) });
-  }, { trans: 'whip', kb: 0, zoom: kicks([[letT, 0.07]]) });
+    hallSet(g, t, { pieces: r.pieces, white: 'magnusSuit', black: 'art', ew: t >= ends[3] ? EX.smug : { ...EXPR.focus, lid: 0.2 }, eb: { ...EXPR.sad, look: [0, 0.5] }, under: fx.under, over: fx.over, clock: clockCA(37) });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[letT, 0.07], [ends[3], 0.08]]), hud: (g, lt, t) => {
+    faceCam(g, 'art', t >= ends[3] ? { ...EXPR.sad, look: [0, 0.6], lid: 0.4 } : { ...EXPR.worried, sweat: 1 }, t, 'ARTEMIEV', { t0: wiA + 0.1 });
+    if (t >= ends[3] + 0.05) stamp(g, '1 – 0', W / 2, 1560, t, ends[3] + 0.05, { color: GOLD, size: 120, rot: -0.08 });
+  } });
   shot(paA, (g, lt, t, sh) => {  // he stands up out of it: MISSION PASSED
     rig(B, lt, [[0, K(0.0, 0.05, 9.0, [4, 3.5, 4.6])], [len(sh), K(0.0, 0.05, 11.5, [4, 3.6, 4.6])]], { t, e: glide });
-    homeSet(g, t, { tv: TV6, e: EXPR.triumph, crown: { dy: -60 * (1 - ease.out(clamp((t - paA) / 0.4))) } });
+    homeSet(g, t, { tv: TV6, e: { ...EXPR.happy, lid: 0, curve: 0.7, open: 0.25 }, crown: { dy: -60 * (1 - ease.out(clamp((t - paA) / 0.4))) } });
     confetti(g, t, paA, { n: 140, seed: 4 });
-  }, { trans: 'flash', kb: 0, zoom: kicks([[paA + 0.05, 0.1]]), hud: (g, lt, t) => { missionPassed(g, t, paA + 0.05); } });
-  cue(wiA - 0.04, 'whoosh_fast', 0.3); ends.forEach(e => cue(e, 'move', 0.4)); cue(paA, 'boom_cine', 0.55); cue(paA + 0.05, 'success', 0.5); cue(paA + 0.5, 'coins', 0.4); cue(paA + 0.1, 'confetti', 0.35);
+  }, { trans: 'zoom', kb: 0, zoom: kicks([[paA + 0.05, 0.1]]), hud: (g, lt, t) => { missionPassed(g, t, paA + 0.05); } });
+  cue(wiA - 0.04, 'whoosh_fast', 0.3); ends.forEach(e => cue(e, 'move', 0.4)); cue(ends[3] + 0.05, 'stamp', 0.5); cue(paA, 'boom_cine', 0.55); cue(paA + 0.05, 'success', 0.5); cue(paA + 0.5, 'coins', 0.4); cue(paA + 0.1, 'confetti', 0.35);
 
   // ======================= Still number one; still the only player above 2800 (the club) =======================
   shot(stA, (g, lt, t, sh) => {
@@ -2679,23 +2699,26 @@ export async function build(T) {
 
   // ======================= THE SPONSOR, IN THE SAME STORY: Magnus's team checks his games; you have Chessigma =======================
   shot(adA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.4, 0.12, 15, [1, 2.6, 7])], [len(sh), K(0.25, 0.1, 12.0, [0.5, 2.6, 7.5])]], { t, e: glide });
+    rig(B, lt, [[0, K(0.4, 0.12, 18, [1, 2.6, 7])], [len(sh), K(0.25, 0.1, 15.5, [0.5, 2.6, 7.5])]], { t, e: glide });
     teamSet(g, t, { pieces: piecesAt(CA, 57), eM: EX.calm });
-  }, { trans: 'whip', kb: 0, zoom: kicks([[teamT, 0.06]]), hud: (g, lt, t) => { adTag(g); if (t >= teamT) badge(g, 'MAGNUS’S TEAM', W / 2, 260, { color: CREAM, size: 52, ...popW(t, teamT) }); } });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[teamT, 0.06]]), hud: (g, lt, t) => { if (t >= teamT) badge(g, 'MAGNUS’S TEAM', W / 2, 260, { color: CREAM, size: 52, ...popW(t, teamT) }); } });
   shot(youA, (g, lt, t, sh) => {  // you: the app's review on your phone (the author's recording of it)
     rig(B, lt, [[0, K(0.0, 0.02, 7.6, [4, 2.0, 2.4])], [len(sh), K(0.04, 0.02, 6.6, [4, 1.9, 2.2])]], { t, e: glide });
-    phoneHeld(g, t, recFrame('review', 6.2 + lt));
-  }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { adTag(g); badge(g, 'YOU', W / 2, 230, { color: GOLD, size: 60, ...popW(t, youA + 0.05) }); } });
+    phoneHeld(g, t, recFrame('review', 3.6 + lt * 0.35));  // the report screen of the author's recording (accuracy and the move grades)
+  }, { trans: 'whip', kb: 0, noGuard: true, hud: (g, lt, t) => {
+    adTag(g);
+    if (t < freeT) badge(g, 'YOU', W / 2, 262, { color: GOLD, size: 60, ...popW(t, youA + 0.05) });
+    if (t >= freeT) badge(g, 'FREE', 250, 262, { color: LIME, size: 58, ...pop(t, freeT) });
+    if (t >= unlT) badge(g, 'UNLIMITED GAME REVIEWS', 670, 262, { color: CREAM, size: 30, ...popW(t, unlT) });
+  } });
   // their 3-second end card as it is (logo, 2M+ players, the store badges): flat, no captions over it
   shot(CLOSE, (g, lt) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
     { flat: true, noGuard: true, noCaptions: true, hud: (g, lt, t) => {
       adTag(g);
-      if (t >= freeT) badge(g, 'FREE', 250, 262, { color: LIME, size: 58, ...pop(t, freeT) });
-      if (t >= unlT) badge(g, 'UNLIMITED GAME REVIEWS', 670, 262, { color: CREAM, size: 30, ...popW(t, unlT) });
-      if (t >= unlT + 0.6) badge(g, 'LINK IN BIO', W / 2, 1462, { color: GOLD, size: 50, ...pop(t, unlT + 0.6) });
+      if (t >= linkT - 0.05) badge(g, 'LINK IN BIO', W / 2, 1462, { color: GOLD, size: 50, ...pop(t, linkT - 0.05) });
     } });
   cue(adA - 0.04, 'whoosh_deep', 0.35); cue(teamT, 'clack', 0.3); cue(youA - 0.04, 'whoosh_fast', 0.3); cue(youA + 0.1, 'swipe_card', 0.35);
-  cue(CLOSE, 'whoosh_soft', 0.3); cue(CLOSE + 0.2, 'reveal_bell', 0.35); cue(freeT, 'success', 0.4); cue(unlT, 'sparkle_pop', 0.3);
+  cue(freeT, 'success', 0.4); cue(unlT, 'sparkle_pop', 0.3); cue(CLOSE, 'whoosh_soft', 0.3); cue(CLOSE + 0.2, 'reveal_bell', 0.35); cue(linkT, 'sparkle_pop', 0.3);
 
   // ======================= CTA: back to the hook (rule 10), the question with a number =======================
   shot(Math.max(ctaA, CLOSE + 3.0), (g, lt, t, sh) => {
@@ -2711,14 +2734,14 @@ export async function build(T) {
   const tvOff = T.duration - 0.5;
   cue(tvOff, 'tvoff', 0.5);
   const music = [
-    { t: 0, m: 'hook' }, { t: lostT, m: 'slam' }, { t: fvA, m: 'tension' }, { t: loA, m: 'void' }, { t: bestT, m: 'slam' }, { t: hwA, m: 'intrigue' },
+    { t: 0, m: 'hook' }, { t: lostT, m: 'slam' }, { t: fvA, m: 'tension' }, { t: loA, m: 'void' }, { t: bestT, m: 'slam' },
     { t: buA, m: 'build' }, { t: ckA, m: 'tension' }, { t: mateT + 0.2, m: 'drop' }, { t: r1A, m: 'digital' }, { t: waA, m: 'hit' },
     { t: dyA, m: 'build' }, { t: muA, m: 'tension' }, { t: arA, m: 'clockwork' }, { t: r2A, m: 'digital' }, { t: wiA, m: 'build' },
     { t: paA, m: 'victory' }, { t: stA, m: 'glory' }, { t: g7A, m: 'hook' }, { t: adA, m: 'digital' }, { t: Math.max(ctaA, CLOSE + 3.0), m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: lostT - 0.3, t1: lostT - 0.01, kind: 'mute' }, { t0: lostT, t1: fvA, kind: 'boost', db: 4 },
-    { t0: loA - 0.3, t1: bestT - 0.01, kind: 'lp', f: 600 }, { t0: bestT, t1: hwA, kind: 'boost', db: 4 },
+    { t0: loA - 0.3, t1: bestT - 0.01, kind: 'lp', f: 600 }, { t0: bestT, t1: buA, kind: 'boost', db: 4 },
     { t0: mateT - 0.1, t1: mateT + 0.19, kind: 'mute' }, { t0: mateT + 0.2, t1: r1A, kind: 'lp', f: 700 },
     { t0: paA - 0.3, t1: paA - 0.01, kind: 'mute' }, { t0: paA, t1: stA, kind: 'boost', db: 5 },
     { t0: adA, t1: T.duration, kind: 'lp', f: 1200 },

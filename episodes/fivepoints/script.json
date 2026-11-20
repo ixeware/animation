@@ -39,134 +39,219 @@
       "text": "GTA 6 just came out.",
       "say": "[excited] GTA six just came out.",
       "pause": 0.15,
-      "take": 2
+      "take": 2,
+      "colors": {
+        "GTA": "gold",
+        "6": "gold"
+      }
     },
     {
       "id": "hook2",
       "text": "Magnus has been world number one since before GTA 5.",
       "say": "Magnus has been world number one since before GTA five.",
       "pause": 0.25,
-      "take": 2
+      "take": 2,
+      "colors": {
+        "Magnus": "gold",
+        "one": "gold",
+        "GTA": "gold",
+        "5.": "gold"
+      }
     },
     {
       "id": "almost",
       "text": "And this week, he almost lost it.",
       "say": "[intense] And this week, he almost lost it.",
       "pause": 0.3,
-      "take": 5
+      "take": 5,
+      "colors": {
+        "almost": "red",
+        "lost": "red",
+        "it.": "red"
+      }
     },
     {
       "id": "five",
       "text": "Five points. That's how close Caruana got.",
       "say": "Five points. That's how close Caruana got.",
       "pause": 0.3,
-      "take": 3
+      "take": 3,
+      "colors": {
+        "Five": "gold",
+        "points.": "gold",
+        "Caruana": "blue"
+      }
     },
     {
       "id": "lowest",
       "text": "When your lowest... is their best.",
       "say": "[dramatic] When your lowest... is their best.",
       "pause": 0.55,
-      "take": 1
-    },
-    {
-      "id": "how",
-      "text": "So how did the GOAT end up here?",
-      "say": "So how did the goat end up here?",
-      "pause": 0.25
+      "take": 1,
+      "colors": {
+        "lowest...": "red",
+        "best.": "lime"
+      }
     },
     {
       "id": "budapest",
       "text": "Budapest. Ten classical games. Zero wins.",
       "say": "Budapest. Ten classical games. [pause] Zero wins.",
       "pause": 0.3,
-      "take": 2
+      "take": 2,
+      "colors": {
+        "Budapest.": "blue",
+        "Zero": "red",
+        "wins.": "red"
+      }
     },
     {
       "id": "clock",
       "text": "In one, he had under a minute on the clock... and walked into mate.",
       "say": "In one, he had under a minute on the clock... [pause] and walked into mate.",
-      "pause": 1.1
+      "pause": 1.1,
+      "colors": {
+        "minute": "red",
+        "mate.": "red"
+      }
     },
     {
       "id": "review1",
       "text": "Even Chessigma's free game review couldn't believe it.",
       "say": "Even Chessigma's free game review couldn't believe it.",
-      "pause": 0.3
+      "pause": 0.3,
+      "colors": {
+        "Chessigma's": "gold"
+      }
     },
     {
       "id": "washed",
       "text": "The internet said he's washed.",
       "say": "The internet said he's washed.",
-      "pause": 0.35
+      "pause": 0.35,
+      "colors": {
+        "washed.": "red"
+      }
     },
     {
       "id": "day",
-      "text": "Then, November 19th. The day GTA 6 dropped.",
-      "say": "Then, November nineteenth. [pause] The day GTA six dropped.",
-      "pause": 0.25
+      "text": "November 19th. The day GTA 6 dropped.",
+      "say": "November nineteenth. [pause] The day GTA six dropped.",
+      "pause": 0.25,
+      "colors": {
+        "November": "gold",
+        "19th.": "gold",
+        "GTA": "gold",
+        "6": "gold"
+      },
+      "take": 3
     },
     {
       "id": "must",
       "text": "He had to beat Artemiev. A draw meant dropping below 2800 for the first time in 17 years.",
       "say": "He had to beat Artemiev. A draw meant dropping below twenty-eight hundred for the first time in seventeen years.",
       "pause": 0.45,
-      "take": 3
+      "take": 3,
+      "colors": {
+        "beat": "red",
+        "Artemiev.": "blue",
+        "draw": "gold",
+        "2800": "red",
+        "17": "gold"
+      }
     },
     {
       "id": "art",
       "text": "This time, Artemiev had 37 seconds. He plays queen c2.",
       "say": "This time, Artemiev had thirty-seven seconds. He plays queen c two.",
       "pause": 0.25,
-      "take": 1
+      "take": 1,
+      "colors": {
+        "Artemiev": "blue",
+        "37": "red",
+        "seconds.": "red",
+        "c2.": "red"
+      }
     },
     {
       "id": "review2",
       "text": "Chessigma's review shows the move that held: knight a4.",
       "say": "Chessigma's review shows the move that held: knight a four.",
-      "pause": 0.3
+      "pause": 0.3,
+      "colors": {
+        "Chessigma's": "gold",
+        "knight": "lime",
+        "a4.": "lime"
+      }
     },
     {
       "id": "win",
       "text": "Magnus never let go.",
       "say": "Magnus never let go.",
       "pause": 0.2,
-      "take": 2
+      "take": 2,
+      "colors": {
+        "never": "gold"
+      }
     },
     {
       "id": "passed",
       "text": "Mission passed.",
       "say": "[excited] Mission passed!",
-      "pause": 0.45,
-      "take": 1
+      "pause": 0.35,
+      "take": 1,
+      "colors": {
+        "Mission": "gold",
+        "passed.": "gold"
+      }
     },
     {
       "id": "still",
       "text": "Still number one. Still the only player above 2800.",
       "say": "Still number one. Still the only player above twenty-eight hundred.",
       "pause": 0.3,
-      "take": 1
+      "take": 1,
+      "colors": {
+        "one.": "gold",
+        "only": "gold",
+        "2800.": "gold"
+      }
     },
     {
       "id": "gta7",
       "text": "At this rate, he'll still be number one when GTA 7 comes out.",
       "say": "[playful] At this rate, he'll still be number one when GTA seven comes out.",
-      "pause": 0.55,
-      "take": 2
+      "pause": 0.4,
+      "take": 2,
+      "colors": {
+        "GTA": "gold",
+        "7": "gold"
+      }
     },
     {
       "id": "ad",
-      "text": "Magnus has a whole team to check his games. You've got Chessigma: free, unlimited game reviews.",
-      "say": "Magnus has a whole team to check his games. You've got Chessigma: free, unlimited game reviews.",
-      "pause": 1.35,
-      "take": 3
+      "text": "Magnus has a whole team to check his games. You've got Chessigma: free, unlimited game reviews. On the App Store and Google Play. Link in bio.",
+      "say": "Magnus has a whole team to check his games. You've got Chessigma: free, unlimited game reviews. On the App Store and Google Play. Link in bio.",
+      "pause": 0.6,
+      "colors": {
+        "Chessigma:": "gold",
+        "free,": "lime",
+        "unlimited": "lime",
+        "App": "gold",
+        "Google": "gold"
+      },
+      "take": 1
     },
     {
       "id": "cta",
       "text": "So what's your rating? Magnus is 2804.",
       "say": "So what's your rating? [pause] Magnus is twenty-eight oh four.",
       "pause": 0.0,
-      "take": 3
+      "take": 3,
+      "colors": {
+        "rating?": "gold",
+        "2804.": "gold"
+      }
     }
   ]
 }
