@@ -86,7 +86,7 @@
       "id": "clock",
       "text": "In one, he had under a minute on the clock... and walked into mate.",
       "say": "In one, he had under a minute on the clock... [pause] and walked into mate.",
-      "pause": 0.5
+      "pause": 1.1
     },
     {
       "id": "review1",

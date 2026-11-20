@@ -2463,8 +2463,8 @@ export async function build(T) {
     if (t >= sinceT) counter(g, '2011', 'NUMBER ONE SINCE', { y: 1560, size: 150, color: GOLD, at: [sinceT, 0.3] });
   } });
   shot(beforeT - 0.05, (g, lt, t, sh) => {  // the TV goes back to 2013: GTA 5; he was already number one
-    rig(B, lt, [[0, K(0.0, 0.02, 9.5, [4, 6.2, 9])], [len(sh), K(0.0, 0.02, 7.8, [4, 6.2, 9.4])]], { t, e: glide });
-    homeSet(g, t, { tv: t >= gta5T - 0.05 ? TV5 : TV6, e: EX.smug });
+    rig(B, lt, [[0, K(-0.22, 0.02, 14.5, [4, 4.9, 8])], [len(sh), K(-0.1, 0.02, 12.5, [4, 4.9, 8.4])]], { t, e: glide });
+    homeSet(g, t, { tv: t >= gta5T - 0.05 ? TV5 : TV6, e: EX.smug, hx: 5.6 });
   }, { trans: 'whip', kb: 0, zoom: kicks([[gta5T, 0.08]]), hud: (g, lt, t) => {
     if (t >= gta5T) { badge(g, 'GTA 5 · 2013', W / 2, 260, { color: '#FF8FB0', size: 54, ...popW(t, gta5T) }); stamp(g, 'ALREADY #1', W / 2, 1600, t, gta5T + 0.15, { color: GOLD, size: 96, rot: -0.1 }); }
   } });
@@ -2525,7 +2525,7 @@ export async function build(T) {
   // ======================= Budapest: ten classical games, zero wins =======================
   const P0 = piecesAt(MC, 0), PM = piecesAt(MC, 77);
   shot(buA, (g, lt, t, sh) => {  // into the hall: the Parliament across the Danube
-    rig(B, lt, [[0, K(Math.PI + 0.35, 0.12, 21, [4, 4.5, 4])], [len(sh), K(Math.PI + 0.12, 0.08, 15.5, [4, 4.5, 6])]], { t, e: glide });
+    rig(B, lt, [[0, K(0.32, 0.1, 22, [4, 4.6, 7])], [len(sh), K(0.12, 0.07, 17, [4, 4.8, 8])]], { t, e: glide });
     hallSet(g, t, { pieces: P0, white: 'magnusSuit', black: 'haik', wPlayer: false, wChair: false, bPlayer: false, bChair: true });
   }, { trans: 'whip', kb: 0, hud: (g, lt, t) => { placeStamp(g, lt, 'BUDAPEST', 'NOV 2026', { y: 230, t0: 0.1 }); } });
   const nTiles = t => Math.min(10, Math.floor(10.99 * clamp((t - tenT) / (zeroT - tenT))));
@@ -2553,12 +2553,12 @@ export async function build(T) {
     rig(B, lt, [[0, K(0.15, 0.85, 12.5, [4, 0, 4])], [len(sh), K(0.0, 0.95, 10.5, [4, 0, 4])]], { t, e: glide, bump: t > rh8 + 0.3 && t < rh8 + 0.6 ? 1.2 : 0 });
     const r = runTo(MC, 77, [qd5, rh8 + 0.3], t), fx = moveFx(r);
     hallSet(g, t, { wPlayer: false, pieces: r.pieces, white: 'haik', black: 'magnusSuit', eb: t >= rh8 ? { ...EXPR.shock, sweat: 1 } : EX.calm, ew: EX.calm, under: fx.under, over: g2 => { fx.over(g2); impact(g2, 'h8', t, rh8 + 0.3); }, clock: clockMC(1) });
-    wasted(g, t, mateT + 0.35);
+    wasted(g, t, mateT + 0.2);
   }, { kb: 0, zoom: kicks([[qd5, 0.06], [rh8 + 0.3, 0.1]]), hud: (g, lt, t) => {
-    if (t >= qd5 && t < mateT + 0.35) moveTag(g, '...Qd5??', W / 2, 1560, RED, 70);
+    if (t >= qd5 && t < mateT + 0.2) moveTag(g, '...Qd5??', W / 2, 1560, RED, 70);
   } });
   cue(ckA - 0.04, 'whoosh_fast', 0.3); for (let k = 0; k < 6; k++) cue(minT + k * 0.5, 'clock_tick', 0.3); cue(qd5, 'move', 0.6);
-  cue(rh8 + 0.3, 'move_capture', 0.5); cue(rh8 + 0.32, 'boom_big', 0.5); cue(mateT + 0.35, 'boom_cine', 0.6); cue(mateT + 0.55, 'dun_dun', 0.35);
+  cue(rh8 + 0.3, 'move_capture', 0.5); cue(rh8 + 0.32, 'boom_big', 0.5); cue(mateT + 0.2, 'boom_cine', 0.6); cue(mateT + 0.4, 'dun_dun', 0.35);
 
   // ======================= Chessigma's review, in the story: the replay of that move (a screen in the hall) =======================
   shot(r1A, (g, lt, t, sh) => {
@@ -2595,7 +2595,7 @@ export async function build(T) {
   // ======================= Carlsen – Artemiev: must win; a draw = below 2800 =======================
   const PA = piecesAt(CA, 57);
   shot(muA, (g, lt, t, sh) => {  // Magnus facing us, Artemiev's back
-    rig(B, lt, [[0, K(Math.PI + 0.3, 0.12, 12.5, [4, 2.6, 1])], [len(sh), K(Math.PI + 0.08, 0.1, 9.5, [4, 2.8, 0])]], { t, e: glide });
+    rig(B, lt, [[0, K(Math.PI - 0.82, 0.2, 13, [3.4, 2.2, 0.8])], [len(sh), K(Math.PI - 0.7, 0.16, 10.5, [3.6, 2.4, 0.4])]], { t, e: glide });
     hallSet(g, t, { pieces: PA, white: 'magnusSuit', black: 'art', ew: { ...EXPR.focus, sweat: t >= beatT ? 1 : 0 }, eb: EX.calm, clock: clockCA(0) });
   }, { trans: 'whip', kb: 0, zoom: kicks([[beatT, 0.08]]), hud: (g, lt, t) => {
     badge(g, 'CARLSEN vs ARTEMIEV', W / 2, 230, { color: CREAM, size: 44, ...popW(t, muA + 0.05) });
@@ -2712,14 +2712,14 @@ export async function build(T) {
   cue(tvOff, 'tvoff', 0.5);
   const music = [
     { t: 0, m: 'hook' }, { t: lostT, m: 'slam' }, { t: fvA, m: 'tension' }, { t: loA, m: 'void' }, { t: bestT, m: 'slam' }, { t: hwA, m: 'intrigue' },
-    { t: buA, m: 'build' }, { t: ckA, m: 'tension' }, { t: mateT + 0.35, m: 'drop' }, { t: r1A, m: 'digital' }, { t: waA, m: 'hit' },
+    { t: buA, m: 'build' }, { t: ckA, m: 'tension' }, { t: mateT + 0.2, m: 'drop' }, { t: r1A, m: 'digital' }, { t: waA, m: 'hit' },
     { t: dyA, m: 'build' }, { t: muA, m: 'tension' }, { t: arA, m: 'clockwork' }, { t: r2A, m: 'digital' }, { t: wiA, m: 'build' },
     { t: paA, m: 'victory' }, { t: stA, m: 'glory' }, { t: g7A, m: 'hook' }, { t: adA, m: 'digital' }, { t: Math.max(ctaA, CLOSE + 3.0), m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: lostT - 0.3, t1: lostT - 0.01, kind: 'mute' }, { t0: lostT, t1: fvA, kind: 'boost', db: 4 },
     { t0: loA - 0.3, t1: bestT - 0.01, kind: 'lp', f: 600 }, { t0: bestT, t1: hwA, kind: 'boost', db: 4 },
-    { t0: mateT + 0.05, t1: mateT + 0.34, kind: 'mute' }, { t0: mateT + 0.35, t1: r1A, kind: 'lp', f: 700 },
+    { t0: mateT - 0.1, t1: mateT + 0.19, kind: 'mute' }, { t0: mateT + 0.2, t1: r1A, kind: 'lp', f: 700 },
     { t0: paA - 0.3, t1: paA - 0.01, kind: 'mute' }, { t0: paA, t1: stA, kind: 'boost', db: 5 },
     { t0: adA, t1: T.duration, kind: 'lp', f: 1200 },
   ];
