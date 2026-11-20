@@ -206,6 +206,12 @@
   `content`; маленькие (< ~20 КБ) приходят в ответ целиком — их не брать.
 
 ## Chessnut (Stella)
+- **20.11.2026, 02:43 UTC — ответ Стеллы:** «Thanks, but we'll pass for now. We're focusing on ads shot with the actual
+  product, and I'll reach out if we need something in the future.» И: «do you have a contract on your side? The payment
+  has already gone through, but I need to complete our internal paperwork, so if you have one, please sign it and send
+  it over.» То есть второго ролика к Чёрной пятнице не будет: им сейчас нужны ролики, снятые с настоящей доской. Нужен
+  договор задним числом на этот ролик ($400). Чьё имя в договоре и кто подписывает — спросить автора (PayPal, на который
+  пришли деньги, на имя из счетов). Ответ Стелле — после его «да» на текст.
 - **19.11.2026 — письмо Стелле отправлено** (автор: «ну, давай тогда. Скажи, что я еще открыт к их предложениям… длинный
   контракт… либо 5 видео»; в ветке «2.13 seconds»): спасибо за оплату и за жалобу (копии нет), цифры (296 тыс., 18,6 тыс.
   лайков, 2,5 тыс. сохранений), «да» на репост у них с отметкой @the64files и чистым мастером, второй ролик к Чёрной
