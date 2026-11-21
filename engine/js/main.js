@@ -1,11 +1,13 @@
 // Film runner: loads an episode, composes shots with transitions, captions and grain.
 // The page exposes renderFrame(t), DURATION and cues for render.mjs.
-import { W, H, FPS, makeCanvas, clamp, inv, QA } from './core.js';
+import { W, H, FPS, makeCanvas, sizeCanvas, clamp, inv, QA } from './core.js';
 import { grain, vignette, lightLeak, flash, tvOff } from './draw.js';
 import { screenShatter } from './fx.js';
 import { buildChunks, drawCaptions } from './captions.js';
 import { finish } from './post.js';
 import { CAM } from './stage.js';
+import { LOOK } from './look.js';
+import { makeGuard } from './guard.js';
 
 const q = new URLSearchParams(location.search);
 QA.on = q.has('qa');
@@ -32,7 +34,7 @@ class Timeline {
 }
 
 const main = document.getElementById('c');
-main.width = W; main.height = H;
+sizeCanvas(main, W, H);  // with ?ss=2 its backing store is 2160 × 3840 (core.js: supersampling)
 const ctx = main.getContext('2d');
 const layer = makeCanvas(), lctx = layer.getContext('2d');
 layer.dataset.qa = '1';
@@ -50,12 +52,35 @@ const shots = film.shots.map((s, i) => ({ ...s, i }));
 shots.forEach((s, i) => { s.b = s.b ?? (shots[i + 1] ? shots[i + 1].a : film.duration ?? T.duration); });
 const chunks = buildChunks(T.phrases, ctx);
 const DURATION = film.duration ?? T.duration;
+// the channel's moving watermark (guard.js, STYLE_BIBLE rule 70): on for every film unless the film returns guard: false
+// or the order set its own mark; a film's guard: { ... } changes its options. The page's ?guard=off (render.mjs --guard off)
+// gives a clean master, ?guard=handle the handle without the line
+const GQ = q.get('guard');
+const guardOpt = GQ === 'off' || GQ === '0' || film.guard === false ? null : film.guard && typeof film.guard === 'object' ? { ...(LOOK.guard || {}), ...film.guard } : LOOK.guard;
+const guard = guardOpt ? makeGuard(shots, DURATION, { seed: ep, ...guardOpt, ...(GQ === 'handle' ? { line: '' } : {}) }, (s, times) => facesAt(s, times)) : null;
 
 function drawShot(s, t, g) {
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = 'none'; g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
   g.fillStyle = '#05090D'; g.fillRect(0, 0, W, H);
   s.draw(g, t - s.a, t, s);
   g.restore();
+}
+
+// the faces of a shot at given moments, for the watermark to keep off them: the shot and its hud drawn on a plain spare
+// canvas (1080 x 1920 at any render scale), where the drawing helpers log every face (core.js: QA.faces)
+const probe = document.createElement('canvas'); probe.width = W; probe.height = H; probe.dataset.qa = '1';
+const pctx = probe.getContext('2d');
+function facesAt(s, times) {
+  const keep = { items: QA.items, faces: QA.faces, M: QA.M, px: CAM.px }, out = [];
+  QA.items = [];
+  for (const t of times) {
+    QA.faces = [];
+    drawShot(s, t, pctx);
+    if (s.hud) { pctx.save(); pctx.setTransform(1, 0, 0, 1, 0, 0); s.hud(pctx, t - s.a, t, s); pctx.restore(); }
+    out.push(...QA.faces);
+  }
+  QA.items = keep.items; QA.faces = keep.faces; QA.M = keep.M; CAM.px = keep.px;
+  return out;
 }
 
 // screen shake driven by impact sounds (boom, hit, stamp, glass); decays in ~0.15 s
@@ -69,7 +94,8 @@ function shakeAmp(t) {
 }
 
 function jumpAt({ every = 1.4, zooms = [1, 1.15, 1.06], shift = 50 }, lt, len, i) {
-  const n = Math.floor(lt / every), last = Math.floor((len - 0.45) / every);
+  // no punch-in closer than 0.7 s to the end of the shot: the piece after it would flash by (STYLE_BIBLE rule 65)
+  const n = Math.floor(lt / every), last = Math.floor((len - 0.7) / every);
   const k = Math.min(n, Math.max(0, last));
   if (k <= 0) return [1, 0, 0];
   const sd = (k + i) % 2 ? 1 : -1;
@@ -115,7 +141,8 @@ function motionBlur(s, t) {
 
 function compose(t, frame) {
   const s = shots.find(s => t >= s.a && t < s.b) || shots[shots.length - 1];
-  QA.items = []; QA.M = null; QA.skip = false; QA.shot = s.i; QA.allow = s.qaAllow || [];
+  if (guard && !s.noGuard) guard.prepare(t, s);
+  QA.items = []; QA.faces = []; QA.M = null; QA.skip = false; QA.shot = s.i; QA.allow = s.qaAllow || [];
   CAM.px = 0;
   drawShot(s, t, lctx);
   const items = QA.items;
@@ -140,10 +167,12 @@ function compose(t, frame) {
   } else {
     // every shot keeps moving: slow push-in across the shot + impact shake from the sound cues
     // info shots (tables, leaderboards, panels, quotes) stay framed: no jump cuts, barely any push-in
-    const kb = s.info ? 0.01 : s.kb ?? 0.04, a = shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
+    // flat shots (a sponsor's end card or store art, shown as delivered) get none of it, and no grade, vignette or grain
+    const kb = s.flat ? 0 : s.info ? 0.01 : s.kb ?? 0.04, a = s.flat ? 0 : shakeAmp(t), sx = Math.sin(t * 83) * a, sy = Math.cos(t * 71) * a;
     // dense editing: long shots get hard punch-in jump cuts every `every` seconds (film.jumpCut)
-    const J = film.jumpCut, [jz, jx, jy] = J && !s.noJump && !s.info ? jumpAt(J, lt, s.b - s.a, s.i) : [1, 0, 0];
-    const z = (1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + a * 0.0015) * jz;
+    const J = film.jumpCut, [jz, jx, jy] = J && !s.noJump && !s.info && !s.flat ? jumpAt(J, lt, s.b - s.a, s.i) : [1, 0, 0];
+    // s.zoom(lt, t): the shot's own punch-ins on the beat (the hud stays put)
+    const z = (1 + kb * clamp(lt / Math.max(0.5, s.b - s.a)) + a * 0.0015) * jz * (s.zoom ? s.zoom(lt, t) : 1);
     ctx.translate(W / 2 + sx + jx, H / 2 + sy + jy); if (s.roll) ctx.rotate(typeof s.roll === 'function' ? s.roll(lt, t) : s.roll);  // a dutch angle
     ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
     { const m = ctx.getTransform(); QA.M = [m.a, m.b, m.c, m.d, m.e, m.f]; }
@@ -160,16 +189,17 @@ function compose(t, frame) {
   }
   // on-screen text that must not ride the camera (push-in, jump-cut zooms): the shot's hud, drawn on the screen itself
   if (s.hud) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); s.hud(ctx, lt, t, s); ctx.restore(); }
-  finish(ctx, main, s.grade ?? film.grade ?? 'neutral', { amount: film.finish ?? 1 });
+  if (!s.flat) finish(ctx, main, s.grade ?? film.grade ?? 'neutral', { amount: film.finish ?? 1 });
   if (s.post) s.post(ctx, lt, t);
   // light leak straddles the cut into this shot (and into the next one, if it asks)
   const nx = shots[s.i + 1];
   if (tr === 'leak' && lt < 0.14) lightLeak(ctx, 0.5 + lt / 0.28);
   if (nx && nx.trans === 'leak' && nx.a - t < 0.14) lightLeak(ctx, 0.5 - (nx.a - t) / 0.28);
   if (tr === 'flash') flash(ctx, 1 - lt / 0.3);
-  vignette(ctx, s.vig ?? 0.55);
+  if (!s.flat) vignette(ctx, s.vig ?? 0.55);
+  if (guard && !s.noGuard) guard(ctx, t, s);  // a sponsor's own card is shown as delivered: its shot says noGuard
   drawCaptions(ctx, chunks, t, { hide: s.noCaptions });
-  grain(ctx, frame, 0.06);
+  if (!s.flat) grain(ctx, frame, 0.06);
 }
 
 function renderFrame(t, frame = Math.round(t * FPS)) {
@@ -183,6 +213,7 @@ function renderFrame(t, frame = Math.round(t * FPS)) {
 }
 
 window.DURATION = DURATION;
+window.SHOTS = shots.map(s => ({ i: s.i, a: +s.a.toFixed(3), b: +s.b.toFixed(3) }));  // for tools: where each shot starts and ends
 window.renderFrame = renderFrame;
 window.qaFrame = t => { renderFrame(t); return { items: QA.items, M: QA.M, skip: QA.skip, shot: QA.shot, allow: QA.allow }; };
 // every stylized cut gets a soft whoosh; glass breaks get their crash

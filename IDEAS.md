@@ -4,10 +4,235 @@
 (драма — один поворот внутри интересной самой по себе истории). Факты ниже проверены по источникам в конце каждого
 пункта; перед сценарием всё равно собрать `SOURCES.md`.
 
+## Chessigma: 4 ролика — версия на широких мемах (18.11.2026, вечер)
+Автор на первые версии: «да не нужно такие нишевые темы, нужно что то кто сразу узнает в чем прикол, типо блять подключи
+себе какой то скилл чтобы ты мог тт листать». Ленту TikTok скрипту не отдают (поиск, хэштеги и «For You» — только
+залогиненному браузеру; обходить защиту не стали), поэтому тренды — по последним роликам больших шахматных аккаунтов:
+`python3 tools/tiktok.py trends`.
+
+**Что залетает сейчас (18.11.2026):**
+- **GTA 6 выходит 19.11.2026** (Rockstar перенесла с 26.05 на 19.11.2026, Take-Two подтвердил дату:
+  [TechRadar](https://www.techradar.com/gaming/grand-theft-auto-6-release-date-confirmed-but-its-been-delayed-heres-why),
+  [PCWorld](https://www.pcworld.com/article/3052217/gta-6s-release-date-confirmed-for-real-this-time-seriously.html)).
+  Под роликами Магнуса: «Hello Magnus, will you visit the shoe store in GTA6» (20 тыс.), «Magnus will you mate Lucia?»
+  (6,8 тыс.), «imagine us getting a new world champion before GTA 6».
+- **Магнус и «Свинка Пеппа»**: «Daddy pig's prep is finally revealed» (09.11, 4,6 млн, 640 тыс. лайков) — он смеётся у
+  телевизора. Комментарии: «#1 player in the world btw» (112 тыс.), «he can finish the movie in 3 moves» (78 тыс.), «He
+  is laughing from a joke that will be 3 minutes ahead» (59 тыс.), «omg Peppa to d5 takes Georgie» (9,6 тыс.).
+- **Chess.com**: «NOBODY has been this close to Magnus in YEARS» (14.11, 1,1 млн) — Фабиано у первого места; «When your
+  lowest is their best.» (19 тыс.), «magnus lock in please». «Hikaru notices SO QUICKLY that the chess game is over»
+  (12.11, 1,1 млн): «me and Hikaru's reaction when we realized it's over» (6,7 тыс.).
+- **chessbrah**: «Bro thinks he is Magnesium Calcification (Bro is 676 elo)» (210 тыс.), «Bro thought it's a checkmate»
+  под «What I've Done».
+- Магнуса в комментариях зовут «washed»: «"washed" and he is a world champion in chess 😭» (4,4 тыс.).
+
+**Четыре ролика на этих мемах** (рисуем своим стилем, без ассетов Rockstar и «Пеппы», правило 67):
+1. **Brilliant — «Bro thinks he's Magnus».** Хук: Магнус смеётся у телевизора — «Magnus laughs at Peppa Pig jokes three
+   minutes before they happen». Потом: «This bro is rated 527. He just played a brilliant move» — 23...Rf1+, на экране
+   GTA-плашка «MISSION PASSED. RESPECT +». «Mate was two moves away.» Он повторяет шахи — ничья — серый экран «WASTED».
+   Подпись: «Bro thinks he's Magnus. (Bro is 527 elo.)» Финал: разбор Chessigma показывает и «бриллиант» (Sigma), и мат,
+   который он не увидел; бесплатно. Вопрос: «What's your rating?»
+2. **Дебюты — «Follow the damn train».** К выходу GTA 6: «All we had to do was follow the damn train, CJ!» → «All you had
+   to do was follow the damn opening.» Эдит-байт: «Daddy Pig's prep is finally revealed. Magnus can prep with Peppa Pig.
+   You can't.» Новичок уходит из линии на 4-м ходу и попадает в ловушку → «WASTED». Финал: Opening Trainer — выучи свою
+   линию. Вопрос: «What's your opening?»
+3. **Принципы — «Ah shit, here we go again».** Каждую партию одно и то же: ферзь на втором ходу, король гуляет — и каждый раз
+   фраза CJ. «Magnus can Bongcloud. Bro is 676 elo.» Финал: модуль принципов — какое правило стоит тебе больше всего, в %.
+   Вопрос: «Which rule do you break every game?»
+4. **Разбор партии — «WASTED».** В каждой проигранной партии есть ход, после которого экран должен стать серым и написать
+   WASTED; разбор находит этот ход. «Hikaru knows it's over in two seconds. You need the game review.» Финал: каждый ход с
+   оценкой, бесплатно и без лимита. Вопрос: «Drop your accuracy.»
+Сроки: волна GTA 6 — ближайшие две недели, поэтому ролики 1 и 2 — как можно раньше.
+
+## Chessigma: 4 ролика по сделке 18.11.2026 — первые идеи (автор: «нишевые»)
+Методом автора (правило 75): актуальное, пасхалки и референсы, одна уместная метафора, которая рисуется буквально.
+Окно актуальности — матч за корону Гукеш — Синдаров в Женеве: FIDE — 22.11–13.12.2026, 1-я партия 24.11
+([FIDE](https://www.fide.com/salesforce-fide-world-championship-match-2026-schedule-format-and-prize-fund-confirmed/),
+[World Chess](https://worldchess.com/news/gukesh-vs-sindarov-everything-you-need-to-know-about-the-2026-world-chess-championship));
+обоим по 20 лет. Chessigma — только в конце (правило 61), в начале — намёк. Все экраны — запись приложения на телефоне.
+
+### Что говорят комментарии (18.11.2026: 4360 комментариев под 30 роликами)
+Автор: «можешь использовать комментари под моими роликами чтобы уловить эту волну». Скачано `tools/tiktok.py`
+(до 1000 комментариев на ролик и ответы в больших ветках), разобрано по лайкам. Главное:
+- **Зрители продолжают наши метафоры своими словами — это самые залайканные комментарии.** Миттенс: «No human or alien
+  beat Mittens 😂» (40 тыс.); Готэм: «not a grandmaster cause he hunts them» (22,5 тыс.), «the hunter cant become a prey»
+  (13,4 тыс.); первый Witty: «from herding goats to playing them» (20 тыс.); Fischerman: «nah gang, I'm the worm😭»
+  (3,7 тыс.), «i'm the bait bro»; `rivalry`: «Above millions below one» (8,1 тыс.). Лестницу с крыльями повторили
+  15 раз. Вывод: метафора должна оставлять зрителю место, куда вставить себя (червяк, наживка, добыча).
+- **У канала уже своя вселенная персонажей.** Чаще всего зовут Магнуса (197), «alien»/Witty (177), Миттенс (151),
+  Stockfish (132), Хикару (110), Фишера (86). Зрители сами связывают ролики: «Bobby Fischerman fished up Stock Fish,
+  and gave it to his cat Mittens» (1,8 тыс.), «but Magnus lost to an alien» (2,6 тыс.), «2.13 sec guy». Камео Witty,
+  Миттенс и «рыбы» Stockfish в новых роликах — пасхалки, которые узнают.
+- **Witty — главный любимец, его Alien Gambit — мем.** «Alien gambit, MY GAMBIT!!!!!» (234), «MY GAMBIT MY LEGACY»
+  (136, 94…), «caro-kan?? bring witty bro» (536), «Witty is destroyer of Caro-Kann», «we shouldve played the alien
+  gambit» (75). Alien Gambit — это 6.Nxf7 против Каро-Канн (`episodes/witty2/SOURCES.md`).
+- **Спор, который зрители ведут сами: «50 бриллиантов за партию».** Под `brilliant` (мы сказали «27 brilliant moves in a
+  single game» у Witty) десяток комментариев: «witty 50 brilliant in one game» (42), «Its witty alien 50 brilliant one
+  game» (40), «ocean of brilliants» (44) — и ответы: «repetitive brilliant that doesn't count», «only… a single brilliant
+  move, due to its repetitive nature». Источника на 50 у Witty нет; у Chess.com есть статья «The Brilliant Moves Cheat
+  Code» — серия «бриллиантов» одной и той же ладьёй, «the only catch is that you don't get to win the game».
+- **Боль «нашёл, но не добил» — их собственными словами.** «Remember if you get a brilliant BUT doesn't play it out, it's a
+  bright blue colored blunder»; «I just sacrificed my rook but I missed the mate» (122); «at first I was witty
+  screaming brilliant then when I checked the review I was FUMING that I missed mate». «Brilliant cause I said so»,
+  «They gave my brilliant a blunder…» — ярлык «!!» кажется им случайным.
+- **Аудитория — новички.** 86 зрителей назвали рейтинг: медиана 400, половина — от 200 до 800. Любят писать про себя
+  числом: «I'm rated 2 ez win» (925), «102 😭» про IQ (1,6 тыс.), «I have 7 brilliant move in one week» (130).
+- **Футбольные сравнения:** «Hikaru is the mbappe of chess» (2,7 тыс.), «The neymar of chess» про Готэма (3,9 тыс.),
+  «gukesh is literally olise». **Гукеш знаком** по нашим роликам: «gukesh a chill guy» (1,2 тыс.), «Gukesh literally
+  studies magnus games all day» (1,1 тыс.). Синдарова в комментариях нет ни разу.
+- **Мем-слова почти не встречаются:** sigma — 0, aura — 3, 67 — 4, Gojo — 6. «Sigma» в финале — только как название
+  ярлыка Chessigma, не как мем ролика. Органика: «tried chessigma, it actually works very well».
+
+**Поправки к идеям по комментариям**
+- **Ролик 1.** Хук — их же спор: на экране их комментарии «witty 50 brilliant in one game» → «Is that even possible?
+  Yes. One trick: sacrifice the same rook again and again» (статья Chess.com) → «The only catch: you don't win» → история
+  527: Rf1+, Rf2+, Rf1+ — ключ крутят туда-обратно в замке, дверь так и не открылась. Бриллиант Witty не утверждаем —
+  только «you say». Вопрос в конце: «Witty's 50: real or fake?» + «What's your rating?». Камео Witty с криком
+  «BRILLIANT» — на ударе.
+- **Ролик 2.** Witty и Alien Gambit — внутри «сценария»: «Champions learn the script. Witty throws a knight at it» (6.Nxf7
+  против Каро-Канн — «bring witty»). Зрители скандируют «MY GAMBIT, MY LEGACY» — показать плашкой как их кричалку, не как
+  слова Witty, пока не найден источник. Вопрос: «Caro-Kann or Alien Gambit?» вместе с «Gukesh or Sindarov?».
+- **Ролик 3.** Модуль показывает цену нарушенного правила — «That wasn't a sacrifice. That was a donation.» (Шутка
+  зрителей про коня Магнуса ушла в ролик 4, в повтор VAR.) (Было ещё «лицо Каспарова» — снято: автор такого
+  мема не знает. Комментарий «Kasparov:» под `bongcloud` — стикер про нашу же сцену, где Каспаров не оценил шутку,
+  а не мем.)
+- **Ролик 4.** «Чёрный ящик» автор не считал («какие еще черные ящики о чем речь») — заменён на VAR (ниже): зрители
+  сами сравнивают шахматистов с футболистами, а их комментарий «at first I was witty screaming brilliant then when I
+  checked the review I was FUMING that I missed mate» — ровно гол, который отменил VAR. Канон зрителей «Bobby
+  Fischerman fished up Stock Fish, and gave it to his cat Mittens» — запасная пасхалка (Stockfish в комнате VAR).
+
+### 1. Brilliant moves — «He found the key» (делать сейчас)
+- **Хук.** Светлая комната, новичок, над ним «527». «This player is rated 527. And he just played a brilliant move.»
+- **История — настоящая партия из бенчмарка Chessigma** (блиц 2+1, 04.08.2025,
+  [партия](https://www.chess.com/game/live/141467642198), чёрные): 23...Rf1+ — у Chess.com «!!». Stockfish (глубина 22):
+  после Rf1+ у чёрных +5,4, дальше 24.Kh2 Rxh1+ 25.Kxh1 Nf2+ с вилкой. А он дал шах ещё раз, и ещё — ничья повторением.
+- **Метафора (главная).** «He found the key. He never opened the door.» Ладья — ключ, поворачивается в замке; за дверью
+  — комната с короной; он уходит по коридору одинаковых дверей Rf1+, Rf2+, Rf1+.
+- **Эдит-байт со звездой.** «Magnus finds the key and walks through. He found it — and walked away.» Сравнение со
+  звездой в хуке: у Хикару больше 5000 «бриллиантов» (наш факт 2021 из `brilliant`), у этого — один.
+- **Пасхалки.** В том же бенчмарке «бриллиант» нашёл и игрок с 3097: Kxf1 в партии на 3 минуты
+  ([партия](https://www.chess.com/game/live/171093760062)); игроки там от ~450 до ~3200 — «Brilliance doesn't check
+  your rating». Мем для комментариев: разборы, которые ставят «!!» на всё, — «That's not a review. That's your mom
+  putting your drawing on the fridge» (холодильник, зевок с «!!» и штампом MASTERPIECE; конкурентов не называем).
+  Мост к спонсору: «If a tree falls in a forest and no one hears it…» — четыре бесплатных разбора из пяти этот ход не
+  заметили (лес из фигур, падает дерево-ладья, тишина).
+- **Финал.** «Chess.com calls it Brilliant. Chessigma calls it… Sigma.» — фигура медленно оборачивается и поднимает
+  бровь (сигма-мем нашим стилем). Его ход Chessigma увидел; из 100 «бриллиантов» Chess.com — 93; бесплатно.
+- **Вопрос.** «What's your rating — and have you ever played a brilliant? Comment both.»
+
+### 2. Дебюты → Opening Trainer — «The script» (выпустить 23–24.11, к 1-й партии)
+- **Хук.** Сцена в Женеве, два стула, над доской «20». «Tomorrow, two 20-year-olds play for the world title. Both
+  already know their first 20 moves.» («20 ходов» — фигура речи про подготовку, строкой в `SOURCES.md`.)
+- **Метафора (главная).** Театр: «An opening is a script. A World Championship is two actors, each waiting for the
+  other to forget his lines.» В суфлёрской будке — секунданты с ноутбуком; «out of book» — гаснет значок книги.
+- **Эдит-байт (Магнус).** В глубине сцены пустой трон с короной: «Magnus didn't lose this crown. He left it on the
+  chair.» Он отказался от матча 20.07.2022: «I am not motivated to play another match»
+  ([OPB/NPR](https://opb.org/article/2022/07/20/magnus-carlsen-done-with-chess-world-championships)). Его прогноз «I
+  think Sindarov will win» (16.09.2026) уже есть в `tablebang`.
+- **Пасхалка.** «You don't need 20 moves. You need 5. Or someone will say "Oh no, my queen" — and mean it.» —
+  фраза Эрика Розена из ловушек гамбита Стаффорда.
+- **Финал.** Opening Trainer: выучить свою линию, пока не перестанешь «забывать текст».
+- **Вопрос.** «Gukesh or Sindarov? Comment your pick.» — комментарии на весь матч.
+
+### 3. Принципы — «Break them like an artist» (после релиза модуля; к партии матча)
+- **Хук.** Магнус и Хикару, двойной Bongcloud 2021 (наша сцена из `bongcloud` — колбэк для своих) или ход из идущего
+  матча, где чемпион нарушил принцип и выиграл/проиграл.
+- **Референс.** «Learn the rules like a pro, so you can break them like an artist» (приписывают Пикассо, не
+  подтверждено — говорить «they say»). Музей: «картины» Магнуса — позиции, где он нарушил правила и выиграл.
+- **Эдит-байт.** «Magnus breaks the rules. The rules break you.»
+- **Продукт.** Новый модуль: какой принцип ты нарушил и сколько шансов на победу это стоило — ценник на каждой
+  «картине» зрителя (цифры — из записи приложения). Колбэк: рисунок с холодильника из ролика 1 висит в музее.
+- **Вопрос.** «Which rule do you break the most?»
+
+### 4. Разбор партии — «VAR» (в основном про Chessigma; к концу матча, до 13.12)
+Было «The black box» (бортовой самописец) — автор не считал метафору с первого раза, заменено.
+- **Метафора (главная).** VAR в футболе: «You scream BRILLIANT. You celebrate. Then VAR checks the replay.» Игрок бежит
+  праздновать, судья рисует в воздухе экран, на табло «VAR CHECKING…», повтор хода по кадрам — «NO BRILLIANT. MISSED
+  MATE.» Разбор партии — это VAR для твоих партий: после игры пересматривает каждый ход и выносит решение.
+- **Почему это:** зрители сами сравнивают шахматистов с футболистами («Hikaru is the mbappe of chess» — 2,7 тыс., «The
+  neymar of chess»), а их комментарий про проверку разбора («I was FUMING that I missed mate») — ровно отменённый гол.
+- **Эдит-байт — Магнус, которому делают эдиты** (Дина убрали: «никтооооо не делает эдиты дингу»). Норвегия 2025,
+  6-й тур: у Магнуса выиграно (−3…−4,6), в цейтноте 52...Ne2+?? — зевок коня, Гукеш выигрывает, Магнус бьёт по столу так,
+  что падают фигуры (факты — `episodes/tablebang/SOURCES.md`). Под нашим `tablebang` зрители шутят «Magnus didn't blunder
+  his knight, he just sacrificed it thinking he's got the advantage» (1,6 тыс.) → повтор VAR по кадрам: «Magnus called
+  it a sacrifice. VAR called it a blunder.» Удар по столу — игрок спорит с судьёй. Актуально: Гукеш сейчас играет матч
+  за корону. Если в матче будет свой решающий зевок — добавить его вторым повтором.
+- **Продукт.** Каждый ход с оценкой, точность, лучший ход, Sigma, принципы, которые стоили дороже всего, твой дебют;
+  бесплатно и без лимита. У Chess.com бесплатный аккаунт — один разбор в день
+  ([Chess.com](https://www.chess.com/article/view/chesscom-features)) — «VAR that works once a day»; формулировку
+  сравнения согласовать с Элиотом.
+- **Вопрос.** «Has VAR ever cancelled your brilliant? Drop your accuracy.»
+
+**Факты для всех четырёх** (бенчмарк — [chessigma.com/benchmarks/brilliant](https://www.chessigma.com/benchmarks/brilliant),
+партии — `/data`): Chessigma находит 93 из 100 «бриллиантов» Chess.com, Chessiro 90, Wintrchess 45, Chessitup 41,
+Chesskit 23; лишний «бриллиант» у Chessigma — раз в 20 партий, у других — раз в 3–6; ярлыки: Chess.com «Brilliant»,
+Chessigma «Sigma», Chessiro «Genius». Цитату «You have to be merciless» (её приписывают Магнусу) не берём: первоисточник
+не найден.
+
+## Следующий ролик: Хикару и Магнус, «The truth» (16.11.2026)
+**Сделан 16.11.2026** — [`episodes/rivalry`](episodes/rivalry/SOURCES.md); версия 3 (стадион, мемы, весы) — 79,5 с.
+**Идея автора:** «может про hikaru rivalry с магнусом, щас с этим грустные эдиты» — прислал такой эдит (TikTok
+7705419674376277300): чёрно-белая нарезка под грустную музыку.
+- **Что в эдите.** Ролик Esports World Cup с детектором лжи (вышел 14.08.2026 на канале EWC; Хикару с манжетой на
+  руке). Магнус спрашивает: «Are you jealous of anything I have achieved?» Хикару: «Yes. Probably the World
+  Championship(s). That's the truth», на экране TRUTH. Последние слова в клипе звучат нечётко (whisper слышит «world-class
+  champions / shanty»), поэтому перед сценарием дословно сверить с оригиналом
+  ([YouTube Short](https://www.youtube.com/shorts/1EWDl2-Vzjo), полное видео на канале EWC). В конце эдита — интервью
+  «Do you think you'll ever be World Chess Champion?» — «No.»: источник не найден, без него в ролик не брать. Найдено
+  близкое: в октябре 2021 он сказал на стриме, что стать чемпионом мира «не реалистично».
+- **Почему сейчас.**
+  1. Грустные эдиты про них в моде.
+  2. Только что стартовал Speed Chess Championship XI ($250 000): у обоих по 5 титулов, оба идут за рекордным шестым.
+     Финал вживую в Лондоне, 5–7 февраля 2027 ([Chess.com](https://www.chess.com/news/view/announcing-speed-chess-championship-2026),
+     [DAZN](https://www.dazn.com/en-US/news/chess/magnus-carlsen-hikaru-nakamura-chess-championship-rivalry-t3r/1dvvumhyamkpc1occxouuld4wd)).
+  3. У нас лучше всего заходят звёзды и стримеры: Миттенс 2,4 млн, Готэм 1,7 млн, Фишер 763 тыс. Хикару уже дал
+     615 тыс. и 263 тыс.
+- **Факты.**
+  - В классике Карлсен ведёт 14:1 при 25–26 ничьих ([база](https://ramachess.com/grandmasters/magnus/vs-nakamura-hi/)).
+    Единственная победа Хикару — Бильбао, 13.07.2016, 1-й тур. До неё у Магнуса было 12 побед и 18 ничьих
+    ([Chess.com](https://www.chess.com/news/view/nakamura-finally-beats-carlsen-leads-in-bilbao-9124),
+    [ChessBase](https://en.chessbase.com/post/bilbao-nakamura-beats-carlsen)).
+  - Все контроли 2005–2025: 144 победы Магнуса, 82 у Хикару, 182 ничьи из 408 партий (та же база).
+  - Speed Chess Championship: у Магнуса 2016, 2017, 2023, 2024, 2025/26; у Хикару 2018–2022 подряд.
+  - Norway Chess 2024: Хикару обыграл Магнуса в армагеддоне после ничьей в классике
+    ([ChessBase](https://en.chessbase.com/newsroom/post/norway-chess-2024-7?page=0)).
+  - Сверить перед сценарием (Википедия из облака не открывается): Хикару — самый молодой гроссмейстер США в 15 лет,
+    2003, побил рекорд Фишера; его места на турнирах претендентов; пять титулов Магнуса (2013–2021).
+- **Сценарий-набросок.**
+  - Хук: Хикару с манжетой детектора, напротив Магнус, вопрос плашкой, ответ, штамп TRUTH. Первый кадр — Хикару крупно
+    с проводами и одна надпись сверху (правило 28).
+  - Середина: вундеркинд, который побил рекорд Фишера, → в его эпоху приходит Магнус → счётчик 14 : 1 → «пять раз
+    чемпион мира — Магнус; Хикару — ноль».
+  - Грустный блок в манере эдитов: серый фильтр, дождь на окне, медленный наезд, пианино. Эдит-байт —
+    метафора-противопоставление: «He could beat the whole world. Just not the man who owns it.» Или прозвище: «The
+    Eternal Number Two».
+  - Поворот: «But in speed chess, it's 5–5. And the sixth title is being played right now.»
+  - Вопрос числом про зрителя: «How many years have you been watching Hikaru?»
+- **Другие идеи из ленты 16.11** (на потом):
+  1. Каруана в 7,2 очка от первого места Магнуса, которое тот держит с 2011 года (Total Chess Pilot, ноябрь 2026,
+     [Chess.com](https://www.chess.com/news/view/2026-total-chess-world-championship-tour-pilot-day-4)). Магнус
+     удержался, поэтому история «чуть не кончилась эпоха».
+  2. Матч Гукеш — Синдаров (старт 24.11, выше).
+  3. Готэм и стримснайпер — уже в `fairplay`.
+
+## Пилот для Chessigma: «He has seen your position before» (10–11.11.2026)
+**Сделан 10.11.2026, версия 2 — 11.11.2026** — [`episodes/woodpecker`](episodes/woodpecker/SOURCES.md), 77 с, 4К. Версию 1
+(«He copied a woodpecker») автор вернул: «я бы пролистал». Версия 2: хук — тест памяти Магнуса Карлсена («He isn't
+calculating. He has seen your position before»), потом Ханс Тикканен и метод Woodpecker; Chessigma — в начале (игра
+Board Memory), в середине (тренажёр с таймером) и в конце (тренер), на телефоне их страницы и записи экрана автора.
+Тему утвердил Eliot Hennebo; его встречное предложение по цене ($150 + $50 за 500 тыс. просмотров, реклама Meta
+90 дней) ждёт ответа автора. Перед публикацией: утверждение сценария Chessigma, голос на платном тарифе ElevenLabs,
+Branded content и #ad, ссылка в био на 7 дней.
+Если пилот зайдёт, у них ещё две темы под платный продукт: дебюты и Chess Coach (разбор своих партий). И ход на будущее:
+у Chessigma есть вкладка Brain с играми на память и реакцию (Board Memory: «уровень 15 — верхний 1 %») — готовый
+вызов зрителю для хука или комментариев.
+
 ## Отдельный ролик для Chessnut: «2.13 seconds» (06.11.2026)
-**Сделан 07.11.2026** — [`episodes/hikaru213`](episodes/hikaru213/SOURCES.md), 85 с; превью с пометкой PREVIEW —
-для письма Стелле (письмо ещё не отправлено). Перед публикацией: голос заново на платном тарифе ElevenLabs,
-официальный логотип Chessnut вместо нашего шрифта, свежие цифры (правило 40), Branded content и #ad.
+**Сделан 07.11.2026** — [`episodes/hikaru213`](episodes/hikaru213/SOURCES.md), 85 с. Письмо с превью ушло 7.11;
+**9.11 Chessnut (Stella) согласился**: «let's go ahead and move forward with this first video». В тот же день версия 4:
+доска Chessnut Move нарисована по материалам с chessnutech.com (размеры, логотип, медные основания фигур — см. SOURCES).
+Перед публикацией: промокод или ссылка от Chessnut, голос заново на платном тарифе ElevenLabs (ключ сейчас на
+бесплатном), Branded content и #ad.
 Мем октября 2026: Хикару подходит к партии Кеймер–Карлсен и за «2.13 секунды» понимает, что Магнус проигрывает
 (эдит @flashccfx — 17,3 млн за 11 дней, эдит Chess.com — 1,1 млн). Ролик: постановка как в реальном видео → что он
 увидел → как мозг гроссмейстера узнаёт позицию → фигуры двигаются в голове, как на Chessnut Move → восхваление
@@ -82,9 +307,10 @@
 **Что видно**
 1. `bongcloud` за два дня набрал 111 тыс. — быстрее, чем `dubov` (130 тыс. за пять дней). Лайков меньше, чем у роликов
    с героем (5,7 %): это снова спор о поведении.
-2. **Каспаров стал мемом-реакцией.** Лучший комментарий под `bongcloud` — просто «Kasparov:» со стикером (865♥).
-   Второй — «the version Magnus plays is called the wrongcloud» (55♥). Секундная реакция Каспарова подойдёт как
-   камео в любой ролик про выходки звёзд.
+2. ~~Каспаров стал мемом-реакцией~~ — **ошибка вывода** (автор, 18.11.2026: «лицо каспарова я в жизни такой мем не
+   видел»). Лучший комментарий под `bongcloud` — «Kasparov:» со стикером (865♥, к 18.11 — 1,7 тыс.): это реакция на нашу
+   же сцену, где Каспаров не оценил шутку, а не мем. Как мем не использовать. Второй — «the version Magnus plays is
+   called the wrongcloud» (55♥).
 3. **Гукеша любят.** Под `tablebang` на расистский комментарий ответили «stfu shitty racist» (1889♥), а «gukesh a chill
    guy» собрал 630♥.
 4. **Числовой вопрос снова сработал:** «I played 3149 brilliant moves» (242♥) под `talbrill`, у которого больше всех
@@ -283,6 +509,14 @@
      - [GMA](https://gmanetwork.com/news/sports/othersports/714007/wesley-so-upsets-no-1-carlsen-claims-world-title/story);
      - [Wikipedia](https://en.wikipedia.org/wiki/Wesley_So).
 5. **Witty Alien, часть 2.** Самое частое имя в комментариях (117), второй ролик канала.
+   - **Реванш был (проверено 12.11.2026 по API Chess.com):** 7.11.2026, 19:37–19:47 UTC, блиц 5+0, без рейтинга,
+     Witty_Alien (белые, 2538) — MagnusCarlsen (чёрные, 3375), 0–1, https://www.chess.com/game/live/186739331724,
+     PGN — `engine/data/witty_magnus_2026-11-07.pgn`. Witty сыграл **свой Alien Gambit** против Магнуса: Каро-Канн,
+     5.Ng5 h6 **6.Nxf7 Kxf7** — Магнус взял коня, король ушёл f7–g8. 23.Re6 — давление, 23...Nxd5! 24.Rxd6, размен
+     ферзей, эндшпиль с конями. В конце Магнус провёл двух ферзей (49...d1=Q+, 51...a1=Q); Witty сдался на 54-м ходу,
+     у него 6 с, у Магнуса 12,5 с. Счёт их партий на Chess.com — 4:1 Магнусу (по ChessBase India, сайт закрыт
+     сетью сессии). Первая партия (победа Witty) — 30.09.2026, https://www.chess.com/game/live/184609437048.
+   - Автор 12.11.2026: «может сделать про то как витти снова поиграл с магнусом но проиграл».
    - Повод — топ-комментарий «witty alien has 21k+ no?» (4634♥): обновить счёт бриллиантов. Проверить на его профиле
      Chess.com в день записи.
    - Хук: «You said I got his number wrong. You were right.» — зрители любят, когда им отвечают.
@@ -349,6 +583,22 @@
   sacrifices in chess history? It's not Magnus.» 2–3 жертвы Таля эффектами §8 (кандидаты, проверить по партиям:
   Таль — Ларсен 1965, 16.Nd5; Ботвинник — Таль 1960, 6-я партия, 21...Nf4), прозвище «волшебник из Риги», вопрос
   числом в конце. Свой ролик `tal` (побег из больницы) — о другом, его можно дать в Related video.
+
+## Тренды на 12.11.2026 и уроки удержания `woodpecker`
+- **Удержание `woodpecker`:** 25 % ролика в среднем (22,6 с из 89,8), до конца — 1,17 %, большинство ушло на 0:01.
+  Причины: спокойный первый кадр-объяснение без конфликта и движения; герой не звезда (Тикканен); 89,8 с; реклама на
+  17-й секунде; ролик сутки висел без метки рекламы («Undisclosed»). Что делать: первое слово на 0,0 с и конфликт со
+  звездой в первом кадре; 62–70 с; реклама только в конце (правило 61); метка Branded content при публикации; новый
+  открытый вопрос каждые ~10 с.
+- **Что в тренде:**
+  1. `witty2` — реванш Witty против Магнуса (7.11), готов, выкладывать сейчас.
+  2. Матч за титул Гукеш — Синдаров, Женева, старт 24.11 (по FIDE после переноса; до 12.12): превью до старта
+     («For the first time, the world champion is the underdog»), звезда в хуке — Магнус назвал Синдарова «a pretty
+     significant favorite» (интервью Chess.com, сентябрь 2026); во время матча — короткие ролики о главных партиях.
+  3. Total Chess Pilot, Будапешт, 10–20.11: Магнус выиграл стартовый блиц без поражений (7/9), финалы 19–20.11 — ждать
+     истории с Магнусом.
+  4. Шевченко (телефон в туалете, 2024): бан кончился в октябре 2026 — если сыграет снова, это продолжение нашего
+     `rausis` («туалет»). Проверять новости.
 
 ## TikTok Studio: выгрузка 24.09–22.10.2026
 Файлы Overview, Content, Followers, Viewers за 24.09–22.10 (данные есть с 12.10 по 21.10).

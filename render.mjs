@@ -4,6 +4,10 @@
 //   node render.mjs fischer --cues                       -> build/cues.json only (sound edits: then audio/mix.py)
 //   node render.mjs fischer --qa [--step 0.1]       -> build/qa.json: text over faces / captions, text off frame, faces cut
 //   any of these with --motion 1|2: the text motion profile (LOOK.motion) for an A/B; --out name.mp4: the video's file name
+//   --scale 2 with a render or --stills: every frame at twice the size, 2160 × 3840 (4K); the engine draws it that
+//   sharp itself (core.js: supersampling), it is not an upscale. About four times the render time
+//   --guard off: without the channel's moving watermark (a clean master for a sponsor's own channels and ads);
+//   --guard handle: the watermark's handle without the line about YouTube (engine/js/guard.js, STYLE_BIBLE rule 70)
 import { chromium } from 'playwright';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -16,6 +20,7 @@ const ep = args[0];
 const opt = k => { const i = args.indexOf('--' + k); return i >= 0 ? args[i + 1] : null; };
 const BUILD = path.join(ROOT, 'episodes', ep, 'build');
 const FPS = 30;
+const SCALE = Math.max(1, Math.round(+(opt('scale') || 1)));  // 2: a 4K render
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.woff2': 'font/woff2', '.png': 'image/png', '.jpg': 'image/jpeg' };
 const server = http.createServer((req, res) => {
@@ -27,10 +32,10 @@ const server = http.createServer((req, res) => {
 const PORT = server.address().port;
 
 async function openPage(browser, extra = '') {
-  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: SCALE });
   page.on('console', m => { if (m.type() === 'error') console.error('[page]', m.text()); });
   page.on('pageerror', e => console.error('[pageerror]', e.message));
-  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}${opt('motion') ? '&motion=' + opt('motion') : ''}`);
+  await page.goto(`http://127.0.0.1:${PORT}/engine/index.html?ep=${ep}${extra}${opt('motion') ? '&motion=' + opt('motion') : ''}${opt('guard') ? '&guard=' + opt('guard') : ''}${SCALE > 1 ? '&ss=' + SCALE : ''}`);
   await page.waitForFunction('window.READY === true', null, { timeout: 120000 });
   return page;
 }
@@ -73,7 +78,8 @@ try {
   if (args.includes('--qa')) {
     const step = +(opt('step') || 0.1), N = +(opt('workers') || 4);
     const p0 = await openPage(browser, '&qa=1'); const dur = await p0.evaluate('window.DURATION'); await p0.close();
-    const ts = []; for (let t = 0.05; t < dur - 0.6; t += step) ts.push(+t.toFixed(3));
+    const ts = [], q0 = opt('from') ? +opt('from') : 0.05, q1 = opt('to') ? Math.min(+opt('to'), dur - 0.6) : dur - 0.6;  // --from/--to: check a stretch
+    for (let t = q0; t < q1; t += step) ts.push(+t.toFixed(3));
     const per = Math.ceil(ts.length / N);
     const found = (await Promise.all([...Array(N)].map(async (_, w) => {
       const page = await openPage(browser, '&qa=1'), mine = ts.slice(w * per, (w + 1) * per), res = [];
@@ -108,6 +114,9 @@ try {
       path.join(dir, 'sheet.jpg')]);
     }
     console.log('stills ->', dir);
+  } else if (args.includes('--shots')) {  // where every shot starts and ends
+    const page = await openPage(browser);
+    for (const s of await page.evaluate('window.SHOTS')) console.log(`shot ${s.i}  ${s.a.toFixed(2)}–${s.b.toFixed(2)}s`);
   } else if (args.includes('--cues')) {  // cues.json only: re-mix after a sound edit without re-rendering the video
     const page = await openPage(browser);
     fs.writeFileSync(path.join(BUILD, 'cues.json'), JSON.stringify(await page.evaluate('({duration: window.DURATION, cues: window.CUES, music: window.MUSIC, musicFx: window.MUSICFX})'), null, 1));

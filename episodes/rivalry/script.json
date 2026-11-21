@@ -1,0 +1,286 @@
+{
+  "title": "The truth: Hikaru and Magnus",
+  "channel": "THE 64 FILES",
+  "post": "Hikaru told the truth on a lie detector 💔 How many years have you been watching Hikaru? #chess #hikaru #magnuscarlsen #gmhikaru #story",
+  "lead_in": 0.05,
+  "tail": 1.4,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.84,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "engine": 2,
+    "tempo": 1.28,
+    "max_gap": 0.16
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5.0,
+    "reverb": 0.4,
+    "reverb_sec": 2.3,
+    "duck": 0.5
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "Magnus asked Hikaru one question on a lie detector.",
+      "say": "[intense] Magnus asked Hikaru one question on a lie detector.",
+      "pause": 0.2,
+      "colors": {
+        "Magnus": "red",
+        "Hikaru": "blue",
+        "lie": "gold",
+        "detector.": "gold"
+      },
+      "take": 1
+    },
+    {
+      "id": "q",
+      "text": "\"Are you jealous of anything I've achieved?\"",
+      "say": "[curious] Are you jealous of anything I've achieved?",
+      "pause": 0.35,
+      "colors": {
+        "jealous": "gold"
+      }
+    },
+    {
+      "id": "yes",
+      "text": "Hikaru said yes. And it was the truth.",
+      "say": "Hikaru said yes. And it was the truth.",
+      "pause": 0.55,
+      "colors": {
+        "yes.": "lime",
+        "truth.": "lime"
+      },
+      "take": 3
+    },
+    {
+      "id": "prodigy",
+      "text": "In 2003, he became America's youngest grandmaster. Younger than Bobby Fischer.",
+      "say": "In two thousand three, he became America's youngest grandmaster. Younger than Bobby Fischer.",
+      "pause": 0.2,
+      "colors": {
+        "2003,": "gold",
+        "youngest": "gold",
+        "Fischer.": "red"
+      }
+    },
+    {
+      "id": "next",
+      "text": "He was supposed to be the next world champion. Then Magnus showed up.",
+      "say": "He was supposed to be the next world champion. Then Magnus showed up.",
+      "pause": 0.75,
+      "colors": {
+        "next": "gold",
+        "champion.": "gold",
+        "Magnus": "red"
+      }
+    },
+    {
+      "id": "score",
+      "text": "In classical chess, Magnus has beaten him 14 times. Hikaru won once.",
+      "say": "In classical chess, Magnus has beaten him fourteen times. Hikaru won once.",
+      "pause": 0.2,
+      "colors": {
+        "14": "red",
+        "once.": "lime"
+      }
+    },
+    {
+      "id": "once",
+      "text": "Once. In 2016.",
+      "say": "Once. In twenty sixteen.",
+      "pause": 0.35,
+      "colors": {
+        "2016.": "gold"
+      },
+      "take": 2
+    },
+    {
+      "id": "bait",
+      "text": "Hikaru could beat the whole world.",
+      "say": "Hikaru could beat the whole world.",
+      "pause": 0.45,
+      "colors": {
+        "whole": "gold",
+        "world.": "gold"
+      },
+      "take": 1
+    },
+    {
+      "id": "bait2",
+      "text": "Just not the man who owns it.",
+      "say": "Just not the man who owns it.",
+      "pause": 0.4,
+      "colors": {
+        "owns": "red"
+      },
+      "take": 2
+    },
+    {
+      "id": "titles",
+      "text": "Magnus won five World Championship matches. Hikaru never got to play in one.",
+      "say": "Magnus won five World Championship matches. Hikaru never got to play in one.",
+      "pause": 0.2,
+      "colors": {
+        "five": "gold",
+        "never": "red"
+      }
+    },
+    {
+      "id": "c2024",
+      "text": "In 2024, it came down to the last round.",
+      "say": "In twenty twenty-four, it came down to the last round.",
+      "pause": 0.2,
+      "colors": {
+        "2024,": "gold",
+        "last": "gold",
+        "round.": "gold"
+      }
+    },
+    {
+      "id": "must",
+      "text": "Hikaru had to beat Gukesh.",
+      "say": "Hikaru had to beat Gukesh.",
+      "pause": 0.7,
+      "colors": {
+        "beat": "red",
+        "Gukesh.": "blue"
+      }
+    },
+    {
+      "id": "draw",
+      "text": "It was a draw.",
+      "say": "[somber] It was a draw.",
+      "pause": 0.35,
+      "colors": {
+        "draw.": "red"
+      }
+    },
+    {
+      "id": "champ",
+      "text": "Gukesh became world champion that year.",
+      "say": "Gukesh became world champion that year.",
+      "pause": 0.25,
+      "colors": {
+        "Gukesh": "blue",
+        "champion": "gold"
+      }
+    },
+    {
+      "id": "toss",
+      "text": "The next year, Hikaru checkmated the world champion in a stadium.",
+      "say": "The next year, Hikaru checkmated the world champion in a stadium.",
+      "pause": 0.15,
+      "colors": {
+        "checkmated": "red",
+        "stadium.": "gold"
+      }
+    },
+    {
+      "id": "toss2",
+      "text": "And threw his king into the crowd.",
+      "say": "And threw his king into the crowd!",
+      "pause": 0.4,
+      "colors": {
+        "king": "gold",
+        "crowd.": "gold"
+      }
+    },
+    {
+      "id": "now",
+      "text": "This year, he finished fifth. He's 38.",
+      "say": "This year, he finished fifth. He's thirty-eight.",
+      "pause": 0.6,
+      "colors": {
+        "fifth.": "red",
+        "38.": "red"
+      }
+    },
+    {
+      "id": "ladder",
+      "text": "A man will spend his whole life building a ladder to reach the sky.",
+      "say": "[somber] A man will spend his whole life building a ladder to reach the sky.",
+      "pause": 0.3,
+      "colors": {
+        "ladder": "gold",
+        "sky.": "gold"
+      },
+      "take": 1
+    },
+    {
+      "id": "wings",
+      "text": "Just to find out that someone else was born with wings.",
+      "say": "Just to find out that someone else was born with wings.",
+      "pause": 0.6,
+      "colors": {
+        "wings.": "gold"
+      },
+      "take": 3
+    },
+    {
+      "id": "twist",
+      "text": "But there's one title where it's still five to five.",
+      "say": "But there's one title where it's still five to five.",
+      "pause": 0.15,
+      "colors": {
+        "five": "gold",
+        "five.": "gold"
+      },
+      "take": 3
+    },
+    {
+      "id": "speed",
+      "text": "Speed chess. Five for Magnus. Five for Hikaru.",
+      "say": "Speed chess. Five for Magnus. Five for Hikaru.",
+      "pause": 0.15,
+      "colors": {
+        "Speed": "lime",
+        "chess.": "lime"
+      }
+    },
+    {
+      "id": "six",
+      "text": "This month, they started playing for number six.",
+      "say": "This month, they started playing for number six.",
+      "pause": 0.15,
+      "colors": {
+        "six.": "gold"
+      }
+    },
+    {
+      "id": "loop",
+      "text": "Hikaru told the truth on a lie detector. Now the board gets to answer.",
+      "say": "Hikaru told the truth on a lie detector. Now the board gets to answer.",
+      "pause": 0.3,
+      "colors": {
+        "truth": "lime",
+        "board": "gold"
+      }
+    },
+    {
+      "id": "cta",
+      "text": "How many years have you been watching Hikaru?",
+      "say": "How many years have you been watching Hikaru?",
+      "pause": 0.0,
+      "colors": {
+        "many": "gold",
+        "years": "gold"
+      },
+      "take": 2
+    }
+  ]
+}

@@ -250,10 +250,10 @@ export function box(g, b, [x0, y0, z0], [x1, y1, z1], { top = '#2A2018', side = 
 }
 
 // the table under the board: a top with a lip and a solid pedestal that hides the players' lower bodies
-export function table(g, b, env = ENV.cold, { x1 = 8.4 } = {}) {
+export function table(g, b, env = ENV.cold, { x0 = -0.4, x1 = 8.4 } = {}) {
   const [top, side, front] = env.table || [mix(env.wall[0], '#000000', 0.35), mix(env.base, '#000000', 0.2), mix(env.wall[1], '#000000', 0.5)];
-  box(g, b, [-0.4, FLOOR_Y, -0.4], [x1, -0.75, 8.4], { top: side, side: mix(side, '#000000', 0.3), front: side });
-  box(g, b, [-1.1, -0.75, -1.1], [x1 + 0.7, -0.35, 9.1], { top, side: front, front });
+  box(g, b, [x0, FLOOR_Y, -0.4], [x1, -0.75, 8.4], { top: side, side: mix(side, '#000000', 0.3), front: side });
+  box(g, b, [x0 - 0.7, -0.75, -1.1], [x1 + 0.7, -0.35, 9.1], { top, side: front, front });
 }
 
 // a chair facing +z (face=1) or -z (face=-1); seat center (x, z)

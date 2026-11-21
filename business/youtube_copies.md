@@ -1,0 +1,506 @@
+# Канал-копия на YouTube: The 64 Stories
+
+Проверено 13.11.2026 около 23:00 UTC. Канал `@the64stories` перезаливает ролики The 64 Files с TikTok без разрешения.
+Здесь — что именно скопировано, ссылки на оригиналы для жалоб и доказательства авторства.
+
+## Каналы
+
+| Канал | Что это | Данные |
+|---|---|---|
+| [The 64 Stories](https://www.youtube.com/@the64stories) (`UCQxxWFxb02DCkTunX0rftJQ`) | копия | создан 19.09.2026; 6,1 тыс. подписчиков; 24 шортса, все — ролики The 64 Files; в сумме ≈5,3 млн просмотров; в описании просит писать о сотрудничестве на свою почту |
+| [@the64files в TikTok](https://www.tiktok.com/@the64files) | оригинал | 16,9 тыс. подписчиков, 28 роликов, первый — 12.10.2026 |
+| [The 64 Files](https://www.youtube.com/@the64filesofficial) (`UCsCp6_Ihp0wqsnkfanbck4g`) | новый канал автора | создан 11.11.2026, один шортс («Who can beat Mittens?») |
+| [The 64 Files](https://www.youtube.com/@the64files) (`UCP_JjtknigGxYbFO8BDl3hw`) | чей — уточнить у автора; судя по нику, чужой | создан 13.07.2026, видео нет, в описании «Every episode is a file. Every square hides a story.» |
+| The 64 Files, `@The64FilesChess` | канал автора, заблокирован | «violates our Impersonation policy»; апелляция отклонена (экран автора от 13.11.2026) |
+
+## Блокировка канала автора (13.11.2026)
+
+- Ответ YouTube на апелляцию: «Your channel won't be put back on YouTube at this time. We've taken a careful look at
+  your channel again, and confirmed that it violates our Impersonation policy… Currently, your channel does not have
+  access to YouTube's pilot programme to apply for a new channel.» Канал — «The 64 Files», ник `@The64FilesChess`.
+- **Догадка, не факт.** Ник `@the64files` на YouTube занят другим каналом с тем же именем «The 64 Files» и той же
+  темой, созданным 13.07.2026, — раньше канала автора (у автора ник с добавкой «Chess», значит, короткий был занят).
+  Для YouTube канал автора выглядел копией этого канала: одно имя, одна тема. Тогда блокировка не обязательно связана
+  с каналом-копией The 64 Stories; кто подал жалобу и была ли она, по открытым данным не видно. Когда тот канал получил
+  имя и ник, тоже не видно: дата создания канала не меняется, а имя и ник меняются.
+- Что из этого следует: любой новый канал с именем «The 64 Files» упрётся в то же совпадение; новый канал после
+  блокировки YouTube к тому же считает обходом. Обычная апелляция использована. Остаётся обращение в поддержку
+  (@TeamYouTube) с доводом по существу: «The 64 Files» — собственный бренд автора (TikTok с 12.10.2026, спонсорские
+  договоры), он не выдавал себя за канал `@the64files`, у которого нет ни одного видео.
+
+### Второй канал тоже заблокирован (14.11.2026)
+
+Автор прислал экран формы «Appeal the removal of The 64 Files» со ссылкой на правило Impersonation: заблокирован и
+новый канал `@the64filesofficial`. Текст апелляции (поле до 800 знаков, здесь 788; вариант от 14.11 с кадром из чужой копии); почтой для связи указать
+the64filestt@gmail.com — она стоит в био TikTok, и по ней проверяющий увидит, что канал настоящий:
+
+> I am the original creator of The 64 Files, not an impersonator. I write, animate and publish these chess videos myself. Proof: my TikTok @the64files (16.9K followers) has the same videos, posted there first, and its bio names this YouTube channel and my business email the64filestt@gmail.com. The channel @the64stories re-uploads my videos, and my handle is still engraved inside its copies: this frame of its video reads @THE64FILES: https://i.ytimg.com/vi/WLywVcbK5FY/oar2.jpg I have no connection to the empty channel @the64files and I do not pretend to be anyone. My earlier channel @The64FilesChess, also mine, was removed for the same reason; I opened this one so viewers could find the real author. If the name causes confusion, I will rename the channel. Please take another look.
+
+В тексте прямо сказано про первый канал: YouTube видит связь и без этого, а довод один — автор ни за кого себя не
+выдаёт. Риск остаётся: новый канал после блокировки YouTube считает обходом. Подавать один раз.
+
+### Апелляция по второму каналу отклонена, аккаунт заявителя удалён (14.11.2026)
+
+Автор прислал экраны (14.11.2026, около 11:50 его времени):
+
+- **Канал.** «Appeal decision: Your channel won't be put back on YouTube at this time… confirmed that it violates our
+  Impersonation… Currently, your channel does not have access to YouTube's pilot program to apply for a new channel.
+  Please stay tuned.» Это ответ на апелляцию по `@the64filesofficial`. Обычный путь обжалования по обоим каналам
+  исчерпан.
+- **Заявки через форму.** На две заявки автора (шесть роликов, строки 2–7 таблицы) пришло то же «Need more info… may
+  be fraudulent… within 7 days», что и на письма с the64filestt, а затем: «We're concerned that some info within this
+  legal request may be fraudulent… As a result, your account has been terminated. If you believe that all of the info
+  you provided in this legal request was accurate, respond with an explanation… you may appeal this decision. If your
+  appeal is accepted, your removal request will be processed and your YouTube channel will be reinstated.» То есть
+  удалён аккаунт YouTube, с которого автор подавал заявки; путь назад назван в самом письме — ответ с объяснением и
+  апелляция по ссылке из письма.
+- **Проверено в тот же час:** все 24 копии на месте (oEmbed отвечает 200); на три ответа, отправленные с the64filestt
+  14.11 в 06:21–06:22 UTC, YouTube ещё не ответил.
+- **Расхождение, которое надо снять.** В заявках через форму автор указал своё полное имя, а письма с the64filestt
+  были подписаны именем из инвойса. Автор (14.11.2026): «тот что в инвойсе это моего двоюродного брата» — то есть в
+  письмах стояло не имя автора; ошибка моя, имя взято из инвойса без вопроса автору. Для YouTube это два разных
+  заявителя на одни и те же шесть роликов за одни сутки; этого достаточно для пометки «fraudulent». Исправление —
+  отдельным письмом в те же ветки (см. ниже, только с согласия автора). Имена в хранилище не пишем.
+- **Гравировка в первом кадре пяти копий.** Автор прислал экран копии «Bongcloud» из приложения YouTube с надписью
+  «@THE64FILES» на ребре доски. Проверено по кадрам с сервера YouTube (`https://i.ytimg.com/vi/<id>/frame0.jpg` —
+  первый кадр, 268×480): надпись читается в `A_MNOn0hvck`, `NwbQCns0Bl4`, `WLywVcbK5FY`, `-m9a1wTFDCs` и
+  `J14e_O5V-TQ`.
+- **Чего не делать:** новых каналов и новых заявок с других аккаунтов — каждая выглядит для YouTube продолжением
+  того же «мошенничества».
+- **Новое доказательство по ролику из заявки автора.** В копии `J14e_O5V-TQ` («GothamChess Lost to Amateur») на кадре
+  с сервера YouTube видна гравировка «@THE64FILES» на переднем ребре доски:
+  [кадр](https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg). Время публикации оригинала зашито в номер ролика TikTok
+  (первые 32 бита — время Unix), задним числом его не изменить; по шести роликам из заявок оно совпадает с таблицей.
+
+**Исправление имени отправлено 14.11.2026 около 09:15 UTC** в три ветки с the64filestt (автор на вопрос «отправить
+исправление?» ответил «Да, отправить»). В письме: прежняя подпись — имя двоюродного брата, взятое по ошибке из
+делового документа канала; автор и правообладатель всех 24 роликов — он сам, полное имя как в его заявках через
+форму; заявки через форму с его аккаунта YouTube подал тот же человек; новое доказательство — гравировка
+«@THE64FILES» в начале пяти копий (ссылки на `frame0.jpg`); оба обязательных заявления повторены от его имени.
+
+**Что сделать автору (по порядку):**
+1. В био TikTok `@the64files` дописать строку `YT-64F-1114` — проверяющий увидит, что заявитель владеет аккаунтом, где
+   ролики вышли первыми. Без этой строки пункт (c) из текста убрать.
+2. Ответить на письмо «your account has been terminated» из того же ящика, куда оно пришло, текстом ниже; вписать имя.
+3. Открыть ссылку «appeal» из этого письма и подать то же самое (если поле короткое — короткий вариант).
+4. Если есть X: написать @TeamYouTube (черновик ниже, обновлён).
+
+**Правило на будущее:** имя для юридических писем спрашивать у автора, а не брать из документов; в инвойсах канала
+стоит имя родственника.
+
+Текст ответа (английский; в квадратных скобках — вписать):
+
+```
+Hello,
+
+All of the information in my removal requests is accurate. I am the author of these videos. I ask you to review
+this decision, process the requests and reinstate my channel.
+
+1. WHO I AM
+I make a chess-history series called "The 64 Files": I write the scripts, build the animation and publish every
+episode myself. I publish first on TikTok, on my account @the64files (https://www.tiktok.com/@the64files), active
+since 12 October 2026, about 17,000 followers. The YouTube channel "The 64 Stories" (@the64stories) downloads my
+episodes from TikTok and re-uploads them without my permission, 24 so far.
+
+My full legal name is [FULL LEGAL NAME], as stated in my requests. The notice about the other 18 copies on the
+same channel, sent by email from the64filestt@gmail.com (reference 33GGAJCXQZSMNIHJNEHY3JQIMY), is also mine: that
+address is the business contact printed in the bio of my TikTok account. That email was signed by mistake with the
+name of my cousin, taken from a business document of the channel; I have sent a correction in that thread. There
+is one claimant, me, not two.
+
+2. EVIDENCE YOU CAN CHECK YOURSELVES
+(a) My handle is inside the copies. The edge of the chessboard in my videos is engraved "@THE64FILES". The
+uploader did not remove it. Open these copies at 0:00 and look at the edge of the board, or see YouTube's own
+first-frame stills:
+https://i.ytimg.com/vi/J14e_O5V-TQ/frame0.jpg (a video in this request; larger: https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg)
+https://i.ytimg.com/vi/A_MNOn0hvck/frame0.jpg
+https://i.ytimg.com/vi/NwbQCns0Bl4/frame0.jpg
+https://i.ytimg.com/vi/WLywVcbK5FY/frame0.jpg
+https://i.ytimg.com/vi/-m9a1wTFDCs/frame0.jpg
+Two more copies still end with my plate "FOLLOW FOR MORE / THE 64 FILES":
+https://i.ytimg.com/vi/nRx_hI8DvDs/oar3.jpg and https://i.ytimg.com/vi/agXowu9Rv-I/oar3.jpg
+The uploader's channel is called "The 64 Stories". The name written inside the videos is mine.
+(b) Dates. Every original was public on TikTok before its copy was uploaded to YouTube (list below). TikTok
+keeps the upload time inside the video ID (its first 32 bits are the Unix time), so it cannot be changed later.
+(c) Control of the original account. I have added the line "YT-64F-1114" to the bio of my TikTok account
+@the64files. Only the owner of that account can do this.
+(d) Source files. Every episode is generated from my own project: scene code, scripts, narration sessions. On
+request I will send the project and the 4K master of any of these videos, and the analytics of the originals.
+The uploader of the copies has none of this.
+
+3. THE WORKS IN MY REQUESTS (each copy is my entire video)
+https://www.youtube.com/watch?v=Dw0bCwE_gNg (uploaded 4 Nov 2026, 19:00 UTC) is a copy of my "Gothamchess, The
+Grandmaster Hunter", published 3 Nov 2026, 19:45 UTC: https://www.tiktok.com/@the64files/video/7704033750190951688
+https://www.youtube.com/watch?v=rUg2CLvelHg (uploaded 9 Nov 2026, 18:44 UTC) is a copy of my "Bobby Fischer - The
+Fischerman", published 8 Nov 2026, 20:29 UTC: https://www.tiktok.com/@the64files/video/7705900508925398279
+https://www.youtube.com/watch?v=J14e_O5V-TQ (uploaded 3 Nov 2026, 18:57 UTC) is a copy of my "Gothamchess Lost to
+Amateur", published 2 Nov 2026, 11:23 UTC: https://www.tiktok.com/@the64files/video/7703533116886961426
+https://www.youtube.com/watch?v=Lm9o3BTdFAA (uploaded 7 Nov 2026, 19:14 UTC) is a copy of my "Bobby Fischer's
+paranoia", published 12 Oct 2026, 22:29 UTC: https://www.tiktok.com/@the64files/video/7695912005613407489
+https://www.youtube.com/watch?v=bCMlxBvqwXg (uploaded 6 Nov 2026, 18:59 UTC) is a copy of my "Who has the most
+brilliant moves on Chess.com?", published 14 Oct 2026, 06:02 UTC:
+https://www.tiktok.com/@the64files/video/7696399796298353928
+https://www.youtube.com/watch?v=hCf_l85jvwo (uploaded 5 Nov 2026, 19:19 UTC) is a copy of my "Who can beat
+Mittens?", published 4 Nov 2026, 20:46 UTC: https://www.tiktok.com/@the64files/video/7704420423659982098
+
+4. ABOUT MY CHANNEL
+My YouTube channels named "The 64 Files" were removed for impersonation. I did not impersonate anyone: "The 64
+Files" is my own series, and the channel that had my videos on YouTube before me is the one that copied them.
+
+I have a good faith belief that the use of my videos by this channel is not authorized by me, my agent or the
+law. The information in this message is accurate, and under penalty of perjury I am the owner of the exclusive
+rights that are infringed.
+
+[FULL LEGAL NAME]
+```
+
+Короткий вариант для поля апелляции (около 820 знаков без имени):
+
+```
+My removal requests are accurate. I am the author of "The 64 Files", a chess-history series I publish first on
+TikTok (@the64files, since 12 Oct 2026). The channel @the64stories re-uploads my episodes. You can check it
+yourselves: (1) my handle is engraved inside its copies: open them at 0:00, or see YouTube's own stills
+https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg and https://i.ytimg.com/vi/A_MNOn0hvck/frame0.jpg (board edge reads
+@THE64FILES); (2) every original was on TikTok before the copy, and the upload time is part of the TikTok video
+ID; (3) the line "YT-64F-1114" is now in the bio of my TikTok account, which only its owner can edit; (4) I can
+send the project files and 4K masters. My channels were removed for impersonation, but the copying went the other
+way. Please review, process the requests and reinstate my channel. [FULL LEGAL NAME]
+```
+
+### Черновик обращения к @TeamYouTube (X, два сообщения по 280 и 220 знаков)
+
+> @TeamYouTube My channel "The 64 Files" (@The64FilesChess) was terminated for impersonation and the appeal was denied. I am the original creator: the same videos are on my TikTok @the64files (16.9K followers) since Oct 12. I never posed as anyone else. Could you take another look?
+
+> A different channel holds the handle @the64files and the same name, with no videos: I have nothing to do with it. And @the64stories re-uploads my videos to YouTube, 24 so far; my copyright removal requests are in review.
+
+Вариант от 14.11 (после удаления аккаунта заявителя), одно сообщение: 281 знак, ссылку X считает за 23, итого 258:
+
+> @TeamYouTube I make The 64 Files (TikTok @the64files). @the64stories re-uploads my videos; my handle is still engraved inside its copies: https://i.ytimg.com/vi/J14e_O5V-TQ/oar1.jpg Yet my channels were removed for impersonation and my takedowns marked fraudulent. Please escalate.
+
+Отправлять автору со своего аккаунта и только если канал `@the64files` действительно не его.
+
+## Доказательства авторства
+
+1. **Даты.** Каждая копия из ленты залита позже оригинала: свежие ролики — через 20–32 часа после TikTok (ролик про
+   Дубова — через 26 минут), старые — через 11–26 дней. Даты копий — из открытой ленты YouTube
+   (`https://www.youtube.com/feeds/videos.xml?channel_id=UCQxxWFxb02DCkTunX0rftJQ`, в ней 15 последних роликов), даты
+   оригиналов — со страниц TikTok.
+2. **Наша плашка в их роликах.** В копиях осталась финальная плашка «FOLLOW FOR MORE — THE 64 FILES». Кадры лежат на
+   сервере самого YouTube: [GothamChess VS 225.000 People](https://i.ytimg.com/vi/nRx_hI8DvDs/oar3.jpg),
+   [Can chess be solved?](https://i.ytimg.com/vi/agXowu9Rv-I/oar3.jpg).
+3. **Исходники.** 23 из 24 роликов собраны кодом в этом репозитории (папки `episodes/<имя>`, колонка «Папка»): сцены,
+   сценарий, озвучка. Такого проекта нет ни у кого другого. У 11 роликов, сделанных с 18.10.2026, первый коммит папки
+   старше и публикации в TikTok, и копии (`git log --diff-filter=A -- episodes/<имя>`); остальные папки внесены
+   первым коммитом хранилища 17.10.2026. Ролика про Mittens в репозитории нет.
+4. **Спонсорский ролик.** «Hikaru realized Magnus is losing» — оплаченная интеграция Chessnut; копия показывает её
+   без ведома автора и спонсора.
+
+## 25-я копия: новый ролик через 39 минут (14.11.2026)
+
+`witty2` («Nah, I'd win… Witty Alien vs Magnus Carlsen, round two») вышел в TikTok 14.11.2026 в 13:49:20 UTC
+([оригинал](https://www.tiktok.com/@the64files/video/7708023874599980295)). Копия на канале-копии —
+[RKOz8rgxtRM](https://www.youtube.com/watch?v=RKOz8rgxtRM), «♟️ Witty Alien VS Magnus Carlsen. Round TWO», по ленте
+канала загружена в 14:28:25 UTC, через 39 минут (раньше он ждал 20–32 часа). Ролик про дятла (11 тыс. просмотров) он
+не взял: берёт то, что набирает.
+
+Доказательства сильнее прежних, потому что есть отметки времени у третьих сторон **до публикации**:
+- 13:19:02 UTC — файл превью создан на Google Drive канала (`1-TINwB7UsGjFAuyLmZ4c3KbKbKdz-Sx2`, владелец the64filestt);
+- 13:21:54 UTC — письмо спонсору (Chessigma) со ссылкой на него; 13:29:52 UTC — письменное одобрение спонсора;
+- 13.11.2026, 15:22 UTC — более ранняя версия этого же ролика приложена к письму спонсору (за сутки до выхода);
+- в самой копии на кадре с сервера YouTube читается гравировка «@THE64FILES» на ребре доски:
+  [кадр на 25 %](https://i.ytimg.com/vi/RKOz8rgxtRM/oar1.jpg);
+- это оплаченная интеграция Chessigma (метка AD, их финальная карточка): копия показывает рекламу без ведома спонсора.
+
+**14.11.2026, 15:12 UTC — отправлено** (автор: «о давай, чтоб эллиот тоже страйк подал»):
+- в три ветки YouTube с the64filestt — эта копия, оригинал, три доказательства выше и оба обязательных заявления;
+- Элиоту (Chessigma), копия Мехди: ролик вышел; ссылка в био заменена на страницу загрузки и почему; копия на
+  YouTube и просьба подать заявку на удаление — от своего имени (в копии их финальная карточка, экраны приложения,
+  логотип) или от нашего как представитель; если подавать не станут — подтвердить YouTube, что ролик сделали мы.
+
+**Поправка, 15:21 UTC.** Автор посмотрел копию: «он в конце рекламу вырезал, но телевизор с чессигмой есть» — концовка
+с блоком Chessigma (около 13 секунд: текст про Chessigma и их карточка) обрезана, обзор на мониторе в кадре остался.
+В письмах выше было «весь ролик» и «с их рекламой». Отправлены исправления: в три ветки YouTube (копия — мой ролик
+без концовки, продукт спонсора в кадре есть) и Элиоту (карточки в копии нет; от своего имени заявка была бы за
+экраны приложения на мониторе, от нашего — как раньше). Длину копии сам проверить не смог: страница ролика YouTube
+отвечает 429. **Урок: прежде чем писать «копия целиком», смотреть копию до конца или спрашивать автора.**
+
+## Копия ролика для Chessnut: письмо спонсору (14.11.2026)
+
+Автор: «отправь стелле тоже письмо чтоб они страйк кинули, он залил видео с хикару осознал что магнус проигрывает».
+Это копия № 1 в таблице ниже, [Wmz-pghiWnE](https://www.youtube.com/watch?v=Wmz-pghiWnE): залита 11.11 в 19:21:51 UTC,
+через 19 ч 45 мин после оригинала (10.11, 23:36:28 UTC); на 14.11 — 174 тыс. просмотров; описание пустое (ни Chessnut,
+ни ссылки, ни промокода). В наше уведомление YouTube от 13.11 она уже входит.
+
+**Что проверено по самой копии.** Проиграть её из сессии нельзя (страница ролика отвечает 429), длины роликов YouTube
+в списках не отдаёт. Четыре кадра копии с сервера YouTube (`frame0.jpg`, `oar1.jpg`–`oar3.jpg`) совпали с кадрами
+нашего файла на 0,0, 7,6, 43,0 и 81,8 с из 84,8 (`python3 tools/framematch.py <наш файл> <кадры>`: сравнение кадра с
+каждым кадром ролика). Последний — финальная фраза, она идёт после рекламного блока (64,2–80,0 с), то есть конец он здесь не
+обрезал. Вырезан ли сам блок из середины, по кадрам не видно; доска Chessnut с логотипом в нашем ролике стоит в кадре
+с 11-й секунды. Кадры `oar1`–`oar3` YouTube берёт не с фиксированных долей длины (у `witty2` это 8,8, 42,3 и 55,3 с),
+длину копии по ним не вычислить.
+
+**14.11.2026, 16:05 UTC — письмо Стелле** (в ветку про «2.13 seconds»): ссылка на копию, когда залита, сколько
+просмотров, что описание пустое; что YouTube пока считает оригиналом тот канал; просьба подать заявку на удаление — от
+своего имени (их логотип и продукт показаны без разрешения; у YouTube для этого отдельная форма по товарным знакам)
+или от нашего как представитель (заявка по авторскому праву: письмом на copyright@youtube.com или формой); для заявки
+— ссылки и время копии и оригинала и то, что готовый ролик был у них письмом 10.11 в 13:02 UTC, до публикации. Про
+рекламный блок в копии в письме ничего не утверждается. Ответа пока нет.
+
+**16.11.2026, 02:30 UTC — ответ Стеллы:** Chessnut сама подаст в YouTube жалобу по товарному знаку (Trademark
+Complaint): в копии их логотип и продукт. Обещала сообщить результат.
+
+## Герой ролика прокомментировал копию (14.11.2026)
+
+Автор прислал скриншот копии `witty2` на YouTube (`RKOz8rgxtRM`): под ней 83 комментария, и первый — от
+подтверждённого канала самого Witty Alien (`@Witty_AlienClips`), около 18:00 UTC: «I am sorry, I let you down 👽❤️ He
+is too strong <3» — 323 отметки, 12 ответов, сердечко от канала-копии. Это ответ на финал нашего ролика («Stand proud,
+Witty. You're strong.»). Автор: «я очень взбешен».
+
+**Уточнение (автор: «он комментнуо мое видео в тт, и видео того мошенника»).** Проверено по комментариям оригинала:
+Witty (в TikTok — `@witty__alien`, два подчёркивания, 826 тыс. подписчиков) сначала написал под оригиналом, в 16:06
+UTC, через 2 ч 17 мин после выхода: «I am sorry I let you down guys 👽❤️» — это верхний комментарий, 1 745 отметок и
+33 ответа, автор его отметил, но не закрепил. Под копией он написал почти то же примерно на два часа позже. Скорее
+всего, он считает канал на YouTube каналом того же автора, а не встал на сторону копии.
+
+- На 23:58 UTC у копии 129 тыс. просмотров (в 16:00 было 5 тыс.); у оригинала в TikTok — 202,8 тыс.
+- В 23:54 UTC автор сам написал Witty в личные сообщения TikTok (аккаунт «Witty_Alien», 826,2 тыс. подписчиков): что
+  канал на YouTube копирует его ролики, и просьба не комментировать там. Доказательств и ссылки в сообщении не было.
+- Что предложено автору: закрепить комментарий Witty под оригиналом и ответить под ним (ответ придёт ему
+  уведомлением, а личка от незнакомого лежит в запросах): канал на YouTube — не наш, он перезаливает наши ролики; в
+  личку дописать ссылку на оригинал (вышел на 39 минут раньше) и про гравировку `@THE64FILES` на ребре доски в самой
+  копии; попросить одно простое действие — ответить под своим комментарием на YouTube, что оригинал у `@the64files`
+  в TikTok, или сделать репост оригинала. Писать фактами, без ругани: так ему проще публично встать на сторону автора.
+- Открытых контактов для писем у Witty не нашлось: в сети названы только его YouTube (`@Witty_AlienClips`) и Twitch
+  (`twitch.tv/witty_alien`). Запасной путь — чат его стрима.
+- В YouTube новых писем не шлём (в трёх ветках уже по пять сообщений); комментарий героя под копией приложить, когда
+  YouTube ответит.
+
+## Жалоба на канал-копию за impersonation (черновик, 15.11.2026)
+
+Автор: «напиши текст для жалобы за имперсонайшн» — после того как узнал, что его каналы удалили за impersonation
+сразу, а копию удаляют только за три страйка.
+
+**Находка, на которой держится жалоба.** Аватар канала «The 64 Stories» — тот же логотип, что у автора в TikTok:
+белый король под софитом с красной печатью «64» ([сравнение](avatar_compare_2026-11-15.png); у копии он круглый, у
+автора квадратный). По правилу YouTube об impersonation канал, который копирует профиль другого так, что выглядит его
+каналом, удаляют, и трёх страйков для этого не нужно. Остальное у копии своё: название «The 64 Stories», описание «True
+stories from the history of chess.♟️», баннер «CHECKMATE»; 6 920 подписчиков на 15.11.2026.
+
+**Где и как подаёт автор** (сам, один раз, с почты the64filestt@gmail.com — она в био TikTok): форма жалобы на
+impersonation по ссылке со страницы правила YouTube
+([Impersonation policy](https://support.google.com/youtube/answer/2801947?hl=en); по сторонним инструкциям, адрес
+формы — `support.google.com/youtube/contact/impersonation`, из сессии не проверить). Вариант — канал выдаёт себя за
+мой канал. Своего канала на YouTube у автора нет — в поле о своём канале ставить TikTok. Приложить сравнение аватаров
+и скриншот комментария Witty под копией.
+
+Текст (707 знаков; полное имя — то, что автор назвал для юридических писем):
+
+> I am the creator of The 64 Files (TikTok: https://www.tiktok.com/@the64files). The channel "The 64 Stories"
+> (https://www.youtube.com/@the64stories) poses as mine: its profile picture is my logo (the white king with a red
+> "64" stamp from my TikTok), and all 25 of its videos are my videos, re-uploaded with my brand inside: "@THE64FILES"
+> on the board and my "THE 64 FILES" end card. Viewers take it for my channel: Witty Alien, the streamer in my latest
+> video, commented under its copy as if it were mine. My own YouTube channels were removed for impersonation; I
+> believe this channel is the reason. My contact email, the64filestt@gmail.com, is in my TikTok bio. Please review
+> this channel for impersonation.
+> [FULL LEGAL NAME]
+
+**Поле в форме — 300 знаков** (автор, 15.11.2026). Текст под него (284 знака; ссылку на копию, имя и почту форма
+спрашивает отдельными полями):
+
+> I'm the creator of The 64 Files: tiktok.com/@the64files. This channel uses my logo as its profile picture and
+> re-uploads all my videos with my brand inside (@THE64FILES on the board, my end card). Viewers take it for my channel:
+> even Witty Alien, the streamer in my latest video, did.
+
+Если где-то в форме есть ещё место, добавить ссылки на кадры с сервера YouTube: гравировка —
+https://i.ytimg.com/vi/RKOz8rgxtRM/oar1.jpg, плашка — https://i.ytimg.com/vi/nRx_hI8DvDs/oar3.jpg; копия последнего
+ролика залита через 39 минут после оригинала (https://www.tiktok.com/@the64files/video/7708023874599980295).
+
+## Пост автора на Reddit (r/PartneredYoutube, 15.11.2026)
+
+Автор выложил пост «Some person on youtube (@the64stories) is copying my entire tiktok channel (@the64files), and when
+i upload my videos from tiktok to youtube, i get banned for impersonation (2 times) What tf should i do?» (сначала в
+r/fuckyoutubedevs). Из сессии Reddit не открывается (403), читали по скриншотам автора. Что советуют и что из этого
+следует:
+- «Upload to YouTube first and keep it private, then post to TikTok, then make it public; strike his copies» (34 голоса;
+  то же советует автор канала на 1,7 млн подписчиков). Верно в принципе: YouTube признаёт оригиналом того, у кого
+  загрузка раньше, а инструмент Copyright Match сам находит перезаливы. Но сейчас нельзя: каналы автора удалены, а
+  новый канал после удаления YouTube считает обходом блокировки. Только после того, как канал вернут.
+  Автор (15.11.2026) всё же попросил версию для YouTube: «сделай вотермарку без if you see this on youtube it's stolen,
+  чтобы я залил на Ютуб приватно, потом когда он зальет кину страйк». Сделано: рендер с `--guard handle`
+  (`episodes/fairplay/build/fairplay_youtube.mp4`); риск обхода блокировки автору назван.
+- «Copyright removal request for each copied video with links to your TikTok originals and their dates; watermark;
+  an on-screen line with your TikTok handle; side-by-side screenshots in the appeal» — всё это уже сделано (заявки на
+  все копии, правило 70, сравнение аватаров).
+- **Подсказка о причине бана.** Комментатор: его второй канал удалили за impersonation, потому что логотип был похож на
+  логотип основного. У автора так и вышло, только наоборот: канал-копия взял его логотип из TikTok (король с печатью
+  «64», см. [сравнение](avatar_compare_2026-11-15.png)) и появился на YouTube раньше, чем канал автора. Для YouTube
+  канал автора с тем же логотипом и похожим именем выглядел копией «The 64 Stories». Это сильнее прежней догадки про
+  чужой ник `@the64files`. Вывод: жалоба на копию за impersonation (логотип) и в любом обращении о возврате канала
+  прямо писать, что логотип украли у автора.
+
+## Режим защиты со следующего ролика (14.11.2026)
+
+Автор: «сделай для следущих видео режим защиты, типо вотермарка прозрачная где лого тт @the64files, и снизу IF YOU SEE
+THIS ON YOUTUBE IT'S STOLEN и типо вотермарка перемещается по эрану обрезками, чтобы ему было очень сложно убрать».
+Сделано в движке, включено у каждого ролика: [STYLE_BIBLE.md](../STYLE_BIBLE.md), правило 70 (`engine/js/guard.js`).
+Что это даёт против копий:
+- копия сама сообщает зрителю и проверяющему YouTube, чей ролик: строка про YouTube видна и на кадрах, которые отдаёт
+  сервер YouTube (`frame0.jpg`, `oar1.jpg`–`oar3.jpg`), — их можно приложить к письму, не открывая ролик;
+- обрезкой метку не убрать (она в середине кадра), одним пятном не закрыть (прыгает и плывёт, вторая метка ползёт
+  по кадру), концовку можно не беречь (он её срезает);
+- до публикации — отпечаток файла в [proofs.md](proofs.md) (`python3 tools/proof.py <файл>`, коммит и пуш).
+Чего это не даёт: закрыть метку вручную можно, если тратить на каждый ролик время (маска на каждом прыжке); скачать
+ролик без водяного знака TikTok он сможет по-прежнему.
+
+21.11.2026 автор: «сделай водяные знаки менее бесящими». Метка стала тише (правило 70, «Тихая метка»): вторая,
+ползущая, выключена; прозрачность 0,24, прыжки раз в шесть секунд. Строка про YouTube и ник остались, метка по-прежнему
+в середине кадра и меняет место, так что всё сказанное выше в силе.
+
+## Третий запрос «need more info» и ответ с документами (17–18.11.2026)
+
+**17.11.2026, 18:48–18:50 UTC** во всех трёх ветках (`U63E3AMUL5GS55AJG4EAC5MXE4` — 4 ролика,
+`QHJR7OU565D37IRZDSHLVUXQOI` — 10, `AZ47HRX6F5TTNNJ2JTCTCWMBFQ` — 10; вместе все 24) одно и то же: «We remain concerned
+that your claim… may not be valid… a copyright registration certificate (if the works are registered) or any supporting
+documentation… if you don't respond within 7 days, or respond with no additional substantive information, your YouTube
+account may be terminated». Срок — **24.11.2026**. Отзыв — фразой «I hereby retract my claim of copyright infringement».
+В цитате у них — уведомление от 13.11 с прежней подписью (имя двоюродного брата), хотя исправление было 14.11.
+
+**Что нашлось 18.11.2026 около 00:40 UTC.**
+- Копия № 1 (`Wmz-pghiWnE`, ролик для Chessnut) **удалена**: oEmbed отвечает 404, кадров на i.ytimg.com нет. Причина не
+  видна; Chessnut 16.11 обещала подать жалобу по товарному знаку. Остальные 23 копии и копия `witty2` на месте.
+- Био TikTok сейчас: `chessigma.com / chessnutech.com / Youtube: @the64filesofficial YT-64F-1114 / @the64stories IS
+  FAKE !!! ⚠️ / Collab: the64filestt@gmail.com` — строка `YT-64F-1114` и почта стоят.
+- 15.11 в 00:29 UTC YouTube прислал на the64filestt «Thank you for reporting this channel on November 14» — жалоба на
+  канал (по всей видимости, за impersonation) принята.
+- Чего нет: регистрации в Бюро авторских прав США; файлов роликов на Google Диске до публикации (там только
+  `woodpecker`, `witty2` и записи экрана Chessigma); история ElevenLabs по API хранит только 13–16.11 и без текстов.
+- **Папка `episodes/records` — другой ролик** («The Craziest Chess World Records», рекорды Гиннесса), а в TikTok и в
+  копии `CPzplLt64VY` — «Top 5 Chess WORLD Records» (269 ходов, ничья и т. д.). Код этой папки к копии не прикладывать.
+  Ролика про Mittens в репозитории нет.
+
+**Новое доказательство — сам проект.** Для каждой копии: кадр с сервера YouTube (`frame0`, `oar1`–`oar3`) и строка
+нашего `scenes.js`, которая рисует надпись в этом кадре, плюс строка `script.json`, которая звучит в этот момент (у 21 из
+23 копий; например, `coverTitle(g, 'THE MAN WHO INVENTED', 'BRILLIANTS', …)` — `episodes/talbrill/scenes.js:1119`).
+Обложка ролика в TikTok у 17 копий — тот же кадр, что `frame0` (или `oar2`) копии. Гравировку `@THE64FILES` рисуют
+`engine/js/look.js:14` и `engine/js/board.js:107`, добавлена коммитом `7c873fb` 22.10.2026 в 22:29 UTC; на кадрах с
+сервера YouTube она читается у `J14e_O5V-TQ` (`oar1`), `WLywVcbK5FY` (`oar2`), `NwbQCns0Bl4` и `A_MNOn0hvck`
+(`frame0`). Плашка «FOLLOW FOR MORE / THE 64 FILES» — `episodes/levy/scenes.js:409`, `episodes/solve/scenes.js:332`.
+
+**18.11.2026, 00:56–00:57 UTC — отправлено** (автор: «ответь ютубу») в три ветки с the64filestt, к каждому письму PDF
+на свою ветку (`The64Files_documentation_<первые 8 знаков обращения>.pdf`, 5, 7 и 6 страниц; в хранилище не кладём —
+в них полное имя автора). В письме: регистрации нет, вместо неё документы; что в документе — исходники по каждому
+ролику, гравировка и плашка в копиях с кодом и датой, оригиналы со временем публикации и обложками, почта в био TikTok и
+предложение вписать в био любое слово или код от YouTube; по каждому ролику ветки — копия, оригинал и время публикации;
+`Wmz-pghiWnE` — удалена, по ней ничего не нужно; про имя — подпись в уведомлении 13.11 была именем двоюродного брата,
+исправлено 14.11; оба обязательных заявления; подпись — полное имя автора, как в исправлении 14.11.
+
+**Дальше.** Если YouTube пришлёт слово или код — автору вписать его в био TikTok в тот же день и ответить в ветке. Если
+снова откажут, выбор за автором: отозвать заявки фразой выше (тогда аккаунт the64filestt вне риска) или идти дальше.
+Сильнее всего добавили бы экраны TikTok Studio (список роликов и аналитика из аккаунта автора) — их может сделать
+только он.
+
+## Свой канал на the64filestt и `rivalry` приватно (18.11.2026)
+
+Автор (18.11.2026, около 01:00 UTC): «я зарегал the64filestt, и залил туда последнее видео но приватным» — канал YouTube
+на аккаунте the64filestt, на нём `rivalry` с доступом «private». Последний ролик в TikTok —
+[`rivalry`](https://www.tiktok.com/@the64files/video/7709151321101749512) («Hikaru was never close to Magnus»), вышел
+17.11.2026 в 14:44 UTC. На 01:00 UTC 18.11 копии на `@the64stories` нет (последняя загрузка там — `RKOz8rgxtRM`
+14.11), значит, первая загрузка этого ролика на YouTube — у автора.
+
+- Первой загрузкой YouTube считает и приватную: по отчёту Google о прозрачности, для Copyright Match Tool достаточно
+  загрузить ролик первым, «public, private, or unlisted». Сам инструмент доступен каналам в партнёрской программе и
+  тем, кто подал действительную заявку на удаление.
+- Когда копия появится: в YouTube Studio этого канала — новая заявка на удаление, оригинал — свой приватный ролик.
+  Ссылку на копию даю из ленты канала-копии (`feeds/videos.xml`), обычно он заливает в 18:00–20:00 UTC.
+- Риски, названные автору: после двух удалённых каналов новый канал YouTube может счесть обходом блокировки; и это та
+  же почта, что в трёх спорах, где YouTube грозит удалить аккаунт. Пока споры не решены — держать ролик приватным, не
+  открывать канал с именем «The 64 Files» и логотипом с королём (за это удалили два прежних).
+- Заливать версию для YouTube (`rivalry_youtube.mp4`, метка без строки «IF YOU SEE THIS ON YOUTUBE, IT'S STOLEN»).
+
+## Все 24 копии
+
+Время — UTC. «Жалоба»: «подана» — заявка на удаление за нарушение авторских прав в YouTube Studio (первые шесть;
+14.11.2026 аккаунт, с которого они поданы, удалён, заявки не обработаны — см. выше); «письмо 13.11» — одно уведомление на остальные 18 роликов, отправленное по просьбе автора
+13.11.2026 в 23:46 UTC с адреса the64filestt@gmail.com на copyright@youtube.com (YouTube принимает уведомления в тексте
+письма; в нём полное имя автора как подпись, почта для связи, пары ссылок «копия — оригинал» и два обязательных
+заявления). Ответы YouTube придут на тот же адрес.
+
+YouTube подтвердил приём через минуту (13.11.2026, 23:47 UTC, обращение `33GGAJCXQZSMNIHJNEHY3JQIMY`): «We detected
+videos from your email and have started processing your request». В списке распознанных — все 24 ролика: 18 из письма и
+шесть, которые в нём названы как уже поданные через форму (их номера система тоже приняла за заявку). Вреда в этом нет:
+это те же копии роликов автора; по ним возможны два ответа — на форму и на письмо.
+
+**14.11.2026, 04:45–04:50 UTC — YouTube запросил подтверждение** (три письма, обращения
+`U63E3AMUL5GS55AJG4EAC5MXE4`, `QHJR7OU565D37IRZDSHLVUXQOI`, `AZ47HRX6F5TTNNJ2JTCTCWMBFQ`): «We are concerned that some
+info in your takedown request may be fraudulent… For each video in question, please provide precise identification of
+the particular copyrighted work or works allegedly infringed and the basis for asserting that claim». Срок ответа —
+7 дней, иначе «your YouTube account may be terminated»; отзыв жалобы — фразой «I hereby retract my claim of copyright
+infringement».
+
+**Ответ отправлен 14.11.2026 около 06:20 UTC** во все три ветки, с согласия автора («ну давай»): по каждому из 24
+роликов — оригинал (название, длина, время публикации в TikTok, ссылка) и время загрузки копии; основание — автор сам
+пишет, анимирует и монтирует ролики; доказательства, которые проверяющий откроет сам:
+- почта отправителя стоит в био TikTok `@the64files`;
+- у 15 копий с известным временем загрузки оригинал старше (в одном случае на 26 минут);
+- имя автора внутри чужих роликов: гравировка «@THE64FILES» на ребре доски в копии `WLywVcbK5FY`
+  ([кадр](https://i.ytimg.com/vi/WLywVcbK5FY/oar2.jpg)) и плашка «FOLLOW FOR MORE / THE 64 FILES» в `nRx_hI8DvDs` и
+  `agXowu9Rv-I`;
+- готовность прислать исходники и аналитику TikTok.
+В ответе прямо сказано, что каналы автора «The 64 Files» удалены за impersonation и что причина, по его мнению, — этот
+канал-копия. Следить за ответами: почта the64filestt, отправитель `youtube-disputes+…@google.com`.
+
+| № | Копия на YouTube | Залита | Просмотры | Оригинал в TikTok | Вышел | Папка | Жалоба |
+|---|---|---|---|---|---|---|---|
+| 1 | [Hikaru realized Magnus is losing](https://www.youtube.com/shorts/Wmz-pghiWnE) | 11.11 19:21 | 146 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7706690840965582132) | 10.11 23:36 | `hikaru213` | письмо 13.11; **удалена** (18.11) |
+| 2 | [Bobby Fischer - The Fischerman](https://www.youtube.com/shorts/rUg2CLvelHg) | 09.11 18:44 | 490 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7705900508925398279) | 08.11 20:29 | `biggerfish` | подана |
+| 3 | [Is Bobby Fischer the GOAT?](https://www.youtube.com/shorts/Lm9o3BTdFAA) | 07.11 19:14 | 239 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7695912005613407489) («Bobby Fischer's paranoia») | 12.10 22:29 | `fischer` | подана |
+| 4 | [Who has the most Brilliant moves?](https://www.youtube.com/shorts/bCMlxBvqwXg) | 06.11 18:59 | 386 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7696399796298353928) | 14.10 06:02 | `brilliant` | подана |
+| 5 | [Who can beat Mittens?](https://www.youtube.com/shorts/hCf_l85jvwo) | 05.11 19:19 | 561 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7704420423659982098) | 04.11 20:46 | — | подана |
+| 6 | [GothamChess, The Grandmaster Hunter](https://www.youtube.com/shorts/Dw0bCwE_gNg) | 04.11 19:00 | 1,4 млн | [оригинал](https://www.tiktok.com/@the64files/video/7704033750190951688) | 03.11 19:45 | `gmhunter` | подана |
+| 7 | [GothamChess Lost to Amateur](https://www.youtube.com/shorts/J14e_O5V-TQ) | 03.11 18:57 | 161 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7703533116886961426) | 02.11 11:23 | `dewakipas` | подана |
+| 8 | [GothamChess VS 225.000 People](https://www.youtube.com/shorts/nRx_hI8DvDs) | 02.11 18:17 | 755 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7696466053831871752) | 14.10 10:19 | `levy` | письмо 13.11 |
+| 9 | [Can chess be solved?](https://www.youtube.com/shorts/agXowu9Rv-I) | 01.11 18:49 | 96 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7696510194909531399) | 14.10 13:10 | `solve` | письмо 13.11 |
+| 10 | [What If Magnus Carlsen Trained a Baby?](https://www.youtube.com/shorts/0K7uOZsonxw) | 31.10 20:05 | 65 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7696591519767203090) | 14.10 18:26 | `baby` | письмо 13.11 |
+| 11 | [Bongcloud Opening by Magnus and Hikaru](https://www.youtube.com/shorts/A_MNOn0hvck) | 30.10 18:44 | 71 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7702196006619778312) | 29.10 20:54 | `bongcloud` | письмо 13.11 |
+| 12 | [Top 5 Chess World Records](https://www.youtube.com/shorts/CPzplLt64VY) | 29.10 18:56 | 84 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7696650628671474962) | 14.10 22:15 | `records` | письмо 13.11 |
+| 13 | [Why Magnus Carlsen quit the World Championship?](https://www.youtube.com/shorts/LXs5dnYe1XA) | 28.10 20:03 | 44 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7696886708524141842) | 15.10 13:31 | `jeans` | письмо 13.11 |
+| 14 | [Magnus VS Bill Gates](https://www.youtube.com/shorts/ZJGgat8akQA) | 27.10 18:28 | 45 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7697080707536932104) | 16.10 02:04 | `gates` | письмо 13.11 |
+| 15 | [Mikhail Tal of New Generation?](https://www.youtube.com/shorts/WLywVcbK5FY) | 26.10 18:51 | 118 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7701044504261971218) | 26.10 18:25 | `dubov` | письмо 13.11 |
+| 16 | [Who invented Brilliant Moves?](https://www.youtube.com/shorts/NwbQCns0Bl4) | до 26.10 | 204 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7700600753475390727) | 25.10 13:44 | `talbrill` | письмо 13.11 |
+| 17 | [Magnus slammed the table](https://www.youtube.com/shorts/-m9a1wTFDCs) | до 26.10 | 16 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7700181701028252936) | 24.10 10:37 | `tablebang` | письмо 13.11 |
+| 18 | [He threw the world champion's king into the crowd](https://www.youtube.com/shorts/SPDbqBgS5EY) | до 26.10 | 41 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7699616946404330759) | 22.10 22:06 | `hikaru` | письмо 13.11 |
+| 19 | [The youngest grandmaster ever](https://www.youtube.com/shorts/ac9gSRzhVAc) | до 26.10 | 40 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7697627947573906696) | 17.10 13:27 | `youngest` | письмо 13.11 |
+| 20 | [Witty Alien beat Magnus Carlsen](https://www.youtube.com/shorts/4Pv_Y9emT0k) | до 26.10 | 11 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7696293136405908744) | 13.10 23:08 | `witty` | письмо 13.11 |
+| 21 | [CHEATER at the World Chess Tournament](https://www.youtube.com/shorts/4yENsvwOtZ4) | до 26.10 | 14 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7698065727143644434) | 18.10 17:46 | `rausis` | письмо 13.11 |
+| 22 | [He played 45 games blindfolded so his family could find him](https://www.youtube.com/shorts/Nvjpwtbhygo) | до 26.10 | 43 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7697912140631493906) | 18.10 07:50 | `najdorf` | письмо 13.11 |
+| 23 | [Why MAGNUS is the GOAT?](https://www.youtube.com/shorts/UwfHxEjj27s) | до 26.10 | 245 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7697650069780057351) | 17.10 14:53 | `magnus` | письмо 13.11 |
+| 24 | [Highest IQs in the chess](https://www.youtube.com/shorts/q5jH6Y-cMGo) | до 26.10 | 31 тыс. | [оригинал](https://www.tiktok.com/@the64files/video/7697225595138231568) | 16.10 11:26 | `iq` | письмо 13.11 |
+
+У роликов 16–24 точную дату загрузки видно на странице самой копии (в ленте YouTube только 15 последних). Если какая-то
+из них окажется старше оригинала в TikTok, в заявке лучше сослаться на более раннюю публикацию этого ролика.
+
+Не скопированы (на 13.11): «Magnus names a famous game from one position» (`woodpecker`, 13.11), «It sat in a drawer
+for 55 years», «The last game of Mikhail Tal», «The Mechanical Turk».
+
+## Что дальше
+
+- На оставшиеся 18 роликов уведомление отправлено письмом (см. выше); если YouTube попросит уточнений — ответить в той же ветке.
+- По справке YouTube, три действующих страйка за авторские права — канал удаляют вместе со всеми видео; страйк
+  действует 90 дней ([Copyright strike basics](https://support.google.com/youtube/answer/2814000?hl=en)).
+- Если владелец копии подаст встречное уведомление, YouTube перешлёт его автору — отвечать в срок и с доказательствами
+  из раздела выше.
+- Заблокированный канал автора обжалуется формой из справки
+  ([Channel or account terminations](https://support.google.com/youtube/answer/2802168?hl=en)); там же сказано, что
+  после блокировки нельзя создавать и использовать другие каналы в обход неё, а повторные обращения замедляют ответ.
+- Спонсорам (Chessnut, Chessigma) стоит назвать настоящие каналы: копия собирает предложения о сотрудничестве на свою
+  почту.
+
+## Как перепроверить
+
+Лента канала (`feeds/videos.xml`) временами отвечает 404 для любого канала (так было 14.11.2026 около 23:58 UTC) —
+это сбой ленты, а не удаление канала: проверять `oembed` роликов и список загрузок (`yt-dlp --flat-playlist`).
+
+- Список копий: `yt-dlp --flat-playlist --dump-single-json https://www.youtube.com/@the64stories`.
+- Жива ли копия: `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=<id>&format=json` (200 — на месте).
+- Кадры копии: `https://i.ytimg.com/vi/<id>/oar1.jpg`, `oar2.jpg`, `oar3.jpg`.
+- Свои ролики с датами: `python3 tools/tiktok.py stats the64files`.
