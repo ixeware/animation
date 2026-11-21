@@ -59,19 +59,27 @@ goat и он забрал его титул, никто не близко, ка�
   при K = 10, лайв ≈ 2792 (2794,2 после 18 ноября). Накамура не играл — 2792,0. Итог: Магнус №1 и **единственный выше
   2800** по лайв-рейтингу; фраза «Still the only player above 2800» верна. Официально — в листе FIDE 1 декабря.
 
-## GTA
-- GTA V вышла 17 сентября 2013 — Магнус уже два года был №1. GTA VI вышла **19 ноября 2026** — в день решающей партии.
-  [Rockstar Newswire](https://www.rockstargames.com/newswire/article/ak3ak31a49a221/grand-theft-auto-vi-is-now-set-to-launch-november-19-2026),
-  [Deadline](https://deadline.com/2026/11/gta-6-sales-launch-day-surge-videogame-1237229514/).
-- Сам Магнус 13.11 выложил коллаж «Time flies when you're having fun» с логотипами GTA V и GTA VI (1,6 млн
-  просмотров); в комментариях: «Magnus carlsen is the first ranking player before gta 5 was released».
-- «WASTED» и «MISSION PASSED! RESPECT +» — экраны GTA, мем. Рисуем своим шрифтом и цветом (правило 62), логотипы игры
-  не используем.
+## Lock in (мем ролика)
+- Сам Магнус 14.08.2026 подписал свой ролик **«always locked in. #EWC2026»** (около 412 тыс. просмотров) — в ролике
+  это его пост (перерисован нашим интерфейсом, без логотипов), на него отвечает развязка «He locked in».
+- В ноябре это главная реакция зрителей на гонку за №1: «magnus lock in please 😭» (около 5 тыс. лайков, под @chess
+  «NOBODY has been this close to Magnus in YEARS»), «yo unc let's lock in ✌️» (около 15 тыс., под его роликом про
+  свинку Пеппу 09.11), «magnus lock in» (1,7 тыс.), «Yo Magnus don't bottle that number 1 spot». Снимки лайков — 20.11.2026.
+- «IS THE CARLSEN ERA OVER?» — заголовок World Chess после группы
+  ([World Chess](https://worldchess.com/news/is-the-carlsen-era-over-world-no-1-crashes-out-of-total-chess)); в ролике —
+  газета нашего вида с этим вопросом, без логотипа издания.
+
+## «When your lowest is their best» — буквально
+- Самая низкая точка Магнуса в ноябре — **2801,2** (после группы, 15.11). Лучшая точка Каруаны в ноябре — **2800,0**
+  (13.11; в листе FIDE на 1 ноября у него 2783, дальше 2798,6 → 2794,2 → около 2792). Даже на дне Магнус выше лучшего
+  дня соперника. В ролике числа подписаны «NOV 2026, LIVE», чтобы не спорить с пиком Каруаны 2844 (2014).
+- «17 years»: Chess.com, день 9 — ничья опустила бы его ниже 2800 «for the first time in 17 years»; заголовок «Carlsen
+  Stays Above 2800» ([Chess.com](https://www.chess.com/news/view/2026-total-chess-world-championship-tour-pilot-day-9)).
 
 ## Комментарии (мемы зрителей)
 - Топ-комментарий под @chess «NOBODY has been this close to Magnus in YEARS» (14.11, 1,1 млн): **«When your lowest is
   their best.»** — около 20 тыс. лайков. [TikTok](https://www.tiktok.com/@chess/video/7708158933801749774). В ролике —
-  плашкой «TOP COMMENT».
+  карточкой «TOP COMMENT» и сразу числами (выше).
 - «washed»: под видео Магнуса «The Internet is a really mean place» (30.10) топ-комментарий «"washed" and he is a world
   champion in chess 😭✌️». Частое: «magnus lock in».
 
@@ -81,6 +89,9 @@ goat и он забрал его титул, никто не близко, ка�
 - Кит для авторов: можно «free unlimited game reviews», «on the App Store and Google Play»; значки сторов один раз,
   App Store первым; финальная карточка — их файл. Ссылка в био:
   `https://www.chessigma.com/go/app/the64files?utm_content=fivepoints`.
+- Связка с историей (версия 3): «One move almost cost Magnus his crown. Want to find the move that's costing you games?» —
+  дальше запись приложения автора (`photos/rec/review.mp4`) и их карточка. Магнуса и других реальных людей в кадре с
+  продуктом нет: разбор его партий в Chessigma не показываем.
 - Обе партии импортированы на chessigma.com (PGN): Карлсен — Артемьев `chessigma.com/games/ff53cbdb-47e7-4fa9-a852-51c0f42305ea`,
   Мартиросян — Карлсен `chessigma.com/games/fc0473cd-056b-4790-b6b8-44059ac7630b`. В облачном браузере сессии разбор
   новой партии не запускается (движок не стартует); уже разобранные партии показываются с оценками. Экраны снимаем
