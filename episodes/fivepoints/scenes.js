@@ -2590,7 +2590,7 @@ function dimBracket(g, y0, y1, x, label, { a = 1, color = RED, side = 1, size = 
 
 // ---------- his post on a phone lying on the table: "always locked in. #EWC2026" (our own interface, no logos) ----------
 const POST = makeCanvas(600, 1200);
-function postTex(t) {
+function postTex(t, likeT = Infinity) {  // likeT: the double tap (the heart goes red and little hearts float up from it)
   const x = POST.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
   x.fillStyle = '#0B0B10'; x.fillRect(0, 0, 600, 1200);
   webcam(x, 0, 0, 600, 1200, 'magnusSuit', { ...EXPR.smug, lid: 0.25 }, t, { bg: ['#D2BE96', '#5A4630'], zoom: 0.9, cy: 0.4 });
@@ -2600,7 +2600,12 @@ function postTex(t) {
   x.font = sans(52, 900); x.fillText('always locked in.', 34, 1062);
   x.fillStyle = '#BFD6FF'; x.font = sans(40, 800); x.fillText('#EWC2026', 34, 1116);
   x.fillStyle = '#FFFFFF'; x.font = sans(30, 800); x.fillText('▶ 412K', 34, 1166);
-  x.textAlign = 'center'; x.font = sans(84, 900); x.fillStyle = '#FFFFFF'; x.fillText('♥', 546, 720);
+  const lk = clamp((t - likeT) / 0.3);
+  x.textAlign = 'center'; x.font = sans(Math.round(84 * (1 + 0.5 * Math.sin(Math.PI * lk))), 900); x.fillStyle = lk > 0 ? '#FE2C55' : '#FFFFFF'; x.fillText('♥', 546, 720);
+  for (let i = 0; i < 6; i++) {  // the little hearts of the tap, up the right edge, clear of his face
+    const u = (t - likeT - i * 0.08) / 0.85;
+    if (u > 0 && u < 1) { x.save(); x.globalAlpha = 1 - u * u; heart(x, 546 + Math.sin(i * 2.1 + u * 5) * 26, 650 - u * 400, 0.42 + 0.12 * (i % 3), i % 2 ? '#FF7A93' : '#FE2C55'); x.restore(); }
+  }
   x.fillStyle = 'rgba(255,255,255,0.85)'; x.beginPath(); x.arc(546, 820, 34, 0, 7); x.fill();
   return POST;
 }
@@ -2866,10 +2871,10 @@ function phoneInHand(g, t, img, c, R, { night = false, likeT = Infinity, bright 
   texQuad(g, img, F(-PHW, PHH, -0.002), F(PHW, PHH, -0.002), F(-PHW, -PHH, -0.002), { under: false, a: bright });
   for (const y of [-0.15, -0.75, -1.35]) obox(g, F(-PHW - 0.1, y, 0.02), [0.16, 0.24, 0.17], skin, Rr);  // the fingers round the left edge
   obox(g, F(PHW - 0.02, -1.05, -0.1), [0.2, 0.5, 0.14], skin, { ...Rr, rz: (Rr.rz || 0) - 0.35 }, {});  // the thumb on the right edge
-  // the double tap: the big heart pops on the screen and floats up
+  // the double tap: the heart pops on the screen and floats up, over his chest: the face on the post stays in sight
   if (t >= likeT && t < likeT + 0.9) {
-    const u = (t - likeT) / 0.9, q = B.project(...F(0, 0.2 + 0.9 * u, -0.01));
-    if (q.z > 0.5) { g.save(); g.globalAlpha *= 1 - clamp((u - 0.6) / 0.4); heart(g, q.x, q.y, q.s * 0.05 * lerp(1.6, 1, ease.back(clamp(u * 4))), '#FE2C55'); g.restore(); }
+    const u = (t - likeT) / 0.9, q = B.project(...F(0.3, -0.85 + 0.45 * u, -0.01));
+    if (q.z > 0.5) { g.save(); g.globalAlpha *= 1 - clamp((u - 0.6) / 0.4); heart(g, q.x, q.y, q.s * 0.028 * lerp(1.6, 1, ease.back(clamp(u * 4))), '#FE2C55'); g.restore(); }
   }
 }
 
@@ -3207,7 +3212,7 @@ export async function build(T) {
   shot(poA, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0.07, 0.2, 7.2, PH1, { cy: 600 }), K(-0.02, 0.16, 6.4, PH1, { cy: 600 }));
     blurred(g, 9, g2 => dayRoom(g2, t, {}));
-    phoneInHand(g, t, postTex(t), PH1, PHR, { likeT: alwT });
+    phoneInHand(g, t, postTex(t, alwT), PH1, PHR);
     lowKey(g, { cy: H * 0.46, a: 0.05 });
   }, { kb: 0, grade: 'warm', zoom: kicks([[postT, 0.05], [alwT, 0.06]]) });
   cue(poA - 0.03, 'whoosh_fast', 0.3); cue(postT, 'notify', 0.45); cue(alwT, 'sparkle_pop', 0.3);
@@ -3220,7 +3225,7 @@ export async function build(T) {
     g.save(); dutch(g, 0.07, 1.13);
     rig(B, lt, [[0, K(0.0, 0.16, 5.8, PH1, { cy: 430 })], [S8 - S6, K(-0.05, 0.14, 5.0, PH1, { cy: 430 })]], { t, e: glide });
     blurred(g, 10, g2 => dayRoom(g2, t, {}));
-    phoneInHand(g, t, postTex(t), PH1, PHR);
+    phoneInHand(g, t, postTex(t, alwT), PH1, PHR);
     g.restore();
     lowKey(g, { cy: H * 0.46, a: 0.06 });
     const pu = ease.back(clamp((t - lockedT) / 0.25)), zu = clamp((t - KH0) / (S8 - KH0));
@@ -3385,8 +3390,9 @@ export async function build(T) {
   const art = (o = {}) => ({ pieces: PA, white: 'magnusSuit', black: 'art', ew: 'focus', eb: 'focus', ...o });
   // "Then, a must-win game.": over Artemiev's shoulder, the lens slams in on Magnus
   shot(stA, (g, lt, t, sh) => {
-    rig(B, lt, [[0, KE([6.2, 5.0, 15.5], [4, 2.9, -1.4], { fov: 1300 })], [0.28, KE([5.5, 4.6, 13.5], [4, 2.9, -1.4], { fov: 2300 }), ease.out],
-      [len(sh), KE([5.2, 4.4, 12.6], [4, 3.0, -1.4], { fov: 2450 })]], { t, e: glide });
+    // the eye sits a little right of the line through both heads, so his shoulder frames Magnus and never covers his face
+    rig(B, lt, [[0, KE([6.65, 5.0, 15.5], [4, 2.9, -1.4], { fov: 1300 })], [0.28, KE([5.95, 4.6, 13.5], [4, 2.9, -1.4], { fov: 2300 }), ease.out],
+      [len(sh), KE([5.65, 4.4, 12.6], [4, 3.0, -1.4], { fov: 2450 })]], { t, e: glide });
     hall(g, t, art({ ew: t >= mustT ? EX.sweat : EX.calm }));
   }, { kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { if (t >= mustT) stamp(g, 'MUST WIN', W / 2, 1600, t, mustT, { color: RED, size: 110, rot: -0.1 }); } });
   cue(stA - 0.03, 'whoosh_fast', 0.3); cue(stA + 0.24, 'thud', 0.35); cue(mustT, 'stamp', 0.5); cue(mustT + 0.3, 'heartbeat', 0.35);
