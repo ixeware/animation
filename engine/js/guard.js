@@ -1,9 +1,11 @@
 // Guard: the channel's moving watermark over the whole film (STYLE_BIBLE rule 70).
 // The TikTok note and the handle, with a line under them for whoever meets the video somewhere else. It is see-through,
-// keeps to the middle of the frame, where a crop cannot reach it, and never stays put: every few seconds it jumps to
-// another height, side, tilt, size and shape (on a cut when one is near) and drifts in between, so no fixed patch covers
-// it and no mask made for one video fits the next (the jumps are seeded by the episode's name). A second, smaller handle
-// crawls across the whole frame all the time. Both lie under the captions and under the film grain.
+// keeps to the middle of the frame, where a crop cannot reach it, and never stays put: every six seconds or so it jumps to
+// another height, side, size and shape (on a cut when one is near) and drifts slowly in between, so no fixed patch covers
+// it and no mask made for one video fits the next (the jumps are seeded by the episode's name). It is kept quiet, because
+// the author found the louder first version annoying (21.11.2026): one mark at a time, faint, a thin edge, barely tilted,
+// never right over the captions. A second, smaller handle that crawls across the whole frame is there for a film that
+// asks for it (crawler: its opacity); by default it is off. The mark lies under the captions and under the film grain.
 // The mark keeps off the faces and off our own titles, counters and stamps: for every stretch of a shot it takes the
 // planned height, or, when that would lie across somebody's eyes and mouth or across a title there, the nearest height
 // that does not (the shot and its titles are drawn at three moments to see where they are).
@@ -12,13 +14,13 @@ import { makeCanvas, rng, clamp, lerp } from './core.js';
 const DEF = {
   handle: '@the64files',
   line: "IF YOU SEE THIS ON YOUTUBE, IT'S STOLEN",  // '' leaves the handle alone
-  alpha: 0.34,         // opacity of the mark
-  size: 46,            // font size of the handle; the line is `lineSize`
-  lineSize: 27,
-  every: 3,            // seconds between jumps, give or take a quarter
-  crawler: 0.22,       // opacity of the smaller handle that crawls across the frame; 0 switches it off
-  // heights the mark may sit at: under the titles, above the captions, and one row right under them
-  rows: [430, 590, 750, 910, 1085, 1442],
+  alpha: 0.24,         // opacity of the mark (0.34 until 21.11.2026: too loud)
+  size: 40,            // font size of the handle; the line is `lineSize`
+  lineSize: 23,
+  every: 6,            // seconds between jumps, give or take a quarter (3 until 21.11.2026: too restless)
+  crawler: 0,          // opacity of the smaller handle that crawls across the frame; 0 switches it off
+  // heights the mark may sit at: under the titles, in the middle, and one row under the captions (none right above them)
+  rows: [430, 590, 750, 910, 1442],
   x: [70, 960],        // it keeps between these: clear of the buttons that TikTok and Shorts put on the right
 };
 const INK = '#06080C', CYAN = '#25F4EE', RED = '#FE2C55';
@@ -35,7 +37,7 @@ function note(g, x, y, h) {
   g.lineWidth = 18;
   // a dark edge all round, the cut ends included: the three layers in ink, shifted round a ring
   g.strokeStyle = INK;
-  for (let k = 0; k < 12; k++) for (const o of [-d, 0, d]) { g.save(); g.translate(o + Math.cos(k * Math.PI / 6) * 5, o + Math.sin(k * Math.PI / 6) * 5); noteStrokes(g); g.restore(); }
+  for (let k = 0; k < 12; k++) for (const o of [-d, 0, d]) { g.save(); g.translate(o + Math.cos(k * Math.PI / 6) * 3, o + Math.sin(k * Math.PI / 6) * 3); noteStrokes(g); g.restore(); }
   g.strokeStyle = CYAN; g.save(); g.translate(-d, -d); noteStrokes(g); g.restore();
   g.strokeStyle = RED; g.save(); g.translate(d, d); noteStrokes(g); g.restore();
   g.strokeStyle = '#FFFFFF'; noteStrokes(g);
@@ -52,7 +54,7 @@ function stamp(handle, lines, hs, ls) {
   const c = makeCanvas(w, h), g = c.getContext('2d');
   const text = (t, x, y, s, spacing) => {
     g.font = font(s); g.letterSpacing = `${spacing}px`; g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
-    g.strokeStyle = INK; g.lineWidth = Math.max(4, s * 0.16); g.strokeText(t, x, y);
+    g.strokeStyle = INK; g.lineWidth = Math.max(2.5, s * 0.09); g.strokeText(t, x, y);  // a thin edge: legible on white, not a sticker
     g.fillStyle = '#FFFFFF'; g.fillText(t, x, y);
   };
   const x0 = (w - row) / 2;
@@ -78,14 +80,14 @@ export function guardPlan(shots, duration, o) {
   let a = 0, row = -1;
   while (a < duration - 0.05) {
     let b = a + o.every * (0.78 + 0.5 * r()), cut = false;
-    const near = cuts.filter(c => c > a + 1.1 && Math.abs(c - b) < 0.8).sort((x, y) => Math.abs(x - b) - Math.abs(y - b))[0];
+    const near = cuts.filter(c => c > a + Math.max(1.1, o.every * 0.5) && Math.abs(c - b) < Math.max(0.8, o.every * 0.3)).sort((x, y) => Math.abs(x - b) - Math.abs(y - b))[0];
     if (near !== undefined) { b = near; cut = true; }  // a jump on a cut is the least distracting one
     if (b > duration - 1.1) { b = duration; cut = true; }
     let n = 0;
     for (let i = 0; i < 12; i++) { n = Math.floor(r() * o.rows.length); if (n !== row && (Math.abs(n - row) > 1 || row < 0 || o.rows.length < 4)) break; }
     row = n;
     segs.push({ i: segs.length, a, b, hardIn: segs.length ? segs[segs.length - 1].hardOut : true, hardOut: cut, y: o.rows[n], compact: r() < 0.5,
-      side: r() * 2 - 1, tilt: (r() * 2 - 1) * 0.12, k: 0.95 + r() * 0.15, vx: (r() * 2 - 1) * 16, vy: (r() * 2 - 1) * 8, spin: (r() * 2 - 1) * 0.008 });
+      side: r() * 2 - 1, tilt: (r() * 2 - 1) * 0.05, k: 0.95 + r() * 0.15, vx: (r() * 2 - 1) * 6, vy: (r() * 2 - 1) * 3, spin: (r() * 2 - 1) * 0.002 });
     a = b;
   }
   return segs;

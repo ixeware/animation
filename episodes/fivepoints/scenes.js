@@ -2590,6 +2590,8 @@ function dimBracket(g, y0, y1, x, label, { a = 1, color = RED, side = 1, size = 
 
 // ---------- his post on a phone lying on the table: "always locked in. #EWC2026" (our own interface, no logos) ----------
 const POST = makeCanvas(600, 1200);
+// what is on the post, for the channel's mark to keep off: his face (drawChar at (300, 480), s = 2.08, fw 0.96) and the lines
+const POST_KEEP = [[0.11, 0.11, 0.89, 0.64, 'face', 'post'], [0.05, 0.79, 0.8, 0.98, 'text', 'post: always locked in']];
 function postTex(t, likeT = Infinity) {  // likeT: the double tap (the heart goes red and little hearts float up from it)
   const x = POST.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
   x.fillStyle = '#0B0B10'; x.fillRect(0, 0, 600, 1200);
@@ -2860,7 +2862,7 @@ function museum(g, t, { lit = () => 1, n = 15, sign = true } = {}) {
 }
 
 // ---------- your phone in your hand, close, seen as you see it: the hand round it, the thumb on the edge ----------
-function phoneInHand(g, t, img, c, R, { night = false, likeT = Infinity, bright = 1 } = {}) {
+function phoneInHand(g, t, img, c, R, { night = false, likeT = Infinity, bright = 1, keep = [] } = {}) {  // keep: [u0, v0, u1, v1, kind, label] on the screen, 0..1
   const Rr = { rx: R.rx + Math.sin(t * 1.1) * 0.012, ry: R.ry + Math.sin(t * 0.8) * 0.018, rz: R.rz || 0 };
   const F = (x, y, z) => { const p = rot3([x, y, z], Rr); return [c[0] + p[0], c[1] + p[1], c[2] + p[2]]; };
   const skin = night ? '#7F7C96' : SKIN2.base, skinD = night ? '#5E5A74' : SKIN2.shade, sleeve = night ? '#1C1E28' : '#2A2D36';
@@ -2869,6 +2871,10 @@ function phoneInHand(g, t, img, c, R, { night = false, likeT = Infinity, bright 
   obox(g, F(0, 0, 0.06), [PHW + 0.07, PHH + 0.08, 0.06], '#121418', Rr, { spec: 0.6 });
   if (night) { const q = B.project(...F(0, 0, 0)); if (q.z > 0.5) { g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createRadialGradient(q.x, q.y, 10, q.x, q.y, q.s * 4.2); gr.addColorStop(0, 'rgba(120,160,255,0.35)'); gr.addColorStop(1, 'rgba(120,160,255,0)'); g.fillStyle = gr; g.fillRect(q.x - q.s * 4.2, q.y - q.s * 4.2, q.s * 8.4, q.s * 8.4); g.restore(); } }
   texQuad(g, img, F(-PHW, PHH, -0.002), F(PHW, PHH, -0.002), F(-PHW, -PHH, -0.002), { under: false, a: bright });
+  for (const [u0, v0, u1, v1, kind, label] of keep) {  // a face or a line on the screen counts as one: the channel's mark keeps off it (guard.js)
+    const q = [[u0, v0], [u1, v0], [u0, v1], [u1, v1]].map(([u, v]) => B.project(...F(lerp(-PHW, PHW, u), lerp(PHH, -PHH, v), -0.002)));
+    if (q.every(p => p.z > 0.5)) { const xs = q.map(p => p.x), ys = q.map(p => p.y); qaRect(g, Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys), kind, label); }
+  }
   for (const y of [-0.15, -0.75, -1.35]) obox(g, F(-PHW - 0.1, y, 0.02), [0.16, 0.24, 0.17], skin, Rr);  // the fingers round the left edge
   obox(g, F(PHW - 0.02, -1.05, -0.1), [0.2, 0.5, 0.14], skin, { ...Rr, rz: (Rr.rz || 0) - 0.35 }, {});  // the thumb on the right edge
   // the double tap: the heart pops on the screen and floats up, over his chest: the face on the post stays in sight
@@ -3212,7 +3218,7 @@ export async function build(T) {
   shot(poA, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0.07, 0.2, 7.2, PH1, { cy: 600 }), K(-0.02, 0.16, 6.4, PH1, { cy: 600 }));
     blurred(g, 9, g2 => dayRoom(g2, t, {}));
-    phoneInHand(g, t, postTex(t, alwT), PH1, PHR);
+    phoneInHand(g, t, postTex(t, alwT), PH1, PHR, { keep: POST_KEEP });
     lowKey(g, { cy: H * 0.46, a: 0.05 });
   }, { kb: 0, grade: 'warm', zoom: kicks([[postT, 0.05], [alwT, 0.06]]) });
   cue(poA - 0.03, 'whoosh_fast', 0.3); cue(postT, 'notify', 0.45); cue(alwT, 'sparkle_pop', 0.3);
@@ -3225,7 +3231,7 @@ export async function build(T) {
     g.save(); dutch(g, 0.07, 1.13);
     rig(B, lt, [[0, K(0.0, 0.16, 5.8, PH1, { cy: 430 })], [S8 - S6, K(-0.05, 0.14, 5.0, PH1, { cy: 430 })]], { t, e: glide });
     blurred(g, 10, g2 => dayRoom(g2, t, {}));
-    phoneInHand(g, t, postTex(t, alwT), PH1, PHR);
+    phoneInHand(g, t, postTex(t, alwT), PH1, PHR, { keep: t < KH0 ? POST_KEEP : [] });
     g.restore();
     lowKey(g, { cy: H * 0.46, a: 0.06 });
     const pu = ease.back(clamp((t - lockedT) / 0.25)), zu = clamp((t - KH0) / (S8 - KH0));
