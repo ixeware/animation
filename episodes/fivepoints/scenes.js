@@ -3360,13 +3360,14 @@ export async function build(T) {
   // "And the comments begged": seen from the phone itself, up at your face in its light, the rain on the window behind
   // you; the comments land on the glass between us
   const S19 = and2T - 0.08, BEG = { ...EXPR.worried, brow: -0.95, browY: -12, lid: 0, look: [0.2, -0.35], mouth: 'o', curve: -0.2, open: 0.3, tear: 1 };  // the 😭 of the comment
-  const CMTS = [['magnus lock in please 😭', '5K', and2T, 320, 46, 900], ['yo unc let’s lock in ✌️', '15K', comT, 465, 46, 900],
+  const CMTS = [['magnus lock in please 😭', '5K', and2T, 320, 42, 880], ['yo unc let’s lock in ✌️', '15K', comT, 455, 42, 880],
     ['Yo Magnus don’t bottle that number 1 spot', null, begT, 1610, 36, 1000]];
   shot(S19, (g, lt, t, sh) => {
     cam(lt, t, sh, KE([4.15, 0.62, 8.72], [4, 2.05, 10.4], { fov: 640, cy: 880 }), KE([3.95, 0.72, 8.86], [4, 2.05, 10.4], { fov: 690, cy: 880 }));
     nightRoom(g, t, { e: t >= begT ? BEG : 'worried', phone: false, glow: 0.7, night: '#3C4C7E' });
   }, { kb: 0, grade: 'night', hud: (g, lt, t) => {
-    for (const [txt, lk, t0, y, size, wd] of CMTS) if (t >= t0) commentCard(g, txt, lk, W / 2, y, { size, w: wd, ...popW(t, t0) });
+    // a softer landing than popW: the cards lie over his hair, the face itself stays clear
+    for (const [txt, lk, t0, y, size, wd] of CMTS) if (t >= t0) commentCard(g, txt, lk, W / 2, y, { size, w: wd, scale: lerp(1.1, 1, ease.back(clamp((t - t0) / 0.25))) });
   } });
   for (const [, , t0] of CMTS) cue(t0, 'notify', 0.4);
   // "Magnus, lock in": the summit in the rain, in profile; his face sets
