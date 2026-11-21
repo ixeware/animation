@@ -22,7 +22,7 @@ import { useLookV2, SKIN2 } from '../../engine/js/look.js';
 import { lowKey, spotCone } from '../../engine/js/light.js';
 import { BOOM_HIT, MOVE_HIT, SLIDE, SLIDE_OPTS, slide, moveOf, moveUnder, moveOver } from '../../engine/js/movefx.js';
 import { drawPiece } from '../../engine/js/pieces.js';
-import { HI, ledGlow, flashTint, speedLines, squareFrame, boardArrow, pieceRing, spread, moveTag } from '../../engine/js/hifx.js';
+import { HI, ledGlow, flashTint, speedLines, squareFrame, boardArrow, pieceRing, spread, moveTag, armsUp, handsOnHead } from '../../engine/js/hifx.js';
 import { webcam, trophy, goat } from '../../engine/js/witty.js';
 import { shockwave, burst, dust, glint } from '../../engine/js/fx.js';
 import { confetti, rays, vignette } from '../../engine/js/draw.js';
@@ -185,6 +185,15 @@ function oboxV(c, [hx, hy, hz], r = {}, pivot = null) {
 }
 const obox = (g, c, h, col, r = {}, o = {}) => solid(g, oboxV(c, h, r, o.pivot), BOXF, col, o);
 const ab = (g, [x0, y0, z0], [x1, y1, z1], col, o = {}) => obox(g, [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2], [(x1 - x0) / 2, (y1 - y0) / 2, (z1 - z0) / 2], col, {}, o);
+// a figure on the set (a wall, a scoreboard, a sign): the watermark keeps off it as it keeps off our titles (guard.js
+// reads the 'text' rects); only while all of it is in the frame and clear of the captions
+function keepClear(g, pts, label) {
+  const q = pts.map(p => B.project(...p));
+  if (q.some(p => p.z < 0.5)) return;
+  const xs = q.map(p => p.x), ys = q.map(p => p.y), x0 = Math.min(...xs), y0 = Math.min(...ys), x1 = Math.max(...xs), y1 = Math.max(...ys);
+  if (x0 < 0 || y0 < 0 || x1 > W || y1 > 1190) return;
+  qaRect(g, x0, y0, x1 - x0, y1 - y0, 'text', label);
+}
 // a turned shape around a vertical axis: rings [y, rx, rz, dz] from the bottom up (convex, so the porcelain bowl)
 function lathe(g, x, z, rings, col, { n = 36, ...o } = {}) {
   const verts = [], faces = [];
@@ -494,7 +503,7 @@ function endWall(g, z, dz, col, sky = SKY_T, lightC = '#FFF6DA') {
   curtain(g, WIN.x0 - 3.0, WIN.x0 + 0.1, z, dz, col); curtain(g, WIN.x1 - 0.1, WIN.x1 + 3.0, z, dz, col);
   [a, b] = zi(0.3, 0.48); ab(g, [WIN.x0 - 3.5, WIN.y1 + 0.72, a], [WIN.x1 + 3.5, WIN.y1 + 0.92, b], '#3A2E28');
 }
-function dayRoom(g, t, { flip = 1, cal = false, farSky = SKY_T } = {}) {
+function dayRoom(g, t, { flip = 1, cal = false, farSky = SKY_T, nearSky = SKY_T } = {}) {
   const E = B.E, { x0, x1, z0, z1, top } = ROOM;
   g.fillStyle = '#F1E6D2'; g.fillRect(0, 0, W, H);
   if (E[1] > FLOOR_Y) {
@@ -503,7 +512,7 @@ function dayRoom(g, t, { flip = 1, cal = false, farSky = SKY_T } = {}) {
     tiled(g, [-5.5, FLOOR_Y + 0.02, -7.5], [19, 0, 0], [0, 0, 19.5], { color: '#7A97B8', grout: 'rgba(255,255,255,0.12)', tu: 19, tv: 1.3 });  // the rug
   }
   if (E[2] < z1) { endWall(g, z1, -1, '#4E8F5C', farSky); if (cal) calendar(g, flip); }   // the far wall, behind the monitor
-  if (E[2] > z0) { endWall(g, z0, 1, '#5B7FA8'); }  // the near wall
+  if (E[2] > z0) { endWall(g, z0, 1, '#5B7FA8', nearSky); }  // the near wall
   const side = { color: '#EADCC6', grout: 'rgba(0,0,0,0.03)', tu: 40, tv: 40 };
   if (E[0] > x0) { tiled(g, [x0, FLOOR_Y, z0], [0, 0, z1 - z0], [0, top - FLOOR_Y, 0], side); bookcase(g); }
   if (E[0] < x1) { tiled(g, [x1, FLOOR_Y, z1], [0, 0, z0 - z1], [0, top - FLOOR_Y, 0], side); wallPrint(g); }
@@ -2649,28 +2658,29 @@ function hallTables(g, t, list) {
     .filter(it => (it.dx === 0 && it.dz === 0) || (it.d > 1 && it.q.x > -1500 && it.q.x < W + 1500)).sort((a, b) => b.d - a.d);  // the main table always (the camera can sit over it)
   for (const it of Lt) shifted(it.dx, it.dz, () => tableSet(g, t + it.dx * 0.07, it.o));
 }
-function hall(g, t, main, { extra = true, gray = 0 } = {}) {
+function hall(g, t, main, { extra = true, gray = 0, deco = null } = {}) {
   const list = [{ dx: 0, dz: 0, o: { tableCol: WOODT, ...main } }];
   if (extra) for (const [dx, dz, wh, bl, pcs] of BG_T) list.push({ dx, dz, o: { pieces: pcs, white: wh, black: bl, ew: 'focus', eb: 'focus', tableCol: WOODT, dof: 0 } });
   hallRoom(g, t, { pools: list.map(it => [it.dx, it.dz]) });
+  if (deco) deco(g);  // something hanging in the hall (the scoreboard), behind the tables
   hallTables(g, t, list);
   lowKey(g, { cy: H * 0.46, a: 0.04 });
   if (gray > 0) desat(g, gray);
 }
 // the ten classical games of the group in a row, Magnus at every table; the results over them
 const ROWN = 10, ROWDX = 13, ROW_OPP = ['opp', 'opp3', 'opp5', 'opp4', 'haik', 'opp2', 'opp6', 'opp', 'opp3', 'opp5'];
-function rowHall(g, t, { eM = 'focus', pcs = PSC } = {}) {
-  const list = [...Array(ROWN).keys()].map(k => ({ dx: k * ROWDX, dz: 0, o: { pieces: pcs, white: ROW_OPP[k], black: 'magnusSuit', ew: 'focus', eb: k === 4 ? { ...EXPR.sad, look: [0, 0.5] } : eM, tableCol: WOODT, dof: 0 } }));
+function rowHall(g, t, { eM = 'focus', pcs = PSC, k4 = null } = {}) {  // k4: the options of the fifth table (his game with Martirosyan)
+  const list = [...Array(ROWN).keys()].map(k => ({ dx: k * ROWDX, dz: 0, o: { pieces: pcs, white: ROW_OPP[k], black: 'magnusSuit', ew: 'focus', eb: k === 4 ? { ...EXPR.sad, look: [0, 0.5] } : eM, tableCol: WOODT, dof: 0, ...(k === 4 && k4 ? k4 : {}) } }));
   hallRoom(g, t, { pools: list.map(it => [it.dx, it.dz]) });
   hallTables(g, t, list);
   lowKey(g, { cy: H * 0.46, a: 0.04 });
 }
-function rowPlates(g, t, t0, step) {
+function rowPlates(g, t, t0, step, { size = q => clamp(q.s * 1.9, 46, 130), lossK = 1 } = {}) {
   for (let k = 0; k < ROWN; k++) {
     const tk = t0 + k * step; if (t < tk) continue;
     const q = B.project(4 + k * ROWDX, 7.4, 4); if (q.z < 1) continue;
     const loss = k === 4, u = clamp((t - tk) / 0.22);
-    plate(g, loss ? '0' : '½', q.x + (loss ? Math.sin(t * 60) * 6 * (1 - u) : 0), q.y, { color: loss ? RED : CREAM, size: clamp(q.s * 1.9, 46, 130), scale: lerp(1.5, 1, ease.back(u)), rot: 0 });
+    plate(g, loss ? '0' : '½', q.x + (loss ? Math.sin(t * 60) * 6 * (1 - u) : 0), q.y, { color: loss ? RED : CREAM, size: size(q) * (loss ? lossK : 1), scale: lerp(1.5, 1, ease.back(u)), rot: 0 });
   }
 }
 
@@ -2789,6 +2799,321 @@ function yourRoom(g, t, { e = 'focus', crown: cr = null, phone = true, glow = 0,
   lowKey(g, { cy: H * 0.46, a: 0.04 });
 }
 
+// ======================= v4 (21.11.2026): A PLACE FOR EVERY PHRASE (rule 77) =======================
+// The author on v3: «проблема в том что оно будто по шаблону без разнообразия в сценах». In v3, 24 of the 49 shots stood
+// on the summit and 16 in the hall, and one medium shot of the throne with a count over it came back ten times. v4 keeps
+// the summit for the turns of the story and gives every other phrase its own place or object: a museum of fifteen crowns,
+// your phone in your hand and the padlock that springs out of it (the camera goes through its keyhole into Budapest), the
+// hall's scoreboard, a trading floor in red, a tear-off calendar, your room at night in the rain, two plinths of rating on
+// a dark stage. The numbers sit on things in the scene: the museum wall, the scoreboard, the trading screen, the calendar,
+// the plinths.
+Object.assign(CAST, {
+  trader: { face: [0.98, 1.04, 0.9], hair: 'swept', hairC: '#3A2A20', brow: '#2E2119', suit: '#2E3440', suitD: '#1F242C', shirt: 'tie', tie: '#C0392B', ears: 1 },
+});
+const OFF = makeCanvas(), offx = OFF.getContext('2d');
+// a scene drawn out of focus behind something sharp (the macro shots): drawn into OFF, laid on blurred
+function blurred(g, px, fn) {
+  offx.setTransform(1, 0, 0, 1, 0, 0); offx.clearRect(0, 0, W, H); fn(offx);
+  g.save(); g.filter = `blur(${px}px)`; g.drawImage(OFF, 0, 0, W, H); g.restore();
+}
+
+// ---------- "Fifteen years at number one": a dark gallery, a crown for each year on a pedestal under glass; the
+// spotlights come on one after another down the row; the count in gold letters on the back wall ----------
+const MUSE = { n: 15, dx: 3.0, z: 8, top: 0.6, wall: 13 };
+const museX = i => i * MUSE.dx;
+const museSign = n => once('muse:' + n, 1600, 600, (x, w, h) => {
+  x.clearRect(0, 0, w, h); x.textAlign = 'center'; x.textBaseline = 'middle';
+  const gr = x.createLinearGradient(0, 40, 0, 560); gr.addColorStop(0, '#FFE58A'); gr.addColorStop(1, '#C98A1E');
+  x.fillStyle = gr; x.shadowColor = 'rgba(255,190,80,0.7)'; x.shadowBlur = 40;
+  x.font = sans(340, 900); x.fillText(String(n), w / 2, 220);
+  x.font = sans(100, 900); x.letterSpacing = '22px'; x.fillText('YEARS AT #1', w / 2 + 11, 500);
+});
+function museum(g, t, { lit = () => 1, n = 15, sign = true } = {}) {
+  const E = B.E, x0 = -16, x1 = museX(MUSE.n - 1) + 16, zb = MUSE.wall, top = 13;
+  g.fillStyle = '#080605'; g.fillRect(0, 0, W, H);
+  if (E[1] > FLOOR_Y) tiled(g, [x0, FLOOR_Y, -26], [x1 - x0, 0, 0], [0, 0, zb + 26], { color: '#17110E', grout: 'rgba(255,220,160,0.05)', tu: 3, tv: 3,
+    light: g2 => { for (let i = 0; i < MUSE.n; i++) { const k = lit(i); if (k > 0) pool(g2, B, museX(i), FLOOR_Y + 0.02, MUSE.z, 3.4, '#FFD58A', 0.3 * k); } } });
+  if (E[2] < zb) {
+    tiled(g, [x0, FLOOR_Y, zb], [x1 - x0, 0, 0], [0, top - FLOOR_Y, 0], { color: '#2A0D10', grout: 'rgba(0,0,0,0.4)', tu: 6, tv: 99 });
+    ab(g, [x0, 3.4, zb - 0.25], [x1, 3.62, zb], '#8E6A2A', { spec: 0.4 });  // a gold rail along the wall
+    if (sign) { const xc = 20; texQuad(g, museSign(n), [xc - 8.5, 12.2, zb - 0.05], [xc + 8.5, 12.2, zb - 0.05], [xc - 8.5, 5.8, zb - 0.05], { under: false });
+      keepClear(g, [[xc - 8.5, 12.2, zb], [xc + 8.5, 12.2, zb], [xc - 8.5, 5.8, zb], [xc + 8.5, 5.8, zb]], 'museum sign'); }
+  }
+  // the cases, far to near: the light cone, the pedestal, the crown, the glass
+  const order = [...Array(MUSE.n).keys()].sort((a, b) => depth(museX(b), 0, MUSE.z) - depth(museX(a), 0, MUSE.z));
+  for (const i of order) {
+    const x = museX(i), z = MUSE.z, k = lit(i), y0 = MUSE.top;
+    if (depth(x, 0, z) < 0.8) continue;
+    spotCone(g, B, { top: [x, top, z], base: [x, y0, z], r0: 0.22, r1: 1.3, color: '#FFE7B0', a: 0.02 + 0.2 * k, dust: 5, t, seed: i + 7 });
+    ab(g, [x - 1.0, FLOOR_Y, z - 1.0], [x + 1.0, FLOOR_Y + 0.35, z + 1.0], mix('#2E2924', '#BDB4A4', 0.3 + 0.7 * k));
+    ab(g, [x - 0.8, FLOOR_Y + 0.35, z - 0.8], [x + 0.8, y0 - 0.2, z + 0.8], mix('#3A332C', '#E4DCCB', 0.25 + 0.75 * k));
+    ab(g, [x - 0.95, y0 - 0.2, z - 0.95], [x + 0.95, y0, z + 0.95], mix('#4A4238', '#F2EBDD', 0.25 + 0.75 * k), { spec: 0.3 });
+    crown3(g, [x, y0 + 0.62, z], 1.15, { a: 0.18 + 0.82 * k });
+    ab(g, [x - 0.85, y0, z - 0.85], [x + 0.85, y0 + 1.9, z + 0.85], '#D8ECFF', { a: 0.08 + 0.06 * k, spec: 0.8 });  // the glass case
+  }
+  lowKey(g, { cy: H * 0.46, a: 0.1 });
+}
+
+// ---------- your phone in your hand, close, seen as you see it: the hand round it, the thumb on the edge ----------
+function phoneInHand(g, t, img, c, R, { night = false, likeT = Infinity, bright = 1 } = {}) {
+  const Rr = { rx: R.rx + Math.sin(t * 1.1) * 0.012, ry: R.ry + Math.sin(t * 0.8) * 0.018, rz: R.rz || 0 };
+  const F = (x, y, z) => { const p = rot3([x, y, z], Rr); return [c[0] + p[0], c[1] + p[1], c[2] + p[2]]; };
+  const skin = night ? '#7F7C96' : SKIN2.base, skinD = night ? '#5E5A74' : SKIN2.shade, sleeve = night ? '#1C1E28' : '#2A2D36';
+  cylinder(g, F(0.5, -5.2, 1.5), F(0.15, -2.3, 0.45), 0.62, sleeve);  // the sleeve, from below
+  obox(g, F(0.05, -1.55, 0.3), [1.05, 1.0, 0.2], skinD, Rr);           // the palm behind the phone
+  obox(g, F(0, 0, 0.06), [PHW + 0.07, PHH + 0.08, 0.06], '#121418', Rr, { spec: 0.6 });
+  if (night) { const q = B.project(...F(0, 0, 0)); if (q.z > 0.5) { g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createRadialGradient(q.x, q.y, 10, q.x, q.y, q.s * 4.2); gr.addColorStop(0, 'rgba(120,160,255,0.35)'); gr.addColorStop(1, 'rgba(120,160,255,0)'); g.fillStyle = gr; g.fillRect(q.x - q.s * 4.2, q.y - q.s * 4.2, q.s * 8.4, q.s * 8.4); g.restore(); } }
+  texQuad(g, img, F(-PHW, PHH, -0.002), F(PHW, PHH, -0.002), F(-PHW, -PHH, -0.002), { under: false, a: bright });
+  for (const y of [-0.15, -0.75, -1.35]) obox(g, F(-PHW - 0.1, y, 0.02), [0.16, 0.24, 0.17], skin, Rr);  // the fingers round the left edge
+  obox(g, F(PHW - 0.02, -1.05, -0.1), [0.2, 0.5, 0.14], skin, { ...Rr, rz: (Rr.rz || 0) - 0.35 }, {});  // the thumb on the right edge
+  // the double tap: the big heart pops on the screen and floats up
+  if (t >= likeT && t < likeT + 0.9) {
+    const u = (t - likeT) / 0.9, q = B.project(...F(0, 0.2 + 0.9 * u, -0.01));
+    if (q.z > 0.5) { g.save(); g.globalAlpha *= 1 - clamp((u - 0.6) / 0.4); heart(g, q.x, q.y, q.s * 0.05 * lerp(1.6, 1, ease.back(clamp(u * 4))), '#FE2C55'); g.restore(); }
+  }
+}
+
+// ---------- the keyhole of the padlock, in padlock() coordinates: the hole the camera goes through ----------
+function keyholePath(g, x, y, s) {
+  g.beginPath(); g.arc(x, y + 110 * s, 40 * s, 0, Math.PI * 2);
+  g.moveTo(x - 22 * s, y + 120 * s); g.lineTo(x + 22 * s, y + 120 * s); g.lineTo(x + 14 * s, y + 210 * s); g.lineTo(x - 14 * s, y + 210 * s); g.closePath();
+}
+
+// ---------- "Zero wins.": the scoreboard hanging over the hall, his name, the zero ----------
+const WINS_T = makeCanvas(1200, 900);
+function winsTex(on, t) {
+  const x = WINS_T.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
+  x.fillStyle = '#05060A'; x.fillRect(0, 0, 1200, 900);
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = sans(84, 900); x.letterSpacing = '16px'; x.fillStyle = '#FFE2B0'; x.fillText('CARLSEN', 608, 110);
+  x.fillStyle = 'rgba(244,239,230,0.25)'; x.fillRect(120, 178, 960, 4);
+  const fl = on <= 0 ? 0 : on < 0.4 ? (Math.sin(t * 90) > 0 ? 1 : 0.25) : 1;  // the zero flickers on
+  if (fl > 0) { x.globalAlpha = fl; x.font = sans(470, 900); x.letterSpacing = '0px'; x.fillStyle = '#FF4A3E'; x.shadowColor = '#FF2A1E'; x.shadowBlur = 70; x.fillText('0', 600, 500); x.shadowBlur = 0; x.globalAlpha = 1; }
+  x.font = sans(120, 900); x.letterSpacing = '24px'; x.fillStyle = fl > 0 ? '#FF6A5E' : '#3A3F4A'; x.fillText('WINS', 612, 800);
+  ledGrid(x, 1200, 900, 10);
+  return WINS_T;
+}
+const WINB = { c: [4, 12.6, 21], hw: 6.4, hh: 4.8 };
+function winsBoard(g, t, on) {
+  const { c, hw, hh } = WINB;
+  g.save(); g.strokeStyle = '#2A2D36'; g.lineWidth = 3; g.beginPath(); for (const dx of [-hw * 0.7, hw * 0.7]) line3(g, [c[0] + dx, c[1] + hh, c[2]], [c[0] + dx, 24, c[2]]); g.stroke(); g.restore();  // the cables
+  camPanel(g, winsTex(on, t), c, hw, hh, 0, { frame: '#111318' });
+  if (on > 0) keepClear(g, [[c[0] - 2, c[1] + 2.4, c[2]], [c[0] + 2, c[1] + 2.4, c[2]], [c[0] - 2, c[1] - 3.9, c[2]], [c[0] + 2, c[1] - 3.9, c[2]]], 'wins 0');
+  if (on > 0) pool(g, B, c[0], c[1] - hh - 0.2, c[2] - 2, 9, '#FF3B30', 0.12 * clamp(on * 3));
+}
+
+// ---------- "22 points gone": a trading floor in red. The video wall with his live rating falling (the start, then the
+// known points after the 13th, 14th and 15th; the 11th and 12th are not known day by day, so that stretch is dashed), the
+// change in big red figures, a ticker under it, desks with their screens, a trader at the middle desk facing us ----------
+const CRASH_T = makeCanvas(1600, 900);
+const CR_PTS = [[0, 2823.0], [3, 2807.2], [4, 2804.0], [5, 2801.2]];  // days from the start of the group
+function crashTex(u, t) {
+  const x = CRASH_T.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
+  const w = 1600, h = 900, L = 110, R = 940, T = 300, Bt = 790, X = d => lerp(L, R, d / 5), Y = v => lerp(T, Bt, (2824 - v) / 24);
+  x.fillStyle = '#0B0204'; x.fillRect(0, 0, w, h);
+  x.textBaseline = 'middle'; x.textAlign = 'left'; x.letterSpacing = '8px';
+  x.font = sans(64, 900); x.fillStyle = '#FFE2B0'; x.fillText('CARLSEN', L, 110);
+  x.font = sans(36, 800); x.letterSpacing = '6px'; x.fillStyle = '#C98A8A'; x.fillText('LIVE RATING · BUDAPEST', L, 178);
+  x.strokeStyle = 'rgba(255,120,120,0.14)'; x.lineWidth = 2;
+  for (let i = 0; i <= 5; i++) { x.beginPath(); x.moveTo(X(i), T - 30); x.lineTo(X(i), Bt + 30); x.stroke(); }
+  for (let j = 0; j <= 4; j++) { const yy = lerp(T - 30, Bt + 30, j / 4); x.beginPath(); x.moveTo(L - 20, yy); x.lineTo(R + 20, yy); x.stroke(); }
+  const n = CR_PTS.length - 1, k = clamp(u) * n;
+  x.lineCap = 'round'; x.lineJoin = 'round'; x.strokeStyle = '#FF4A3E'; x.shadowColor = '#FF2A1E'; x.shadowBlur = 26; x.lineWidth = 13;
+  let hx = X(0), hy = Y(CR_PTS[0][1]);
+  for (let i = 0; i < n && i < k; i++) {
+    const f = clamp(k - i), [d0, v0] = CR_PTS[i], [d1, v1] = CR_PTS[i + 1];
+    hx = lerp(X(d0), X(d1), f); hy = lerp(Y(v0), Y(v1), f);
+    x.setLineDash(i === 0 ? [28, 20] : []); x.beginPath(); x.moveTo(X(d0), Y(v0)); x.lineTo(hx, hy); x.stroke();
+  }
+  x.setLineDash([]); x.fillStyle = '#FFB0A8'; x.beginPath(); x.arc(hx, hy, 18 + 6 * Math.sin(t * 14), 0, 7); x.fill();
+  const drop = 21.8 * ease.out(clamp(u));
+  x.textAlign = 'right'; x.font = mono(210, 800); x.letterSpacing = '0px'; x.fillStyle = '#FF4A3E'; x.shadowBlur = 46;
+  x.fillText('-' + drop.toFixed(1), w - 50, 470);
+  x.shadowBlur = 0; x.font = sans(46, 900); x.letterSpacing = '8px'; x.fillStyle = '#FF8A80'; x.fillText('RATING POINTS', w - 60, 640);
+  ledGrid(x, w, h, 10);
+  return CRASH_T;
+}
+// the side screens: red candles going down (no figures on them)
+const CANDLE_T = tex(900, 900, (x, w, h) => {
+  x.fillStyle = '#0B0204'; x.fillRect(0, 0, w, h); const r = rng(31);
+  let v = 180;
+  for (let i = 0; i < 16; i++) { const o = v, c = v + 20 + r() * 50, hi = Math.min(o, c) - 10 - r() * 30, lo = Math.max(o, c) + 10 + r() * 30, xx = 50 + i * 51;
+    x.strokeStyle = '#FF6A5E'; x.lineWidth = 4; x.beginPath(); x.moveTo(xx, hi); x.lineTo(xx, lo); x.stroke(); x.fillStyle = i % 5 === 3 ? '#3AD07A' : '#FF4A3E'; x.fillRect(xx - 16, Math.min(o, c), 32, Math.abs(c - o)); v = c; }
+  ledGrid(x, w, h, 10);
+});
+const TICK_T = tex(4000, 120, (x, w, h) => {
+  x.fillStyle = '#120406'; x.fillRect(0, 0, w, h); x.textBaseline = 'middle'; x.font = sans(64, 900); x.letterSpacing = '6px';
+  let xx = 20; while (xx < w) for (const [s, col] of [['CARLSEN ▼', '#FF5A4F'], ['  ·  ', '#8A5A5A'], ['LIVE RATING', '#FFC9A8'], ['  ·  ', '#8A5A5A'], ['BUDAPEST', '#FFC9A8'], ['  ·  ', '#8A5A5A']]) { x.fillStyle = col; x.fillText(s, xx, h / 2 + 4); xx += x.measureText(s).width; }
+});
+const MINI_T = tex(400, 260, (x, w, h) => {
+  x.fillStyle = '#100508'; x.fillRect(0, 0, w, h); x.strokeStyle = '#FF4A3E'; x.lineWidth = 6; x.beginPath(); const r = rng(9); let y = 60;
+  for (let i = 0; i <= 10; i++) { y += 8 + r() * 18 - (i === 4 ? 30 : 0); i ? x.lineTo(20 + i * 36, y) : x.moveTo(20, y); } x.stroke(); ledGrid(x, w, h, 8);
+});
+// a desk at (x, z): the top at 0, two screens on it facing -z (toward us) or +z (their backs to us)
+function tradeDesk(g, x, z, { face = -1, w = 2.6 } = {}) {
+  ab(g, [x - w, FLOOR_Y, z - 0.9], [x + w, 0, z + 0.9], '#1C1416', { spec: 0.2 });
+  for (const dx of [-w * 0.5, w * 0.5]) {
+    const cx = x + dx, cz = z - face * 0.2;
+    ab(g, [cx - 0.12, 0, cz - 0.1], [cx + 0.12, 0.7, cz + 0.1], '#101012');
+    obox(g, [cx, 1.6, cz], [1.1, 0.75, 0.06], '#0E0E12', {}, { spec: 0.4 });
+    if ((B.E[2] - cz) * face > 0) { const zz = cz + face * 0.07; face < 0 ? texQuad(g, MINI_T, [cx - 1.0, 2.28, zz], [cx + 1.0, 2.28, zz], [cx - 1.0, 0.92, zz]) : texQuad(g, MINI_T, [cx + 1.0, 2.28, zz], [cx - 1.0, 2.28, zz], [cx + 1.0, 0.92, zz]); }
+  }
+}
+const TRADER = { x: 4, y: 3.7, z: 6.3, k: 1.12 };
+function crashFloor(g, t, { u = 1, e = 'focus', arms = 0, trader = true, alarm = 1, cal = null } = {}) {
+  const E = B.E, zw = 17;
+  g.fillStyle = '#0A0304'; g.fillRect(0, 0, W, H);
+  if (E[1] > FLOOR_Y) tiled(g, [-34, FLOOR_Y, -24], [72, 0, 0], [0, 0, zw + 24], { color: '#1A0B0D', grout: 'rgba(255,80,80,0.06)', tu: 3, tv: 3,
+    light: g2 => pool(g2, B, 4, FLOOR_Y + 0.02, 11, 15, '#FF3B30', 0.24) });
+  if (E[2] < zw) {
+    ab(g, [-34, FLOOR_Y, zw], [38, 22, zw + 0.5], '#12070A');
+    ab(g, [-4.9, 3.3, zw - 0.3], [12.9, 13.55, zw - 0.02], '#08080A');  // the frame of the screen, then the picture on it
+    texQuad(g, crashTex(u, t), [-4.5, 13.2, zw - 0.32], [12.5, 13.2, zw - 0.32], [-4.5, 3.64, zw - 0.32]);  // 17 × 9.56
+    if (u > 0.05) keepClear(g, [[5.0, 9.5, zw - 0.32], [12.3, 9.5, zw - 0.32], [5.0, 6.9, zw - 0.32], [12.3, 6.9, zw - 0.32]], 'wall figure');
+    for (const [xa, xb] of [[-13.5, -5.5], [13.5, 21.5]]) { ab(g, [xa - 0.3, 4.1, zw - 0.3], [xb + 0.3, 12.4, zw - 0.02], '#08080A'); texQuad(g, CANDLE_T, [xa, 12.1, zw - 0.32], [xb, 12.1, zw - 0.32], [xa, 4.4, zw - 0.32]); }
+    const off = (t * 520) % 2000;
+    texQuad(g, TICK_T, [-13.5, 2.9, zw - 0.32], [21.5, 2.9, zw - 0.32], [-13.5, 1.7, zw - 0.32], { src: [off, 0, 1990, 120] });
+    pool(g, B, 4, 8, zw - 0.4, 15, '#FF3B30', 0.22, true);
+  }
+  // the rows of desks toward the wall (their screens toward us), his desk, his two screens with their backs to us
+  for (const z of [13.6, 10.4]) for (const x of [-10, -3.5, 11.5, 18]) tradeDesk(g, x, z, { face: -1 });
+  ab(g, [0.2, FLOOR_Y, 4.3], [7.8, 0, 5.5], '#24181A', { spec: 0.25 });  // his desk
+  if (trader) {
+    const { x, y, z, k } = TRADER, p = B.project(x, y, z);
+    if (p.z > 0.8) {
+      const s = p.s * k * 1.05 / 100;
+      armsUp(g, p.x, p.y, s, arms, CAST.trader.suit);
+      actor(g, B, 'trader', { x, y, z, k, e, t, face: -1 });
+      handsOnHead(g, p.x, p.y, s, t, arms, skinOf('trader').base);
+    }
+  }
+  for (const [x, z] of [[-1.4, 4.6], [9.4, 4.6]]) tradeDesk(g, x, z, { face: 1, w: 1.6 });
+  if (cal) cal(g);
+  lowKey(g, { cy: H * 0.46, a: 0.12 });
+  if (alarm > 0) flashTint(g, '#FF2A1E', 0.07 * alarm * (0.5 + 0.5 * Math.sin(t * 11)));
+}
+
+// ---------- "in five days": a tear-off calendar on his desk, a page a day, Wednesday to Sunday ----------
+const WD = { 11: 'WED', 12: 'THU', 13: 'FRI', 14: 'SAT', 15: 'SUN' };
+const dayPage = d => once('day:' + d, 420, 520, (x, w, h) => {
+  x.fillStyle = '#FBF8F2'; x.fillRect(0, 0, w, h);
+  x.fillStyle = '#D6403A'; x.fillRect(0, 0, w, 112);
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = '#FFFFFF'; x.font = sans(54, 900); x.letterSpacing = '8px'; x.fillText('NOV ' + d, w / 2 + 4, 60);
+  x.fillStyle = '#1E1E24'; x.font = sans(150, 900); x.letterSpacing = '4px'; x.fillText(WD[d], w / 2 + 2, 300);
+  x.fillStyle = '#9A958C'; x.font = sans(32, 800); x.letterSpacing = '6px'; x.fillText('BUDAPEST', w / 2 + 3, 450);
+  x.fillStyle = 'rgba(0,0,0,0.22)'; for (let i = 8; i < w; i += 22) x.fillRect(i, 114, 10, 5);
+});
+const CAL3 = { c: [6.2, 0, 4.7], hw: 0.62, hh: 0.77, lean: 0.24 };
+function tearCal(g, t, { first = 11, last = 15, tears = [] } = {}) {
+  const { c: [cx, cy, cz], hw, hh, lean } = CAL3, y0 = cy + 0.2;
+  const P = (u, v) => [cx + u * hw, y0 + (1 + v) * hh * Math.cos(lean), cz + 0.05 + (1 + v) * hh * Math.sin(lean)];
+  ab(g, [cx - 0.78, cy, cz - 0.3], [cx + 0.78, y0, cz + 0.62], '#22242A', { spec: 0.4 });  // the stand
+  let cur = first; tears.forEach((tk, i) => { if (t >= tk) cur = first + i + 1; });
+  const left = last - cur, back = 0.05 + 0.02 * left;  // the block gets thinner
+  solid(g, [P(-1, -1), P(1, -1), P(1, 1), P(-1, 1)].flatMap(p => [p, [p[0], p[1] - back * Math.sin(lean), p[2] + back * Math.cos(lean)]]),
+    [[0, 2, 4, 6], [1, 3, 5, 7], [0, 1, 3, 2], [4, 5, 7, 6], [0, 1, 7, 6], [2, 3, 5, 4]], '#E8E2D6');
+  texQuad(g, dayPage(Math.min(cur, last)), P(-1, 1), P(1, 1), P(-1, -1));
+  tears.forEach((tk, i) => {  // a torn page: it swings up toward us from its top edge, then drifts off and fades
+    const u = (t - tk) / 0.34; if (u <= 0 || u >= 1) return;
+    const a = lean + ease.out(u) * 2.7, top = P(0, 1), sd = (i % 2 ? 1 : -1) * 0.9 * u * u, up = 1.2 * u * u;
+    const T0 = [top[0] + sd, top[1] + up, top[2] - 0.3 * u], d = [0, -Math.cos(a) * 2 * hh, -Math.sin(a) * 2 * hh];
+    texQuad(g, dayPage(first + i), [T0[0] - hw, T0[1], T0[2]], [T0[0] + hw, T0[1], T0[2]], [T0[0] - hw + d[0], T0[1] + d[1], T0[2] + d[2]], { a: 1 - clamp((u - 0.7) / 0.3) });
+  });
+}
+
+// ---------- your room at night: the same room, the lamp off, rain on the window; you in bed, the phone lighting you ----------
+const NIGHT_T = tex(1200, 880, (x, w, h) => {
+  const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#060A18'); gr.addColorStop(1, '#1A2648'); x.fillStyle = gr; x.fillRect(0, 0, w, h);
+  const r = rng(77);
+  for (let i = 0; i < 11; i++) { const bw = 70 + r() * 130, bh = 140 + r() * 300, bx = i * 112 - 30 + r() * 40; x.fillStyle = '#0A0F22'; x.fillRect(bx, h - bh, bw, bh);
+    for (let k = 0; k < 7; k++) if (r() < 0.55) { x.fillStyle = `rgba(255,${200 + (r() * 40 | 0)},140,${(0.35 + r() * 0.5).toFixed(2)})`; x.fillRect(bx + 10 + r() * (bw - 26), h - bh + 16 + r() * (bh - 30), 10, 13); } }
+  x.strokeStyle = '#1B2238'; x.lineWidth = 30; x.strokeRect(0, 0, w, h); x.lineWidth = 16; x.beginPath(); x.moveTo(w / 2, 0); x.lineTo(w / 2, h); x.moveTo(0, h * 0.46); x.lineTo(w, h * 0.46); x.stroke();
+});
+const DROPS = (() => { const r = rng(404), o = []; for (let i = 0; i < 70; i++) o.push([lerp(WIN.x0, WIN.x1, r()), lerp(WIN.y0, WIN.y1, r()), 0.03 + r() * 0.06, r()]); return o; })();
+function nightRoom(g, t, { e = 'worried', glow = 1, you = true, phone = true, night = '#2A3558' } = {}) {
+  dayRoom(g, t, { farSky: NIGHT_T, nearSky: NIGHT_T });
+  const zw = ROOM.z1 - 0.13;
+  { const pts = [[WIN.x0, WIN.y1, zw], [WIN.x1, WIN.y1, zw], [WIN.x1, WIN.y0, zw], [WIN.x0, WIN.y0, zw]];  // rain on the glass
+    if (B.E[2] < zw && B.poly(g, pts)) { g.save(); g.clip(); rain(g, t, 0.7);
+      for (const [x, y, rr, ph] of DROPS) { const yy = y - ((t * 0.5 + ph) % 1) * 0.6 * (ph > 0.7 ? 1 : 0), q = B.project(x, yy, zw - 0.01); if (q.z > 0.5) { g.fillStyle = 'rgba(200,220,255,0.45)'; g.beginPath(); g.arc(q.x, q.y, Math.max(1, rr * q.s), 0, 7); g.fill(); } }
+      g.restore(); } }
+  ab(g, [-3.2, FLOOR_Y, 13.2], [11.2, 2.4, 13.55], '#3A2C24');      // the headboard
+  ab(g, [-3.0, FLOOR_Y, 6.0], [11.0, -1.7, 13.4], '#3A2C24');       // the frame
+  ab(g, [-2.8, -1.7, 6.2], [10.8, -1.0, 13.2], '#E9E4DA');           // the mattress
+  ab(g, [-1.0, -1.0, 11.4], [9.0, 0.3, 13.1], '#F4F1EA', { spec: 0.2 });  // the pillow
+  ab(g, [11.6, FLOOR_Y, 9.6], [14.4, -0.4, 12.6], '#3A2C24');       // the nightstand
+  if (you) actor(g, B, 'you', { x: 4, y: 2.0, z: 10.4, k: 1.15, e, t, face: -1 });
+  ab(g, [-2.9, -1.1, 6.1], [10.9, -0.1, 9.7], '#34507E', { spec: 0.1 });  // the blanket, up to your waist
+  if (you && phone) obox(g, [4.0, 0.55, 8.9], [0.66, 1.3, 0.07], '#121418', { rx: 0.4 }, { spec: 0.6 });  // the phone in your hands, its back to us
+  g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = night; g.fillRect(0, 0, W, H); g.restore();  // the night
+  if (you && glow > 0) {  // the phone's light on your face
+    const q = B.project(4, 1.7, 9.2); if (q.z > 0.5) { const r = q.s * 3.6; g.save(); g.globalCompositeOperation = 'screen'; const gr = g.createRadialGradient(q.x, q.y + r * 0.1, 4, q.x, q.y, r); gr.addColorStop(0, `rgba(130,170,255,${(0.55 * glow).toFixed(3)})`); gr.addColorStop(1, 'rgba(130,170,255,0)'); g.fillStyle = gr; g.fillRect(q.x - r, q.y - r, 2 * r, 2 * r); g.restore(); }
+  }
+  lowKey(g, { cy: H * 0.46, a: 0.12 });
+}
+
+// ---------- the top comment, literally: two plinths rise out of a dark stage, his to his lowest of the month and
+// Caruana's to his best (NOV 2026, live: SOURCES.md); a gold laser line at 2800 runs between them ----------
+const PLN = { xm: -0.6, xf: 8.6, z: 8, hw: 2.1, v0: 2787, sc: 0.62 };
+const plnY = v => FLOOR_Y + (v - PLN.v0) * PLN.sc;  // 2800 → 4.86, 2801.2 → 5.60
+const plnTex = (label, val, col) => once('pln:' + label, 700, 760, (x, w, h) => {
+  x.fillStyle = '#0B0D14'; x.fillRect(0, 0, w, h); x.fillStyle = col; x.fillRect(0, 0, w, 16);
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = sans(66, 900); x.letterSpacing = '10px'; x.fillStyle = col; x.fillText(label, w / 2 + 5, 130);
+  x.font = mono(168, 800); x.letterSpacing = '0px'; x.shadowColor = col; x.shadowBlur = 34; x.fillText(val, w / 2, 330);
+  ledGrid(x, w, h, 10);
+});
+function plinths(g, t, { hm = 1, hf = 1, eM = 'smug', eF = 'focus', line = 1, leds = true, labelX = 15.5 } = {}) {  // leds: the figures on the fronts
+  const E = B.E, zw = 22;
+  g.fillStyle = '#05060B'; g.fillRect(0, 0, W, H);
+  if (E[1] > FLOOR_Y) tiled(g, [-34, FLOOR_Y, -30], [80, 0, 0], [0, 0, zw + 30], { color: '#0C0E16', grout: 'rgba(140,160,255,0.07)', tu: 3, tv: 3,
+    light: g2 => { pool(g2, B, PLN.xm, FLOOR_Y + 0.02, PLN.z, 6, '#FFD58A', 0.26); pool(g2, B, PLN.xf, FLOOR_Y + 0.02, PLN.z, 6, '#9FB4D8', 0.22); } });
+  if (E[2] < zw) tiled(g, [-34, FLOOR_Y, zw], [80, 0, 0], [0, 34, 0], { color: '#090C18', grout: 'rgba(120,140,255,0.05)', tu: 4, tv: 4 });
+  const yM = lerp(FLOOR_Y + 0.2, plnY(2801.2), ease.out(clamp(hm))), yF = lerp(FLOOR_Y + 0.2, plnY(2800.0), ease.out(clamp(hf)));
+  const L = [[PLN.xm, yM, 'magnusSuit', eM, plnTex('HIS LOWEST', '2801.2', GOLD), '#B8902E', '#FFE7B0'], [PLN.xf, yF, 'fab', eF, plnTex('THEIR BEST', '2800.0', '#AFC4E8'), '#4A5C80', '#CFE0FF']]
+    .sort((a, b) => depth(b[0], 0, PLN.z) - depth(a[0], 0, PLN.z));
+  const heads = {};
+  for (const [x, y, who, e, img, col, light] of L) {
+    const { z, hw } = PLN;
+    spotCone(g, B, { top: [x, 24, z], base: [x, y + 2, z], r0: 0.4, r1: 2.8, color: light, a: 0.1, dust: 10, t, seed: 3 + (x > 4 ? 1 : 0) });
+    ab(g, [x - hw, FLOOR_Y, z - hw], [x + hw, y, z + hw], col, { spec: 0.35 });
+    if (leds && E[2] < z - hw) { const fh = Math.min(y - FLOOR_Y - 0.2, (2 * hw - 0.4) * 760 / 700); if (fh > 0.3) texQuad(g, img, [x - hw + 0.2, y - 0.2, z - hw - 0.02], [x + hw - 0.2, y - 0.2, z - hw - 0.02], [x - hw + 0.2, y - 0.2 - fh, z - hw - 0.02], { src: [0, 0, 700, 760 * Math.min(1, fh / ((2 * hw - 0.4) * 760 / 700))] }); }
+    g.save(); g.beginPath(); g.rect(-W, -H, 3 * W, 3 * H);
+    const cut = pts => { const q = pts.map(p => B.project(...p)); if (q.some(p => p.z < 0.3)) return; g.moveTo(q[0].x, q[0].y); for (const p of q.slice(1)) g.lineTo(p.x, p.y); g.closePath(); };
+    cut([[x - hw, FLOOR_Y, z - hw], [x + hw, FLOOR_Y, z - hw], [x + hw, y, z - hw], [x - hw, y, z - hw]]);  // the front
+    const sx = E[0] < x - hw ? x - hw : E[0] > x + hw ? x + hw : null;
+    if (sx !== null) cut([[sx, FLOOR_Y, z - hw], [sx, FLOOR_Y, z + hw], [sx, y, z + hw], [sx, y, z - hw]]);  // the side we see
+    g.clip('evenodd');
+    heads[who] = actor(g, B, who, { x, y: y + 3.0, z: z + 0.6, k: 1.1, e, t: t + x * 0.13, face: -1 });
+    g.restore();
+    if (leds && E[2] < z - hw && y - FLOOR_Y > 3) { const yv = y - 0.2 - 0.434 * Math.min(y - FLOOR_Y - 0.2, (2 * hw - 0.4) * 760 / 700); keepClear(g, [[x - hw, yv + 0.6, z - hw], [x + hw, yv + 0.6, z - hw], [x - hw, yv - 0.6, z - hw], [x + hw, yv - 0.6, z - hw]], 'plinth ' + who); }
+    ab(g, [x - hw, y, z - hw], [x + hw, y + 1.25, z - hw + 0.35], mix(col, '#000000', 0.25), { spec: 0.4 });  // the rail at the front of the top
+  }
+  if (line > 0) {  // the laser at 2800
+    const y = plnY(2800);
+    g.save(); g.globalAlpha *= clamp(line); g.setLineDash([22, 14]); g.strokeStyle = 'rgba(255,214,90,0.95)'; g.lineWidth = 5; g.shadowColor = GOLD; g.shadowBlur = 16;
+    g.beginPath(); line3(g, [-9, y, PLN.z - PLN.hw - 0.4], [18, y, PLN.z - PLN.hw - 0.4]); g.stroke(); g.restore();
+    const q = B.project(labelX, y + 0.55, PLN.z - PLN.hw - 0.4); if (q.z > 0.5 && q.x > 60 && q.x < W - 60) plate(g, '2800', q.x, q.y, { color: GOLD, size: clamp(q.s * 0.9, 30, 64), rot: 0, qa: false });
+  }
+  lowKey(g, { cy: H * 0.46, a: 0.1 });
+  return heads;
+}
+
+
+// ---------- "is the Carlsen era over?": the paper on your phone at night (a news page of our own, no logos) ----------
+const ERA_T = makeCanvas(600, 1200);
+function eraPhoneTex(t, ring = 0) {
+  const x = ERA_T.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0);
+  x.fillStyle = '#0B0C12'; x.fillRect(0, 0, 600, 1200);
+  x.fillStyle = '#161A2A'; x.fillRect(0, 0, 600, 170);
+  x.textBaseline = 'middle'; x.textAlign = 'left'; x.letterSpacing = '4px'; x.font = sans(32, 900); x.fillStyle = '#FF5A4F'; x.fillText('● BREAKING', 36, 112);
+  eraPaper(x, t, { x: 300, y: 664, s: 0.6, rot: 0, ring });
+  x.fillStyle = '#2A2E40'; x.beginPath(); x.roundRect(200, 1150, 200, 10, 5); x.fill();  // the home bar
+  return ERA_T;
+}
+
+
 export async function build(T) {
   const s = id => T.s(id), w = (id, k) => T.w(id, k).s;
   const cues = [];
@@ -2855,96 +3180,104 @@ export async function build(T) {
     if (t >= fiveT) counter(g, '5.4', 'POINTS AWAY', { y: 330, size: 180, color: RED, at: [t, fiveT] });
   } });
   cue(S2 - 0.04, 'whoosh_fast', 0.35); cue(fiveT, 'boom_move', 0.5); cue(fiveT + 0.3, 'thud', 0.35); cue(ptsT, 'riser', 0.25);
-  // "from losing number one": the crown shakes on his head
+  // "from losing number one": the vertigo on the throne, from his side over the edge (the camera goes in as the lens goes
+  // wide: he keeps his size and the drop and the clouds behind him rush away); on "one" the crown lurches on his head
   const S3 = losT - 0.05;
   shot(S3, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.05, 0.04, 6.4, [4, 3.4, 9.3]), K(-0.04, 0.03, 5.2, [4, 3.5, 9.3]));
-    const wob = t >= oneT ? Math.sin((t - oneT) * 30) * Math.exp(-(t - oneT) * 4) : 0;
-    summit(g, t, sunny(t, { eM: t >= losT ? EXPR.shock : EX.smug, cr: { rot: 0.14 * wob + (t >= losT ? 0.07 : 0), dx: 16 * wob } }));
-  }, { kb: 0, grade: 'warm', zoom: kicks([[losT, 0.08]]), hud: (g, lt, t) => {
-    if (t >= oneT) counter(g, '#1', null, { x: W / 2 + Math.sin(t * 70) * 9 * Math.exp(-(t - oneT) * 5), y: 330, size: 210, color: RED, at: [t, oneT] });
-  } });
-  cue(S3, 'heartbeat', 0.35); cue(losT, 'dun_dun', 0.45); cue(oneT, 'glass', 0.35);
+    rig(B, lt, [[0, K(-1.4, 0.3, 10.4, [4, 3.6, 9.3], { fov: 2420 })], [yrA - S3, K(-1.24, 0.27, 4.6, [4, 3.6, 9.3], { fov: 1070 })]], { t, e: ease.inOut, shake: 0.6 });
+    const d = t - oneT, wob = d >= 0 ? Math.sin(d * 30) * Math.exp(-d * 4) * clamp(1 - d / 0.6) : 0, tilt = t >= losT ? 0.07 * (1 - clamp(d / 0.5)) : 0;
+    summit(g, t, sunny(t, { eM: t >= losT ? EXPR.shock : EX.smug, cr: { rot: 0.14 * wob + tilt, dx: 16 * wob } }));
+  }, { kb: 0, grade: 'warm' });
+  cue(S3, 'heartbeat', 0.35); cue(losT, 'dun_dun', 0.45); cue(losT + 0.05, 'riser', 0.22); cue(oneT, 'glass', 0.35);
 
-  // ======================= FIFTEEN YEARS: days and nights over the summit; his post =======================
+  // ======================= FIFTEEN YEARS: a museum of his crowns; his post on your phone; the padlock =======================
+  // a match cut from the crown on his head to the first crown under glass: a dark gallery, a crown for every year at
+  // number one; the lights come on down the row as the count on the back wall goes up
   const S4 = yrA, cnt0 = fifT - 0.05, cntD = numT - fifT;
+  const litAt = k => k === 0 ? S4 - 1 : cnt0 + cntD * (1 - Math.cbrt(1 - k / 14));
   shot(S4, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.5, 0.1, 21, [4, 2.5, 8]), K(0.7, 0.12, 19, [4, 2.7, 8]), lin);
-    const u = clamp(lt / (sh.b - sh.a)), tod = 3 * ease.inOut(u), night = Math.max(0, 1 - Math.abs(tod - 2)), gold = Math.max(0, 1 - Math.abs(tod - 1));
-    summit(g, t, sunny(t, { wChair: false, P: skyAt(tod), stars: Math.max(0, 1 - Math.abs(tod - 2) * 1.4), drift: lt * 40,
-      grade: night + gold > 0.02 ? mix(mix('#FFFFFF', '#FFD9BC', gold), '#6E7AAE', night) : null }));
-  }, { kb: 0, hud: (g, lt, t) => {
-    const n = 1 + Math.floor(14 * ease.out(clamp((t - cnt0) / cntD)));
-    counter(g, String(n), 'YEARS AT #1', { y: 330, size: 200, color: GOLD, at: [t, S4 + 0.02] });
-  } });
+    rig(B, lt, [[0, K(0, 0.05, 4.0, [0, 1.22, 8], { fov: 812, cy: 710 })], [numT - S4 + 0.05, KE([-7, 3.0, -4], [12, 2.6, 9]), ease.inOut], [len(sh), KE([-6.4, 3.05, -3.3], [12.2, 2.7, 9])]], { t, e: glide });
+    museum(g, t, { lit: i => clamp((t - litAt(i)) / 0.12), n: 1 + Math.floor(14 * ease.out(clamp((t - cnt0) / cntD))) });
+  }, { kb: 0, grade: 'warm' });
   cue(S4, 'whoosh_soft', 0.3);
-  for (let k = 1; k <= 14; k++) cue(cnt0 + cntD * (1 - Math.cbrt(1 - k / 14)), 'clock_tick', k === 14 ? 0.4 : 0.16);
+  for (let k = 1; k <= 14; k++) cue(litAt(k), 'clock_tick', k === 14 ? 0.4 : 0.16);
   cue(numT, 'shimmer', 0.35);
-  // "He even posted: always locked in." — his post on the phone lying on the table (our own interface)
+  // "He even posted: always locked in." — his post on your phone, in your hand (our own interface, no logos)
+  const PH1 = [4, 2.3, -3.2], PHR = { rx: 0.2, ry: -0.06, rz: 0.04 };
   shot(poA, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.5, 0.75, 7.5, [9.6, -0.2, 7.0], { cy: H * 0.5 - 200 }), K(0.36, 0.95, 4.3, [9.6, -0.2, 7.05], { cy: H * 0.5 - 220 }));  // the post's words above the captions
-    summit(g, t, sunny(t, { over: g2 => tablePhone(g2, postTex(t)) }));
-  }, { kb: 0, qaAllow: ['face cut by frame'], grade: 'warm', zoom: kicks([[postT, 0.05], [alwT, 0.06]]) });
+    cam(lt, t, sh, K(0.07, 0.2, 7.2, PH1, { cy: 600 }), K(-0.02, 0.16, 6.4, PH1, { cy: 600 }));
+    blurred(g, 9, g2 => dayRoom(g2, t, {}));
+    phoneInHand(g, t, postTex(t), PH1, PHR, { likeT: alwT });
+    lowKey(g, { cy: H * 0.46, a: 0.05 });
+  }, { kb: 0, grade: 'warm', zoom: kicks([[postT, 0.05], [alwT, 0.06]]) });
   cue(poA - 0.03, 'whoosh_fast', 0.3); cue(postT, 'notify', 0.45); cue(alwT, 'sparkle_pop', 0.3);
-  // "locked in": the padlock snaps beside the words
-  const S6 = lockedT - 0.04;
+  // "locked in": closer, at an angle; the padlock springs out of the screen and snaps shut. Then the camera goes through
+  // its keyhole into Budapest: what the keyhole shows is the first frame of the next shot
+  const S6 = lockedT - 0.04, S8 = budT + 0.03, KH0 = buA - 0.25, HALL0 = K(0.32, 0.18, 26, [4, 3.2, 6]);
+  const dutch = (g, a, k) => { g.translate(W / 2, H / 2); g.rotate(a); g.scale(k, k); g.translate(-W / 2, -H / 2); };  // k covers the corners
   shot(S6, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.15, 0.05, 6.0, [4, 3.4, 9.3]), K(-0.05, 0.04, 5.0, [4, 3.45, 9.3]));
-    summit(g, t, sunny(t));
-  }, { kb: 0, grade: 'warm', zoom: kicks([[lockInT, 0.07]]), hud: (g, lt, t) => {
-    if (t < lockedT) return;
-    g.save(); g.font = sans(70, 900); g.letterSpacing = '1px'; const pw = g.measureText('LOCKED IN').width + 70 * 0.95; g.restore();
-    const px = W / 2 + 80, sc = popW(t, lockedT).scale;
-    plate(g, 'LOCKED IN', px, 250, { color: GOLD, size: 70, rot: 0, scale: sc });
-    padlock(g, px - pw / 2 - 90, 232, 0.24 * sc, ease.out(clamp((t - lockInT) / 0.12)), { glow: t >= lockInT ? Math.exp(-(t - lockInT) * 3) : 0 });
-    if (t >= lockInT) glint(g, px - pw / 2 - 90, 205, t, lockInT, { r: 140, color: '#FFF1B0' });
-  } });
-  cue(lockedT, 'ratchet', 0.4); cue(lockInT, 'stamp', 0.5);
+    g.fillStyle = '#1A140E'; g.fillRect(0, 0, W, H);
+    g.save(); dutch(g, 0.07, 1.13);
+    rig(B, lt, [[0, K(0.0, 0.16, 5.8, PH1, { cy: 430 })], [S8 - S6, K(-0.05, 0.14, 5.0, PH1, { cy: 430 })]], { t, e: glide });
+    blurred(g, 10, g2 => dayRoom(g2, t, {}));
+    phoneInHand(g, t, postTex(t), PH1, PHR);
+    g.restore();
+    lowKey(g, { cy: H * 0.46, a: 0.06 });
+    const pu = ease.back(clamp((t - lockedT) / 0.25)), zu = clamp((t - KH0) / (S8 - KH0));
+    const s = lerp(0, 1.1, pu) * Math.pow(40 / 1.1, zu), KX = 540, KY = lerp(470, 960, ease.inOut(zu)), oy = KY - 110 * s;
+    if (s < 0.01) return;
+    const gl = t >= lockInT ? Math.exp(-(t - lockInT) * 3) : 0;
+    if (gl > 0.02) rays(g, KX, KY, t, { n: 16, color: GOLD, a: 0.3 * gl, len: 1100 });
+    padlock(g, KX, oy, s, ease.out(clamp((t - lockInT) / 0.12)), { glow: gl });
+    if (t >= lockInT) { shockwave(g, KX, KY, t, lockInT, { r1: 620, color: GOLD, lw: 14 }); glint(g, KX + 150 * s, oy - 120 * s, t, lockInT + 0.05, { r: 200 }); }
+    if (t >= KH0) {  // through the keyhole; the padlock round it goes dark as it fills the frame
+      g.save(); keyholePath(g, KX, oy, s); g.rect(0, 0, W, H); g.fillStyle = rgba('#120C04', 0.6 * ease.out(zu)); g.fill('evenodd'); g.restore();
+      g.save(); keyholePath(g, KX, oy, s); g.clip(); g.globalAlpha = clamp((t - KH0) / 0.1);
+      rig(B, 0, [[0, HALL0]], { t });
+      hall(g, t, { pieces: PSC, white: 'opp3', black: 'magnusSuit', eb: EX.calm });
+      g.restore();
+    }
+  }, { kb: 0, grade: 'warm', zoom: kicks([[lockInT, 0.05]]) });
+  cue(lockedT, 'ratchet', 0.4); cue(lockInT, 'stamp', 0.5); cue(lockInT + 0.02, 'boom_move', 0.3); cue(KH0, 'whoosh_deep', 0.45);
 
-  // ======================= BUDAPEST: down through the clouds into the hall =======================
-  const S7 = buA - 0.15;
-  shot(S7, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.2, 0.12, 15, [4, 2.5, 8.5]), K(0.26, 0.42, 15, [4, -5, 5]), x => x * x);  // the tilt down off the summit, into the white of the clouds
-    const u = clamp(lt / (sh.b - sh.a));
-    summit(g, t, sunny(t, { eM: EX.calm, after: g2 => whiteout(g2, ease.inOut(clamp((u - 0.42) / 0.5))) }));
-  }, { kb: 0 });
-  cue(S7, 'whoosh_deep', 0.45); cue(S7 + 0.3, 'wind', 0.3);
-  const S8 = budT + 0.03;
+  // ======================= BUDAPEST: the hall; the row of ten games; the scoreboard =======================
   shot(S8, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.32, 0.18, 26, [4, 3.2, 6]), K(0.2, 0.14, 21, [4, 3.2, 6]));
+    cam(lt, t, sh, HALL0, K(0.2, 0.14, 21, [4, 3.2, 6]));
     hall(g, t, { pieces: PSC, white: 'opp3', black: 'magnusSuit', eb: EX.calm });
-    whiteout(g, 1 - ease.out(clamp(lt / 0.3)));
-  }, { kb: 0 });  // the hall's own banner says BUDAPEST · NOVEMBER 2026
+  }, { kb: 0, grade: 'warm' });  // the hall's own banner says BUDAPEST · NOVEMBER 2026; the grade of the keyhole shot
   cue(S8, 'murmur', 0.3); cue(S8 + 0.05, 'reveal_bell', 0.2);
-  // "Ten classical games": the ten games of the group in a row, a result over each
-  const S9 = tenT - 0.05, RW0 = tenT + 0.05, RWS = 0.11;
+  // "Ten classical games": the ten games of the group in a row, seen from high on the diagonal; a result over each
+  const S9 = tenT - 0.05, RW0 = tenT + 0.05, RWS = 0.12;
   shot(S9, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-1.08, 0.7, 220, [50, 0, -6], { fov: 2400, cy: H * 0.5 - 60 }), K(-1.03, 0.72, 215, [52, 0, -6], { fov: 2400, cy: H * 0.5 - 60 }));  // high over the row: the ten results spread up the frame
+    cam(lt, t, sh, KE([-34, 80, -40], [60, 0, 4], { fov: 1600, cy: 690 }), KE([-30, 78, -42], [62, 0, 4], { fov: 1600, cy: 690 }));
     rowHall(g, t, { eM: EX.calm });
-    rowPlates(g, t, RW0, RWS);
+    rowPlates(g, t, RW0, RWS, { size: q => clamp(q.s * 4.6, 44, 100), lossK: 1.7 });
   }, { kb: 0 });
   for (let k = 0; k < 10; k++) cue(RW0 + k * RWS, k === 4 ? 'error' : 'clock_press', k === 4 ? 0.4 : 0.25);
-  // "Zero wins."
+  // "Zero wins.": from just over the board where the empty chair would be: his pieces low in the frame, his face, and
+  // over him the scoreboard of the hall; the zero flickers on
   const S10 = zeroT - 0.05;
   shot(S10, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.3, 0.1, 8.0, [4, 3.0, 9.3]), K(0.1, 0.08, 6.6, [4, 3.1, 9.3]));
-    hall(g, t, { pieces: PSC, white: 'opp3', black: 'magnusSuit', wPlayer: false, eb: EX.sad });
-  }, { kb: 0, qaAllow: ['face cut by frame'], zoom: kicks([[zeroT, 0.07]]), hud: (g, lt, t) => { if (t >= zeroT) stamp(g, '0 WINS', W / 2, 1600, t, zeroT, { color: RED, size: 120, rot: -0.1 }); } });
-  cue(zeroT, 'record_scratch', 0.4); cue(winsT, 'stamp', 0.5);
+    cam(lt, t, sh, KE([4.45, 2.0, -2.3], [4, 8.0, 21], { cy: 690 }), KE([4.2, 2.1, -1.0], [4, 8.3, 21], { cy: 690 }));
+    hall(g, t, { pieces: PSC, white: 'opp3', black: 'magnusSuit', wPlayer: false, wChair: false, eb: EX.sad }, { deco: g2 => winsBoard(g2, t, clamp((t - zeroT) / 0.5)) });
+  }, { kb: 0, qaAllow: ['face cut by frame'], zoom: kicks([[zeroT, 0.05]]) });
+  cue(zeroT, 'record_scratch', 0.4); cue(zeroT + 0.02, 'buzz', 0.3); cue(winsT, 'stamp', 0.5);
 
   // ======================= THE CLOCK: 46 seconds, and he walks into mate =======================
   const PM = piecesAt(MC, 77);  // after 39.Re8; Magnus (Black) to move with 0:46
   const mart = (o = {}) => ({ pieces: PM, white: 'haik', black: 'magnusSuit', ew: 'focus', eb: EXPR.worried, clock: clockMC(46), ...o });
-  shot(ckA, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.25, 0.22, 14, [4.5, 1.5, 7]), K(0.2, 0.2, 12, [4.3, 1.7, 7]));
-    hall(g, t, mart({ eb: EX.worriedClock }));
-  }, { kb: 0, hud: (g, lt) => { scrim(g, 0.9); nameTitle(g, lt, 'Haik Martirosyan', 'NOV 13 · BUDAPEST', { y: 230, t0: 0.05 }); } });
-  cue(ckA - 0.03, 'whoosh_soft', 0.3); cue(ckA + 0.1, 'swipe_card', 0.25);
+  // "And in one of them": the crane comes down out of the row onto the fifth table, his game with Martirosyan
   const S11b = secT - 0.04;
+  shot(ckA, (g, lt, t, sh) => {
+    rig(B, lt, [[0, KE([60, 40, 44], [56, 2, 4])], [0.62, K(2.84, 0.22, 12.5, [56, 2.2, 4]), ease.inOut], [S11b - ckA + 0.35, K(2.9, 0.2, 11.5, [56, 2.3, 4])]], { t, e: glide });
+    rowHall(g, t, { eM: EX.calm, k4: mart({ eb: EX.worriedClock }) });
+  }, { kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt) => { scrim(g, 0.9 * clamp((lt - 0.3) / 0.2)); nameTitle(g, lt, 'Haik Martirosyan', 'NOV 13 · BUDAPEST', { y: 230, t0: 0.45 }); } });
+  cue(ckA - 0.03, 'whoosh_deep', 0.35); cue(ckA + 0.45, 'swipe_card', 0.25);
+  // "with 46 seconds left": the clock, close, his face beyond it (no counter: the clock says it)
   shot(S11b, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.5, 0.02, 8.5, [9, 0.6, 5], { fov: 2000, cy: H * 0.5 - 150 }), K(0.52, 0.02, 7.9, [9, 0.6, 5], { fov: 2000, cy: H * 0.5 - 150 }));  // his whole face on the left, the whole clock under the number
+    cam(lt, t, sh, KE([11.6, 1.15, 0.6], [8.6, 1.6, 6.2]), KE([11.0, 1.15, 1.2], [8.6, 1.6, 6.2]));
     hall(g, t, mart(), { extra: false });
-  }, { kb: 0, zoom: kicks([[secT, 0.06]]), hud: (g, lt, t) => counter(g, '0:46', 'SECONDS LEFT', { x: 720, y: 330, size: 190, color: RED, at: [t, secT] }) });
+  }, { kb: 0, zoom: kicks([[secT, 0.06]]) });
   for (let k = 0; k < 6; k++) cue(secT + k * 0.25, 'clock_tick', 0.3);
   cue(S11b + 0.2, 'heartbeat', 0.35);
   // "he walked straight into mate": 39...Qd5 from above, then 40.Rh8+ in his face
@@ -2965,23 +3298,28 @@ export async function build(T) {
   }, { kb: 0, hud: (g, lt, t) => { if (t >= rh8 + 0.1) stamp(g, 'FORCED MATE', W / 2, 1600, t, rh8 + 0.1, { color: RED, size: 100, rot: -0.1 }); } });
   cue(rh8, 'boom_big', 0.6); cue(rh8, 'move_capture', 0.35); cue(rh8 + 0.35, 'dun_dun', 0.4);
 
-  // ======================= THE STORM: 22 points in five days; Caruana five points behind =======================
+  // ======================= 22 POINTS GONE: a trading floor in red; the calendar; Caruana five points behind =======================
+  // close on the video wall: the drop counts up to 21.8 on "22 points"; the lens pulls back to the trader at the middle
+  // desk, and on "gone" his hands go to his head
+  const c22T = w('crash', 0), cPtsT = w('crash', 1), S15 = goneT + 0.23;
+  const TEARS = [0, 1, 2, 3].map(i => lerp(S15 + 0.12, daysT - 0.05, i / 3));
+  const CRASH_G = { con: 1.14, sat: 1.08, bri: 0.98, tone: ['#FF5040', 0.16], lift: ['#2A0608', 0.14], bloom: 0.45 };
   shot(crA, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.25, 0.1, 20, [4, 2.5, 8]), K(0.15, 0.08, 16, [4, 2.8, 8.4]));
-    summit(g, t, storm(t, { skyFx: g2 => bolt(g2, t, goneT, 760, 820, hz() + 40, 3), after: g2 => flashTint(g2, '#E6EEFF', 0.35 * boltA(t, goneT)) }));
-  }, { kb: 0, grade: 'cold', zoom: kicks([[goneT, 0.08]]), hud: (g, lt, t) => {
-    const v = Math.round(22 * ease.out(clamp((t - (crA + 0.1)) / 0.45)));
-    counter(g, v ? '-' + v : '0', 'RATING POINTS', { y: 330, size: 200, color: RED, at: [t, crA + 0.03] });
-  } });
-  cue(crA - 0.03, 'whoosh_deep', 0.35); cue(crA + 0.1, 'wind', 0.3);
-  for (let k = 0; k < 6; k++) cue(crA + 0.1 + k * 0.075, 'tick', 0.18);
-  cue(crA + 0.56, 'thud', 0.4); cue(goneT, 'boom_cine', 0.55);
-  const S15 = daysT - 0.08, bolt2 = daysT + 0.05;
+    rig(B, lt, [[0, KE([8.6, 8.0, 5.7], [8.6, 8.0, 17], { cy: 760 })], [Math.max(0.3, cPtsT - crA), KE([8.45, 7.95, 5.0], [8.55, 7.95, 17], { cy: 760 })],
+      [goneT - crA + 0.12, KE([3.3, 5.4, -4.5], [4.5, 5.9, 10], { cy: 760 }), ease.inOut], [len(sh), KE([3.4, 5.3, -3.9], [4.5, 5.9, 10], { cy: 760 })]],
+      { t, e: glide, bump: t >= goneT ? Math.exp(-(t - goneT) * 5) : 0 });
+    crashFloor(g, t, { u: ease.out(clamp((t - c22T + 0.05) / (cPtsT - c22T + 0.25))), e: t < cPtsT ? 'focus' : t < goneT ? 'worried' : EXPR.shock,
+      arms: clamp((t - goneT) / 0.25), cal: g2 => tearCal(g2, t, {}) });
+  }, { kb: 0, grade: CRASH_G });
+  cue(crA - 0.03, 'whoosh_deep', 0.35); for (let k = 0; k < 8; k++) cue(c22T + 0.05 + k * 0.12, 'tick', 0.16);
+  cue(goneT, 'boom_cine', 0.55); cue(goneT + 0.05, 'alarm', 0.25);
+  // "in five days": his tear-off calendar, close; a page a day, Wednesday to Sunday
   shot(S15, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.12, 0.05, 6.2, [4, 3.4, 9.3]), K(0.02, 0.04, 5.4, [4, 3.45, 9.3]));
-    summit(g, t, storm(t, { rainA: 0.9, skyFx: g2 => bolt(g2, t, bolt2, 260, 330, hz() + 40, 7), after: g2 => flashTint(g2, '#E6EEFF', 0.3 * boltA(t, bolt2)) }));
-  }, { kb: 0, grade: 'cold', zoom: kicks([[daysT, 0.06]]), hud: (g, lt, t) => counter(g, '5', 'DAYS', { y: 330, size: 210, color: CREAM, at: [t, daysT] }) });
-  cue(daysT, 'thud', 0.4); cue(bolt2, 'boom', 0.35);
+    cam(lt, t, sh, K(0.32, 0.24, 3.6, [6.2, 0.95, 4.85], { cy: 800 }), K(0.22, 0.2, 3.0, [6.2, 0.95, 4.85], { cy: 800 }));
+    blurred(g, 10, g2 => crashFloor(g2, t, { arms: 1, e: EXPR.shock, cal: null }));
+    tearCal(g, t, { tears: TEARS });
+  }, { kb: 0, grade: CRASH_G, zoom: kicks([[daysT, 0.05]]) });
+  TEARS.forEach(tk => cue(tk, 'page_flip', 0.3)); cue(daysT, 'thud', 0.4);
   // "And Caruana": he climbs into the frame below the rim, in the rain
   const S16 = andT - 0.06, CARU = { who: 'fab', ang: -1.99, grip: -4.6, e: 'focus' };
   shot(S16, (g, lt, t, sh) => {
@@ -3003,35 +3341,38 @@ export async function build(T) {
   }, { kb: 0, grade: 'cold' });
   cue(five2T, 'swipe_card', 0.3); cue(five2T + 0.25, 'slash', 0.25); cue(behT, 'stamp', 0.4);
 
-  // ======================= THE INTERNET: the paper's question, the comments =======================
+  // ======================= THE INTERNET: your room at night in the rain; the question on your phone; the comments =======================
+  const PH2 = [4, 4.2, 2.4];
   shot(inA, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.2, 0.08, 16, [4, 2.8, 8.4]), K(0.1, 0.07, 14, [4, 2.9, 8.6]));
-    summit(g, t, storm(t));
-    const u = ease.out(clamp(lt / 0.5)), fl = Math.sin(t * 9) * 0.02 * (1 - u * 0.6);
-    eraPaper(g, t, { x: lerp(1450, 540, u), y: lerp(1150, 900, u), s: lerp(0.5, 0.85, u), rot: lerp(0.6, -0.06, u) + fl });
-  }, { kb: 0, grade: 'cold', zoom: kicks([[askT, 0.04]]) });
-  cue(inA, 'paper', 0.45); cue(inA, 'whoosh_fast', 0.3);
+    cam(lt, t, sh, KE([4, 3.6, -3], [4, 2.6, 10]), KE([4, 3.0, 1.8], [4, 2.4, 10]));
+    nightRoom(g, t, { e: 'worried', night: '#4C5E96', glow: 1.35 });
+  }, { kb: 0, grade: 'night' });
+  cue(inA - 0.03, 'whoosh_soft', 0.3); cue(inA, 'wind', 0.2); cue(askT, 'notify', 0.4);
+  // "is the Carlsen era over?": what you are reading, the paper on your phone
   const S18b = carlT - 0.25;
   shot(S18b, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.1, 0.07, 14, [4, 2.9, 8.6]), K(0.05, 0.06, 13, [4, 2.9, 8.6]));
-    summit(g, t, storm(t));
-    eraPaper(g, t, { x: 540, y: 1000, s: lerp(1.08, 1.16, clamp(lt / 1.6)), rot: -0.03 + Math.sin(t * 2) * 0.01, ring: clamp((t - overT) / 0.4) });
-  }, { kb: 0, grade: 'cold', zoom: kicks([[carlT, 0.04], [overT, 0.06]]) });
-  cue(S18b, 'page_flip', 0.25); cue(overT, 'slash', 0.3);
-  const S19 = and2T - 0.08;
+    cam(lt, t, sh, K(0.05, 0.12, 6.4, PH2, { cy: 700 }), K(-0.03, 0.1, 5.8, PH2, { cy: 700 }));
+    blurred(g, 10, g2 => nightRoom(g2, t, { you: false }));
+    phoneInHand(g, t, eraPhoneTex(t, clamp((t - overT) / 0.4)), PH2, { rx: 0.15, ry: 0.05, rz: -0.03 }, { night: true });
+    lowKey(g, { cy: H * 0.46, a: 0.1 });
+  }, { kb: 0, grade: 'night', zoom: kicks([[carlT, 0.04], [overT, 0.06]]) });
+  cue(S18b, 'swipe_card', 0.3); cue(overT, 'slash', 0.3);
+  // "And the comments begged": seen from the phone itself, up at your face in its light, the rain on the window behind
+  // you; the comments land on the glass between us
+  const S19 = and2T - 0.08, BEG = { ...EXPR.worried, brow: -0.95, browY: -12, lid: 0, look: [0.2, -0.35], mouth: 'o', curve: -0.2, open: 0.3, tear: 1 };  // the 😭 of the comment
   const CMTS = [['magnus lock in please 😭', '5K', and2T, 330, 46, 900], ['yo unc let’s lock in ✌️', '15K', comT, 520, 46, 900],
-    ['Yo Magnus don’t bottle that number 1 spot', null, begT, 1540, 36, 1000]];
+    ['Yo Magnus don’t bottle that number 1 spot', null, begT, 1610, 36, 1000]];
   shot(S19, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.3, 0.1, 22, [4, 2.5, 8]), K(-0.15, 0.08, 18, [4, 2.8, 8.4]));
-    summit(g, t, storm(t));
-  }, { kb: 0, grade: 'cold', hud: (g, lt, t) => {
+    cam(lt, t, sh, KE([4.15, 0.62, 8.72], [4, 2.05, 10.4], { fov: 640, cy: 880 }), KE([3.95, 0.72, 8.86], [4, 2.05, 10.4], { fov: 690, cy: 880 }));
+    nightRoom(g, t, { e: t >= begT ? BEG : 'worried', phone: false, glow: 0.7, night: '#3C4C7E' });
+  }, { kb: 0, grade: 'night', hud: (g, lt, t) => {
     for (const [txt, lk, t0, y, size, wd] of CMTS) if (t >= t0) commentCard(g, txt, lk, W / 2, y, { size, w: wd, ...popW(t, t0) });
   } });
   for (const [, , t0] of CMTS) cue(t0, 'notify', 0.4);
-  // "Magnus, lock in": close on him in the rain; his face sets
+  // "Magnus, lock in": the summit in the rain, in profile; his face sets
   const S20 = magT - 0.10;
   shot(S20, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.12, 0.05, 6.6, [4, 3.4, 9.3]), K(0.0, 0.04, 5.4, [4, 3.45, 9.3]));
+    cam(lt, t, sh, K(1.25, -0.1, 6.0, [4, 3.6, 9.3], { cy: 810 }), K(1.05, -0.06, 5.2, [4, 3.6, 9.3], { cy: 810 }));
     summit(g, t, storm(t, { rainA: 0.85, eM: t >= lockT ? EX.calm : EXPR.worried }));
   }, { kb: 0, grade: 'cold', zoom: kicks([[lockT, 0.06]]), hud: (g, lt, t) => {
     if (t >= lockT) commentCard(g, 'magnus lock in', '1.7K', W / 2, 300, { size: 50, w: 760, ...popW(t, lockT) });
@@ -3041,11 +3382,13 @@ export async function build(T) {
   // ======================= THE STAKES: must win; a draw would raise the line of 2800 over his head =======================
   const PA = piecesAt(CA, 20);  // Carlsen (White) – Artemiev, 19 Nov
   const art = (o = {}) => ({ pieces: PA, white: 'magnusSuit', black: 'art', ew: 'focus', eb: 'focus', ...o });
+  // "Then, a must-win game.": over Artemiev's shoulder, the lens slams in on Magnus
   shot(stA, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(Math.PI - 0.35, 0.1, 10, [4, 2.9, -1.4]), K(Math.PI - 0.15, 0.08, 7.6, [4, 3.1, -1.4]));
-    hall(g, t, art({ ew: t >= mustT ? EX.sweat : EX.calm, bPlayer: false }));
-  }, { kb: 0, qaAllow: ['face cut by frame'], zoom: kicks([[mustT, 0.07]]), hud: (g, lt, t) => { if (t >= mustT) stamp(g, 'MUST WIN', W / 2, 1600, t, mustT, { color: RED, size: 110, rot: -0.1 }); } });
-  cue(stA - 0.03, 'whoosh_fast', 0.3); cue(mustT, 'stamp', 0.5); cue(mustT + 0.3, 'heartbeat', 0.35);
+    rig(B, lt, [[0, KE([6.2, 5.0, 15.5], [4, 2.9, -1.4], { fov: 1300 })], [0.28, KE([5.5, 4.6, 13.5], [4, 2.9, -1.4], { fov: 2300 }), ease.out],
+      [len(sh), KE([5.2, 4.4, 12.6], [4, 3.0, -1.4], { fov: 2450 })]], { t, e: glide });
+    hall(g, t, art({ ew: t >= mustT ? EX.sweat : EX.calm }));
+  }, { kb: 0, qaAllow: ['face cut by frame'], hud: (g, lt, t) => { if (t >= mustT) stamp(g, 'MUST WIN', W / 2, 1600, t, mustT, { color: RED, size: 110, rot: -0.1 }); } });
+  cue(stA - 0.03, 'whoosh_fast', 0.3); cue(stA + 0.24, 'thud', 0.35); cue(mustT, 'stamp', 0.5); cue(mustT + 0.3, 'heartbeat', 0.35);
   const S23 = drawT - 0.14, ringU = t => ease.inOut(clamp((t - S23) / (32.2 - S23)));
   shot(S23, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0.1, 0.12, 22, [4, 1, 8]), K(0, 0.1, 19, [4, 1.5, 8]));
@@ -3066,11 +3409,15 @@ export async function build(T) {
       cr: { dy: -420 * cu, rot: 0.4 * cu, dx: 60 * cu }, crownA: 1 - cu, after: g2 => { desat(g2, 0.85); ring2800(g2, 5.4, 'front'); } }));
   }, { kb: 0, zoom: kicks([[t2800, 0.06]]), hud: (g, lt, t) => { if (t >= t2800) plate(g, 'BELOW 2800', W / 2, 300, { color: RED, size: 80, rot: 0, ...popW(t, t2800) }); } });
   cue(t2800, 'boom_cine', 0.45); cue(S24 + 0.1, 'wind_barren', 0.3);
+  // "for the first time in 17 years": his eyes, very close, at an angle
   const S25 = firstT - 0.10;
   shot(S25, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(Math.PI + 0.12, 0.06, 7.0, [4, 3.1, -1.4]), K(Math.PI - 0.04, 0.05, 5.6, [4, 3.15, -1.4]));
+    g.fillStyle = '#ECEFF3'; g.fillRect(0, 0, W, H);
+    g.save(); dutch(g, 0.1, 1.18);
+    cam(lt, t, sh, K(3.2616, 0.05, 2.1, [4, 3.25, -1.4]), K(3.1816, 0.04, 1.75, [4, 3.25, -1.4]));
     hall(g, t, art({ ew: EX.sweat, bPlayer: false }));
-  }, { kb: 0, zoom: kicks([[n17T, 0.07]]), hud: (g, lt, t) => { if (t >= n17T) stamp(g, '17 YEARS', W / 2, 1600, t, n17T, { color: GOLD, size: 110, rot: -0.1 }); } });
+    g.restore();
+  }, { kb: 0, qaAllow: ['face cut by frame'], zoom: kicks([[n17T, 0.07]]), hud: (g, lt, t) => { if (t >= n17T) stamp(g, '17 YEARS', W / 2, 1600, t, n17T, { color: GOLD, size: 110, rot: -0.1 }); } });
   cue(S25, 'heartbeat', 0.35); cue(n17T, 'stamp', 0.5);
   const S26 = yrsT + 0.32;
   shot(S26, (g, lt, t, sh) => {
@@ -3151,10 +3498,11 @@ export async function build(T) {
     const c = crownTop(); glint(g, c.x + 40 * c.sc, c.y - 30 * c.sc, t, siA + 0.4, { r: 220 });
   }, { kb: 0, grade: 'gold', zoom: kicks([[one2T, 0.06]]), hud: (g, lt, t) => { if (t >= one2T) counter(g, '#1', 'STILL', { y: 300, size: 210, color: GOLD, at: [t, one2T] }); } });
   cue(siA, 'reveal_bell', 0.4); cue(siA + 0.4, 'sparkle_pop', 0.3); cue(one2T, 'shimmer', 0.35);
+  // "Still the only player": a drone high over the summit, the others on the slopes under the ring
   const S35 = st2T - 0.05;
   const CLIMB3 = [{ who: 'fab', ang: -1.3, grip: -10.0, e: 'focus' }, { who: 'hikaruSuit', ang: -1.9, grip: -11.0, e: 'focus' }, { who: 'opp4', ang: -1.05, grip: -11.4, e: 'focus' }];
   shot(S35, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0, 0.16, 24, [4.5, -2, 4.5]), K(0, 0.2057, 35.243, [4.5, -3.2, 4.5]));
+    cam(lt, t, sh, K(0, 1.2, 34, [4.5, -3, 4.5]), K(0.22, 1.24, 31, [4.5, -3, 4.5]));
     summit(g, t, sunny(t, { cl: -14, ring: { y: -4.6 }, climbers: CLIMB3, wChair: false }));
   }, { kb: 0, qaAllow: ['face cut by frame'], grade: 'gold', hud: (g, lt, t) => { if (t >= onlyT) badge(g, 'ONLY ONE', W / 2, 300, { color: GOLD, size: 70, ...popW(t, onlyT) }); } });
   cue(S35, 'whoosh_deep', 0.35); cue(onlyT, 'stamp', 0.4);
@@ -3166,37 +3514,43 @@ export async function build(T) {
   }, { kb: 0, qaAllow: ['face cut by frame'], grade: 'gold' });
   cue(S36, 'whoosh_soft', 0.3); cue(n2800T, 'reveal_bell', 0.35);
 
-  // ======================= THE TOP COMMENT, LITERALLY: his lowest above their best (NOV 2026, LIVE) =======================
+  // ======================= THE TOP COMMENT, LITERALLY: two plinths of rating on a dark stage (NOV 2026, LIVE) =======================
   shot(cmA, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0, 0.1, 26, [4, 5, 9]), K(0, 0.08, 22, [4, 5.5, 10]));
-    stageSet(g, t, { u: 0, lo: 0, hi: 0, eM: EX.smug });
+    cam(lt, t, sh, K(0, 0.1, 20, [4, 0.6, 8], { cy: 790 }), K(0, 0.09, 18, [4, 0.8, 8], { cy: 790 }));
+    plinths(g, t, { hm: 0, hf: 0, line: 0 });
   }, { kb: 0, hud: (g, lt, t) => commentCard(g, 'When your lowest is their best.', '20K', W / 2, 1600, { size: 44, w: 920, label: 'TOP COMMENT', scale: lerp(1.1, 1, ease.back(clamp((t - cmA - 0.1) / 0.25))) }) });
   cue(cmA, 'notify', 0.45);
+  // "when your lowest": his plinth rises, the camera rides up with it to his lowest of the month
   const S38 = whenT - 0.04;
   shot(S38, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0, 0.03, 19, [1.5, 8, 16]), K(-0.03, 0.03, 15.5, [0.8, 8, 16]));
-    stageSet(g, t, { u: ease.inOut(clamp((t - S38) / 0.9)), lo: clamp((t - lowT) / 0.2), hi: 0, pulse: t >= lowT ? Math.exp(-(t - lowT) * 4) : 0, eM: EX.smug });
+    rig(B, lt, [[0, K(0.3, 0.02, 13, [-0.6, 0.5, 6], { cy: 760 })], [lowT - S38 + 0.1, K(0.21, 0.06, 11.2, [-0.6, 6.0, 6], { cy: 760 }), ease.out],
+      [len(sh), K(0.17, 0.06, 10.6, [-0.6, 6.0, 6], { cy: 760 })]], { t, e: glide });
+    plinths(g, t, { hm: clamp((t - S38) / (lowT - S38 + 0.1)), hf: 0, line: 0 });
   }, { kb: 0, zoom: kicks([[lowT, 0.05]]) });
-  cue(S38, 'whoosh_soft', 0.25); cue(lowT, 'sparkle_pop', 0.35);
+  cue(S38, 'whoosh_soft', 0.25); cue(S38 + 0.05, 'riser', 0.22); cue(lowT, 'sparkle_pop', 0.35);
+  // "is their best": the other plinth, to Caruana's best
   const S39 = theirT - 0.11;
   shot(S39, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.05, 0.02, 15.5, [-1.0, 7.6, 16]), K(0.02, 0.02, 13.5, [-1.5, 7.6, 16]));
-    stageSet(g, t, { u: 1, lo: 1, hi: clamp((t - bestT) / 0.2), pulse: t >= bestT ? Math.exp(-(t - bestT) * 4) : 0, eM: EX.smug });
+    rig(B, lt, [[0, K(-0.27, 0.02, 13, [8.6, 0.5, 6], { cy: 760 })], [bestT - S39 + 0.1, K(-0.2, 0.06, 11.2, [8.6, 5.2, 6], { cy: 760 }), ease.out],
+      [len(sh), K(-0.16, 0.06, 10.6, [8.6, 5.2, 6], { cy: 760 })]], { t, e: glide });
+    plinths(g, t, { hm: 1, hf: clamp((t - S39) / (bestT - S39 + 0.1)), line: 0 });
   }, { kb: 0, zoom: kicks([[bestT, 0.05]]) });
   cue(bestT, 'sparkle_pop', 0.35);
+  // "Literally.": both, and the line of 2800 between them: his lowest is just over it, their best on it
   const S40 = litT - 0.08;
   shot(S40, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.15, 0.05, 7, [0.4, 3.9, 9]), K(0.05, 0.04, 5.8, [0.4, 4.0, 9]));
-    stageSet(g, t, { u: 1, lo: 1, hi: 1, eM: EX.smug });
+    cam(lt, t, sh, K(0, 0.04, 26, [4, 5.4, 8]), K(0.03, 0.05, 23, [4, 5.6, 8]));
+    plinths(g, t, { leds: false, labelX: 4, line: clamp((t - S40) / 0.25) });
   }, { kb: 0, zoom: kicks([[litT, 0.07]]), hud: (g, lt, t) => { if (t >= litT) stamp(g, 'LITERALLY', W / 2, 1600, t, litT, { color: GOLD, size: 110, rot: -0.1 }); } });
-  cue(litT, 'stamp', 0.45);
+  cue(S40, 'swipe_card', 0.25); cue(litT, 'stamp', 0.45);
 
   // ======================= THE SPONSOR, IN THE SAME STORY: the crown falls off the summit onto your desk =======================
+  // "One move almost cost Magnus his crown": the crown on his head, close; on "cost" it slips
   shot(a1A, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.2, 0.06, 8, [4, 3.4, 9.3]), K(-0.1, 0.05, 6.6, [4, 3.45, 9.3]));
+    cam(lt, t, sh, K(-0.2, 0.06, 2.6, [4, 4.6, 9.3]), K(-0.06, 0.05, 2.2, [4, 4.6, 9.3]));
     const u = ease.in(clamp((t - cost2T) / 0.5));
     summit(g, t, sunny(t, { eM: t >= cost2T ? EXPR.worried : EX.smug, cr: { rot: 0.5 * u, dx: 40 * u, dy: 60 * u } }));
-  }, { kb: 0, grade: 'warm', zoom: kicks([[cost2T, 0.05]]) });
+  }, { kb: 0, grade: 'warm', qaAllow: ['face cut by frame'], zoom: kicks([[cost2T, 0.05]]) });
   cue(a1A - 0.03, 'whoosh_soft', 0.3); cue(cost2T, 'creak', 0.35);
   const S42 = magnT + 0.04, cu42 = t => clamp((t - (S42 + 0.05)) / 1.15);
   shot(S42, (g, lt, t, sh) => {
@@ -3260,7 +3614,7 @@ export async function build(T) {
   const tvOff = T.duration - 0.5;
   cue(tvOff, 'tvoff', 0.5);
   const music = [
-    { t: 0, m: 'hook' }, { t: yrA, m: 'glory' }, { t: S7, m: 'build' }, { t: ckA, m: 'tension' }, { t: rh8, m: 'drop' },
+    { t: 0, m: 'hook' }, { t: yrA, m: 'glory' }, { t: buA - 0.15, m: 'build' }, { t: ckA, m: 'tension' }, { t: rh8, m: 'drop' },
     { t: crA, m: 'slam' }, { t: inA, m: 'paranoia' }, { t: stA, m: 'tension' }, { t: S23, m: 'void' }, { t: miA, m: 'clockwork' },
     { t: slipT, m: 'drop' }, { t: loA, m: 'build' }, { t: inT, m: 'victory' }, { t: siA, m: 'glory' }, { t: cmA, m: 'hook' },
     { t: a1A, m: 'intrigue' }, { t: a2A, m: 'digital' }, { t: ctA, m: 'hook' }, { t: T.duration, m: 'end' },
