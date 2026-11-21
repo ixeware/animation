@@ -156,12 +156,15 @@ if (SS > 1) {
 // QA mode (render.mjs --qa): drawing helpers log screen rectangles of faces, on-screen text and captions here,
 // so overlaps (text over a face, text under the captions, text cut by the frame) can be found automatically.
 // Faces and on-screen text are logged in every mode (QA.faces): the channel's watermark keeps off them (guard.js).
+// 'keep' marks the thing a shot is about (a crown, a calendar, a clock): the watermark keeps off it, the layout check
+// does not look at it (a crown on a head is not a title over a face).
 export const QA = { on: false, items: [], faces: [] };
 export function qaRect(g, x, y, w, h, kind, label = '') {
-  if (!(QA.on || kind === 'face' || kind === 'text') || g.globalAlpha < 0.35 || !(g.canvas?.id === 'c' || g.canvas?.dataset?.qa)) return;  // only the film layer and the screen
+  const guarded = kind === 'face' || kind === 'text' || kind === 'keep';
+  if (!(QA.on || guarded) || g.globalAlpha < 0.35 || !(g.canvas?.id === 'c' || g.canvas?.dataset?.qa)) return;  // only the film layer and the screen
   const m = g.getTransform(), pts = [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([px, py]) => [m.a * px + m.c * py + m.e, m.b * px + m.d * py + m.f]);
   const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
   const r = { kind, label: String(label).slice(0, 40), x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys), screen: g.canvas?.id === 'c' };
-  if (kind === 'face' || kind === 'text') QA.faces.push(r);
+  if (guarded) QA.faces.push(r);
   if (QA.on) QA.items.push(r);
 }

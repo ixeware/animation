@@ -6,9 +6,10 @@
 // the author found the louder first version annoying (21.11.2026): one mark at a time, faint, a thin edge, barely tilted,
 // never right over the captions. A second, smaller handle that crawls across the whole frame is there for a film that
 // asks for it (crawler: its opacity); by default it is off. The mark lies under the captions and under the film grain.
-// The mark keeps off the faces and off our own titles, counters and stamps: for every stretch of a shot it takes the
-// planned height, or, when that would lie across somebody's eyes and mouth or across a title there, the nearest height
-// that does not (the shot and its titles are drawn at three moments to see where they are).
+// The mark keeps off the faces, off our own titles, counters and stamps, and off what the shot is about when the scene
+// marks it (qaRect kind 'keep': a crown, a calendar, a clock): for every stretch of a shot it takes the planned height,
+// or, when that would lie across somebody's eyes and mouth or across one of those, the nearest height that does not
+// (the shot and its titles are drawn at three moments to see where they are).
 import { makeCanvas, rng, clamp, lerp } from './core.js';
 
 const DEF = {
@@ -112,8 +113,9 @@ export function makeGuard(shots, duration, opts = {}, faces = null) {
     let y = s.y;
     if (faces && b - a > 0.15) {
       // what must stay clear of a face: from the brows to the chin, with room for the camera's push-in
-      const keep = faces(shot, [a + 0.05, (a + b) / 2, b - 0.05]).filter(f => f.kind === 'text' ? f.w >= 40 && f.y < 1200 : f.w >= 80)
-        .map(f => f.kind === 'text' ? { x0: f.x - 24, y0: f.y - 18, x1: f.x + f.w + 24, y1: f.y + f.h + 18 }  // a title: all of it
+      const keep = faces(shot, [a + 0.05, (a + b) / 2, b - 0.05])
+        .filter(f => f.kind === 'text' ? f.w >= 40 && f.y < 1200 : f.kind === 'keep' ? f.w >= 40 : f.w >= 80)
+        .map(f => f.kind !== 'face' ? { x0: f.x - 24, y0: f.y - 18, x1: f.x + f.w + 24, y1: f.y + f.h + 18 }  // a title or the thing the shot is about: all of it
           : { x0: f.x + f.w * 0.08 - 30, y0: f.y + f.h * 0.3 - 24, x1: f.x + f.w * 0.92 + 30, y1: f.y + f.h * 0.9 + 24 });  // a face: brows to chin
       const hit = yy => {
         const p = place(s, yy, 0), c = Math.abs(Math.cos(p.rot)), sn = Math.abs(Math.sin(p.rot)), w = p.tex.width * s.k / 2, h = p.tex.height * s.k / 2;

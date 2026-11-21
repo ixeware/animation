@@ -194,6 +194,14 @@ function keepClear(g, pts, label) {
   if (x0 < 0 || y0 < 0 || x1 > W || y1 > 1190) return;
   qaRect(g, x0, y0, x1 - x0, y1 - y0, 'text', label);
 }
+// the thing a shot is about (the crown, the calendar, the clock): the watermark keeps off it, the layout check does not
+// look at it; it may stand partly out of the frame or under the captions
+function keepOff(g, pts, label) {
+  const q = pts.map(p => B.project(...p));
+  if (q.some(p => p.z < 0.5)) return;
+  const xs = q.map(p => p.x), ys = q.map(p => p.y), x0 = Math.min(...xs), y0 = Math.min(...ys);
+  qaRect(g, x0, y0, Math.max(...xs) - x0, Math.max(...ys) - y0, 'keep', label);
+}
 // a turned shape around a vertical axis: rings [y, rx, rz, dz] from the bottom up (convex, so the porcelain bowl)
 function lathe(g, x, z, rings, col, { n = 36, ...o } = {}) {
   const verts = [], faces = [];
@@ -328,6 +336,7 @@ function lcdClock(g, st, press = 0) {
   if (E[2] > 4.9) texQuad(g, img, [10.8 - m, 0.55 - m, 4.9 + e], [9 + m, 0.55 - m, 4.9 + e], [10.8 - m, -0.35 + m, 4.9 + e]);
   if (E[0] > 10.8) texQuad(g, img, [10.8 + e, 0.55 - m, 3.1 + m], [10.8 + e, 0.55 - m, 4.9 - m], [10.8 + e, -0.35 + m, 3.1 + m]);
   pool(g, B, 9.9, 0.1, 4, 2.2, '#BFFFD8', 0.1, true);
+  keepOff(g, [[9, -0.35, 3.1], [10.8, -0.35, 3.1], [9, 0.75, 3.1], [10.8, 0.75, 3.1], [9, -0.35, 4.9], [10.8, -0.35, 4.9], [9, 0.75, 4.9], [10.8, 0.75, 4.9]], 'clock');
 }
 
 // ---------- the stage table: White at z -1.4, Black at z 9.3 (seats wx, bx), the clock and the captured pieces on the
@@ -1331,6 +1340,7 @@ const headAt = () => { const hp = B.project(4, 3.1, 9.3); return { x: hp.x, y: h
 function crown(g, x, y, s, { a = 1, rot = 0, dashed = false } = {}) {
   if (a <= 0) return;
   g.save(); g.globalAlpha *= a; g.translate(x, y); g.rotate(rot); g.scale(s, s);
+  qaRect(g, -76, -52, 152, 88, 'keep', 'crown');  // the watermark keeps off the crown
   g.beginPath(); g.moveTo(-62, 32); g.lineTo(-72, -32); g.lineTo(-36, 2); g.lineTo(0, -48); g.lineTo(36, 2); g.lineTo(72, -32); g.lineTo(62, 32); g.closePath();
   if (dashed) { g.setLineDash([14, 10]); g.strokeStyle = 'rgba(255,214,90,0.95)'; g.lineWidth = 8; g.lineJoin = 'round'; g.stroke(); g.setLineDash([]); }
   else {
@@ -3025,6 +3035,7 @@ function tearCal(g, t, { first = 11, last = 15, tears = [] } = {}) {
   solid(g, [P(-1, -1), P(1, -1), P(1, 1), P(-1, 1)].flatMap(p => [p, [p[0], p[1] - back * Math.sin(lean), p[2] + back * Math.cos(lean)]]),
     [[0, 2, 4, 6], [1, 3, 5, 7], [0, 1, 3, 2], [4, 5, 7, 6], [0, 1, 7, 6], [2, 3, 5, 4]], '#E8E2D6');
   texQuad(g, dayPage(Math.min(cur, last)), P(-1, 1), P(1, 1), P(-1, -1));
+  keepOff(g, [P(-1, 1), P(1, 1), P(-1, -1), P(1, -1)], 'calendar');
   tears.forEach((tk, i) => {  // a torn page: it swings up toward us from its top edge, then drifts off and fades
     const u = (t - tk) / 0.34; if (u <= 0 || u >= 1) return;
     const a = lean + ease.out(u) * 2.7, top = P(0, 1), sd = (i % 2 ? 1 : -1) * 0.9 * u * u, up = 1.2 * u * u;
