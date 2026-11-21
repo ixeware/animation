@@ -3237,7 +3237,7 @@ export async function build(T) {
       hall(g, t, { pieces: PSC, white: 'opp3', black: 'magnusSuit', eb: EX.calm });
       g.restore();
     }
-  }, { kb: 0, grade: 'warm', zoom: kicks([[lockInT, 0.05]]) });
+  }, { kb: 0, grade: 'warm', qaAllow: ['face cut by frame'], zoom: kicks([[lockInT, 0.05]]) });  // the extras of the hall in the keyhole
   cue(lockedT, 'ratchet', 0.4); cue(lockInT, 'stamp', 0.5); cue(lockInT + 0.02, 'boom_move', 0.3); cue(KH0, 'whoosh_deep', 0.45);
 
   // ======================= BUDAPEST: the hall; the row of ten games; the scoreboard =======================
@@ -3249,9 +3249,9 @@ export async function build(T) {
   // "Ten classical games": the ten games of the group in a row, seen from high on the diagonal; a result over each
   const S9 = tenT - 0.05, RW0 = tenT + 0.05, RWS = 0.12;
   shot(S9, (g, lt, t, sh) => {
-    cam(lt, t, sh, KE([-34, 80, -40], [60, 0, 4], { fov: 1600, cy: 690 }), KE([-30, 78, -42], [62, 0, 4], { fov: 1600, cy: 690 }));
+    cam(lt, t, sh, KE([-34, 80, -40], [60, 0, 4], { fov: 1600, cx: 610, cy: 690 }), KE([-30, 78, -42], [62, 0, 4], { fov: 1600, cx: 610, cy: 690 }));
     rowHall(g, t, { eM: EX.calm });
-    rowPlates(g, t, RW0, RWS, { size: q => clamp(q.s * 4.6, 44, 100), lossK: 1.7 });
+    rowPlates(g, t, RW0, RWS, { size: q => clamp(q.s * 4.6, 44, 100), lossK: 1.2 });
   }, { kb: 0 });
   for (let k = 0; k < 10; k++) cue(RW0 + k * RWS, k === 4 ? 'error' : 'clock_press', k === 4 ? 0.4 : 0.25);
   // "Zero wins.": from just over the board where the empty chair would be: his pieces low in the frame, his face, and
@@ -3360,7 +3360,7 @@ export async function build(T) {
   // "And the comments begged": seen from the phone itself, up at your face in its light, the rain on the window behind
   // you; the comments land on the glass between us
   const S19 = and2T - 0.08, BEG = { ...EXPR.worried, brow: -0.95, browY: -12, lid: 0, look: [0.2, -0.35], mouth: 'o', curve: -0.2, open: 0.3, tear: 1 };  // the 😭 of the comment
-  const CMTS = [['magnus lock in please 😭', '5K', and2T, 330, 46, 900], ['yo unc let’s lock in ✌️', '15K', comT, 520, 46, 900],
+  const CMTS = [['magnus lock in please 😭', '5K', and2T, 320, 46, 900], ['yo unc let’s lock in ✌️', '15K', comT, 465, 46, 900],
     ['Yo Magnus don’t bottle that number 1 spot', null, begT, 1610, 36, 1000]];
   shot(S19, (g, lt, t, sh) => {
     cam(lt, t, sh, KE([4.15, 0.62, 8.72], [4, 2.05, 10.4], { fov: 640, cy: 880 }), KE([3.95, 0.72, 8.86], [4, 2.05, 10.4], { fov: 690, cy: 880 }));
