@@ -34,7 +34,18 @@
   роликов, дольше право на рекламу, версия для YouTube Shorts.
 
 ## Chessigma (Eliot Hennebo)
-- **20–21.11.2026 — ролик `fivepoints` (Магнус и №1) для Chessigma, версия 3.** Реклама внутри истории: корона, которую
+- **22.11.2026 — превью `fivepoints` v4 готово, письмо Элиоту НЕ отправлено.** Автор сначала: «отправь чессигме», потом:
+  «письмо не кидай». До отправки автор решает, как ролик идёт в сделку:
+  - ролик 1 вместо brilliant moves (советуем);
+  - или отдельный, пятый ролик за $125.
+
+  Автор спросил: «всмысле, он прям свои идеи предлагал?» Да: 4 темы 18.11 назвал сам Элиот (ниже). Черновик письма,
+  файлы и пересборка — [HANDOFF.md](../HANDOFF.md), §0.
+- **20.11.2026 — ответ Элиота про крипту:** «At the moment we can't pay bills with crypto. We can look to set it up after
+  this contract of 4 videos if this is the only option for you but we would have to figure it out how to make it work».
+  Этот договор — банком, как раньше. Ответа ещё не было: поблагодарить в письме с превью.
+- **20–21.11.2026 — ролик `fivepoints` (Магнус и №1) для Chessigma, версия 3** (21.11 — версия 4: другие планы сцен
+  и тихая метка). Реклама внутри истории: корона, которую
   Магнус чуть не потерял, падает сквозь облака на стол зрителя рядом с телефоном — «One move almost cost Magnus his crown.
   Want to find the move that's costing you games?» — дальше запись приложения автора (разбор, кнопка «Start review») и их
   карточка 3 с. Слова только из кита: «free, unlimited game reviews», «On the App Store and Google Play». Разбор партий

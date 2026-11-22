@@ -1,8 +1,138 @@
-# Передача проекта (handoff), 8.11.2026, дополнено 9.11.2026
+# Передача проекта (handoff), 8.11.2026, дополнено 9.11 и 22.11.2026
 
 Записка для модели или человека, который продолжит работу. Проект — шахматные шортсы для TikTok, сделанные кодом.
 Здесь: что прочитать, как поставить окружение, как собрать ролик, что уже сделано и на чём легко ошибиться.
 Правила работы живут в [CLAUDE.md](CLAUDE.md). Файл назван по Claude Code, но обязателен для любой модели.
+
+## 0. Состояние на 22.11.2026 — читать первым
+
+Автор переходит на другой аккаунт Claude: на этом кончились лимиты. Здесь всё, что висит, и как продолжить в новом
+контейнере. Подробности — [memory/sponsors.md](memory/sponsors.md) (Chessigma, Chessnut, PolyBuzz),
+[business/youtube_copies.md](business/youtube_copies.md), [memory/journal.md](memory/journal.md).
+
+### 0.1. Ждёт решения автора: ролик `fivepoints` для Chessigma
+
+- **Письмо Элиоту НЕ отправлять.** 22.11 автор сначала сказал «отправь чессигме», потом остановил: «письмо не кидай».
+  Текст письма готов (ниже, §0.3). Отправлять только по новому прямому слову автора.
+- До отправки автор решает, как ролик идёт в сделку на 4 ролика по $125:
+  - **вариант А (советуем):** ролик 1 вместо «brilliant moves». Первая половина INV-2026-003 (57 €) оплачена 18.11,
+    Элиот ждёт идею ролика 1, а тема сейчас горячая;
+  - **вариант Б:** отдельный, пятый ролик за $125, новый счёт двумя половинами; brilliant moves остаётся роликом 1.
+- Почему вообще спрашиваем. Автор спросил: «всмысле, он прям свои идеи предлагал?» Да: 18.11 Элиот сам назвал 4 темы:
+  1. brilliant moves;
+  2. дебюты (Opening Trainer);
+  3. принципы — после их релиза;
+  4. game review — после релиза.
+
+  Мы обещали начать с brilliant moves и присылать идею до работы. `fivepoints` — наша идея вне списка.
+
+### 0.2. `fivepoints` (Магнус чуть не потерял №1): что готово и как пересобрать
+
+- Версия 4 одобрена автором. Метка канала — тихая (правило 70). Проверка вёрстки: no issues.
+- Реклама идёт примерно с 0:57 до 1:06:
+  - корона, которую Магнус чуть не потерял, падает на стол зрителя рядом с телефоном;
+  - «One move almost cost Magnus his crown. Want to find the move that's costing you games?»;
+  - запись приложения автора;
+  - «Chessigma's game reviews are free and unlimited»;
+  - их карточка 3 с: App Store / Google Play, «link in bio».
+
+  Слова — только из их кита. Магнуса рядом с продуктом нет (реальные люди с продуктом не появляются).
+- Готовые файлы были только в `episodes/fivepoints/build/`, который не в git, поэтому в новом контейнере их нет:
+  - `The64Files_Magnus_Five_Points_Chessigma_DRAFT.mp4` — 1080×1920, 69,33 с, 30 МБ; автору отправлен 21.11;
+  - `The64Files_Magnus_Five_Points_Chessigma_PREVIEW.mp4` — 720×1280, с пометками PREVIEW, 8,6 МБ, для Элиота;
+    автору отправлен файлом 22.11;
+  - 4K для публикации запущен 22.11 и, скорее всего, не досчитался — пересобрать.
+- Голос лежит в git: `episodes/fivepoints/tts_cache/` (101 файл, 12 МБ). Записи экрана —
+  `episodes/fivepoints/photos/rec/`. Пересборка не тратит кредиты ElevenLabs и не требует ключа:
+  ```
+  mkdir -p episodes/fivepoints/build && cp -r episodes/fivepoints/tts_cache episodes/fivepoints/build/
+  python3 audio/tts.py episodes/fivepoints          # всё из кэша
+  python3 tools/frames.py episodes/fivepoints       # кадры записей экрана
+  node render.mjs fivepoints --qa --step 0.1        # должно быть «no issues»
+  node render.mjs fivepoints --workers 4 && python3 audio/mix.py episodes/fivepoints            # 1080×1920
+  node render.mjs fivepoints --workers 4 --scale 2 && python3 audio/mix.py episodes/fivepoints  # 4K, ~25 мин
+  ```
+- Как сделать превью для спонсора, написано в начале `tools/preview_overlay.py`:
+  - накладываем пометки и уменьшаем до 720×1280;
+  - кодируем в два прохода, `-b:v 850k`, aac 128k, `+faststart`;
+  - называем файл `<имя>_PREVIEW.mp4`.
+
+  Файл для публикации — два прохода `-b:v 12000k` (CLAUDE.md, шаг 8).
+
+### 0.3. Письмо Элиоту — черновик, НЕ отправлен
+
+- Куда: ответом в ветку «Re: Invoice INV-2026-001 reissued to ARCHE LABS LTD (The 64 Files x Chessigma)», thread
+  `1a1cd1a82e2a9623`, на его письмо от 20.11 (`1a1f7c9484bbad63`).
+- Копия: `mehdi@chessigma.com` — поставить самим, в последнем письме Элиота копии нет.
+- Превью — ссылкой: вложения в Gmail ограничены 25 МБ.
+  - Залить на Google Drive: `create_file` со ссылкой на файл `sha256:<хеш>:<путь>`, потом `share_file`,
+    anyoneWithLink, reader.
+  - Или автор заливает сам.
+
+```
+Hi Eliot,
+
+Thanks for checking on crypto. No problem at all, bank transfer works fine for this contract.
+
+We made a video on what everyone in chess is talking about right now: Magnus nearly losing his No. 1 spot.
+Here's the preview: <LINK>
+
+<ВАРИАНТ А> We'd love this to be video 1 instead of brilliant moves: it's timely, and the story leads straight into
+game review. If you'd rather keep brilliant moves first, tell us and we'll count this one as an extra video.
+<ВАРИАНТ Б> This one would be an extra video on top of our four, at the same $125 (half on approval, half once it's
+live). Brilliant moves stays as video 1.
+
+Where Chessigma comes in (about 0:57–1:06): the crown Magnus almost lost falls onto the viewer's desk next to their
+phone, "One move almost cost Magnus his crown. Want to find the move that's costing you games?", then a recording of
+the app, "Chessigma's game reviews are free and unlimited", and your 3-second card with App Store / Google Play and
+"link in bio". We only used claims from your kit, and Magnus never appears with the product.
+
+The PREVIEW marks are only on this file. Once you're happy with it, we'll post it with Branded content on and #ad,
+with your link in bio. Any changes, just tell us.
+
+Best,
+The 64 Files
+```
+
+- Оставить один из двух вариантов (А или Б) по слову автора.
+- Подпись — только «The 64 Files». Личные имена автора и родственников не писать.
+
+### 0.4. После «ок» Элиота
+
+1. Собрать 4K. Затем `python3 tools/proof.py <файл>.mp4` — строка в `business/proofs.md`, коммит и пуш, всё до
+   публикации.
+2. Опубликовать:
+   - Content disclosure → Branded content и #ad в подписи;
+   - подпись — `post` из `episodes/fivepoints/script.json`;
+   - ссылка в био: `https://www.chessigma.com/go/app/the64files?utm_content=fivepoints`.
+3. Элиоту — «it's live» со ссылкой и счёт на вторую половину: INV-2026-003 при варианте А, новый счёт при варианте Б.
+
+### 0.5. Остальное
+
+- **Крипта.** Ответ Элиота 20.11: «At the moment we can't pay bills with crypto. We can look to set it up after this
+  contract of 4 videos if this is the only option for you but we would have to figure it out how to make it work».
+  - Этот договор — банком, как раньше.
+  - Риск для автора: резиденту России закон 259-ФЗ (ст. 14) запрещает принимать крипту в оплату услуг.
+- **YouTube, копии канала The 64 Stories.** 22.11 YouTube удовлетворил два обращения из трёх и удалил 14 копий:
+  - `U63E3AMUL5GS55AJG4EAC5MXE4` — 4 ролика;
+  - `QHJR7OU565D37IRZDSHLVUXQOI` — 10 роликов.
+
+  По `AZ47HRX6F5TTNNJ2JTCTCWMBFQ` (10 роликов) ответа ещё нет. Если попросят уточнений — ответить в той же ветке
+  доказательствами из `business/youtube_copies.md`.
+- **Chessnut (Стелла).** Второго ролика не будет: им нужны ролики, снятые с настоящей доской. Деньги за `hikaru213`
+  пришли.
+  - Стелле нужен наш подписанный договор. Он у автора: PDF ему отправлен 20.11, в хранилище его нет, там личные данные.
+  - Подписывает брат автора, потом договор уходит Стелле.
+- **PolyBuzz (Bioby).** Ждём ответа на цену $600. Если до 24.11 тишина — одно короткое напоминание, по слову автора.
+- **В новом аккаунте подключить заново:**
+  - Gmail и Google Drive почты канала `the64filestt@gmail.com`;
+  - ключ ElevenLabs в настройках облачного окружения (для `fivepoints` не нужен).
+- **Правила, которые легко нарушить:**
+  - письма уходят только по прямому слову автора;
+  - имя для юридических писем спрашивать у автора: в счетах канала стоит имя родственника;
+  - личные имена, реквизиты и пароли не писать никуда;
+  - в Chessigma входить только по слову автора и никогда не нажимать «Sign out»;
+  - защиту TikTok от ботов не обходить.
 
 ## 1. Коротко
 
