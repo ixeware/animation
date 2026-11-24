@@ -119,7 +119,8 @@
 - Метка канала — тихая (правило 70). Проверка вёрстки: no issues. Магнуса рядом с продуктом нет.
 - Готовые файлы лежат только в `episodes/fivepoints/build/`, который не в git; в новом контейнере их нет:
   - `The64Files_Magnus_Five_Points_Chessigma_v6_DRAFT.mp4` — 1080×1920, 77,5 с, около 33 МБ; автору отправлен 24.11;
-  - `The64Files_Magnus_Five_Points_Chessigma_v6_PREVIEW.mp4` — 720×1280, с пометками PREVIEW, около 14 МБ, для Элиота;
+  - `The64Files_Magnus_Five_Points_Chessigma_v6_PREVIEW.mp4` — 720×1280, с пометками PREVIEW, 9,5 МБ (`-b:v 840k`), для
+    Элиота; автору отправлен файлом 24.11;
   - 4K версии 6 не собран: собрать после «ок» Элиота (ниже, ~25 мин), два прохода `-b:v 12000k`;
   - файлы версий 4 и 5 (без `v6` в имени) устарели, не публиковать;
   - `shortshots.py` отмечает 16,43–16,77 с и 45,07–45,60 с — так было и в версии 4, это не брак: мат и вспышка замка.
@@ -145,10 +146,10 @@
 - Куда: ответом в ветку «Re: Invoice INV-2026-001 reissued to ARCHE LABS LTD (The 64 Files x Chessigma)», thread
   `1a1cd1a82e2a9623`, на его письмо от 20.11 (`1a1f7c9484bbad63`).
 - Копия: `mehdi@chessigma.com` — поставить самим, в последнем письме Элиота копии нет.
-- Превью — ссылкой: вложения в Gmail ограничены 25 МБ.
-  - Залить на Google Drive: `create_file` со ссылкой на файл `sha256:<хеш>:<путь>`, потом `share_file`,
-    anyoneWithLink, reader.
-  - Или автор заливает сам.
+- Превью — ссылкой на Google Drive, и заливает его автор: из облачной сессии коннектор Drive принимает не больше
+  ~3 МБ за вызов (проверено 24.11: 9,5 МБ не прошли, 14 МБ тоже). Не пытаться обойти — отдать файл автору.
+- **24.11, 22:25 UTC: автор сказал «отправляй», но письмо не ушло** — превью не загрузилось на Drive. Ждём от автора
+  ссылку на залитое превью (или он отправляет письмо сам).
 
 Версия от 24.11, вечер. Прежний черновик (ролик Магнуса вместо brilliant moves) устарел; он в git, коммит `0bfa30d`.
 Письмо с превью — когда ролик готов (секунды и ссылку вписать):
@@ -173,8 +174,8 @@ One note: the app recording we have was made signed out, so we framed the review
 button. If you'd rather see the coach's comment there, we'll re-record it signed in.
 
 As we wrote, we'd like to post it on Wednesday, Nov 25, as soon as you OK it, with Branded content on, #ad, and
-your link in bio. The second Black Friday video will be on Principles; we'll send its idea next. Please send the new
-assets and the exact Black Friday line you want us to use.
+your link in bio. For the second Black Friday video we're thinking Principles, now that the module is out; we'll send
+you the idea next. Please send the new assets and the exact Black Friday line you want us to use.
 
 Thanks for checking on crypto. No problem, bank transfer works fine for this contract.
 
