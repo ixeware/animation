@@ -3736,7 +3736,7 @@ export async function build(T) {
   cue(S43b - 0.03, 'whoosh_soft', 0.25); cue(brilT, 'clack', 0.35); cue(flagT - 0.1, 'whoosh_fast', 0.3); cue(flagT + 0.3, 'success', 0.45); cue(flagT + 0.34, 'sparkle_pop', 0.35);
   // "will make you think you're him": you hold the crown over your head and put it on; the comment under the scene is
   // the meme everyone writes ("bro thinks he's Magnus")
-  const S43c = willT - 0.05, wornT = youreT + 0.14, cardT = himT + 0.12;
+  const S43c = willT - 0.05, wornT = youreT + 0.14, cardT = wornT + 0.1;  // the comment stays on for 1.3 s, long enough to read
   shot(S43c, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.1, 0.1, 10, [4, 3.5, 7.4], { cy: 890 })], [wornT - S43c, K(0.05, 0.08, 8.6, [4, 3.5, 7.4], { cy: 820 })], [len(sh), K(0.0, 0.07, 7.6, [4, 3.5, 7.4], { cy: 770 })]], { t, e: glide });
     const dn = ease.inOut(clamp((t - thinkT) / (wornT - thinkT))), d = t - wornT, sett = d >= 0 ? Math.exp(-d * 9) * Math.sin(d * 26) : 0;
@@ -3766,7 +3766,7 @@ export async function build(T) {
     cam(lt, t, sh, K(-0.2, 0.04, 6.4, [4, 3.5, 7.4], { cy: 810 }), K(-0.14, 0.03, 5.7, [4, 3.5, 7.4], { cy: 810 }), lin);
     yourRoom(g, t, { e: { ...SIG_E, turn: lerp(0.55, 0.22, ease.out(clamp(lt / 0.55))) }, wear: { oy: -150, grip: 0 }, phone: false });
     desat(g, 0.35); vignette(g, 0.55, 0.42);
-  }, { kb: 0, zoom: kicks([[sigT, 0.08]]), qaAllow: ['face cut by frame'] });
+  }, { kb: 0, zoom: kicks([[sigT, 0.08]]), qaAllow: ['face cut by frame'], hud: g => adTag(g) });
   cue(S44, 'boom_move', 0.55); cue(S44 + 0.02, 'dun_dun', 0.3);
   // "And its free review finds": on your desk again, the app's own panel "Your brilliant moves" (the games under it blurred)
   const S45 = a4A + 0.1;
