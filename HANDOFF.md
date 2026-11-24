@@ -26,7 +26,8 @@
     1. «46 seconds cost Magnus a game. 37 cost his opponent the draw. This player had 24, and he's rated 527.»
     2. «He played a brilliant move.» — на доске 23...Rf1+, на телефоне разбор Chessigma со значком Sigma;
     3. «He found the key… and never opened the door. Check, check, draw.»
-    4. сравнение с другими разборами — только в формулировке, которую подтвердит Элиот (вопрос в письме, §0.3);
+    4. без сравнения с другими разборами и без Chess.com — тогда не ждём ответа Элиота (сравнение — только если он сам
+       даст формулировку);
     5. «Chessigma's game reviews are free and unlimited. On the App Store and Google Play. Link in bio.»;
     6. вопрос: «What's your rating — and have you ever played a brilliant?» (из идеи 1) или прежний «So, how far are
        you from 2800?»;
@@ -57,8 +58,12 @@
     как записи в `photos/rec/`;
   - Магнуса в интерфейсе Chessigma по-прежнему не показываем; партию 527 — можно, без ников.
 - **Сроки.**
-  - Обещание «I'll post the first video on Wednesday, November 25» с переделкой, скорее всего, не выполнить: нужны
-    голос, сцены, превью и «ок» Элиота. Предупредить его — письмо в §0.3, только по слову автора.
+  - Обещание «I'll post the first video on Wednesday, November 25» выполнимо (автор: «ты же за час их делаешь»).
+    Переделка — 1–2 часа: 3–4 новые фразы голосом, 2–3 новых плана, проверка вёрстки, черновик, превью.
+  - Узкое место — письменное «ок» Элиота. Превью ему 24.11 вечером (письмо в §0.3, по слову автора): ответ в среду днём
+    по Европе, а выкладываем для США вечером.
+  - Значок Sigma: автор один раз открывает разбор партии на телефоне — или запись экрана телефона.
+  - Если превью к вечеру 24.11 не готово — короткое письмо о переносе (§0.3), тоже только по слову автора.
   - Чёрная пятница — 27.11; Элиот просит 2 ролика на этой неделе. Второй — принципы (§0.0, п. 3).
   - Строку про Black Friday брать только у Элиота: баннер на сайте 24.11 менялся («Yearly, Save 59%, $5.68/month»,
     потом «Lifetime, Save 41%, 2 LEFT, $290 вместо $490»).
@@ -88,7 +93,7 @@
 
 **План по порядку:**
 1. **`fivepoints` переделать под brilliant moves** — решение автора 24.11 вечером, раздел «Сначала» выше; делает
-   сессия на Fable. Элиоту — короткое письмо о сроках (§0.3), по слову автора. Без его «ок» не выкладывать.
+   сессия на Fable. Превью Элиоту — 24.11 вечером (письмо в §0.3), по слову автора; выход 25.11 только после его «ок».
 2. **После «ок»** (25.11):
    - `proof.py`, коммит и пуш;
    - публикация с Branded content и #ad, ссылка в био с `utm_content=fivepoints`;
@@ -176,20 +181,22 @@
   - Или автор заливает сам.
 
 Версия от 24.11, вечер. Прежний черновик (ролик Магнуса вместо brilliant moves) устарел; он в git, коммит `0bfa30d`.
-Сейчас нужно короткое письмо о сроках, до превью:
+Письмо с превью — когда ролик готов (секунды и ссылку вписать):
 
 ```
 Hi Eliot,
 
-Quick update. We're making video 1 about brilliant moves, as you suggested, and building it on the story everyone in
-chess is talking about this week: Magnus nearly losing his No. 1 spot. So it won't go out on Wednesday as we wrote.
-We'll send you the preview first and post as soon as you OK it, still within Black Friday week.
+Here's video 1 for your approval: <LINK>
 
-One question for the script: may we use the line from your benchmark page, that Chessigma catches 93 of Chess.com's
-100 brilliant moves, or would you rather we don't name Chess.com?
+It's about brilliant moves, as you suggested, built on the story everyone in chess is talking about this week:
+Magnus nearly losing his No. 1 spot. Chessigma comes in at <0:00–0:00>: a 527-rated player finds a brilliant move
+with 24 seconds left, the one from your benchmark, and Chessigma's review marks it with a Sigma. Then "free and
+unlimited", and your card with App Store / Google Play and "link in bio". Magnus never appears with the product,
+and the players' usernames aren't shown. The PREVIEW marks are only on this file.
 
-For Black Friday, please send the exact line and assets you want us to use. The second video will be on Principles;
-we'll send its idea with the preview.
+As we wrote, we'd like to post it on Wednesday, Nov 25, as soon as you OK it, with Branded content on, #ad, and
+your link in bio. The second Black Friday video will be on Principles; we'll send its idea next. Please send the new
+assets and the exact Black Friday line you want us to use.
 
 Thanks for checking on crypto. No problem, bank transfer works fine for this contract.
 
@@ -197,8 +204,20 @@ Best,
 The 64 Files
 ```
 
-Письмо с превью — когда ролик будет готов: ссылка на превью, где в ролике Chessigma (секунды), какие слова взяты из кита
-и из ответа Элиота, что Магнуса рядом с продуктом нет, и что выход — с Branded content, #ad и ссылкой в био.
+Если превью к вечеру 24.11 не готово — короткое письмо о переносе:
+
+```
+Hi Eliot,
+
+Quick update. We're making video 1 about brilliant moves, as you suggested, built on the story everyone in chess is
+talking about this week: Magnus nearly losing his No. 1 spot. The preview will come tomorrow, and we'll post as soon
+as you OK it, still within Black Friday week.
+
+For Black Friday, please send the exact line and assets you want us to use.
+
+Best,
+The 64 Files
+```
 
 - Подпись — только «The 64 Files». Личные имена автора и родственников не писать.
 
