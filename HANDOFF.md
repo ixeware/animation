@@ -4,11 +4,58 @@
 Здесь: что прочитать, как поставить окружение, как собрать ролик, что уже сделано и на чём легко ошибиться.
 Правила работы живут в [CLAUDE.md](CLAUDE.md). Файл назван по Claude Code, но обязателен для любой модели.
 
-## 0. Состояние на 22.11.2026 — читать первым
+## 0. Состояние на 24.11.2026 — читать первым
 
-Автор переходит на другой аккаунт Claude: на этом кончились лимиты. Здесь всё, что висит, и как продолжить в новом
-контейнере. Подробности — [memory/sponsors.md](memory/sponsors.md) (Chessigma, Chessnut, PolyBuzz),
-[business/youtube_copies.md](business/youtube_copies.md), [memory/journal.md](memory/journal.md).
+Здесь всё, что висит, и как продолжить в новом контейнере. Подробности:
+- [memory/sponsors.md](memory/sponsors.md) — Chessigma, Hungry Studio, PolyBuzz, Chessnut;
+- [business/youtube_copies.md](business/youtube_copies.md);
+- [memory/journal.md](memory/journal.md).
+
+### 0.0. Новое в почте на 24.11 и план
+
+**Что пришло:**
+- **Элиот, 23.11, 07:08 UTC.** Спрашивает сроки и просит выложить «at least 2 of your videos» на неделе Чёрной пятницы
+  (сама пятница — 27.11). Пришлёт новые ассеты и B-roll с упоминанием Black Friday и вышедшим модулем Principles. Пока
+  можно брать то, что есть.
+- **24.11, 11:19 UTC, из почты канала ушёл ответ Элиоту** — не из сессии Claude: «I'll post the first video on Wednesday,
+  November 25».
+  - Превью он не видел, письменного «ок» нет.
+  - Наше письмо от 18.11 обещает: «each video goes out only after your approval».
+  - Копии Мехди в этом ответе нет.
+- **23.11, 05:53 UTC, письмо Google: «You allowed OpenAI access to some of your Google Account data»** для
+  `the64filestt@gmail.com`. Письма 24.11 Элиоту и Hungry Studio ушли с разницей в 2 минуты — похоже, оттуда. Спросить
+  автора, его ли это доступ. Если нет — отозвать: Google Account → Безопасность → сторонние подключения, и сменить пароль.
+- **Hungry Studio (Block Blast!).**
+  - 24.11, 08:43 UTC — приглашение.
+  - 11:21 UTC — из почты канала ушёл ответ с интересом.
+  - 12:24 UTC — условия от Patrick: $50 за ролик сразу на TikTok, YouTube Shorts и Instagram Reels, до 10 роликов по
+    10–20 с; по ролику в день 27.11–6.12 и 18–25.12; оплата через 30 дней.
+  - Главное условие: «The creator needs to appear on camera».
+- **YouTube.** Третье обращение (`AZ47…`) закрыто ещё 22.11: удалены все 24 копии канала The 64 Stories.
+- PolyBuzz и Стелла (Chessnut) с 21.11 не писали.
+
+**План по порядку:**
+1. **Сегодня — превью `fivepoints` Элиоту на одобрение**, по слову автора: письмо в §0.3, превью ссылкой на Drive.
+   Без его «ок» 25.11 не выкладывать. Если ответа нет — сдвинуть выход и предупредить его.
+2. **После «ок»** (25.11):
+   - `proof.py`, коммит и пуш;
+   - публикация с Branded content и #ad, ссылка в био с `utm_content=fivepoints`;
+   - Элиоту «it's live» и счёт на вторую половину INV-2026-003.
+3. **Второй ролик к Чёрной пятнице — принципы**: модуль вышел, счёт INV-2026-005.
+   - Идея Элиоту — 24–25.11.
+   - Сборка — 25–27.11.
+   - Превью ему — 27–28.11.
+   - Выход — к 29.11.
+   - Упоминание Black Friday — по его новым ассетам.
+4. **Hungry Studio — вежливо отказать** или предложить свой формат: один анимированный ролик без лица, по нашей цене.
+   Причины отказа:
+   - $50 сразу за три площадки;
+   - автор должен быть в кадре;
+   - ролик в день прямо в неделю Chessigma.
+5. **PolyBuzz** — одно короткое напоминание (срок 24.11 настал), по слову автора.
+6. **Chessnut** — договор, подписанный братом, отправить Стелле (ждём от автора).
+7. **Доступ OpenAI к почте** — подтвердить у автора. Если сам — договориться, кто пишет спонсорам: два агента в одной
+   почте уже дали обещание срока без одобрения.
 
 ### 0.1. Ждёт решения автора: ролик `fivepoints` для Chessigma
 
@@ -74,32 +121,34 @@
     anyoneWithLink, reader.
   - Или автор заливает сам.
 
+Версия от 24.11. Учитывает письмо Элиота про Чёрную пятницу и наш ответ «I'll post the first video on Wednesday,
+November 25». Ролик идёт как ролик 1 вместо brilliant moves — автор фактически так и написал. Подтвердить у автора.
+
 ```
 Hi Eliot,
 
-Thanks for checking on crypto. No problem at all, bank transfer works fine for this contract.
+Here's the first video for your approval: <LINK>
 
-We made a video on what everyone in chess is talking about right now: Magnus nearly losing his No. 1 spot.
-Here's the preview: <LINK>
-
-<ВАРИАНТ А> We'd love this to be video 1 instead of brilliant moves: it's timely, and the story leads straight into
-game review. If you'd rather keep brilliant moves first, tell us and we'll count this one as an extra video.
-<ВАРИАНТ Б> This one would be an extra video on top of our four, at the same $125 (half on approval, half once it's
-live). Brilliant moves stays as video 1.
+It's about what everyone in chess is talking about right now: Magnus nearly losing his No. 1 spot. Since it's
+timely and ready, we'd count it as video 1 instead of brilliant moves. We'll post it on Wednesday, Nov 25, as soon
+as you OK it.
 
 Where Chessigma comes in (about 0:57–1:06): the crown Magnus almost lost falls onto the viewer's desk next to their
 phone, "One move almost cost Magnus his crown. Want to find the move that's costing you games?", then a recording of
 the app, "Chessigma's game reviews are free and unlimited", and your 3-second card with App Store / Google Play and
-"link in bio". We only used claims from your kit, and Magnus never appears with the product.
+"link in bio". We only used claims from your kit, and Magnus never appears with the product. The PREVIEW marks are
+only on this file. It goes out with Branded content on, #ad, and your link in bio.
 
-The PREVIEW marks are only on this file. Once you're happy with it, we'll post it with Branded content on and #ad,
-with your link in bio. Any changes, just tell us.
+For Black Friday week, the second video would be on Principles, now that the module is out. We'll send you the idea
+tomorrow and aim to post it by Sunday, Nov 29. Please send the new assets and the exact Black Friday line you want
+us to use.
+
+Thanks for checking on crypto. No problem, bank transfer works fine for this contract.
 
 Best,
 The 64 Files
 ```
 
-- Оставить один из двух вариантов (А или Б) по слову автора.
 - Подпись — только «The 64 Files». Личные имена автора и родственников не писать.
 
 ### 0.4. После «ок» Элиота
@@ -118,12 +167,11 @@ The 64 Files
   contract of 4 videos if this is the only option for you but we would have to figure it out how to make it work».
   - Этот договор — банком, как раньше.
   - Риск для автора: резиденту России закон 259-ФЗ (ст. 14) запрещает принимать крипту в оплату услуг.
-- **YouTube, копии канала The 64 Stories.** 22.11 YouTube удовлетворил два обращения из трёх и удалил 14 копий:
-  - `U63E3AMUL5GS55AJG4EAC5MXE4` — 4 ролика;
-  - `QHJR7OU565D37IRZDSHLVUXQOI` — 10 роликов.
+- **YouTube, копии канала The 64 Stories.** 22.11 YouTube закрыл все три обращения, удалены все 24 копии:
+  - 4 + 10 + 9 — по нашим обращениям;
+  - ещё одна, `Wmz-pghiWnE`, была удалена раньше.
 
-  По `AZ47HRX6F5TTNNJ2JTCTCWMBFQ` (10 роликов) ответа ещё нет. Если попросят уточнений — ответить в той же ветке
-  доказательствами из `business/youtube_copies.md`.
+  Подробности — `business/youtube_copies.md`.
 - **Chessnut (Стелла).** Второго ролика не будет: им нужны ролики, снятые с настоящей доской. Деньги за `hikaru213`
   пришли.
   - Стелле нужен наш подписанный договор. Он у автора: PDF ему отправлен 20.11, в хранилище его нет, там личные данные.

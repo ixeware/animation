@@ -9,6 +9,24 @@
 > и баннер «Video may require content disclosure» и может урезать показ: `woodpecker` так набрал 5,2 тыс. за первые
 > часы. Это же — условие спонсоров (#ad + Branded content обещаны в нашем предложении).
 
+## Hungry Studio (Block Blast!), 24.11.2026
+- 08:43 UTC — приглашение с `chenyong002151@hungrystudio.com` от команды Block Blast! и RotateRings: геймплей «в вашем
+  стиле», TikTok / Instagram / YouTube, «share your rates». Обычная массовая рассылка.
+- 11:21 UTC — из почты канала ушёл ответ, не из сессии Claude. В нём интерес к платной коллаборации и идея: головоломка
+  Block Blast как «угадай ход». Спросили игру, бюджет, сроки и число роликов.
+- 12:24 UTC — условия от Patrick (`patrick@hungrystudio.com`):
+  - $50 за ролик сразу на TikTok, YouTube Shorts и Instagram Reels, до 10 роликов, 10–20 с;
+  - по ролику в день: 27.11–6.12 и 18–25.12;
+  - бриф — в Google Docs;
+  - оплата через 30 дней после последнего ролика месяца, PayPal или банк;
+  - «we can't accept full-screen gameplay screen recordings. The creator needs to appear on camera».
+- Оценка — советуем отказать или предложить свой формат (один анимированный ролик без лица, по нашей цене):
+  - цена в разы ниже наших: Chessigma платит $125 за один TikTok, Chessnut — $400;
+  - канал без лица;
+  - ролик в день о посторонней игре в неделю Чёрной пятницы Chessigma.
+
+  Решение за автором.
+
 ## PolyBuzz через Bioby (Xenia), 17.11.2026
 - Письмо 17.11 в 04:13 UTC с `business@biobyai.cn`, тема «Paid Collab with PolyBuzz💡»: TikTok-ролик, ссылка в био
   7 дней, код Spark Ads на 60 дней, «reply with your quote». Ни ссылок на вход, ни файлов, ни просьб заплатить.
@@ -34,6 +52,15 @@
   роликов, дольше право на рекламу, версия для YouTube Shorts.
 
 ## Chessigma (Eliot Hennebo)
+- **24.11.2026, 11:19 UTC — из почты канала ушёл ответ Элиоту, не из сессии Claude:** «I'll post the first video on
+  Wednesday, November 25». Копии Мехди нет, превью нет.
+  - Похоже, писал ChatGPT: 23.11 к почте подключили OpenAI, см. HANDOFF §0.0.
+  - Элиот ролик не видел, а выкладываем только после его письменного «ок».
+  - Новый черновик письма с превью — HANDOFF §0.3.
+- **23.11.2026, 07:08 UTC — Элиот:** «Any update on the timeline for the release of the videos? We're doing a big Black
+  Friday week and would like you to publish at least 2 of your videos during this week». Обновит ассеты и B-roll:
+  упоминание Black Friday и вышедший модуль Principles. Пока можно брать то, что есть. Обращается к автору по имени —
+  в хранилище имя не пишем.
 - **22.11.2026 — превью `fivepoints` v4 готово, письмо Элиоту НЕ отправлено.** Автор сначала: «отправь чессигме», потом:
   «письмо не кидай». До отправки автор решает, как ролик идёт в сделку:
   - ролик 1 вместо brilliant moves (советуем);

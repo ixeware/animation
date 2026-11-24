@@ -482,18 +482,22 @@ infringement».
 Не скопированы (на 13.11): «Magnus names a famous game from one position» (`woodpecker`, 13.11), «It sat in a drawer
 for 55 years», «The last game of Mikhail Tal», «The Mechanical Turk».
 
-## Решения YouTube: 14 копий удалены (22.11.2026)
+## Решения YouTube: все 24 копии удалены (22.11.2026)
 
-Ответы с `copyright@youtube.com` в ночь на 22.11: «Request resolved. The content listed below has been removed».
-- `U63E3AMUL5GS55AJG4EAC5MXE4`, удалены 4: `4Pv_Y9emT0k`, `SPDbqBgS5EY`, `UwfHxEjj27s`, `ac9gSRzhVAc`.
-- `QHJR7OU565D37IRZDSHLVUXQOI`, удалены 10: `0K7uOZsonxw`, `4yENsvwOtZ4`, `A_MNOn0hvck`, `LXs5dnYe1XA`,
+Ответы с `youtube-disputes@google.com` в ночь на 22.11 (00:59–01:05 UTC), по всем трём обращениям: «Request resolved.
+The content listed below has been removed».
+- `U63E3AMUL5GS55AJG4EAC5MXE4` — удалены 4: `4Pv_Y9emT0k`, `SPDbqBgS5EY`, `UwfHxEjj27s`, `ac9gSRzhVAc`.
+- `QHJR7OU565D37IRZDSHLVUXQOI` — удалены 10: `0K7uOZsonxw`, `4yENsvwOtZ4`, `A_MNOn0hvck`, `LXs5dnYe1XA`,
   `Nvjpwtbhygo`, `NwbQCns0Bl4`, `WLywVcbK5FY`, `agXowu9Rv-I`, `hCf_l85jvwo`, `nRx_hI8DvDs`.
-- `AZ47HRX6F5TTNNJ2JTCTCWMBFQ`, 10 роликов, — ответа ещё нет.
+- `AZ47HRX6F5TTNNJ2JTCTCWMBFQ` — удалены 9: `-m9a1wTFDCs`, `CPzplLt64VY`, `Dw0bCwE_gNg`, `J14e_O5V-TQ`,
+  `Lm9o3BTdFAA`, `ZJGgat8akQA`, `bCMlxBvqwXg`, `q5jH6Y-cMGo`, `rUg2CLvelHg`. `Wmz-pghiWnE` (копия ролика для Chessnut)
+  к тому времени уже был удалён.
+
+22.11 сначала было записано, что по `AZ47…` ответа нет. Это ошибка: ответ пришёл в ту же ночь. Исправлено 24.11.
 
 ## Что дальше
 
-- Ждём решения по `AZ47HRX6F5TTNNJ2JTCTCWMBFQ`. Если попросят уточнений — ответить в той же ветке теми же
-  доказательствами.
+- Все три обращения закрыты. Если канал-копия зальёт ролики снова — новое обращение с теми же доказательствами.
 
 - На оставшиеся 18 роликов уведомление отправлено письмом (см. выше); если YouTube попросит уточнений — ответить в той же ветке.
 - По справке YouTube, три действующих страйка за авторские права — канал удаляют вместе со всеми видео; страйк
