@@ -17,6 +17,13 @@
   с той же идеей». Значит, ролик 1 — brilliant moves, построенный на истории Магнуса. Выбор А/Б из §0.1 снят.
 - **Видео делает автор сам, в сессии на Fable:** «делать видео не начинай, я сделаю через fable». В этой сессии ролик не
   меняли: `script.json` и `scenes.js` — версия 4.
+- **Что хочет Элиот** (письмо 18.11, 08:49 UTC, его слова): «1. Brilliant moves, your first idea. Our brilliant
+  detection is the best on the market alongside Chess.com, and it is free: we find 93 of Chess.com's 100 brilliant
+  moves, more than any other free tool». Тема — наша первая идея, посыл — его. Сюжета он не давал, ждёт идею от нас.
+  Данные (13:29 UTC, «that you may or may not use»):
+  - 100 настоящих бриллиантов Chess.com через все бесплатные разборы: Chessigma находит 93, остальные — 90, 45, 41, 23;
+  - ложные бриллианты: у Chessigma — раз в 20 партий, у другого разбора — раз в 3, у третьего неверна половина;
+  - 4 бриллианта поймал только Chessigma: Rf1+ игрока 527 и Kxf1 игрока 3097 в блице.
 - **Идея (черновик, утвердить у автора):**
   - история Магнуса — строки 0–11 `script.json` — без изменений;
   - мост — часы: у Магнуса было 46 с, у Артемьева 37, а игрок с рейтингом 527 при 24 с на часах нашёл бриллиант;
@@ -26,8 +33,8 @@
     1. «46 seconds cost Magnus a game. 37 cost his opponent the draw. This player had 24, and he's rated 527.»
     2. «He played a brilliant move.» — на доске 23...Rf1+, на телефоне разбор Chessigma со значком Sigma;
     3. «He found the key… and never opened the door. Check, check, draw.»
-    4. без сравнения с другими разборами и без Chess.com — тогда не ждём ответа Элиота (сравнение — только если он сам
-       даст формулировку);
+    4. посыл Элиота его словами: «93 of Chess.com's 100 brilliant moves, more than any other free tool». Chess.com он
+       называет сам, фразу можно брать как есть; другие разборы по именам не называть;
     5. «Chessigma's game reviews are free and unlimited. On the App Store and Google Play. Link in bio.»;
     6. вопрос: «What's your rating — and have you ever played a brilliant?» (из идеи 1) или прежний «So, how far are
        you from 2800?»;
