@@ -108,6 +108,11 @@ goat и он забрал его титул, никто не близко, ка�
     с флажком SIGMA (с 7,9 с). Чужие ники закрыты (`recClean` в `scenes.js`).
   - В записи вход не выполнен: под комментарием тренера кнопка «Sign in for free». Элиот просил показывать разбор
     залогиненным (13.11.2026), поэтому кадрируем без кнопки. Лучше переснять этот ход залогиненным.
+- **Версия 6 (24.11.2026):** реклама короче — «Chessigma's free, unlimited game reviews find 93 of Chess.com's 100
+  brilliant moves. More than any other free tool.» и «On the App Store and Google Play. Link in bio.»; реплика про
+  Sigma убрана. Топ-комментарий «When your lowest is their best» (он настоящий, см. выше) стоит после рекламы; до
+  него в углу закрытая плашка «TOP COMMENT». Строка поиска «is the carlsen era over» в кадре «The internet asked» —
+  наш рисунок по заголовку World Chess, без логотипов.
 - Связка с историей (версия 3, до версии 5): «One move almost cost Magnus his crown. Want to find the move that's costing you games?» —
   дальше запись приложения автора (`photos/rec/review.mp4`) и их карточка. Магнуса и других реальных людей в кадре с
   продуктом нет: разбор его партий в Chessigma не показываем.

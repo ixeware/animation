@@ -11,29 +11,38 @@
 - [business/youtube_copies.md](business/youtube_copies.md);
 - [memory/journal.md](memory/journal.md).
 
-### Сначала: 24.11 — `fivepoints` версия 5, реклама про brilliant moves (тема Элиота)
+### Сначала: 24.11 — `fivepoints` версия 6: реклама про brilliant moves и проход по всему ролику
 
 - **Почему.** Автор вспомнил, что Элиот просил свои темы, первая — brilliant moves: «может как-то переделать под его
-  идею, но с той же идеей». Мост через игрока с рейтингом 527 автор отклонил: «идея где обычный игрок находит че то
-  там, никому нахуй это не интересно» (правило 78). Сделано в этой же сессии, на модели Fable: «вот продолжи».
+  идею, но с той же идеей». Мост через игрока с рейтингом 527 он отклонил (правило 78). После черновика версии 5:
+  «сделай видео в общем лучше т.к ты фейбл» — отсюда версия 6.
 - **Что хочет Элиот** (письмо 18.11, его слова): «Our brilliant detection is the best on the market alongside
   Chess.com, and it is free: we find 93 of Chess.com's 100 brilliant moves, more than any other free tool». Сюжета он не
   давал. Данные: Chessigma 93, остальные бесплатные разборы — 90, 45, 41, 23.
-- **Что в версии 5.** История Магнуса (строки 0–11) не менялась. Реклама — с 0:55 до 1:17, около 21 с:
+- **Порядок в версии 6** (77,5 с): история до «Still the only player above 2800» → реклама (18 с) → топ-комментарий →
+  вопрос про 2800. Топ-комментарий стал развязкой после рекламы: с конца истории в углу висит закрытая плашка
+  «TOP COMMENT» с замком, полоска на ней заполняется всю рекламу, после карточки спонсора она раскрывается.
+- **Реклама, 0:50–1:09:**
   1. «One move almost cost Magnus his crown.» — корона падает с вершины на стол зрителя;
   2. «And one brilliant move will make you think you're him.» — в приложении ход получает флажок SIGMA !!, зритель сам
      себя коронует, под сценой комментарий «bro thinks he's Magnus»;
-  3. «Chessigma calls it... Sigma.» — тот же ход на телефоне, потом лицо с короной;
-  4. «And its free review finds 93 of Chess.com's 100 brilliant moves. More than any other free tool.» — панель «Your
-     brilliant moves», стена из 100 «!!» (горят 93), диаграмма пяти бесплатных разборов без чужих имён;
-  5. «Free, unlimited game reviews. On the App Store and Google Play. Link in bio.» — отчёт и их карточка 3 с.
+  3. «Chessigma's free, unlimited game reviews find 93 of Chess.com's 100 brilliant moves. More than any other free
+     tool.» — тот же ход на телефоне, стена из 100 «!!» (горят 93), диаграмма пяти бесплатных разборов без чужих имён;
+  4. «On the App Store and Google Play. Link in bio.» — их карточка 3 с.
+- **Что ещё изменено в версии 6:**
+  - кадр «The internet asked» был мутным: теперь вопрос набирается в строке поиска над освещённым лицом;
+  - топ-комментарий — крупной карточкой в две строки, потом ещё раз над «LITERALLY»;
+  - хук ближе к Магнусу, с первых кадров убрано моргание;
+  - реплика «Chessigma calls it... Sigma» и планы с лицом в короне, панелью и отчётом убраны — реклама короче на 3 с;
+  - на двух планах рекламы в комнате нет метки канала: она наезжала на корону и комментарий.
 - **Проверено.** В решающей партии Магнуса бриллианта нет (Stockfish), поэтому его ходы так не называем. Голос —
   чистые дубли (`voice_check.py`). Вёрстка: no issues.
-- **Экран приложения — запись автора** `photos/rec/review.mp4`: там уже есть ход «Bxh3 is sigma» с флажком и панель
-  «Your brilliant moves». Чужие ники закрыты.
-  - В записи вход не выполнен: виден призыв «Sign in for free». Элиот просил показывать разбор залогиненным, поэтому
+- **Экран приложения — запись автора** `photos/rec/review.mp4`: ход «Bxh3 is sigma» с флажком. Чужие ники закрыты.
+  - В записи вход не выполнен: есть кнопка «Sign in for free». Элиот просил показывать разбор залогиненным, поэтому
     кадрируем без кнопки. Если автор запишет этот ход залогиненным — подставить.
   - Из облака значок Sigma не снять: `chessigma.com/tools/analysis?pgn=` оценок ходов не показывает.
+- **Вернуть прежний порядок** (топ-комментарий до рекламы): в `script.json` поставить фразу `comment` перед `ad1` —
+  планы сами встанут по времени; плашку убрать (`chip` в `scenes.js`).
 - **Сроки.** Из почты канала обещан выход в среду, 25.11. Нужно письменное «ок» Элиота: превью ему — как только автор
   одобрит черновик (письмо в §0.3, только по слову автора). Чёрная пятница — 27.11, второй ролик — принципы (§0.0, п. 3).
 - **Строку про Black Friday** брать только у Элиота: баннер на сайте 24.11 менялся.
@@ -62,7 +71,7 @@
 - PolyBuzz и Стелла (Chessnut) с 21.11 не писали.
 
 **План по порядку:**
-1. **`fivepoints` версия 5 (реклама про brilliant moves) готова**, раздел «Сначала» выше. Автор смотрит черновик;
+1. **`fivepoints` версия 6 (реклама про brilliant moves) готова**, раздел «Сначала» выше. Автор смотрит черновик;
    после его «да» — превью Элиоту (письмо в §0.3), по слову автора. Выход 25.11 только после «ок» Элиота.
 2. **После «ок»** (25.11):
    - `proof.py`, коммит и пуш;
@@ -86,7 +95,7 @@
 
 ### 0.1. Ждёт решения автора: ролик `fivepoints` для Chessigma
 
-- **Решено 24.11:** ролик 1 — brilliant moves на истории Магнуса, версия 5 (раздел «Сначала»). Варианты А/Б ниже —
+- **Решено 24.11:** ролик 1 — brilliant moves на истории Магнуса, версия 6 (раздел «Сначала»). Варианты А/Б ниже —
   история решения.
 - **Письмо Элиоту НЕ отправлять.** 22.11 автор сначала сказал «отправь чессигме», потом остановил: «письмо не кидай».
   Текст письма готов (ниже, §0.3). Отправлять только по новому прямому слову автора.
@@ -104,15 +113,15 @@
 
 ### 0.2. `fivepoints` (Магнус чуть не потерял №1): что готово и как пересобрать
 
-- **Текущая версия — 5** (24.11): реклама про brilliant moves, 0:55–1:17; ролик 80,6 с. Что в ней — раздел «Сначала».
-  Версию 4 (реклама «find the move that's costing you games», 69,3 с) автор одобрял 21.11; она в git до коммита
-  `a37a3e5`.
+- **Текущая версия — 6** (24.11): реклама про brilliant moves, 0:50–1:09; ролик 77,5 с. Что в ней — раздел «Сначала».
+  Версия 5 (реклама 21 с в самом конце, 80,6 с) — в git до коммита `c3fec77`. Версию 4 (реклама «find the move
+  that's costing you games», 69,3 с) автор одобрял 21.11; она в git до коммита `a37a3e5`.
 - Метка канала — тихая (правило 70). Проверка вёрстки: no issues. Магнуса рядом с продуктом нет.
 - Готовые файлы лежат только в `episodes/fivepoints/build/`, который не в git; в новом контейнере их нет:
-  - `The64Files_Magnus_Five_Points_Chessigma_v5_DRAFT.mp4` — 1080×1920, 80,57 с, около 35 МБ; автору отправлен 24.11;
-  - `The64Files_Magnus_Five_Points_Chessigma_v5_PREVIEW.mp4` — 720×1280, с пометками PREVIEW, около 15 МБ, для Элиота;
-  - 4K версии 5 не собран: собрать после «ок» Элиота (ниже, ~25 мин), два прохода `-b:v 12000k`;
-  - файлы версии 4 (`…_DRAFT.mp4`, `…_PREVIEW.mp4`, `…_4K.mp4` без `v5` в имени) устарели, не публиковать;
+  - `The64Files_Magnus_Five_Points_Chessigma_v6_DRAFT.mp4` — 1080×1920, 77,5 с, около 33 МБ; автору отправлен 24.11;
+  - `The64Files_Magnus_Five_Points_Chessigma_v6_PREVIEW.mp4` — 720×1280, с пометками PREVIEW, около 14 МБ, для Элиота;
+  - 4K версии 6 не собран: собрать после «ок» Элиота (ниже, ~25 мин), два прохода `-b:v 12000k`;
+  - файлы версий 4 и 5 (без `v6` в имени) устарели, не публиковать;
   - `shortshots.py` отмечает 16,43–16,77 с и 45,07–45,60 с — так было и в версии 4, это не брак: мат и вспышка замка.
 - Голос лежит в git: `episodes/fivepoints/tts_cache/` (115 файлов, 14 МБ, вместе с дублями версии 5). Записи экрана —
   `episodes/fivepoints/photos/rec/`. Пересборка не тратит кредиты ElevenLabs и не требует ключа:
@@ -150,12 +159,15 @@ Hi Eliot,
 Here's video 1 for your approval: <LINK>
 
 It's about brilliant moves, as you suggested, built on the story everyone in chess is talking about this week:
-Magnus nearly losing his No. 1 spot. Chessigma comes in at 0:55–1:17: the crown Magnus almost lost lands on the
+Magnus nearly losing his No. 1 spot. Chessigma comes in at 0:50–1:09: the crown Magnus almost lost lands on the
 viewer's desk, "One brilliant move will make you think you're him", and a move gets its Sigma in your review on the
-phone. Then your line, "its free review finds 93 of Chess.com's 100 brilliant moves, more than any other free tool",
-with the 100 moves on a wall and the five free tools as bars (the other four are not named), then "free, unlimited
-game reviews" and your card with App Store / Google Play and "link in bio". Magnus never appears with the product.
-The PREVIEW marks are only on this file.
+phone. Then your line, "Chessigma's free, unlimited game reviews find 93 of Chess.com's 100 brilliant moves. More
+than any other free tool", with the 100 moves on a wall and the five free tools as bars (the other four are not
+named), and your card with App Store / Google Play and "link in bio". Magnus never appears with the product.
+
+The story's last beat (the top comment) and the question to viewers come right after your card: a locked "top
+comment" tag stays on screen through your part, so people have a reason to watch it to the end. The PREVIEW marks
+are only on this file.
 
 One note: the app recording we have was made signed out, so we framed the review without the "Sign in for free"
 button. If you'd rather see the coach's comment there, we'll re-record it signed in.
