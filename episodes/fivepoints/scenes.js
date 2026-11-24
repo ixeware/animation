@@ -3715,7 +3715,7 @@ export async function build(T) {
   shot(S43a, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0.15, 0.25, 11.4, [4, 1.5, 4]), K(0.11, 0.27, 10.6, [4, 1.3, 3.8]), glide, { bump: t >= LAND ? Math.exp(-(t - LAND) * 6) : 0 });
     const u = ease.in(clamp((t - S43a) / (LAND - S43a)));
-    yourRoom(g, t, { e: t >= LAND ? EXPR.shock : EXPR.focus, crown: { p: [DESK[0], lerp(12, DESK[1], u), DESK[2]], k: 1.4, rot: (1 - u) * 2 }, glow: 0.6, img: recClean(7.6) });
+    yourRoom(g, t, { e: t >= LAND ? EXPR.shock : EXPR.focus, crown: { p: [DESK[0], lerp(12, DESK[1], u), DESK[2]], k: 1.4, rot: (1 - u) * 2 }, glow: 0.6, img: recClean(3.6) });  // the report on the phone: no sign-in button on that screen
     whiteout(g, 1 - ease.out(clamp(lt / 0.22)));
   }, { kb: 0, zoom: kicks([[LAND, 0.06]]), hud: g => adTag(g) });
   cue(LAND, 'thud', 0.5); cue(LAND + 0.02, 'clack', 0.3);
@@ -3741,7 +3741,7 @@ export async function build(T) {
     rig(B, lt, [[0, K(0.1, 0.1, 10, [4, 3.5, 7.4], { cy: 890 })], [wornT - S43c, K(0.05, 0.08, 8.6, [4, 3.5, 7.4], { cy: 820 })], [len(sh), K(0.0, 0.07, 7.6, [4, 3.5, 7.4], { cy: 770 })]], { t, e: glide });
     const dn = ease.inOut(clamp((t - thinkT) / (wornT - thinkT))), d = t - wornT, sett = d >= 0 ? Math.exp(-d * 9) * Math.sin(d * 26) : 0;
     const oy = lerp(-345, -150, dn) + sett * 9 + (1 - dn) * Math.sin(t * 5) * 5, grip = 1 - ease.inOut(clamp((t - himT + 0.08) / 0.3));
-    yourRoom(g, t, { e: t >= wornT ? SIG_E : EXPR.happy, wear: { oy, grip, rot: (1 - dn) * Math.sin(t * 3.1) * 0.05 }, glow: 0.7, img: recClean(9.6) });
+    yourRoom(g, t, { e: t >= wornT ? SIG_E : EXPR.happy, wear: { oy, grip, rot: (1 - dn) * Math.sin(t * 3.1) * 0.05 }, glow: 0.7, img: recClean(3.6) });
     if (t >= wornT) { const hp = B.project(YOU_AT.x, YOU_AT.y, YOU_AT.z), s = hp.s * YOU_AT.k * 1.05 / 100; glint(g, hp.x + 34 * s, hp.y - 176 * s, t, wornT + 0.02, { r: 240 }); }
   }, { kb: 0, zoom: kicks([[wornT, 0.06]]), hud: (g, lt, t) => {
     adTag(g);
