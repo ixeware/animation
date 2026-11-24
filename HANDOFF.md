@@ -1,4 +1,4 @@
-# Передача проекта (handoff), 8.11.2026, дополнено 9.11 и 22.11.2026
+# Передача проекта (handoff), 8.11.2026, дополнено 9.11, 22.11 и 24.11.2026
 
 Записка для модели или человека, который продолжит работу. Проект — шахматные шортсы для TikTok, сделанные кодом.
 Здесь: что прочитать, как поставить окружение, как собрать ролик, что уже сделано и на чём легко ошибиться.
@@ -10,6 +10,58 @@
 - [memory/sponsors.md](memory/sponsors.md) — Chessigma, Hungry Studio, PolyBuzz, Chessnut;
 - [business/youtube_copies.md](business/youtube_copies.md);
 - [memory/journal.md](memory/journal.md).
+
+### Сначала: 24.11, вечер — `fivepoints` переделать под тему Элиота (brilliant moves); делает сессия на Fable
+
+- **Решение автора.** Автор вспомнил, что Элиот просил свои темы, и сказал: «может как-то переделать под его идею, но
+  с той же идеей». Значит, ролик 1 — brilliant moves, построенный на истории Магнуса. Выбор А/Б из §0.1 снят.
+- **Видео делает автор сам, в сессии на Fable:** «делать видео не начинай, я сделаю через fable». В этой сессии ролик не
+  меняли: `script.json` и `scenes.js` — версия 4.
+- **Идея (черновик, утвердить у автора):**
+  - история Магнуса — строки 0–11 `script.json` — без изменений;
+  - мост — часы: у Магнуса было 46 с, у Артемьева 37, а игрок с рейтингом 527 при 24 с на часах нашёл бриллиант;
+  - мотив: в ролике уже есть замок («He locked in»), у идеи 1 в [IDEAS.md](IDEAS.md) — ключ («He found the key. He never
+    opened the door.»). Магнус вошёл в дверь, а игрок 527 нашёл ключ и ушёл: дал шах ещё раз, и ещё — ничья;
+  - черновик строк вместо 12–14:
+    1. «46 seconds cost Magnus a game. 37 cost his opponent the draw. This player had 24, and he's rated 527.»
+    2. «He played a brilliant move.» — на доске 23...Rf1+, на телефоне разбор Chessigma со значком Sigma;
+    3. «He found the key… and never opened the door. Check, check, draw.»
+    4. сравнение с другими разборами — только в формулировке, которую подтвердит Элиот (вопрос в письме, §0.3);
+    5. «Chessigma's game reviews are free and unlimited. On the App Store and Google Play. Link in bio.»;
+    6. вопрос: «What's your rating — and have you ever played a brilliant?» (из идеи 1) или прежний «So, how far are
+       you from 2800?»;
+  - ролик вырастет с 69 до ~80 с. Если длинно — убрать строку 11 (top comment).
+- **Партия** (PGN из бенчмарка Chessigma, `chessigma.com/benchmarks/brilliant/data`; ссылка на партию — в IDEAS, идея 1):
+  - блиц 2+1, 04.08.2025, белые 579, чёрные 527, ничья повторением;
+  - 23...Rf1+ — 46-й полуход. Часы чёрных: 0:23,9 до хода, 0:20,0 после, с добавкой 1 с — думал около 5 с;
+  - Stockfish (глубина 22, из IDEAS): после Rf1+ у чёрных +5,4; выигрывало 24.Kh2 Rxh1+ 25.Kxh1 Nf2+ с вилкой;
+  - по словам Элиота (18.11), это один из 4 ходов, которые из пяти разборов нашёл только Chessigma; всего Chessigma
+    находит 93 из 100 «бриллиантов» Chess.com;
+  - ники игроков не показывать. PGN для съёмки, без ников:
+    ```
+    [White "White"]
+    [Black "Black"]
+    [WhiteElo "579"]
+    [BlackElo "527"]
+    [Result "1/2-1/2"]
+
+    1. d4 d5 2. Bf4 Nf6 3. Nf3 Nc6 4. e3 Bg4 5. h3 Bxf3 6. Qxf3 e6 7. c4 Bd6 8. Bxd6 Qxd6 9. c5 Qd7 10. Bb5 a6
+    11. Ba4 b5 12. Bc2 O-O 13. h4 Nb4 14. Bd1 Nd3+ 15. Kf1 Nxb2 16. g4 Nc4 17. g5 Ne4 18. h5 g6 19. hxg6 fxg6
+    20. Qh3 Rxf2+ 21. Kg1 Raf8 22. Bg4 Qf7 23. Bxe6 Rf1+ 24. Kh2 Rf2+ 25. Kg1 Rf1+ 26. Kh2 Rf2+ 27. Kg1 1/2-1/2
+    ```
+- **Как снять значок Sigma для телефона в кадре:**
+  - `chessigma.com/tools/analysis?pgn=<PGN>` в headless показывает доску, ходы и движок, но без оценок ходов: это доска
+    анализа, а не разбор (проверено 24.11);
+  - разбор с оценками: импортировать PGN на chessigma.com и один раз нажать «Start review» на настоящем устройстве,
+    потом `episodes/fivepoints/capture/cg_capture.cjs` снимает экраны headless. Или автор записывает экран телефона,
+    как записи в `photos/rec/`;
+  - Магнуса в интерфейсе Chessigma по-прежнему не показываем; партию 527 — можно, без ников.
+- **Сроки.**
+  - Обещание «I'll post the first video on Wednesday, November 25» с переделкой, скорее всего, не выполнить: нужны
+    голос, сцены, превью и «ок» Элиота. Предупредить его — письмо в §0.3, только по слову автора.
+  - Чёрная пятница — 27.11; Элиот просит 2 ролика на этой неделе. Второй — принципы (§0.0, п. 3).
+  - Строку про Black Friday брать только у Элиота: баннер на сайте 24.11 менялся («Yearly, Save 59%, $5.68/month»,
+    потом «Lifetime, Save 41%, 2 LEFT, $290 вместо $490»).
 
 ### 0.0. Новое в почте на 24.11 и план
 
@@ -35,8 +87,8 @@
 - PolyBuzz и Стелла (Chessnut) с 21.11 не писали.
 
 **План по порядку:**
-1. **Сегодня — превью `fivepoints` Элиоту на одобрение**, по слову автора: письмо в §0.3, превью ссылкой на Drive.
-   Без его «ок» 25.11 не выкладывать. Если ответа нет — сдвинуть выход и предупредить его.
+1. **`fivepoints` переделать под brilliant moves** — решение автора 24.11 вечером, раздел «Сначала» выше; делает
+   сессия на Fable. Элиоту — короткое письмо о сроках (§0.3), по слову автора. Без его «ок» не выкладывать.
 2. **После «ок»** (25.11):
    - `proof.py`, коммит и пуш;
    - публикация с Branded content и #ad, ссылка в био с `utm_content=fivepoints`;
@@ -59,6 +111,8 @@
 
 ### 0.1. Ждёт решения автора: ролик `fivepoints` для Chessigma
 
+- **Решено 24.11 вечером:** ролик 1 — brilliant moves на истории Магнуса (раздел «Сначала»). Варианты А/Б ниже —
+  история решения.
 - **Письмо Элиоту НЕ отправлять.** 22.11 автор сначала сказал «отправь чессигме», потом остановил: «письмо не кидай».
   Текст письма готов (ниже, §0.3). Отправлять только по новому прямому слову автора.
 - До отправки автор решает, как ролик идёт в сделку на 4 ролика по $125:
@@ -121,33 +175,30 @@
     anyoneWithLink, reader.
   - Или автор заливает сам.
 
-Версия от 24.11. Учитывает письмо Элиота про Чёрную пятницу и наш ответ «I'll post the first video on Wednesday,
-November 25». Ролик идёт как ролик 1 вместо brilliant moves — автор фактически так и написал. Подтвердить у автора.
+Версия от 24.11, вечер. Прежний черновик (ролик Магнуса вместо brilliant moves) устарел; он в git, коммит `0bfa30d`.
+Сейчас нужно короткое письмо о сроках, до превью:
 
 ```
 Hi Eliot,
 
-Here's the first video for your approval: <LINK>
+Quick update. We're making video 1 about brilliant moves, as you suggested, and building it on the story everyone in
+chess is talking about this week: Magnus nearly losing his No. 1 spot. So it won't go out on Wednesday as we wrote.
+We'll send you the preview first and post as soon as you OK it, still within Black Friday week.
 
-It's about what everyone in chess is talking about right now: Magnus nearly losing his No. 1 spot. Since it's
-timely and ready, we'd count it as video 1 instead of brilliant moves. We'll post it on Wednesday, Nov 25, as soon
-as you OK it.
+One question for the script: may we use the line from your benchmark page, that Chessigma catches 93 of Chess.com's
+100 brilliant moves, or would you rather we don't name Chess.com?
 
-Where Chessigma comes in (about 0:57–1:06): the crown Magnus almost lost falls onto the viewer's desk next to their
-phone, "One move almost cost Magnus his crown. Want to find the move that's costing you games?", then a recording of
-the app, "Chessigma's game reviews are free and unlimited", and your 3-second card with App Store / Google Play and
-"link in bio". We only used claims from your kit, and Magnus never appears with the product. The PREVIEW marks are
-only on this file. It goes out with Branded content on, #ad, and your link in bio.
-
-For Black Friday week, the second video would be on Principles, now that the module is out. We'll send you the idea
-tomorrow and aim to post it by Sunday, Nov 29. Please send the new assets and the exact Black Friday line you want
-us to use.
+For Black Friday, please send the exact line and assets you want us to use. The second video will be on Principles;
+we'll send its idea with the preview.
 
 Thanks for checking on crypto. No problem, bank transfer works fine for this contract.
 
 Best,
 The 64 Files
 ```
+
+Письмо с превью — когда ролик будет готов: ссылка на превью, где в ролике Chessigma (секунды), какие слова взяты из кита
+и из ответа Элиота, что Магнуса рядом с продуктом нет, и что выход — с Branded content, #ad и ссылкой в био.
 
 - Подпись — только «The 64 Files». Личные имена автора и родственников не писать.
 
