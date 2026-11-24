@@ -3260,6 +3260,56 @@ function barsWall(g, t, lt) {
   lowKey(g, { cy: H * 0.46, a: 0.1 });
 }
 
+// ---------- v6: the top comment is the payoff after the sponsor's card. From the end of the story a small locked chip
+// "TOP COMMENT" sits in the corner (the padlock of this film), its bar fills through the sponsor's block, and after the
+// card it opens into the comment itself ----------
+function lockChip(g, t, t0, t1, { x = W - 200, y = 146 } = {}) {
+  const u = clamp((t - t0) / 0.25); if (u <= 0 || t >= t1) return;
+  const k = lerp(1.3, 1, ease.back(u)), wd = 304, hg = 54, p = clamp((t - t0) / (t1 - t0));
+  g.save(); g.translate(x, y); g.scale(k, k); g.globalAlpha *= clamp(u * 2) * 0.95;
+  g.fillStyle = '#16161E'; g.beginPath(); g.roundRect(-wd / 2, -hg / 2, wd, hg, 10); g.fill();
+  const lx = -wd / 2 + 32;  // the padlock
+  g.strokeStyle = GOLD; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.arc(lx, -7, 9, Math.PI, 0); g.stroke();
+  g.fillStyle = GOLD; g.beginPath(); g.roundRect(lx - 13, -6, 26, 21, 4); g.fill();
+  g.textAlign = 'left'; g.textBaseline = 'middle'; g.font = sans(24, 900); g.letterSpacing = '3px'; g.fillStyle = CREAM; g.fillText('TOP COMMENT', lx + 28, -1);
+  g.fillStyle = 'rgba(255,255,255,0.2)'; g.fillRect(-wd / 2 + 14, hg / 2 - 10, wd - 28, 4);  // the bar that fills until it opens
+  g.fillStyle = GOLD; g.fillRect(-wd / 2 + 14, hg / 2 - 10, (wd - 28) * p, 4);
+  g.restore();
+  qaRect(g, x - wd / 2, y - hg / 2, wd, hg, 'text', 'TOP COMMENT (locked)');
+}
+// a comment as on TikTok, large, on two lines (the payoff is read as much as heard)
+function commentBig(g, lines, likes, x, y, { a = 1, scale = 1, label = null, size = 64, w = 940 } = {}) {
+  if (a <= 0 || scale <= 0.02) return;
+  const hgt = size * 2.5 + (label ? size * 0.9 : 0) + size * 0.7;
+  g.save(); g.globalAlpha *= a; g.translate(x, y); g.scale(scale, scale);
+  g.fillStyle = 'rgba(10,10,16,0.4)'; g.beginPath(); g.roundRect(-w / 2 + 10, -hgt / 2 + 12, w, hgt, 36); g.fill();
+  g.fillStyle = '#FFFFFF'; g.beginPath(); g.roundRect(-w / 2, -hgt / 2, w, hgt, 36); g.fill();
+  const ax = -w / 2 + size * 1.15, ay = -hgt / 2 + size * 1.25, ar = size * 0.72;
+  g.fillStyle = '#C9CDD6'; g.beginPath(); g.arc(ax, ay, ar, 0, 7); g.fill();
+  g.fillStyle = '#8E95A3'; g.beginPath(); g.arc(ax, ay - ar * 0.24, ar * 0.37, 0, 7); g.fill(); g.beginPath(); g.ellipse(ax, ay + ar * 0.56, ar * 0.6, ar * 0.37, 0, Math.PI, 0); g.fill();
+  g.textAlign = 'left'; g.textBaseline = 'middle'; const tx = -w / 2 + size * 2.2; let ty = -hgt / 2 + size * 0.85;
+  if (label) { g.font = sans(Math.round(size * 0.42), 800); g.letterSpacing = '3px'; g.fillStyle = '#8A8F9C'; g.fillText(label, tx, ty); ty += size * 0.95; }
+  g.font = sans(size, 900); g.letterSpacing = '0px'; g.fillStyle = '#16161E';
+  for (const ln of lines) { g.fillText(ln, tx, ty); ty += size * 1.18; }
+  if (likes) { g.textAlign = 'center'; g.fillStyle = '#FE2C55'; g.font = sans(size * 0.9, 900); g.fillText('♥', w / 2 - size * 1.05, -size * 0.2); g.fillStyle = '#5A5F6C'; g.font = sans(size * 0.46, 800); g.fillText(likes, w / 2 - size * 1.05, size * 0.6); }
+  g.restore();
+  qaRect(g, x - w / 2 * scale, y - hgt / 2 * scale, w * scale, hgt * scale, 'text', lines.join(' '));
+}
+// a search bar with the question being typed (u 0..1), our own, no logos
+function searchBar(g, text, x, y, u, t, { w = 920, h = 118, a = 1 } = {}) {
+  if (a <= 0) return;
+  const n = Math.round(text.length * clamp(u)), shown = text.slice(0, n), pop = lerp(1.12, 1, ease.back(clamp(u * 6)));
+  g.save(); g.globalAlpha *= a; g.translate(x, y); g.scale(pop, pop);
+  g.fillStyle = 'rgba(4,6,14,0.45)'; g.beginPath(); g.roundRect(-w / 2 + 8, -h / 2 + 12, w, h, h / 2); g.fill();
+  g.fillStyle = '#FFFFFF'; g.beginPath(); g.roundRect(-w / 2, -h / 2, w, h, h / 2); g.fill();
+  const mx = -w / 2 + 66;  // the magnifier
+  g.strokeStyle = '#5A6070'; g.lineWidth = 8; g.lineCap = 'round'; g.beginPath(); g.arc(mx - 4, -4, 19, 0, 7); g.stroke(); g.beginPath(); g.moveTo(mx + 11, 11); g.lineTo(mx + 26, 26); g.stroke();
+  g.textAlign = 'left'; g.textBaseline = 'middle'; g.font = sans(54, 800); g.letterSpacing = '0px'; g.fillStyle = '#16161E'; g.fillText(shown, mx + 52, 3);
+  if (Math.sin(t * 14) > -0.2) { const tw = g.measureText(shown).width; g.fillStyle = '#2F6BFF'; g.fillRect(mx + 56 + tw, -26, 5, 54); }  // the caret
+  g.restore();
+  qaRect(g, x - w / 2, y - h / 2, w, h, 'text', text);
+}
+
 export async function build(T) {
   const s = id => T.s(id), w = (id, k) => T.w(id, k).s;
   const cues = [];
@@ -3305,19 +3355,19 @@ export async function build(T) {
   const slipT = w('slip', 2);
   const loA = s('lock') - 0.06, needT = w('lock', 3), heT = w('lock', 4), inT = w('lock', 6);
   const siA = s('still') - 0.06, one2T = w('still', 2), st2T = w('still', 3), onlyT = w('still', 5), n2800T = w('still', 8);
-  const cmA = s('comment') - 0.06, whenT = w('comment', 2), lowT = w('comment', 4), theirT = w('comment', 6), bestT = w('comment', 7), litT = w('comment', 8);
   const a1A = s('ad1') - 0.06, cost2T = w('ad1', 3), magnT = w('ad1', 4);
   const a2A = s('ad2') - 0.06, brilT = w('ad2', 2), willT = w('ad2', 4), thinkT = w('ad2', 7), youreT = w('ad2', 8), himT = w('ad2', 9);
-  const a3A = s('ad3') - 0.06, callsT = w('ad3', 1), itT = w('ad3', 2), sigT = w('ad3', 3);
-  const a4A = s('ad4') - 0.06, free4T = w('ad4', 2), n93T = w('ad4', 5), chessT = w('ad4', 7), n100T = w('ad4', 8), moreT = w('ad4', 11), otherT = w('ad4', 14);
-  const a5A = s('ad5') - 0.06, freeT = w('ad5', 0), unlT = w('ad5', 1), onT = w('ad5', 4), linkT = w('ad5', 11), CLOSE = onT - 0.08;
-  const ctA = Math.max(s('cta') - 0.06, CLOSE + 3.0), howT = w('cta', 1), q2800T = w('cta', 6);
+  const a3A = s('ad3') - 0.06, freeT = w('ad3', 1), unlT = w('ad3', 2), n93T = w('ad3', 6), chessT = w('ad3', 8), n100T = w('ad3', 9), moreT = w('ad3', 12), otherT = w('ad3', 15);
+  const onT = w('ad4', 0), linkT = w('ad4', 7), CLOSE = onT - 0.08;
+  // v6: the top comment is the payoff after the sponsor's card (their card keeps its three seconds)
+  const cmA = Math.max(s('comment') - 0.06, CLOSE + 3.0), whenT = w('comment', 2), lowT = w('comment', 4), theirT = w('comment', 6), bestT = w('comment', 7), litT = w('comment', 8);
+  const ctA = s('cta') - 0.06, howT = w('cta', 1), q2800T = w('cta', 6);
 
   // ======================= HOOK (rules 1, 28, 57, 72): the summit, and someone at its edge =======================
   // number one is the summit above the clouds: Magnus on the throne at the far side of the board, the chair across empty
   shot(0, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.24, -0.14, 17, [4.1, 3.3, 8.9]), K(0.14, -0.08, 13, [4, 3.4, 9.1]));  // low, through his pieces: the king above the clouds
-    summit(g, t, sunny(t, { wChair: false }));
+    cam(lt, t, sh, K(0.24, -0.14, 14.2, [4.1, 3.55, 8.9]), K(0.14, -0.08, 11.2, [4, 3.65, 9.1]));  // low, through his pieces: the king above the clouds (v6: closer, the face reads on the first frame)
+    summit(g, t + 0.5, sunny(t + 0.5, { wChair: false }));  // half a second on: his blink at 0.03 s fell on the opening frames
   }, { kb: 0, grade: 'warm', hud: (g, lt, t) => counter(g, '#1', 'IN THE WORLD', { y: 300, size: 190, color: GOLD, at: [t, 0.05] }) });
   cue(0, 'wind_barren', 0.35); cue(0.05, 'shimmer', 0.3);
   // "five points": a hand on the rim, Caruana rises over the edge of the summit
@@ -3494,8 +3544,8 @@ export async function build(T) {
   const PH2 = [4, 4.2, 2.4];
   shot(inA, (g, lt, t, sh) => {
     cam(lt, t, sh, KE([4, 3.6, -3], [4, 2.6, 10]), KE([4, 3.0, 1.8], [4, 2.4, 10]));
-    nightRoom(g, t, { e: 'worried', night: '#4C5E96', glow: 1.35 });
-  }, { kb: 0, grade: 'night' });
+    nightRoom(g, t, { e: 'worried', night: '#6A7FBE', glow: 1.9 });
+  }, { kb: 0, grade: 'night', hud: (g, lt, t) => searchBar(g, 'is the carlsen era over', W / 2, 470, (t - inA - 0.12) / (S18b - inA - 0.3), t) });
   cue(inA - 0.03, 'whoosh_soft', 0.3); cue(inA, 'wind', 0.2); cue(askT, 'notify', 0.4);
   // "is the Carlsen era over?": what you are reading, the paper on your phone
   const S18b = carlT - 0.25;
@@ -3658,19 +3708,22 @@ export async function build(T) {
   }, { kb: 0, qaAllow: ['face cut by frame'], grade: 'gold', hud: (g, lt, t) => { if (t >= onlyT) badge(g, 'ONLY ONE', W / 2, 300, { color: GOLD, size: 70, ...popW(t, onlyT) }); } });
   cue(S35, 'whoosh_deep', 0.35); cue(onlyT, 'stamp', 0.4);
   // "above 2800": a crane from the others on the slope up past the ring to the summit
-  const S36 = n2800T - 0.06;
+  const S36 = n2800T - 0.06, chipT = n2800T + 0.3, chip = (g, t) => lockChip(g, t, chipT, cmA);  // v6: the locked top comment
   shot(S36, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0, 0.12, 20, [5, -6, -4]), K(0, 0.14, 24, [4.5, 1.0, 6]));
     summit(g, t, sunny(t, { cl: -14, ring: { y: -4.6 }, climbers: CLIMB3, wChair: false, after: g2 => { if (t >= n2800T) ringLabel(g2, -4.6, { side: 0.3, scale: 1.35 * popW(t, n2800T).scale }); } }));
-  }, { kb: 0, qaAllow: ['face cut by frame'], grade: 'gold' });
-  cue(S36, 'whoosh_soft', 0.3); cue(n2800T, 'reveal_bell', 0.35);
+  }, { kb: 0, qaAllow: ['face cut by frame'], grade: 'gold', hud: (g, lt, t) => chip(g, t) });
+  cue(S36, 'whoosh_soft', 0.3); cue(n2800T, 'reveal_bell', 0.35); cue(chipT, 'clack', 0.4); cue(chipT + 0.02, 'notify', 0.3);
 
   // ======================= THE TOP COMMENT, LITERALLY: two plinths of rating on a dark stage (NOV 2026, LIVE) =======================
   shot(cmA, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0, 0.1, 20, [4, 0.6, 8], { cy: 790 }), K(0, 0.09, 18, [4, 0.8, 8], { cy: 790 }));
     plinths(g, t, { hm: 0, hf: 0, line: 0 });
-  }, { kb: 0, hud: (g, lt, t) => commentCard(g, 'When your lowest is their best.', '20K', W / 2, 1600, { size: 44, w: 920, label: 'TOP COMMENT', scale: lerp(1.1, 1, ease.back(clamp((t - cmA - 0.1) / 0.25))) }) });
-  cue(cmA, 'notify', 0.45);
+  }, { kb: 0, hud: (g, lt, t) => {  // the chip flies out of its corner and opens
+    const u = ease.out(clamp((t - cmA) / 0.3)), bounce = 1 + 0.05 * Math.sin(Math.PI * clamp((t - cmA - 0.3) / 0.22));
+    commentBig(g, ['When your lowest', 'is their best.'], '20K', lerp(W - 200, W / 2, u), lerp(146, 440, u), { label: 'TOP COMMENT', scale: lerp(0.3, 1, u) * bounce });
+  } });
+  cue(cmA, 'success', 0.45); cue(cmA + 0.05, 'notify', 0.4);
   // "when your lowest": his plinth rises, the camera rides up with it to his lowest of the month
   const S38 = whenT - 0.04;
   shot(S38, (g, lt, t, sh) => {
@@ -3692,23 +3745,26 @@ export async function build(T) {
   shot(S40, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0, 0.04, 26, [4, 5.4, 8]), K(0.03, 0.05, 23, [4, 5.6, 8]));
     plinths(g, t, { leds: false, labelX: 4, line: clamp((t - S40) / 0.25) });
-  }, { kb: 0, zoom: kicks([[litT, 0.07]]), hud: (g, lt, t) => { if (t >= litT) stamp(g, 'LITERALLY', W / 2, 1600, t, litT, { color: GOLD, size: 110, rot: -0.1 }); } });
+  }, { kb: 0, zoom: kicks([[litT, 0.07]]), hud: (g, lt, t) => {
+    commentCard(g, 'When your lowest is their best.', '20K', W / 2, 330, { size: 44, w: 920, label: 'TOP COMMENT', scale: lerp(1.1, 1, ease.back(clamp((t - S40 - 0.05) / 0.25))) });  // the comment again, over the proof
+    if (t >= litT) stamp(g, 'LITERALLY', W / 2, 1600, t, litT, { color: GOLD, size: 110, rot: -0.1 });
+  } });
   cue(S40, 'swipe_card', 0.25); cue(litT, 'stamp', 0.45);
 
-  // ======================= THE SPONSOR, IN THE SAME STORY (v5: brilliant moves): the crown falls off the summit to your desk =======================
+  // ======================= THE SPONSOR, IN THE SAME STORY (v5: brilliant moves; v6: shorter, the top comment waits behind it) =======================
   // "One move almost cost Magnus his crown": the crown on his head, close; on "cost" it slips
   shot(a1A, (g, lt, t, sh) => {
     cam(lt, t, sh, K(-0.2, 0.06, 2.6, [4, 4.6, 9.3]), K(-0.06, 0.05, 2.2, [4, 4.6, 9.3]));
     const u = ease.in(clamp((t - cost2T) / 0.5));
     summit(g, t, sunny(t, { eM: t >= cost2T ? EXPR.worried : EX.smug, cr: { rot: 0.5 * u, dx: 40 * u, dy: 60 * u } }));
-  }, { kb: 0, grade: 'warm', qaAllow: ['face cut by frame'], zoom: kicks([[cost2T, 0.05]]) });
+  }, { kb: 0, grade: 'warm', qaAllow: ['face cut by frame'], zoom: kicks([[cost2T, 0.05]]), hud: (g, lt, t) => chip(g, t) });
   cue(a1A - 0.03, 'whoosh_soft', 0.3); cue(cost2T, 'creak', 0.35);
   const S42 = magnT + 0.04, cu42 = t => clamp((t - (S42 + 0.05)) / 1.15);
   shot(S42, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.3, 0.1, 12, [4.5, 4.5, 8])], [0.5, K(0.4, 0.2, 14, [5.2, 1.5, 2])], [len(sh), K(0.5, 0.3, 14, [6, -14, -12])]], { t, e: glide });
     const u = cu42(t), p = [4 + 2 * u, 4.6 + 6 * u - 26 * u * u, 9.3 - 22 * u];
     summit(g, t, sunny(t, { eM: EXPR.shock, crownAt: p, crownK: 1.6, crownRot: u * 8, after: g2 => whiteout(g2, clamp((-9 - B.E[1]) / 4)) }));
-  }, { kb: 0, grade: 'warm' });
+  }, { kb: 0, grade: 'warm', hud: (g, lt, t) => chip(g, t) });
   cue(S42, 'whoosh_deep', 0.4); cue(S42 + 0.4, 'wind', 0.3);
   // it lands on your desk, by your phone (you were in the middle of a game)
   const S43a = a2A - 0.14, LAND = S43a + 0.27, DESK = [2.6, 0.6, 3.2];
@@ -3717,7 +3773,7 @@ export async function build(T) {
     const u = ease.in(clamp((t - S43a) / (LAND - S43a)));
     yourRoom(g, t, { e: t >= LAND ? EXPR.shock : EXPR.focus, crown: { p: [DESK[0], lerp(12, DESK[1], u), DESK[2]], k: 1.4, rot: (1 - u) * 2 }, glow: 0.6, img: recClean(3.6) });  // the report on the phone: no sign-in button on that screen
     whiteout(g, 1 - ease.out(clamp(lt / 0.22)));
-  }, { kb: 0, zoom: kicks([[LAND, 0.06]]), hud: g => adTag(g) });
+  }, { kb: 0, noGuard: true, zoom: kicks([[LAND, 0.06]]), hud: (g, lt, t) => { adTag(g); chip(g, t); } });
   cue(LAND, 'thud', 0.5); cue(LAND + 0.02, 'clack', 0.3);
   // "one brilliant move": your phone from above. The move lands in the app's review and its SIGMA flag comes out (the
   // author's recording at its own speed: the bishop lands at 7.98 s of it, the flag is out by 8.45 s); the camera goes in
@@ -3729,7 +3785,7 @@ export async function build(T) {
     yourRoom(g, t, { e: EXPR.focus, crown: { p: DESK, k: 1.4 }, glow: 1, img: recClean(recB(t)) });
     flagQ = B.project(...FLAGP);
   }, { kb: 0, noGuard: true, zoom: kicks([[flagT, 0.05]]), hud: (g, lt, t) => {
-    adTag(g);
+    adTag(g); chip(g, t);
     const rt = flagT + 0.3;  // the ring round the flag when the camera has arrived
     if (flagQ && t >= rt) { shockwave(g, flagQ.x, flagQ.y, t, rt, { r0: 40, r1: 260, life: 0.5, color: TEAL_HI, lw: 9, squash: 1 }); glint(g, flagQ.x, flagQ.y, t, rt, { r: 220, color: '#E8FFF9' }); }
   } });
@@ -3738,53 +3794,37 @@ export async function build(T) {
   // the meme everyone writes ("bro thinks he's Magnus")
   const S43c = willT - 0.05, wornT = youreT + 0.14, cardT = wornT + 0.1;  // the comment stays on for 1.3 s, long enough to read
   shot(S43c, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.1, 0.1, 10, [4, 3.5, 7.4], { cy: 890 })], [wornT - S43c, K(0.05, 0.08, 8.6, [4, 3.5, 7.4], { cy: 820 })], [len(sh), K(0.0, 0.07, 7.6, [4, 3.5, 7.4], { cy: 770 })]], { t, e: glide });
+    rig(B, lt, [[0, K(0.1, 0.1, 10.6, [4, 3.5, 7.4], { cy: 960 })], [wornT - S43c, K(0.05, 0.08, 8.8, [4, 3.5, 7.4], { cy: 850 })], [len(sh), K(0.0, 0.07, 7.6, [4, 3.5, 7.4], { cy: 780 })]], { t, e: glide });
     const dn = ease.inOut(clamp((t - thinkT) / (wornT - thinkT))), d = t - wornT, sett = d >= 0 ? Math.exp(-d * 9) * Math.sin(d * 26) : 0;
     const oy = lerp(-345, -150, dn) + sett * 9 + (1 - dn) * Math.sin(t * 5) * 5, grip = 1 - ease.inOut(clamp((t - himT + 0.08) / 0.3));
     yourRoom(g, t, { e: t >= wornT ? SIG_E : EXPR.happy, wear: { oy, grip, rot: (1 - dn) * Math.sin(t * 3.1) * 0.05 }, glow: 0.7, img: recClean(3.6) });
     if (t >= wornT) { const hp = B.project(YOU_AT.x, YOU_AT.y, YOU_AT.z), s = hp.s * YOU_AT.k * 1.05 / 100; glint(g, hp.x + 34 * s, hp.y - 176 * s, t, wornT + 0.02, { r: 240 }); }
-  }, { kb: 0, zoom: kicks([[wornT, 0.06]]), hud: (g, lt, t) => {
-    adTag(g);
+  }, { kb: 0, noGuard: true, zoom: kicks([[wornT, 0.06]]), hud: (g, lt, t) => {
+    adTag(g); chip(g, t);
     if (t >= cardT) commentCard(g, 'bro thinks he\'s Magnus', '48.2K', W / 2, 1480, { size: 54, w: 960, scale: lerp(1.12, 1, ease.back(clamp((t - cardT) / 0.25))) });
   } });
   cue(S43c - 0.03, 'whoosh_soft', 0.25); cue(thinkT, 'riser', 0.2); cue(wornT, 'sparkle_pop', 0.4); cue(wornT + 0.02, 'shimmer', 0.3); cue(cardT, 'notify', 0.45);
-  // "Chessigma calls it...": the phone in your hand, the same move in the review; in the pause the camera goes to the
-  // flag on the board, so the word is read before it is said
-  const pushA = callsT - 0.05, pushB = itT + 0.28;
+  // "Chessigma's free, unlimited game reviews find": the phone in your hand, the same move in the review; the camera goes
+  // to the SIGMA flag on the board (their word for a brilliant move, on their own screen)
+  const pushA = freeT - 0.05, pushB = unlT + 0.4;
   shot(a3A, (g, lt, t, sh) => {
     rig(B, lt, [[0, K(0.06, 0.02, 5.6, [4.5, 0.6, 2.2], { cy: H * 0.5 - 270 })], [pushA - a3A, K(0.04, 0.02, 5.3, [4.52, 0.6, 2.2], { cy: H * 0.5 - 260 })],
-      [pushB - a3A, K(0.0, 0.02, 4.7, [4.7, 0.62, 2.2], { cy: H * 0.5 - 190 }), ease.inOut], [len(sh), K(-0.01, 0.02, 4.4, [4.72, 0.6, 2.2], { cy: H * 0.5 - 190 })]], { t, e: glide });
+      [pushB - a3A, K(0.0, 0.02, 4.7, [4.7, 0.62, 2.2], { cy: H * 0.5 - 190 }), ease.inOut], [len(sh), K(-0.01, 0.02, 4.3, [4.72, 0.6, 2.2], { cy: H * 0.5 - 190 })]], { t, e: glide });
     phoneHeld(g, t, recClean(9.7));
   }, { trans: 'whip', kb: 0, noGuard: true, qaAllow: ['text over face'], hud: (g, lt, t) => {  // your face is behind the phone
-    adTag(g);
-    badge(g, 'CHESSIGMA', W / 2, 262, { color: '#F2B33D', size: 60, ...popW(t, a3A + 0.08) });
+    adTag(g); chip(g, t);
+    if (t < freeT) badge(g, 'CHESSIGMA', W / 2, 262, { color: '#F2B33D', size: 60, ...popW(t, a3A + 0.08) });
+    if (t >= freeT) badge(g, 'FREE', 250, 262, { color: LIME, size: 58, ...pop(t, freeT) });
+    if (t >= unlT) badge(g, 'UNLIMITED GAME REVIEWS', 670, 262, { color: CREAM, size: 30, ...popW(t, unlT) });
   } });
-  cue(a3A - 0.04, 'whoosh_fast', 0.3); cue(a3A + 0.08, 'swipe_card', 0.3); cue(pushA, 'riser', 0.2); cue(pushB, 'sparkle_pop', 0.3);
-  // "Sigma.": you, with the crown on, and the look that goes with the word
-  const S44 = sigT - 0.03;
-  shot(S44, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.2, 0.04, 6.4, [4, 3.5, 7.4], { cy: 810 }), K(-0.14, 0.03, 5.7, [4, 3.5, 7.4], { cy: 810 }), lin);
-    yourRoom(g, t, { e: { ...SIG_E, turn: lerp(0.55, 0.22, ease.out(clamp(lt / 0.55))) }, wear: { oy: -150, grip: 0 }, phone: false });
-    desat(g, 0.35); vignette(g, 0.55, 0.42);
-  }, { kb: 0, zoom: kicks([[sigT, 0.08]]), qaAllow: ['face cut by frame'], hud: g => adTag(g) });
-  cue(S44, 'boom_move', 0.55); cue(S44 + 0.02, 'dun_dun', 0.3);
-  // "And its free review finds": on your desk again, the app's own panel "Your brilliant moves" (the games under it blurred)
-  const S45 = a4A + 0.1;
-  shot(S45, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.07, 1.2, 2.5, [6.2, 0.1, 4.0], { cy: 830 }), K(0.01, 1.24, 2.1, [6.2, 0.1, 4.0], { cy: 830 }));
-    yourRoom(g, t, { e: EXPR.focus, glow: 1, img: recClean(0.33) });
-  }, { kb: 0, noGuard: true, hud: (g, lt, t) => {
-    adTag(g);
-    if (t >= free4T) badge(g, 'FREE', W / 2, 262, { color: LIME, size: 64, ...pop(t, free4T) });
-  } });
-  cue(S45 - 0.03, 'whoosh_soft', 0.25); cue(free4T, 'success', 0.35);
+  cue(a3A - 0.04, 'whoosh_fast', 0.3); cue(a3A + 0.08, 'swipe_card', 0.3); cue(freeT, 'success', 0.4); cue(unlT, 'sparkle_pop', 0.3);
   // "93 of Chess.com's 100 brilliant moves": the wall of a hundred; they light up in a run and the count stops at 93
   const S46w = n93T - 0.12, RUN = 0.95, tileAt = k => { const i = LIT93.indexOf(k); return i < 0 ? Infinity : n93T + RUN * (i + 1) / 93; };
   shot(S46w, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0.16, 0.03, 19.2, [4, 7.1, 13], { cy: 835 }), K(0.05, 0.02, 17.6, [4, 7.1, 13], { cy: 835 }));
     tileWall(g, t, tileAt, n100T);
   }, { trans: 'whip', kb: 0, noGuard: true, zoom: kicks([[n93T + RUN, 0.06]]), hud: (g, lt, t) => {
-    adTag(g);
+    adTag(g); chip(g, t);
     const n = LIT93.filter(k => t >= tileAt(k)).length;
     counter(g, `${n}/100`, 'BRILLIANT MOVES FOUND', { y: 292, size: 160, color: n >= 93 ? GOLD : CREAM, at: [t, S46w + 0.05] });
     if (t >= chessT) badge(g, 'CHESSIGMA\'S TEST: 100 FROM CHESS.COM', W / 2, 1480, { color: CREAM, size: 34, ...popW(t, chessT) });
@@ -3798,26 +3838,15 @@ export async function build(T) {
     cam(lt, t, sh, K(-0.15, 0.03, 16.2, [4, 7.1, 13], { cy: 810 }), K(-0.06, 0.02, 15, [4, 7.1, 13], { cy: 810 }));
     barsWall(g, t, lt);
   }, { kb: 0, noGuard: true, zoom: kicks([[otherT, 0.05]]), hud: (g, lt, t) => {
-    adTag(g);
-    if (t >= otherT) badge(g, 'MORE THAN ANY OTHER FREE TOOL', W / 2, 222, { color: GOLD, size: 46, ...popW(t, otherT) });
+    adTag(g); chip(g, t);
+    if (t >= otherT) badge(g, 'MORE THAN ANY OTHER FREE TOOL', W / 2, 246, { color: GOLD, size: 46, ...popW(t, otherT) });
     badge(g, 'CHESSIGMA.COM/BENCHMARKS/BRILLIANT', W / 2, 1480, { color: CREAM, size: 30, a: seg(t, S47 + 0.3, S47 + 0.5) });
   } });
   cue(S47 - 0.03, 'swipe_card', 0.3); cue(S47 + 0.1, 'riser', 0.25); cue(otherT, 'stamp', 0.4);
-  // "Free, unlimited game reviews.": the phone in your hand, the report of a game
-  const revT = t => 3.6 + (t - a5A) * 0.3;  // the report screen of the author's recording
-  shot(a5A, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.0, 0.02, 8.15, [4, 2.0, 2.4], { cy: H * 0.5 - 170 }), K(0.04, 0.02, 7.05, [4, 1.9, 2.2], { cy: H * 0.5 - 170 }));  // the Start review button above the captions
-    phoneHeld(g, t, recClean(revT(t)));
-  }, { trans: 'whip', kb: 0, noGuard: true, hud: (g, lt, t) => {
-    adTag(g);
-    if (t >= freeT) badge(g, 'FREE', 250, 262, { color: LIME, size: 58, ...pop(t, freeT) });
-    if (t >= unlT) badge(g, 'UNLIMITED GAME REVIEWS', 670, 262, { color: CREAM, size: 30, ...popW(t, unlT) });
-  } });
-  cue(a5A - 0.04, 'whoosh_fast', 0.3); cue(freeT, 'success', 0.4); cue(unlT, 'sparkle_pop', 0.3);
   // their 3-second end card as it is (logo, 2M+ players, the store badges): flat, no captions over it
   shot(CLOSE, (g, lt) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
     { flat: true, noGuard: true, noCaptions: true, hud: (g, lt, t) => {
-      adTag(g);
+      adTag(g); chip(g, t);
       if (t >= linkT - 0.05) badge(g, 'LINK IN BIO', W / 2, 1462, { color: GOLD, size: 50, ...pop(t, linkT - 0.05) });
     } });
   cue(CLOSE, 'whoosh_soft', 0.3); cue(CLOSE + 0.2, 'reveal_bell', 0.35); cue(linkT, 'sparkle_pop', 0.3);
@@ -3846,15 +3875,15 @@ export async function build(T) {
   const music = [
     { t: 0, m: 'hook' }, { t: yrA, m: 'glory' }, { t: buA - 0.15, m: 'build' }, { t: ckA, m: 'tension' }, { t: rh8, m: 'drop' },
     { t: crA, m: 'slam' }, { t: inA, m: 'paranoia' }, { t: stA, m: 'tension' }, { t: S23, m: 'void' }, { t: miA, m: 'clockwork' },
-    { t: slipT, m: 'drop' }, { t: loA, m: 'build' }, { t: inT, m: 'victory' }, { t: siA, m: 'glory' }, { t: cmA, m: 'hook' },
-    { t: a1A, m: 'intrigue' }, { t: S43b, m: 'digital' }, { t: S43c, m: 'glory' }, { t: a3A, m: 'digital' }, { t: S46w, m: 'build' }, { t: a5A, m: 'digital' }, { t: ctA, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: slipT, m: 'drop' }, { t: loA, m: 'build' }, { t: inT, m: 'victory' }, { t: siA, m: 'glory' },
+    { t: a1A, m: 'intrigue' }, { t: S43b, m: 'digital' }, { t: S43c, m: 'glory' }, { t: a3A, m: 'digital' }, { t: S46w, m: 'build' }, { t: CLOSE, m: 'digital' }, { t: cmA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: rh8 - 0.3, t1: rh8 - 0.01, kind: 'mute' }, { t0: rh8, t1: crA, kind: 'boost', db: 4 },
     { t0: S23, t1: S26, kind: 'lp', f: 700 },
     { t0: S30, t1: slipT - 0.03, kind: 'mute' },
     { t0: inT - 0.3, t1: inT - 0.01, kind: 'mute' }, { t0: inT, t1: siA, kind: 'boost', db: 4 },
-    { t0: S43a, t1: ctA, kind: 'lp', f: 1200 },
+    { t0: S43a, t1: cmA, kind: 'lp', f: 1200 },
   ];
   shots.sort((a, b) => a.a - b.a);
   return { shots, cues, music, musicFx, tvOff, duration: T.duration, autoWhoosh: false, jumpCut: { every: 1.4, zooms: [1, 1.1, 1.04], shift: 30 } };

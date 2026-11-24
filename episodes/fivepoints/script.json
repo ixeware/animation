@@ -170,21 +170,10 @@
       }
     },
     {
-      "id": "comment",
-      "text": "Top comment: when your lowest is their best. Literally.",
-      "say": "Top comment: [pause] when your lowest... is their best. [pause] Literally.",
-      "pause": 0.45,
-      "colors": {
-        "lowest": "red",
-        "best.": "gold",
-        "Literally.": "lime"
-      }
-    },
-    {
       "id": "ad1",
       "text": "One move almost cost Magnus his crown.",
       "say": "One move almost cost Magnus his crown.",
-      "pause": 0.22,
+      "pause": 0.2,
       "colors": {
         "One": "gold",
         "move": "gold",
@@ -195,7 +184,7 @@
       "id": "ad2",
       "text": "And one brilliant move will make you think you're him.",
       "say": "[mischievously] And one brilliant move... will make you think you're him.",
-      "pause": 0.3,
+      "pause": 0.25,
       "colors": {
         "brilliant": "lime",
         "move": "lime",
@@ -205,26 +194,13 @@
     },
     {
       "id": "ad3",
-      "text": "Chessigma calls it... Sigma.",
-      "say": "Chessigma calls it... [pause] [deadpan] Sigma.",
-      "pause": 0.3,
+      "text": "Chessigma's free, unlimited game reviews find 93 of Chess.com's 100 brilliant moves. More than any other free tool.",
+      "say": "[impressed] Chessigma's free, unlimited game reviews find ninety-three of Chess dot com's one hundred brilliant moves. [pause] More than any other free tool.",
+      "pause": 0.25,
       "colors": {
-        "Chessigma": "gold",
-        "Sigma.": "lime"
-      },
-      "take": 1,
-      "hold": {
-        "after": "it...",
-        "sec": 0.45
-      }
-    },
-    {
-      "id": "ad4",
-      "text": "And its free review finds 93 of Chess.com's 100 brilliant moves. More than any other free tool.",
-      "say": "[impressed] And its free review finds ninety-three of Chess dot com's one hundred brilliant moves. [pause] More than any other free tool.",
-      "pause": 0.3,
-      "colors": {
-        "free": "lime",
+        "Chessigma's": "gold",
+        "free,": "lime",
+        "unlimited": "lime",
         "93": "gold",
         "100": "gold",
         "brilliant": "lime",
@@ -233,16 +209,29 @@
         "any": "gold",
         "other": "gold"
       },
-      "take": 3
+      "take": 1,
+      "tempo": 1.36
     },
     {
-      "id": "ad5",
-      "text": "Free, unlimited game reviews. On the App Store and Google Play. Link in bio.",
-      "say": "Free, unlimited game reviews. On the App Store and Google Play. Link in bio.",
-      "pause": 0.3,
+      "id": "ad4",
+      "text": "On the App Store and Google Play. Link in bio.",
+      "say": "On the App Store and Google Play. Link in bio.",
+      "pause": 0.8,
       "colors": {
-        "Free,": "lime",
-        "unlimited": "lime"
+        "Link": "gold",
+        "bio.": "gold"
+      },
+      "tempo": 1.36
+    },
+    {
+      "id": "comment",
+      "text": "Top comment: when your lowest is their best. Literally.",
+      "say": "Top comment: [pause] when your lowest... is their best. [pause] Literally.",
+      "pause": 0.4,
+      "colors": {
+        "lowest": "red",
+        "best.": "gold",
+        "Literally.": "lime"
       }
     },
     {
@@ -258,5 +247,5 @@
       "take": 1
     }
   ],
-  "_voice_notes": "v3 (20.11.2026): the story was rewritten after the author's notes on draft 2 (rule 76): no GTA; the crown above the clouds, the lock-in meme, the mirror 46 s / 37 s, the top comment as the payoff. Numbers are spelled out in `say` (2800 = twenty-eight hundred). v5 (24.11.2026): the sponsor's block is about brilliant moves (the sponsor's own topic and claim, SOURCES.md): ad1–ad5; takes chosen with tools/voice_check.py (ad2 take 3, ad3 take 1 with a hold before \"Sigma\", ad4 take 3)."
+  "_voice_notes": "v3 (20.11.2026): the story was rewritten after the author's notes on draft 2 (rule 76): no GTA; the crown above the clouds, the lock-in meme, the mirror 46 s / 37 s, the top comment as the payoff. Numbers are spelled out in `say` (2800 = twenty-eight hundred). v5 (24.11.2026): the sponsor's block is about brilliant moves (the sponsor's own topic and claim, SOURCES.md): ad1–ad5; takes chosen with tools/voice_check.py (ad2 take 3, ad3 take 1 with a hold before \"Sigma\", ad4 take 3). v6 (24.11.2026): the ad is four phrases (the 'Sigma' line and the separate free/unlimited sentence are gone, ad3 carries the sponsor's claim), and the top comment comes after the ad as the payoff."
 }
