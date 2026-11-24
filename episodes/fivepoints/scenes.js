@@ -2800,9 +2800,14 @@ function split(g, Lf, Rf) {
 }
 
 // ---------- your room: a desk by the window, your phone on it; the crown lands there ----------
-function yourRoom(g, t, { e = 'focus', crown: cr = null, phone = true, glow = 0, you = true, img = null } = {}) {
+function yourRoom(g, t, { e = 'focus', crown: cr = null, phone = true, glow = 0, you = true, img = null, wear = null } = {}) {
   dayRoom(g, t, {});
-  if (you) actor(g, B, 'you', { x: 4, y: 3.5, z: 7.4, k: 1.15, e, t, face: -1 });
+  if (you) {  // wear (v5): the crown in your hands or on your head, see crownArm
+    const hp = B.project(YOU_AT.x, YOU_AT.y, YOU_AT.z), s = hp.s * YOU_AT.k * 1.05 / 100, on = wear && hp.z > 0.8;
+    if (on) crownSleeves(g, hp, s, t, wear);
+    actor(g, B, 'you', { ...YOU_AT, e, t, face: -1 });
+    if (on) { crownHead(g, hp, YOU_AT.k, t, 'you', e, { dy: wear.oy + 150, rot: wear.rot || 0 }); crownHands(g, hp, s, t, wear); }
+  }
   ab(g, [-2.2, FLOOR_Y + 0.6, 6.0], [10.2, -0.45, 6.3], '#6E5034');  // the back panel of the desk
   ab(g, [-2.2, -0.45, 1.0], [10.2, 0, 6.4], '#8A6440', { spec: 0.15 });  // the desk
   for (const [x, z] of [[-1.8, 1.4], [9.8, 1.4]]) ab(g, [x - 0.18, FLOOR_Y, z - 0.18], [x + 0.18, -0.45, z + 0.18], '#5E4128');
@@ -3136,6 +3141,125 @@ function eraPhoneTex(t, ring = 0) {
 }
 
 
+// ======================= v5 (24.11.2026): THE SPONSOR'S TOPIC, BRILLIANT MOVES, IN THE SAME STORY =======================
+// The author: the sponsor asked for his own topics and the first is brilliant moves («может как то переделать под его
+// идею но с той же идеей»); a nameless player's game from the sponsor's benchmark was turned down («никому это не
+// интересно»). The story of Magnus stays as it is. The crown that falls off the summit lands by your phone; one move in
+// the app's review gets its SIGMA flag (the author's recording, "Bxh3 is sigma"), and you crown yourself: the comment
+// under it is the meme «bro thinks he's Magnus». Then the sponsor's own line (Eliot Hennebo, 18.11.2026: "we find 93 of
+// Chess.com's 100 brilliant moves, more than any other free tool"): a wall of a hundred "!!", 93 of them lit, and the
+// five free tools of their benchmark as bars, the other four unnamed (SOURCES.md).
+const TEAL = '#2FC7AC', TEAL_HI = '#7AD8C6';
+// the author's recording with other people's names covered: the list of games under the panel "Your brilliant moves" is
+// blurred (the recording's first 2.83 s), the two names in the header of a review are painted over, and so are the
+// names under the graph of the report (2.83–5.83 s)
+const RC = makeCanvas(780, 1600), RCX = RC.getContext('2d');
+function recClean(sec) {
+  const img = recFrame('review', sec);
+  RCX.setTransform(1, 0, 0, 1, 0, 0); RCX.filter = 'none'; RCX.drawImage(img, 0, 0, 780, 1600);
+  if (sec < 2.83) { RCX.filter = 'blur(18px)'; RCX.drawImage(img, 0, 650, 780, 950, 0, 650, 780, 950); RCX.filter = 'none'; }
+  else {
+    RCX.fillStyle = '#EEEEEE'; RCX.fillRect(158, 22, 146, 52);
+    RCX.fillStyle = '#101010'; RCX.fillRect(430, 22, 250, 52);
+    if (sec < 5.83) { RCX.fillStyle = '#242424'; RCX.fillRect(96, 466, 136, 44); RCX.fillRect(536, 466, 176, 44); }
+  }
+  return RC;
+}
+// where a point of the recording (px of its 780 × 1600 frame) is on the phone that lies on your desk
+const onDesk = (px, py) => [5.48 + 1.44 * px / 780, 0.13, 4.82 - 2.94 * py / 1600];
+
+// ---------- you and the crown: both sleeves go up behind the head, the hands hold the crown by its sides ----------
+// wear = { oy, grip, rot }: the crown's centre over the head's anchor in the head's own units (-150: on the head),
+// grip 0..1: the hands on the crown (1) or down under the desk (0)
+const YOU_AT = { x: 4, y: 3.5, z: 7.4, k: 1.15 };
+const bobOf = (hp, s, t, who) => Math.sin(t * 1.7 + who.length * 1.7 + hp.x * 0.01) * 4 * s;
+function crownArm(sd, oy, grip) {
+  const k = ease.inOut(clamp(grip)), L = (a, b) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k)];
+  const up = { e: [sd * (228 - Math.max(0, -oy - 150) * 0.12), 250 + (oy - 250) * 0.42], w: [sd * 120, oy + 30], h: [sd * 101, oy + 8] };
+  const down = { e: [sd * 178, 300], w: [sd * 168, 330], h: [sd * 165, 340] };
+  return { s: [sd * 140, 250], e: L(down.e, up.e), w: L(down.w, up.w), h: L(down.h, up.h) };
+}
+function crownSleeves(g, hp, s, t, { oy, grip }) {
+  if (grip <= 0.02) return;
+  const x = hp.x, y = hp.y + bobOf(hp, s, t, 'you'), jacket = CAST.you.suit;
+  g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  for (const [col, lw] of [[mix(jacket, '#000000', 0.35), 66 * s + 6], [jacket, 66 * s]])
+    for (const sd of [-1, 1]) {
+      const a = crownArm(sd, oy, grip); g.strokeStyle = col; g.lineWidth = lw;
+      g.beginPath(); g.moveTo(x + a.s[0] * s, y + a.s[1] * s); g.lineTo(x + a.e[0] * s, y + a.e[1] * s); g.lineTo(x + a.w[0] * s, y + a.w[1] * s); g.stroke();
+    }
+  g.restore();
+}
+function crownHands(g, hp, s, t, { oy, grip }) {
+  if (grip <= 0.02) return;
+  const x = hp.x, y = hp.y + bobOf(hp, s, t, 'you'), skin = skinOf('you').base;
+  for (const sd of [-1, 1]) { const a = crownArm(sd, oy, grip); hand(g, x + a.h[0] * s, y + a.h[1] * s, 33 * s, skin); }
+}
+// the look of a man with a crown on: half-closed eyes, one eyebrow up, a smirk (the "sigma" face)
+const SIG_E = { ...EXPR.smug, lid: 0.52, look: [0, 0.05], browTilt: 0.6, curve: 0.75 };
+
+// ---------- the sponsor's test on a wall: a hundred brilliant moves, a tile each; the ones the review found are lit ----------
+const CWALL = { x0: -1, y1: 12.1, z: 13 };  // the tile (i, j) is centred at (x0 + 0.5 + i, y1 - 0.5 - j)
+const DARK7 = [6, 23, 37, 51, 68, 74, 92];  // the seven it did not find, anywhere on the wall
+const LIT93 = Array.from({ length: 100 }, (_, k) => k).filter(k => !DARK7.includes(k));
+const tileTex = kind => once('tile:' + kind, 128, 128, (x, w, h) => {
+  const on = kind !== 'off';
+  if (on) { const gr = x.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, kind === 'flash' ? '#FFFFFF' : '#49E2C6'); gr.addColorStop(1, kind === 'flash' ? '#C9FFF3' : '#1FA890'); x.fillStyle = gr; }
+  else x.fillStyle = '#1B2231';
+  x.beginPath(); x.roundRect(6, 6, w - 12, h - 12, 22); x.fill();
+  if (!on) { x.strokeStyle = '#2D3850'; x.lineWidth = 4; x.stroke(); }
+  x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = sans(84, 900); x.letterSpacing = '2px';
+  x.fillStyle = kind === 'off' ? '#3D4B66' : kind === 'flash' ? '#12806C' : '#FFFFFF'; x.fillText('!!', w / 2 + 1, h / 2 + 6);
+});
+function claimStage(g, t, glow = 0) {
+  const E = B.E, zw = 22;
+  g.fillStyle = '#05060B'; g.fillRect(0, 0, W, H);
+  if (E[1] > FLOOR_Y) tiled(g, [-34, FLOOR_Y, -30], [80, 0, 0], [0, 0, zw + 30], { color: '#0C0E16', grout: 'rgba(140,160,255,0.07)', tu: 3, tv: 3,
+    light: g2 => pool(g2, B, 4, FLOOR_Y + 0.02, CWALL.z - 4.5, 9, TEAL_HI, 0.1 + 0.2 * glow) });
+  if (E[2] < zw) tiled(g, [-34, FLOOR_Y, zw], [80, 0, 0], [0, 34, 0], { color: '#090C18', grout: 'rgba(120,140,255,0.05)', tu: 4, tv: 4 });
+  const { x0, y1, z } = CWALL;
+  for (const x of [x0 + 1.2, x0 + 8.8]) ab(g, [x - 0.25, FLOOR_Y, z + 0.1], [x + 0.25, y1 - 10, z + 0.6], '#10131C', { spec: 0.3 });  // the legs
+  ab(g, [x0 - 0.45, y1 - 10.45, z], [x0 + 10.45, y1 + 0.45, z + 0.7], '#0B0D14', { spec: 0.3 });  // the body of the wall
+}
+// litAt(k): when the k-th tile (0..99, row by row) lights up, or Infinity; sheenT: a glint runs over the lit tiles
+function tileWall(g, t, litAt, sheenT = Infinity) {
+  claimStage(g, t, clamp(LIT93.filter(k => t >= litAt(k)).length / 93));
+  const { x0, y1, z } = CWALL, zf = z - 0.02;
+  for (let k = 0; k < 100; k++) {
+    const i = k % 10, j = Math.floor(k / 10), cx = x0 + 0.5 + i, cy = y1 - 0.5 - j, dt = t - litAt(k);
+    const on = dt >= 0, sheen = on && Math.abs((i + j) / 18 - (t - sheenT) / 0.5) < 0.06;
+    const fl = (on && dt < 0.1) || sheen, h = 0.43 * (on ? 1 + 0.3 * Math.exp(-dt * 16) : 1) * (sheen ? 1.08 : 1);
+    texQuad(g, tileTex(fl ? 'flash' : on ? 'on' : 'off'), [cx - h, cy + h, zf], [cx + h, cy + h, zf], [cx - h, cy - h, zf], { under: false });
+  }
+  lowKey(g, { cy: H * 0.46, a: 0.1 });
+}
+// the five free review tools of the sponsor's benchmark as bars on the same wall: brilliant moves found out of 100.
+// One accent for the sponsor and a neutral grey for the other four, every bar with its number (the others unnamed)
+const BARS_T = makeCanvas(1200, 1200), BARS = [['CHESSIGMA', 93], [null, 90], [null, 45], [null, 41], [null, 23]];
+function barsTex(lt) {
+  const x = BARS_T.getContext('2d'), w = 1200, h = 1200; x.setTransform(1, 0, 0, 1, 0, 0);
+  x.fillStyle = '#080A11'; x.fillRect(0, 0, w, h); x.textBaseline = 'middle';
+  x.textAlign = 'left'; x.font = sans(74, 900); x.letterSpacing = '5px'; x.fillStyle = CREAM; x.fillText('BRILLIANT MOVES FOUND', 80, 112);
+  x.font = sans(50, 800); x.letterSpacing = '5px'; x.fillStyle = '#9AA4B8'; x.fillText('OUT OF 100 FROM CHESS.COM', 80, 196);
+  const X0 = 80, FULL = 850;
+  BARS.forEach(([name, v], i) => {
+    const me = i === 0, y = me ? 426 : 700 + (i - 1) * 128, th = me ? 112 : 84, u = ease.out(clamp((lt - 0.08 - i * 0.07) / 0.5)), bw = Math.max(8, FULL * v / 100 * u);
+    if (me) { x.font = sans(68, 900); x.letterSpacing = '6px'; x.fillStyle = CREAM; x.fillText(name, X0, y - 104); }
+    x.fillStyle = me ? GOLD : '#5F6A80'; x.beginPath(); x.roundRect(X0, y - th / 2, bw, th, [0, 8, 8, 0]); x.fill();
+    if (me) { x.save(); x.shadowColor = GOLD; x.shadowBlur = 40; x.globalAlpha = 0.5 * u; x.fill(); x.restore(); }
+    x.font = mono(me ? 116 : 86, 800); x.letterSpacing = '0px'; x.fillStyle = me ? '#FFFFFF' : '#C6CEDC'; x.fillText(String(Math.round(v * u)), X0 + bw + 26, y + 4);
+  });
+  x.font = sans(50, 800); x.letterSpacing = '5px'; x.fillStyle = '#9AA4B8'; x.fillText('OTHER FREE TOOLS', X0, 600);
+  ledGrid(x, w, h, 10);
+  return BARS_T;
+}
+function barsWall(g, t, lt) {
+  claimStage(g, t, 0.6);
+  const { x0, y1, z } = CWALL;
+  texQuad(g, barsTex(lt), [x0, y1, z - 0.02], [x0 + 10, y1, z - 0.02], [x0, y1 - 10, z - 0.02], { under: false });
+  lowKey(g, { cy: H * 0.46, a: 0.1 });
+}
+
 export async function build(T) {
   const s = id => T.s(id), w = (id, k) => T.w(id, k).s;
   const cues = [];
@@ -3182,8 +3306,11 @@ export async function build(T) {
   const loA = s('lock') - 0.06, needT = w('lock', 3), heT = w('lock', 4), inT = w('lock', 6);
   const siA = s('still') - 0.06, one2T = w('still', 2), st2T = w('still', 3), onlyT = w('still', 5), n2800T = w('still', 8);
   const cmA = s('comment') - 0.06, whenT = w('comment', 2), lowT = w('comment', 4), theirT = w('comment', 6), bestT = w('comment', 7), litT = w('comment', 8);
-  const a1A = s('ad1') - 0.06, cost2T = w('ad1', 3), magnT = w('ad1', 4), wantT = w('ad1', 7), findT = w('ad1', 9), costingT = w('ad1', 13);
-  const a2A = s('ad2') - 0.06, freeT = w('ad2', 4), unlT = w('ad2', 6), onT = w('ad2', 7), linkT = w('ad2', 14), CLOSE = onT - 0.08;
+  const a1A = s('ad1') - 0.06, cost2T = w('ad1', 3), magnT = w('ad1', 4);
+  const a2A = s('ad2') - 0.06, brilT = w('ad2', 2), willT = w('ad2', 4), thinkT = w('ad2', 7), youreT = w('ad2', 8), himT = w('ad2', 9);
+  const a3A = s('ad3') - 0.06, callsT = w('ad3', 1), itT = w('ad3', 2), sigT = w('ad3', 3);
+  const a4A = s('ad4') - 0.06, free4T = w('ad4', 2), n93T = w('ad4', 5), chessT = w('ad4', 7), n100T = w('ad4', 8), moreT = w('ad4', 11), otherT = w('ad4', 14);
+  const a5A = s('ad5') - 0.06, freeT = w('ad5', 0), unlT = w('ad5', 1), onT = w('ad5', 4), linkT = w('ad5', 11), CLOSE = onT - 0.08;
   const ctA = Math.max(s('cta') - 0.06, CLOSE + 3.0), howT = w('cta', 1), q2800T = w('cta', 6);
 
   // ======================= HOOK (rules 1, 28, 57, 72): the summit, and someone at its edge =======================
@@ -3568,7 +3695,7 @@ export async function build(T) {
   }, { kb: 0, zoom: kicks([[litT, 0.07]]), hud: (g, lt, t) => { if (t >= litT) stamp(g, 'LITERALLY', W / 2, 1600, t, litT, { color: GOLD, size: 110, rot: -0.1 }); } });
   cue(S40, 'swipe_card', 0.25); cue(litT, 'stamp', 0.45);
 
-  // ======================= THE SPONSOR, IN THE SAME STORY: the crown falls off the summit onto your desk =======================
+  // ======================= THE SPONSOR, IN THE SAME STORY (v5: brilliant moves): the crown falls off the summit to your desk =======================
   // "One move almost cost Magnus his crown": the crown on his head, close; on "cost" it slips
   shot(a1A, (g, lt, t, sh) => {
     cam(lt, t, sh, K(-0.2, 0.06, 2.6, [4, 4.6, 9.3]), K(-0.06, 0.05, 2.2, [4, 4.6, 9.3]));
@@ -3583,31 +3710,110 @@ export async function build(T) {
     summit(g, t, sunny(t, { eM: EXPR.shock, crownAt: p, crownK: 1.6, crownRot: u * 8, after: g2 => whiteout(g2, clamp((-9 - B.E[1]) / 4)) }));
   }, { kb: 0, grade: 'warm' });
   cue(S42, 'whoosh_deep', 0.4); cue(S42 + 0.4, 'wind', 0.3);
-  // "Want to find the move that's costing you games?": the crown lands on your desk, by your phone
-  const S43a = wantT - 0.06, LAND = 58.1;
+  // it lands on your desk, by your phone (you were in the middle of a game)
+  const S43a = a2A - 0.14, LAND = S43a + 0.27, DESK = [2.6, 0.6, 3.2];
   shot(S43a, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.15, 0.25, 12, [4, 1.5, 4]), K(0.08, 0.3, 10, [4, 1.2, 3.6]), glide, { bump: t >= LAND ? Math.exp(-(t - LAND) * 6) : 0 });
+    cam(lt, t, sh, K(0.15, 0.25, 11.4, [4, 1.5, 4]), K(0.11, 0.27, 10.6, [4, 1.3, 3.8]), glide, { bump: t >= LAND ? Math.exp(-(t - LAND) * 6) : 0 });
     const u = ease.in(clamp((t - S43a) / (LAND - S43a)));
-    yourRoom(g, t, { e: t >= findT ? EXPR.focus : EXPR.shock, crown: { p: [2.6, lerp(12, 0.6, u), 3.2], k: 1.4, rot: (1 - u) * 2 }, glow: clamp((t - findT) / 0.5) * 0.6 });
-    whiteout(g, 1 - ease.out(clamp(lt / 0.25)));
+    yourRoom(g, t, { e: t >= LAND ? EXPR.shock : EXPR.focus, crown: { p: [DESK[0], lerp(12, DESK[1], u), DESK[2]], k: 1.4, rot: (1 - u) * 2 }, glow: 0.6, img: recClean(7.6) });
+    whiteout(g, 1 - ease.out(clamp(lt / 0.22)));
   }, { kb: 0, zoom: kicks([[LAND, 0.06]]), hud: g => adTag(g) });
   cue(LAND, 'thud', 0.5); cue(LAND + 0.02, 'clack', 0.3);
-  const S43b = costingT - 0.04, revT = t => 3.6 + (t - S43b) * 0.3;  // the report screen of the author's recording
+  // "one brilliant move": your phone from above. The move lands in the app's review and its SIGMA flag comes out (the
+  // author's recording at its own speed: the bishop lands at 7.98 s of it, the flag is out by 8.45 s); the camera goes in
+  const S43b = brilT - 0.04, recB = t => 7.98 + (t - brilT), flagT = brilT + 0.4, FLAGP = onDesk(700, 1000);
+  let flagQ = null;
   shot(S43b, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.08, 1.12, 4.6, [6.2, 0.1, 3.35], { cy: H * 0.5 - 200 }), K(0.02, 1.2, 3.7, [6.2, 0.1, 3.35], { cy: H * 0.5 - 210 }));  // the Start review button above the captions
-    yourRoom(g, t, { e: EXPR.focus, crown: { p: [2.6, 0.6, 3.2], k: 1.4 }, glow: lerp(0.6, 1, clamp(lt / 0.5)), img: recFrame('review', revT(t)) });
-  }, { kb: 0, noGuard: true, hud: g => adTag(g) });
-  cue(S43b - 0.03, 'whoosh_soft', 0.25); cue(S43b + 0.15, 'swipe_card', 0.3);
-  shot(a2A, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.08, 1.12, 4.3, [6.2, 0.1, 3.35], { cy: H * 0.5 - 200 })], [flagT - S43b - 0.12, K(0.06, 1.15, 4.0, [6.2, 0.1, 3.32], { cy: H * 0.5 - 200 })],
+      [flagT - S43b + 0.3, K(0.02, 1.22, 2.3, [6.42, 0.1, 2.9], { cy: H * 0.5 - 310 }), ease.out], [len(sh), K(0.0, 1.24, 2.15, [6.42, 0.1, 2.9], { cy: H * 0.5 - 310 })]], { t, e: glide });
+    yourRoom(g, t, { e: EXPR.focus, crown: { p: DESK, k: 1.4 }, glow: 1, img: recClean(recB(t)) });
+    flagQ = B.project(...FLAGP);
+  }, { kb: 0, noGuard: true, zoom: kicks([[flagT, 0.05]]), hud: (g, lt, t) => {
+    adTag(g);
+    const rt = flagT + 0.3;  // the ring round the flag when the camera has arrived
+    if (flagQ && t >= rt) { shockwave(g, flagQ.x, flagQ.y, t, rt, { r0: 40, r1: 260, life: 0.5, color: TEAL_HI, lw: 9, squash: 1 }); glint(g, flagQ.x, flagQ.y, t, rt, { r: 220, color: '#E8FFF9' }); }
+  } });
+  cue(S43b - 0.03, 'whoosh_soft', 0.25); cue(brilT, 'clack', 0.35); cue(flagT - 0.1, 'whoosh_fast', 0.3); cue(flagT + 0.3, 'success', 0.45); cue(flagT + 0.34, 'sparkle_pop', 0.35);
+  // "will make you think you're him": you hold the crown over your head and put it on; the comment under the scene is
+  // the meme everyone writes ("bro thinks he's Magnus")
+  const S43c = willT - 0.05, wornT = youreT + 0.14, cardT = himT + 0.12;
+  shot(S43c, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.1, 0.1, 10, [4, 3.5, 7.4], { cy: 890 })], [wornT - S43c, K(0.05, 0.08, 8.6, [4, 3.5, 7.4], { cy: 820 })], [len(sh), K(0.0, 0.07, 7.6, [4, 3.5, 7.4], { cy: 770 })]], { t, e: glide });
+    const dn = ease.inOut(clamp((t - thinkT) / (wornT - thinkT))), d = t - wornT, sett = d >= 0 ? Math.exp(-d * 9) * Math.sin(d * 26) : 0;
+    const oy = lerp(-345, -150, dn) + sett * 9 + (1 - dn) * Math.sin(t * 5) * 5, grip = 1 - ease.inOut(clamp((t - himT + 0.08) / 0.3));
+    yourRoom(g, t, { e: t >= wornT ? SIG_E : EXPR.happy, wear: { oy, grip, rot: (1 - dn) * Math.sin(t * 3.1) * 0.05 }, glow: 0.7, img: recClean(9.6) });
+    if (t >= wornT) { const hp = B.project(YOU_AT.x, YOU_AT.y, YOU_AT.z), s = hp.s * YOU_AT.k * 1.05 / 100; glint(g, hp.x + 34 * s, hp.y - 176 * s, t, wornT + 0.02, { r: 240 }); }
+  }, { kb: 0, zoom: kicks([[wornT, 0.06]]), hud: (g, lt, t) => {
+    adTag(g);
+    if (t >= cardT) commentCard(g, 'bro thinks he\'s Magnus', '48.2K', W / 2, 1480, { size: 54, w: 960, scale: lerp(1.12, 1, ease.back(clamp((t - cardT) / 0.25))) });
+  } });
+  cue(S43c - 0.03, 'whoosh_soft', 0.25); cue(thinkT, 'riser', 0.2); cue(wornT, 'sparkle_pop', 0.4); cue(wornT + 0.02, 'shimmer', 0.3); cue(cardT, 'notify', 0.45);
+  // "Chessigma calls it...": the phone in your hand, the same move in the review; in the pause the camera goes to the
+  // flag on the board, so the word is read before it is said
+  const pushA = callsT - 0.05, pushB = itT + 0.28;
+  shot(a3A, (g, lt, t, sh) => {
+    rig(B, lt, [[0, K(0.05, 0.02, 7.7, [4, 2.0, 2.4], { cy: H * 0.5 - 170 })], [pushA - a3A, K(0.03, 0.02, 7.3, [4, 1.95, 2.3], { cy: H * 0.5 - 170 })],
+      [pushB - a3A, K(0.0, 0.02, 4.7, [4.7, 0.62, 2.2], { cy: H * 0.5 - 190 }), ease.inOut], [len(sh), K(-0.01, 0.02, 4.4, [4.72, 0.6, 2.2], { cy: H * 0.5 - 190 })]], { t, e: glide });
+    phoneHeld(g, t, recClean(9.7));
+  }, { trans: 'whip', kb: 0, noGuard: true, qaAllow: ['text over face'], hud: (g, lt, t) => {  // your face is behind the phone
+    adTag(g);
+    badge(g, 'CHESSIGMA', W / 2, 262, { color: '#F2B33D', size: 60, ...popW(t, a3A + 0.08) });
+  } });
+  cue(a3A - 0.04, 'whoosh_fast', 0.3); cue(a3A + 0.08, 'swipe_card', 0.3); cue(pushA, 'riser', 0.2); cue(pushB, 'sparkle_pop', 0.3);
+  // "Sigma.": you, with the crown on, and the look that goes with the word
+  const S44 = sigT - 0.03;
+  shot(S44, (g, lt, t, sh) => {
+    cam(lt, t, sh, K(-0.2, 0.04, 6.4, [4, 3.5, 7.4], { cy: 810 }), K(-0.14, 0.03, 5.7, [4, 3.5, 7.4], { cy: 810 }), lin);
+    yourRoom(g, t, { e: { ...SIG_E, turn: lerp(0.55, 0.22, ease.out(clamp(lt / 0.55))) }, wear: { oy: -150, grip: 0 }, phone: false });
+    desat(g, 0.35); vignette(g, 0.55, 0.42);
+  }, { kb: 0, zoom: kicks([[sigT, 0.08]]), qaAllow: ['face cut by frame'] });
+  cue(S44, 'boom_move', 0.55); cue(S44 + 0.02, 'dun_dun', 0.3);
+  // "And its free review finds": on your desk again, the app's own panel "Your brilliant moves" (the games under it blurred)
+  const S45 = a4A + 0.1;
+  shot(S45, (g, lt, t, sh) => {
+    cam(lt, t, sh, K(0.07, 1.2, 2.5, [6.2, 0.1, 4.0], { cy: 830 }), K(0.01, 1.24, 2.1, [6.2, 0.1, 4.0], { cy: 830 }));
+    yourRoom(g, t, { e: EXPR.focus, glow: 1, img: recClean(0.33) });
+  }, { kb: 0, noGuard: true, hud: (g, lt, t) => {
+    adTag(g);
+    if (t >= free4T) badge(g, 'FREE', W / 2, 262, { color: LIME, size: 64, ...pop(t, free4T) });
+  } });
+  cue(S45 - 0.03, 'whoosh_soft', 0.25); cue(free4T, 'success', 0.35);
+  // "93 of Chess.com's 100 brilliant moves": the wall of a hundred; they light up in a run and the count stops at 93
+  const S46w = n93T - 0.12, RUN = 0.95, tileAt = k => { const i = LIT93.indexOf(k); return i < 0 ? Infinity : n93T + RUN * (i + 1) / 93; };
+  shot(S46w, (g, lt, t, sh) => {
+    cam(lt, t, sh, K(0.16, 0.03, 19.2, [4, 7.1, 13], { cy: 835 }), K(0.05, 0.02, 17.6, [4, 7.1, 13], { cy: 835 }));
+    tileWall(g, t, tileAt, n100T);
+  }, { trans: 'whip', kb: 0, noGuard: true, zoom: kicks([[n93T + RUN, 0.06]]), hud: (g, lt, t) => {
+    adTag(g);
+    const n = LIT93.filter(k => t >= tileAt(k)).length;
+    counter(g, `${n}/100`, 'BRILLIANT MOVES FOUND', { y: 292, size: 160, color: n >= 93 ? GOLD : CREAM, at: [t, S46w + 0.05] });
+    if (t >= chessT) badge(g, 'CHESSIGMA\'S TEST: 100 FROM CHESS.COM', W / 2, 1480, { color: CREAM, size: 34, ...popW(t, chessT) });
+  } });
+  cue(S46w - 0.04, 'whoosh_fast', 0.3); cue(n93T - 0.02, 'riser', 0.3);
+  for (let k = 0; k < 8; k++) cue(n93T + RUN * k / 8, 'clock_tick', 0.2);
+  cue(n93T + RUN, 'reveal_bell', 0.45); cue(n93T + RUN + 0.03, 'shimmer', 0.3);
+  // "More than any other free tool.": the same wall, the five free tools of their benchmark as bars
+  const S47 = moreT - 0.1;
+  shot(S47, (g, lt, t, sh) => {
+    cam(lt, t, sh, K(-0.15, 0.03, 16.2, [4, 7.1, 13], { cy: 810 }), K(-0.06, 0.02, 15, [4, 7.1, 13], { cy: 810 }));
+    barsWall(g, t, lt);
+  }, { kb: 0, noGuard: true, zoom: kicks([[otherT, 0.05]]), hud: (g, lt, t) => {
+    adTag(g);
+    if (t >= otherT) badge(g, 'MORE THAN ANY OTHER FREE TOOL', W / 2, 222, { color: GOLD, size: 46, ...popW(t, otherT) });
+    badge(g, 'CHESSIGMA.COM/BENCHMARKS/BRILLIANT', W / 2, 1480, { color: CREAM, size: 30, a: seg(t, S47 + 0.3, S47 + 0.5) });
+  } });
+  cue(S47 - 0.03, 'swipe_card', 0.3); cue(S47 + 0.1, 'riser', 0.25); cue(otherT, 'stamp', 0.4);
+  // "Free, unlimited game reviews.": the phone in your hand, the report of a game
+  const revT = t => 3.6 + (t - a5A) * 0.3;  // the report screen of the author's recording
+  shot(a5A, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0.0, 0.02, 8.15, [4, 2.0, 2.4], { cy: H * 0.5 - 170 }), K(0.04, 0.02, 7.05, [4, 1.9, 2.2], { cy: H * 0.5 - 170 }));  // the Start review button above the captions
-    phoneHeld(g, t, recFrame('review', revT(t)));
+    phoneHeld(g, t, recClean(revT(t)));
   }, { trans: 'whip', kb: 0, noGuard: true, hud: (g, lt, t) => {
     adTag(g);
-    if (t < freeT) badge(g, 'CHESSIGMA', W / 2, 262, { color: '#F2B33D', size: 60, ...popW(t, a2A + 0.08) });
     if (t >= freeT) badge(g, 'FREE', 250, 262, { color: LIME, size: 58, ...pop(t, freeT) });
     if (t >= unlT) badge(g, 'UNLIMITED GAME REVIEWS', 670, 262, { color: CREAM, size: 30, ...popW(t, unlT) });
   } });
-  cue(a2A - 0.04, 'whoosh_fast', 0.3); cue(freeT, 'success', 0.4); cue(unlT, 'sparkle_pop', 0.3);
+  cue(a5A - 0.04, 'whoosh_fast', 0.3); cue(freeT, 'success', 0.4); cue(unlT, 'sparkle_pop', 0.3);
   // their 3-second end card as it is (logo, 2M+ players, the store badges): flat, no captions over it
   shot(CLOSE, (g, lt) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
     { flat: true, noGuard: true, noCaptions: true, hud: (g, lt, t) => {
@@ -3641,7 +3847,7 @@ export async function build(T) {
     { t: 0, m: 'hook' }, { t: yrA, m: 'glory' }, { t: buA - 0.15, m: 'build' }, { t: ckA, m: 'tension' }, { t: rh8, m: 'drop' },
     { t: crA, m: 'slam' }, { t: inA, m: 'paranoia' }, { t: stA, m: 'tension' }, { t: S23, m: 'void' }, { t: miA, m: 'clockwork' },
     { t: slipT, m: 'drop' }, { t: loA, m: 'build' }, { t: inT, m: 'victory' }, { t: siA, m: 'glory' }, { t: cmA, m: 'hook' },
-    { t: a1A, m: 'intrigue' }, { t: a2A, m: 'digital' }, { t: ctA, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: a1A, m: 'intrigue' }, { t: S43b, m: 'digital' }, { t: S43c, m: 'glory' }, { t: a3A, m: 'digital' }, { t: S46w, m: 'build' }, { t: a5A, m: 'digital' }, { t: ctA, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: rh8 - 0.3, t1: rh8 - 0.01, kind: 'mute' }, { t0: rh8, t1: crA, kind: 'boost', db: 4 },

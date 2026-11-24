@@ -89,7 +89,26 @@ goat и он забрал его титул, никто не близко, ка�
 - Кит для авторов: можно «free unlimited game reviews», «on the App Store and Google Play»; значки сторов один раз,
   App Store первым; финальная карточка — их файл. Ссылка в био:
   `https://www.chessigma.com/go/app/the64files?utm_content=fivepoints`.
-- Связка с историей (версия 3): «One move almost cost Magnus his crown. Want to find the move that's costing you games?» —
+- **Версия 5 (24.11.2026): тема спонсора — brilliant moves.** Элиот, письмо 18.11.2026: «Our brilliant detection is the
+  best on the market alongside Chess.com, and it is free: we find 93 of Chess.com's 100 brilliant moves, more than any
+  other free tool». Его данные: 100 настоящих бриллиантов Chess.com прогнали через все бесплатные разборы — Chessigma
+  нашёл 93, остальные 90, 45, 41 и 23. Страница теста:
+  [chessigma.com/benchmarks/brilliant](https://www.chessigma.com/benchmarks/brilliant) (проверено 24.11.2026: Chess.com
+  100/100 «answer key», Chessigma 93/100, дальше 90, 45, 41, 23).
+  - В ролике это его слова: «its free review finds 93 of Chess.com's 100 brilliant moves. More than any other free
+    tool.» Стена из 100 «!!», горят 93; на диаграмме пять бесплатных разборов, четыре других без имён.
+  - Связка с историей: «One move almost cost Magnus his crown. And one brilliant move will make you think you're him.»
+    Корона падает на стол зрителя, он сам себя коронует. Комментарий «bro thinks he's Magnus» — мем, не цитата
+    конкретного человека; число лайков на карточке выдумано.
+  - «Chessigma calls it... Sigma.» — Sigma у них и есть оценка бриллиантового хода: экран разбора пишет «Bxh3 is sigma»
+    и ставит флажок SIGMA !!, а панель называется «Your brilliant moves».
+  - В решающей партии Магнуса бриллианта не было: Stockfish (глубина 18) по всем ходам белых жертв не нашёл, а
+    29...Na4 Артемьева — тихий ход. Ходы Магнуса бриллиантовыми не называем.
+  - Экран — запись автора `photos/rec/review.mp4`: панель «Your brilliant moves» (0–2,8 с), отчёт (2,8–5,8 с), ход Bxh3
+    с флажком SIGMA (с 7,9 с). Чужие ники закрыты (`recClean` в `scenes.js`).
+  - В записи вход не выполнен: под комментарием тренера кнопка «Sign in for free». Элиот просил показывать разбор
+    залогиненным (13.11.2026), поэтому кадрируем без кнопки. Лучше переснять этот ход залогиненным.
+- Связка с историей (версия 3, до версии 5): «One move almost cost Magnus his crown. Want to find the move that's costing you games?» —
   дальше запись приложения автора (`photos/rec/review.mp4`) и их карточка. Магнуса и других реальных людей в кадре с
   продуктом нет: разбор его партий в Chessigma не показываем.
 - Обе партии импортированы на chessigma.com (PGN): Карлсен — Артемьев `chessigma.com/games/ff53cbdb-47e7-4fa9-a852-51c0f42305ea`,

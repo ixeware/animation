@@ -11,69 +11,32 @@
 - [business/youtube_copies.md](business/youtube_copies.md);
 - [memory/journal.md](memory/journal.md).
 
-### Сначала: 24.11, вечер — `fivepoints` переделать под тему Элиота (brilliant moves); делает сессия на Fable
+### Сначала: 24.11 — `fivepoints` версия 5, реклама про brilliant moves (тема Элиота)
 
-- **Решение автора.** Автор вспомнил, что Элиот просил свои темы, и сказал: «может как-то переделать под его идею, но
-  с той же идеей». Значит, ролик 1 — brilliant moves, построенный на истории Магнуса. Выбор А/Б из §0.1 снят.
-- **Видео делает автор сам, в сессии на Fable:** «делать видео не начинай, я сделаю через fable». В этой сессии ролик не
-  меняли: `script.json` и `scenes.js` — версия 4.
-- **Что хочет Элиот** (письмо 18.11, 08:49 UTC, его слова): «1. Brilliant moves, your first idea. Our brilliant
-  detection is the best on the market alongside Chess.com, and it is free: we find 93 of Chess.com's 100 brilliant
-  moves, more than any other free tool». Тема — наша первая идея, посыл — его. Сюжета он не давал, ждёт идею от нас.
-  Данные (13:29 UTC, «that you may or may not use»):
-  - 100 настоящих бриллиантов Chess.com через все бесплатные разборы: Chessigma находит 93, остальные — 90, 45, 41, 23;
-  - ложные бриллианты: у Chessigma — раз в 20 партий, у другого разбора — раз в 3, у третьего неверна половина;
-  - 4 бриллианта поймал только Chessigma: Rf1+ игрока 527 и Kxf1 игрока 3097 в блице.
-- **Идея (черновик, утвердить у автора):**
-  - история Магнуса — строки 0–11 `script.json` — без изменений;
-  - мост — часы: у Магнуса было 46 с, у Артемьева 37, а игрок с рейтингом 527 при 24 с на часах нашёл бриллиант;
-  - мотив: в ролике уже есть замок («He locked in»), у идеи 1 в [IDEAS.md](IDEAS.md) — ключ («He found the key. He never
-    opened the door.»). Магнус вошёл в дверь, а игрок 527 нашёл ключ и ушёл: дал шах ещё раз, и ещё — ничья;
-  - черновик строк вместо 12–14:
-    1. «46 seconds cost Magnus a game. 37 cost his opponent the draw. This player had 24, and he's rated 527.»
-    2. «He played a brilliant move.» — на доске 23...Rf1+, на телефоне разбор Chessigma со значком Sigma;
-    3. «He found the key… and never opened the door. Check, check, draw.»
-    4. посыл Элиота его словами: «93 of Chess.com's 100 brilliant moves, more than any other free tool». Chess.com он
-       называет сам, фразу можно брать как есть; другие разборы по именам не называть;
-    5. «Chessigma's game reviews are free and unlimited. On the App Store and Google Play. Link in bio.»;
-    6. вопрос: «What's your rating — and have you ever played a brilliant?» (из идеи 1) или прежний «So, how far are
-       you from 2800?»;
-  - ролик вырастет с 69 до ~80 с. Если длинно — убрать строку 11 (top comment).
-- **Партия** (PGN из бенчмарка Chessigma, `chessigma.com/benchmarks/brilliant/data`; ссылка на партию — в IDEAS, идея 1):
-  - блиц 2+1, 04.08.2025, белые 579, чёрные 527, ничья повторением;
-  - 23...Rf1+ — 46-й полуход. Часы чёрных: 0:23,9 до хода, 0:20,0 после, с добавкой 1 с — думал около 5 с;
-  - Stockfish (глубина 22, из IDEAS): после Rf1+ у чёрных +5,4; выигрывало 24.Kh2 Rxh1+ 25.Kxh1 Nf2+ с вилкой;
-  - по словам Элиота (18.11), это один из 4 ходов, которые из пяти разборов нашёл только Chessigma; всего Chessigma
-    находит 93 из 100 «бриллиантов» Chess.com;
-  - ники игроков не показывать. PGN для съёмки, без ников:
-    ```
-    [White "White"]
-    [Black "Black"]
-    [WhiteElo "579"]
-    [BlackElo "527"]
-    [Result "1/2-1/2"]
-
-    1. d4 d5 2. Bf4 Nf6 3. Nf3 Nc6 4. e3 Bg4 5. h3 Bxf3 6. Qxf3 e6 7. c4 Bd6 8. Bxd6 Qxd6 9. c5 Qd7 10. Bb5 a6
-    11. Ba4 b5 12. Bc2 O-O 13. h4 Nb4 14. Bd1 Nd3+ 15. Kf1 Nxb2 16. g4 Nc4 17. g5 Ne4 18. h5 g6 19. hxg6 fxg6
-    20. Qh3 Rxf2+ 21. Kg1 Raf8 22. Bg4 Qf7 23. Bxe6 Rf1+ 24. Kh2 Rf2+ 25. Kg1 Rf1+ 26. Kh2 Rf2+ 27. Kg1 1/2-1/2
-    ```
-- **Как снять значок Sigma для телефона в кадре:**
-  - `chessigma.com/tools/analysis?pgn=<PGN>` в headless показывает доску, ходы и движок, но без оценок ходов: это доска
-    анализа, а не разбор (проверено 24.11);
-  - разбор с оценками: импортировать PGN на chessigma.com и один раз нажать «Start review» на настоящем устройстве,
-    потом `episodes/fivepoints/capture/cg_capture.cjs` снимает экраны headless. Или автор записывает экран телефона,
-    как записи в `photos/rec/`;
-  - Магнуса в интерфейсе Chessigma по-прежнему не показываем; партию 527 — можно, без ников.
-- **Сроки.**
-  - Обещание «I'll post the first video on Wednesday, November 25» выполнимо (автор: «ты же за час их делаешь»).
-    Переделка — 1–2 часа: 3–4 новые фразы голосом, 2–3 новых плана, проверка вёрстки, черновик, превью.
-  - Узкое место — письменное «ок» Элиота. Превью ему 24.11 вечером (письмо в §0.3, по слову автора): ответ в среду днём
-    по Европе, а выкладываем для США вечером.
-  - Значок Sigma: автор один раз открывает разбор партии на телефоне — или запись экрана телефона.
-  - Если превью к вечеру 24.11 не готово — короткое письмо о переносе (§0.3), тоже только по слову автора.
-  - Чёрная пятница — 27.11; Элиот просит 2 ролика на этой неделе. Второй — принципы (§0.0, п. 3).
-  - Строку про Black Friday брать только у Элиота: баннер на сайте 24.11 менялся («Yearly, Save 59%, $5.68/month»,
-    потом «Lifetime, Save 41%, 2 LEFT, $290 вместо $490»).
+- **Почему.** Автор вспомнил, что Элиот просил свои темы, первая — brilliant moves: «может как-то переделать под его
+  идею, но с той же идеей». Мост через игрока с рейтингом 527 автор отклонил: «идея где обычный игрок находит че то
+  там, никому нахуй это не интересно» (правило 78). Сделано в этой же сессии, на модели Fable: «вот продолжи».
+- **Что хочет Элиот** (письмо 18.11, его слова): «Our brilliant detection is the best on the market alongside
+  Chess.com, and it is free: we find 93 of Chess.com's 100 brilliant moves, more than any other free tool». Сюжета он не
+  давал. Данные: Chessigma 93, остальные бесплатные разборы — 90, 45, 41, 23.
+- **Что в версии 5.** История Магнуса (строки 0–11) не менялась. Реклама — с 0:55 до 1:17, около 21 с:
+  1. «One move almost cost Magnus his crown.» — корона падает с вершины на стол зрителя;
+  2. «And one brilliant move will make you think you're him.» — в приложении ход получает флажок SIGMA !!, зритель сам
+     себя коронует, под сценой комментарий «bro thinks he's Magnus»;
+  3. «Chessigma calls it... Sigma.» — тот же ход на телефоне, потом лицо с короной;
+  4. «And its free review finds 93 of Chess.com's 100 brilliant moves. More than any other free tool.» — панель «Your
+     brilliant moves», стена из 100 «!!» (горят 93), диаграмма пяти бесплатных разборов без чужих имён;
+  5. «Free, unlimited game reviews. On the App Store and Google Play. Link in bio.» — отчёт и их карточка 3 с.
+- **Проверено.** В решающей партии Магнуса бриллианта нет (Stockfish), поэтому его ходы так не называем. Голос —
+  чистые дубли (`voice_check.py`). Вёрстка: no issues.
+- **Экран приложения — запись автора** `photos/rec/review.mp4`: там уже есть ход «Bxh3 is sigma» с флажком и панель
+  «Your brilliant moves». Чужие ники закрыты.
+  - В записи вход не выполнен: виден призыв «Sign in for free». Элиот просил показывать разбор залогиненным, поэтому
+    кадрируем без кнопки. Если автор запишет этот ход залогиненным — подставить.
+  - Из облака значок Sigma не снять: `chessigma.com/tools/analysis?pgn=` оценок ходов не показывает.
+- **Сроки.** Из почты канала обещан выход в среду, 25.11. Нужно письменное «ок» Элиота: превью ему — как только автор
+  одобрит черновик (письмо в §0.3, только по слову автора). Чёрная пятница — 27.11, второй ролик — принципы (§0.0, п. 3).
+- **Строку про Black Friday** брать только у Элиота: баннер на сайте 24.11 менялся.
 
 ### 0.0. Новое в почте на 24.11 и план
 
@@ -99,8 +62,8 @@
 - PolyBuzz и Стелла (Chessnut) с 21.11 не писали.
 
 **План по порядку:**
-1. **`fivepoints` переделать под brilliant moves** — решение автора 24.11 вечером, раздел «Сначала» выше; делает
-   сессия на Fable. Превью Элиоту — 24.11 вечером (письмо в §0.3), по слову автора; выход 25.11 только после его «ок».
+1. **`fivepoints` версия 5 (реклама про brilliant moves) готова**, раздел «Сначала» выше. Автор смотрит черновик;
+   после его «да» — превью Элиоту (письмо в §0.3), по слову автора. Выход 25.11 только после «ок» Элиота.
 2. **После «ок»** (25.11):
    - `proof.py`, коммит и пуш;
    - публикация с Branded content и #ad, ссылка в био с `utm_content=fivepoints`;
@@ -123,7 +86,7 @@
 
 ### 0.1. Ждёт решения автора: ролик `fivepoints` для Chessigma
 
-- **Решено 24.11 вечером:** ролик 1 — brilliant moves на истории Магнуса (раздел «Сначала»). Варианты А/Б ниже —
+- **Решено 24.11:** ролик 1 — brilliant moves на истории Магнуса, версия 5 (раздел «Сначала»). Варианты А/Б ниже —
   история решения.
 - **Письмо Элиоту НЕ отправлять.** 22.11 автор сначала сказал «отправь чессигме», потом остановил: «письмо не кидай».
   Текст письма готов (ниже, §0.3). Отправлять только по новому прямому слову автора.
@@ -196,10 +159,15 @@ Hi Eliot,
 Here's video 1 for your approval: <LINK>
 
 It's about brilliant moves, as you suggested, built on the story everyone in chess is talking about this week:
-Magnus nearly losing his No. 1 spot. Chessigma comes in at <0:00–0:00>: a 527-rated player finds a brilliant move
-with 24 seconds left, the one from your benchmark, and Chessigma's review marks it with a Sigma. Then "free and
-unlimited", and your card with App Store / Google Play and "link in bio". Magnus never appears with the product,
-and the players' usernames aren't shown. The PREVIEW marks are only on this file.
+Magnus nearly losing his No. 1 spot. Chessigma comes in at 0:55–1:17: the crown Magnus almost lost lands on the
+viewer's desk, "One brilliant move will make you think you're him", and a move gets its Sigma in your review on the
+phone. Then your line, "its free review finds 93 of Chess.com's 100 brilliant moves, more than any other free tool",
+with the 100 moves on a wall and the five free tools as bars (the other four are not named), then "free, unlimited
+game reviews" and your card with App Store / Google Play and "link in bio". Magnus never appears with the product.
+The PREVIEW marks are only on this file.
+
+One note: the app recording we have was made signed out, so we framed the review without the "Sign in for free"
+button. If you'd rather see the coach's comment there, we'll re-record it signed in.
 
 As we wrote, we'd like to post it on Wednesday, Nov 25, as soon as you OK it, with Branded content on, #ad, and
 your link in bio. The second Black Friday video will be on Principles; we'll send its idea next. Please send the new

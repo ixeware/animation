@@ -1,7 +1,7 @@
 {
   "title": "Five points: Magnus nearly lost world No. 1",
   "channel": "THE 64 FILES",
-  "post": "Magnus was 5 points from losing world No. 1 😳 Then he locked in 🔒 How far are you from 2800? 👇\nFree, unlimited game reviews on Chessigma. Link in bio.\n#ad #chessigma #chess #magnuscarlsen #caruana #lockin #goat",
+  "post": "Magnus was 5 points from losing world No. 1 😳 Then he locked in 🔒 How far are you from 2800? 👇\nChessigma's free game review finds 93 of Chess.com's 100 brilliant moves. Free, unlimited game reviews. Link in bio.\n#ad #chessigma #chess #magnuscarlsen #brilliantmove #caruana #lockin #goat",
   "lead_in": 0.05,
   "tail": 1.4,
   "voice": {
@@ -182,25 +182,67 @@
     },
     {
       "id": "ad1",
-      "text": "One move almost cost Magnus his crown. Want to find the move that's costing you games?",
-      "say": "One move almost cost Magnus his crown. [pause] Want to find the move that's costing you games?",
-      "pause": 0.2,
+      "text": "One move almost cost Magnus his crown.",
+      "say": "One move almost cost Magnus his crown.",
+      "pause": 0.22,
       "colors": {
         "One": "gold",
         "move": "gold",
-        "crown.": "gold",
-        "you": "lime"
+        "crown.": "gold"
       }
     },
     {
       "id": "ad2",
-      "text": "Chessigma's game reviews are free and unlimited. On the App Store and Google Play. Link in bio.",
-      "say": "Chessigma's game reviews are free and unlimited. On the App Store and Google Play. Link in bio.",
+      "text": "And one brilliant move will make you think you're him.",
+      "say": "[mischievously] And one brilliant move... will make you think you're him.",
       "pause": 0.3,
       "colors": {
-        "Chessigma's": "gold",
+        "brilliant": "lime",
+        "move": "lime",
+        "him.": "gold"
+      },
+      "take": 3
+    },
+    {
+      "id": "ad3",
+      "text": "Chessigma calls it... Sigma.",
+      "say": "Chessigma calls it... [pause] [deadpan] Sigma.",
+      "pause": 0.3,
+      "colors": {
+        "Chessigma": "gold",
+        "Sigma.": "lime"
+      },
+      "take": 1,
+      "hold": {
+        "after": "it...",
+        "sec": 0.45
+      }
+    },
+    {
+      "id": "ad4",
+      "text": "And its free review finds 93 of Chess.com's 100 brilliant moves. More than any other free tool.",
+      "say": "[impressed] And its free review finds ninety-three of Chess dot com's one hundred brilliant moves. [pause] More than any other free tool.",
+      "pause": 0.3,
+      "colors": {
         "free": "lime",
-        "unlimited.": "lime"
+        "93": "gold",
+        "100": "gold",
+        "brilliant": "lime",
+        "moves.": "lime",
+        "More": "gold",
+        "any": "gold",
+        "other": "gold"
+      },
+      "take": 3
+    },
+    {
+      "id": "ad5",
+      "text": "Free, unlimited game reviews. On the App Store and Google Play. Link in bio.",
+      "say": "Free, unlimited game reviews. On the App Store and Google Play. Link in bio.",
+      "pause": 0.3,
+      "colors": {
+        "Free,": "lime",
+        "unlimited": "lime"
       }
     },
     {
@@ -216,5 +258,5 @@
       "take": 1
     }
   ],
-  "_voice_notes": "v3 (20.11.2026): the story was rewritten after the author's notes on draft 2 (rule 76): no GTA; the crown above the clouds, the lock-in meme, the mirror 46 s / 37 s, the top comment as the payoff. Numbers are spelled out in `say` (2800 = twenty-eight hundred)."
+  "_voice_notes": "v3 (20.11.2026): the story was rewritten after the author's notes on draft 2 (rule 76): no GTA; the crown above the clouds, the lock-in meme, the mirror 46 s / 37 s, the top comment as the payoff. Numbers are spelled out in `say` (2800 = twenty-eight hundred). v5 (24.11.2026): the sponsor's block is about brilliant moves (the sponsor's own topic and claim, SOURCES.md): ad1–ad5; takes chosen with tools/voice_check.py (ad2 take 3, ad3 take 1 with a hold before \"Sigma\", ad4 take 3)."
 }
