@@ -3359,8 +3359,9 @@ export async function build(T) {
   const a2A = s('ad2') - 0.06, brilT = w('ad2', 2), willT = w('ad2', 4), thinkT = w('ad2', 7), youreT = w('ad2', 8), himT = w('ad2', 9);
   const a3A = s('ad3') - 0.06, freeT = w('ad3', 1), unlT = w('ad3', 2), n93T = w('ad3', 6), chessT = w('ad3', 8), n100T = w('ad3', 9), moreT = w('ad3', 12), otherT = w('ad3', 15);
   const onT = w('ad4', 0), linkT = w('ad4', 7), CLOSE = onT - 0.08;
-  // v6: the top comment is the payoff after the sponsor's card (their card keeps its three seconds)
-  const cmA = Math.max(s('comment') - 0.06, CLOSE + 3.0), whenT = w('comment', 2), lowT = w('comment', 4), theirT = w('comment', 6), bestT = w('comment', 7), litT = w('comment', 8);
+  // v6: the top comment is the payoff after the sponsor's card (their card keeps its three seconds); the chip opens in
+  // the pause before the voice
+  const cmA = Math.max(s('comment') - 0.45, CLOSE + 3.0), whenT = w('comment', 2), lowT = w('comment', 4), theirT = w('comment', 6), bestT = w('comment', 7), litT = w('comment', 8);
   const ctA = s('cta') - 0.06, howT = w('cta', 1), q2800T = w('cta', 6);
 
   // ======================= HOOK (rules 1, 28, 57, 72): the summit, and someone at its edge =======================
