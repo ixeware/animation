@@ -3724,7 +3724,7 @@ export async function build(T) {
   const S43b = brilT - 0.04, recB = t => 7.98 + (t - brilT), flagT = brilT + 0.4, FLAGP = onDesk(700, 1000);
   let flagQ = null;
   shot(S43b, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.08, 1.12, 4.3, [6.2, 0.1, 3.35], { cy: H * 0.5 - 200 })], [flagT - S43b - 0.12, K(0.06, 1.15, 4.0, [6.2, 0.1, 3.32], { cy: H * 0.5 - 200 })],
+    rig(B, lt, [[0, K(0.09, 1.17, 2.75, [6.36, 0.1, 2.9], { cy: H * 0.5 - 470 })], [flagT - S43b - 0.12, K(0.07, 1.18, 2.62, [6.38, 0.1, 2.9], { cy: H * 0.5 - 450 })],
       [flagT - S43b + 0.3, K(0.02, 1.22, 2.3, [6.42, 0.1, 2.9], { cy: H * 0.5 - 310 }), ease.out], [len(sh), K(0.0, 1.24, 2.15, [6.42, 0.1, 2.9], { cy: H * 0.5 - 310 })]], { t, e: glide });
     yourRoom(g, t, { e: EXPR.focus, crown: { p: DESK, k: 1.4 }, glow: 1, img: recClean(recB(t)) });
     flagQ = B.project(...FLAGP);
@@ -3752,7 +3752,7 @@ export async function build(T) {
   // flag on the board, so the word is read before it is said
   const pushA = callsT - 0.05, pushB = itT + 0.28;
   shot(a3A, (g, lt, t, sh) => {
-    rig(B, lt, [[0, K(0.05, 0.02, 7.7, [4, 2.0, 2.4], { cy: H * 0.5 - 170 })], [pushA - a3A, K(0.03, 0.02, 7.3, [4, 1.95, 2.3], { cy: H * 0.5 - 170 })],
+    rig(B, lt, [[0, K(0.06, 0.02, 5.6, [4.5, 0.6, 2.2], { cy: H * 0.5 - 270 })], [pushA - a3A, K(0.04, 0.02, 5.3, [4.52, 0.6, 2.2], { cy: H * 0.5 - 260 })],
       [pushB - a3A, K(0.0, 0.02, 4.7, [4.7, 0.62, 2.2], { cy: H * 0.5 - 190 }), ease.inOut], [len(sh), K(-0.01, 0.02, 4.4, [4.72, 0.6, 2.2], { cy: H * 0.5 - 190 })]], { t, e: glide });
     phoneHeld(g, t, recClean(9.7));
   }, { trans: 'whip', kb: 0, noGuard: true, qaAllow: ['text over face'], hud: (g, lt, t) => {  // your face is behind the phone
