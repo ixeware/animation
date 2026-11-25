@@ -37,17 +37,15 @@
   11. вопрос «So, how many brilliant moves do you have?» и петля на первый кадр.
 - **Где знак спонсора до рекламы:** корешок книги правил Chessigma (28–29 с). В кадрах с Магнусом его нет (правило 78).
   Реклама стоит в конце по правилу 61; Элиоту это объяснено в черновике ответа ниже.
-- **Что не проверено и чего в ролике поэтому нет:** какой значок Chessigma и Chess.com дают самому ходу 50.Qh6+. В
-  сцене «тот же ход» взята учебная жертва, а не ход Магнуса.
-- **Запись приложения — прежняя, без входа** (`photos/rec/review.mp4`): кадр начинается под карточкой тренера с кнопкой
-  «Sign in for free». Для чистовика нужна новая запись автора **со входом**; лучше всего — разбор именно партии
-  Карлсен — Карякин (PGN: `engine/data/carlsen_karjakin_2016_tb4.pgn`): если Chessigma ставит 50.Qh6+ Sigma, в
-  рекламный блок встаёт этот ход. Подставить: положить файл в `episodes/nobrilliant/photos/rec/review.mp4`,
-  `python3 tools/frames.py episodes/nobrilliant`, поправить в `scenes.js` моменты записи (`recS`, `recClean`) и кадр.
+- **Проверено записью автора (25.11, со входом): Chessigma ставит 50.Qh6+ оценку Sigma.** Запись —
+  `episodes/nobrilliant/photos/rec/sigma.mp4` (8,6 с, разбор этой партии: «Kh1 is best», «Qf2 is best», «Rc8+ is
+  clown», «Kh7 is miss», 50.Qh6+ — вспышка и флажок SIGMA на 5,95 с). Она стоит в двух планах рекламы (версия 2
+  черновика): «No limit, no signup» и «There, they're called... Sigma». Отрезок «Rc8+ is clown» в ролик не взят.
+  Старая запись без входа (`review.mp4`) осталась только в финальном плане (панель «Your brilliant moves»).
+  Какой значок ставит Chess.com, не проверяли: сцена «тот же ход» — на учебной жертве слона.
 - **Файлы** (в `episodes/nobrilliant/build/`, в git не попадают):
-  `The64Files_Brilliant_Moves_Dont_Exist_Chessigma_v1_DRAFT.mp4` — автору;
-  `…_v1_PREVIEW.mp4` — превью для Элиота (720×1280, с надписью PREVIEW, 9,1 МБ, sha256 `4604c268…65fb`). Оба файла
-  отправлены автору 25.11. Пересборка: `./build.sh nobrilliant` или шаги
+  `The64Files_Brilliant_Moves_Dont_Exist_Chessigma_v2_DRAFT.mp4` — автору (v1 — до новой записи приложения);
+  `…_v2_PREVIEW.mp4` — превью для Элиота (720×1280, с надписью PREVIEW). Пересборка: `./build.sh nobrilliant` или шаги
   из [CLAUDE.md](CLAUDE.md); голос в кэше (`episodes/nobrilliant/tts_cache`), кредиты не тратятся.
 - **Голос:** дубли bait 1, ny 2, ad1 3 (в дублях по умолчанию одна фраза была громче остальных на 2,7–3,5 дБ);
   `voice_check.py` — «no phrase stands out». Вёрстка — «no issues», планов короче 0,6 с нет, −16,4 LUFS.
@@ -55,38 +53,38 @@
 - **Дальше:** автор смотрит черновик → правки → превью Элиоту (заливает автор: коннектор Drive из сессии берёт до
   3 МБ) → его письменное «ок» → 4К (`--scale 2`), отпечаток (`tools/proof.py`), публикация с #ad и Branded content.
   `fivepoints` v6 остался без спонсора: выпускать ли его как обычный ролик без рекламного блока — решает автор.
-- **25.11, вечер:** автор залил DRAFT на Drive (id `1dhFvSb-G8uj9I2IaYKfujvy0SNhRihYn`, доступ по ссылке) и прислал
-  ссылку. Ответ Элиоту с ней лежит черновиком в Gmail (`r-3221608010690707967`), **не отправлен**: автор спросил
-  «всмысле переснять» про строку о новой записи экрана приложения. Подробности — в `memory/sponsors.md`.
-- **Черновик ответа Элиоту** (не отправлен; отправлять только по слову автора, ответом в ту же ветку, копия Мехди;
-  в Gmail лежит чуть более короткая редакция этого текста со ссылкой на Drive):
+- **25.11, вечер.** Автор залил на Drive черновик v1 (id `1dhFvSb-G8uj9I2IaYKfujvy0SNhRihYn`, доступ по ссылке), на
+  вопрос «отправить?» ответил «всмысле переснять», после объяснения записал экран приложения со входом и прислал
+  запись. Собрана **версия 2** с этой записью; оба файла v2 отправлены автору.
+  - Ссылка на Drive ведёт на **v1** (старая запись приложения): для письма нужна ссылка на v2. Из сессии файл не
+    приложить и не залить: коннекторы берут до 3 МБ за вызов (превью 9,1 МБ). Заливает автор.
+  - Письмо Элиоту **не отправлено**, черновика в Gmail нет (прежний, с текстом под v1, удалён). Текст — ниже;
+    отправлять только по слову автора, ответом на письмо `1a2119e6078a2e8a`, копия Мехди.
+- **Текст ответа Элиоту** (вместо `[link]` — ссылка автора на v2):
 
   > Hi Eliot,
   >
-  > Understood, thanks for the clear brief: each video about the feature it promotes.
+  > Understood, and thanks for the clear brief: each video is about the feature it promotes.
   >
-  > Video 1 is now "Brilliant moves don't exist", built on the pitch you quoted. Preview: [link]
+  > Here is the new video 1, "Brilliant moves don't exist", built on the pitch you quoted: [link]
   >
-  > What is in it (62 s):
-  > - The famous sacrifice is Carlsen's 50.Qh6+ against Karjakin (New York, 2016), "the most brilliant final move of any
-  >   world chess championship" (Kavalek). Stockfish calls it +M2: just a number.
-  > - The "!!" is a sticker a review site adds afterwards, by its own rules: Chess.com's own definition, and Lichess,
-  >   which has no such label.
-  > - Your benchmark: one free tool found 23 of 100, Chessigma's free review found 93. "No limit, no signup."
-  > - "There, they're called... Sigma": the Sigma flag in your app, then your end card, App Store and Google Play.
+  > What is in it (62 seconds):
+  > - The famous sacrifice is Carlsen's 50.Qh6+ against Karjakin (New York, 2016), which GM Kavalek called "the most
+  >   brilliant final move of any world chess championship in history". Stockfish calls it +M2: just a number.
+  > - The "!!" is a sticker that a review site adds afterwards, by its own rules: Chess.com's own definition, and
+  >   Lichess, which has no such label at all.
+  > - Your benchmark: one free tool found 23 of 100, Chessigma's free review found 93. No limit, no signup.
+  > - "There, they're called... Sigma": your app reviewing that very game, recorded signed in. The coach's comments
+  >   and arrows, then 50.Qh6+ gets its SIGMA flag. Then your end card with the App Store and Google Play.
   >
-  > Branding: we kept the integration at the end, because our numbers drop when a sponsor comes early. So we took your
-  > second option, Chessigma on screen in the assets: your rulebook next to Chess.com's and Lichess's (0:28), your
-  > benchmark chart with your logo (0:48), your app (0:51 and 0:58), your end card (0:55). If you would rather have the
-  > logo on the board in more shots, or one line at the start, tell us and we will change it.
+  > Branding: the integration is at the end, because our average watch time drops when a sponsor appears early (it
+  > did with Woodpecker). So we took your second option and put Chessigma on screen in the assets: your rulebook next
+  > to Chess.com's and Lichess's (0:28), your benchmark chart with your logo (0:48), your app with the Sigma flag on
+  > the brilliant move itself (0:51 to 0:55), your end card (0:55) and your app again (0:58). If you would like the
+  > logo on the board in more shots, or one line at the start, tell me and I will add it.
   >
-  > Two things:
-  > 1. The preview still uses the earlier recording, framed below the coach card. We are recording again signed in and
-  >    will swap it in before the final version.
-  > 2. Does Chessigma give Sigma to 50.Qh6+ itself? If it does, we would show your review of that exact move.
-  >
-  > After your OK we can post within a day. For the second video this week: Openings, Game Review or Principles — which
-  > one first?
+  > I can post within a day of your OK. For the second video this week, which topic would you like first: Openings,
+  > Game Review or Principles?
   >
   > Best,
   > The 64 Files

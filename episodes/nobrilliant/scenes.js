@@ -3704,6 +3704,11 @@ function testWall(g, t, litAt, { brand = false, sheenT = Infinity } = {}) {
   texQuad(g, signTex(brand), [x0 + 0.4, y1 + 2.36, z - 0.02], [x0 + 9.6, y1 + 2.36, z - 0.02], [x0 + 0.4, y1 + 0.83, z - 0.02], { under: false });
 }
 const KEEP23 = [2, 9, 11, 15, 20, 27, 29, 33, 38, 40, 44, 46, 53, 57, 60, 62, 65, 71, 77, 80, 85, 88, 96];  // the 23 the weakest tool found: any 23 of the 93
+// the author's recording of 25.11.2026, signed in as the sponsor asked: the app's review of this very game, its last
+// moves ("Kh1 is best", "Qf2 is best", "Rc8+ is clown", "Kh7 is miss": the coach's comments and arrows), then 50.Qh6+:
+// the app's own burst and the SIGMA flag, out at 5.95 s. The phone's status bar is cropped off the file
+// (photos/rec/sigma.mp4, 780 × 1600); the names in its header are the two players'
+const sigFrame = sec => recFrame('sigma', sec), SIG_FLAG = [686, 741], SIG_OUT = 5.95;
 // a point of the recording on the phone held up in your hand (phoneHeld's own sway)
 function heldPt(t, px, py, { c = [4, 1.6, 2.2], rx = -0.12, ry = 0.08 } = {}) {
   const R = { rx: rx + Math.sin(t * 1.1) * 0.02, ry: ry + Math.sin(t * 0.8) * 0.03 }, p = rot3([-PHW + 2 * PHW * px / 780, PHH - 2 * PHH * py / 1600, -0.002], R);
@@ -4057,34 +4062,34 @@ export async function build(T) {
   } });
   cue(a1A - 0.03, 'swipe_card', 0.3); cue(RUN0, 'riser', 0.3); for (let k = 0; k < 8; k++) cue(lerp(RUN0, RUN1, k / 8), 'clock_tick', 0.2);
   cue(RUN1, 'reveal_bell', 0.5); cue(RUN1 + 0.03, 'shimmer', 0.35);
-  // "No limit, no signup.": the review on your phone (the author's recording: the report of a game)
+  // "No limit, no signup.": the review on your phone, the whole screen: the coach's comment on a move of this game
   const S28 = noT - 0.1;
   shot(S28, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.09, 0.02, 6.2, [4, 2.1, 2.2]), K(0.03, 0.02, 5.6, [4, 2.05, 2.2]));
-    phoneHeld(g, t, recClean(3.6));
+    cam(lt, t, sh, K(0.09, 0.02, 4.5, [4, 1.6, 2.2]), K(0.03, 0.02, 4.1, [4, 1.62, 2.2]));
+    phoneHeld(g, t, sigFrame(0.25 + (t - S28)));
   }, { trans: 'whip', kb: 0, noGuard: true, qaAllow: ['text over face'], hud: (g, lt, t) => {  // your face is behind the phone
     adTag(g);
-    if (t >= limitT - 0.12) badge(g, 'NO LIMIT', 290, 262, { color: LIME, size: 56, ...popW(t, limitT - 0.12) });
-    if (t >= signT - 0.12) badge(g, 'NO SIGNUP', 780, 262, { color: LIME, size: 56, ...popW(t, signT - 0.12) });
+    if (t >= limitT - 0.12) badge(g, 'NO LIMIT', 290, 505, { color: LIME, size: 56, ...popW(t, limitT - 0.12) });  // between the coach's card and the board
+    if (t >= signT - 0.12) badge(g, 'NO SIGNUP', 780, 505, { color: LIME, size: 56, ...popW(t, signT - 0.12) });
   } });
   cue(S28 - 0.04, 'whoosh_fast', 0.3); cue(limitT - 0.12, 'success', 0.4); cue(signT - 0.12, 'sparkle_pop', 0.35);
-  // "There, they're called... Sigma.": the board of the same review; the move lands and its SIGMA flag comes out on the
-  // word (the recording at its own speed: the flag is out at 8.45 s of it)
-  const S29 = thereT - 0.1, recS = t => clamp(8.36 + (t - sigmaT), 6.4, 12);
+  // "There, they're called... Sigma.": the same review two moves on. "Kh7 is miss", the arrow to h6; the queen goes
+  // there and the app's own burst and SIGMA flag come out on the word (the recording at its own speed)
+  const S29 = thereT - 0.1, recS = t => clamp(SIG_OUT - 0.03 + (t - sigmaT), 3.72, 8.5);
   let flagQ = null;
   shot(S29, (g, lt, t, sh) => {
-    // the frame starts under the coach's card (its "Sign in" button is of the signed-out app; Eliot: record signed in): the board fills it
-    rig(B, lt, [[0, K(0.06, 0.02, 4.4, [3.95, 0.0, 2.2])], [sigmaT - S29, K(0.03, 0.02, 4.2, [4.05, 0.1, 2.2])],
-      [sigmaT - S29 + 0.35, K(0.0, 0.02, 3.6, [4.3, 0.5, 2.2]), ease.out], [len(sh), K(-0.01, 0.02, 3.5, [4.32, 0.52, 2.2])]], { t, e: glide });
-    phoneHeld(g, t, recClean(recS(t)));
-    flagQ = B.project(...heldPt(t, 700, 1000));
+    // the camera goes in with the queen and stands still when the flag comes out; the board and the move strip fill the frame
+    rig(B, lt, [[0, K(0.06, 0.02, 4.3, [4.0, 1.62, 2.2])], [sigmaT - S29 - 0.8, K(0.03, 0.02, 4.0, [4.05, 1.66, 2.2])],
+      [sigmaT - S29 - 0.15, K(0.0, 0.02, 3.3, [4.3, 1.35, 2.2]), ease.inOut], [len(sh), K(-0.01, 0.02, 3.15, [4.32, 1.36, 2.2])]], { t, e: glide });
+    phoneHeld(g, t, sigFrame(recS(t)));
+    flagQ = B.project(...heldPt(t, ...SIG_FLAG));
   }, { kb: 0, noGuard: true, qaAllow: ['text over face'], zoom: kicks([[sigmaT, 0.05]]), hud: (g, lt, t) => {
     adTag(g);
     const rt = sigmaT + 0.12;
-    if (flagQ && t >= rt) { shockwave(g, flagQ.x, flagQ.y, t, rt, { r0: 40, r1: 300, life: 0.5, color: TEAL_HI, lw: 9, squash: 1 }); glint(g, flagQ.x, flagQ.y, t, rt, { r: 240, color: '#E8FFF9' }); }
-    if (t >= rt) plate(g, 'BRILLIANT = SIGMA', W / 2, 262, { color: LIME, size: 62, rot: -0.02, ...popW(t, rt) });
+    if (flagQ && t >= rt) glint(g, flagQ.x, flagQ.y, t, rt, { r: 240, color: '#E8FFF9' });
+    if (t >= rt) plate(g, 'BRILLIANT = SIGMA', W / 2 + 30, 132, { color: LIME, size: 64, rot: -0.02, ...popW(t, rt) });  // over the app's end-of-game card
   } });
-  cue(S29 - 0.03, 'whoosh_soft', 0.25); cue(sigmaT - 0.38, 'clack', 0.35); cue(sigmaT + 0.05, 'success', 0.5); cue(sigmaT + 0.1, 'sparkle_pop', 0.4);
+  cue(S29 - 0.03, 'whoosh_soft', 0.25); cue(sigmaT - 0.35, 'move', 0.4); cue(sigmaT - 0.2, 'riser', 0.25); cue(sigmaT + 0.02, 'success', 0.5); cue(sigmaT + 0.1, 'sparkle_pop', 0.4);
   // their 3-second end card as it is (logo, 2M+ players, the store badges): flat, no captions over it
   shot(CLOSE, (g, lt) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
     { flat: true, noGuard: true, noCaptions: true, hud: (g, lt, t) => {
