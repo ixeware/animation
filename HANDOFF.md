@@ -1,17 +1,93 @@
-# Передача проекта (handoff), 8.11.2026, дополнено 9.11, 22.11 и 24.11.2026
+# Передача проекта (handoff), 8.11.2026, дополнено 9.11, 22.11, 24.11 и 25.11.2026
 
 Записка для модели или человека, который продолжит работу. Проект — шахматные шортсы для TikTok, сделанные кодом.
 Здесь: что прочитать, как поставить окружение, как собрать ролик, что уже сделано и на чём легко ошибиться.
 Правила работы живут в [CLAUDE.md](CLAUDE.md). Файл назван по Claude Code, но обязателен для любой модели.
 
-## 0. Состояние на 24.11.2026 — читать первым
+## 0. Состояние на 25.11.2026 — читать первым
 
 Здесь всё, что висит, и как продолжить в новом контейнере. Подробности:
 - [memory/sponsors.md](memory/sponsors.md) — Chessigma, Hungry Studio, PolyBuzz, Chessnut;
 - [business/youtube_copies.md](business/youtube_copies.md);
 - [memory/journal.md](memory/journal.md).
 
-### Сначала: 24.11 — `fivepoints` версия 6: реклама про brilliant moves и проход по всему ролику
+### Сначала: 25.11 — Элиот не принял `fivepoints`; новый ролик 1 — `nobrilliant` («Brilliant moves don't exist»)
+
+- **Письмо Элиота, 25.11, 07:31 UTC** (ветка `1a1cd1a82e2a9623`, письмо `1a2119e6078a2e8a`, копия Мехди): «The video is
+  well made, but I think we had a misunderstanding about the topics». Каждый из четырёх роликов должен быть **о функции,
+  которую рекламирует**. Про бриллианты — наш первый питч (9.11) «Brilliant moves don't exist». Брендинг — одно из двух:
+  короткая интеграция в начале или знак Chessigma в кадре («the Sigma icon on the brilliant move, or the Chessigma logo
+  on the board»). Запись приложения — переснять со входом в аккаунт. Остальные три темы: дебюты, Game Review, принципы
+  («These are only examples»). Полностью — [memory/sponsors.md](memory/sponsors.md).
+- **Автор:** «чекни письмо эллиота и сделай че он хочет». Сделан черновик `episodes/nobrilliant` (61,8 с).
+- **Сюжет** — один сквозной предмет, круглый стикер «!!»:
+  1. хук: Магнус держит его как медаль — «Brilliant moves don't exist» — стикер исчезает из руки;
+  2. эдит-байт: Stockfish (рыба в аквариуме с табло) «can beat any human. But it has never seen a brilliant move»;
+  3. Нью-Йорк, 30.11.2016, его день рождения, тай-брейк за титул, **50.Qh6+**; слова Кавалека на карточке;
+  4. у движка это `+M2`: «Just a number»;
+  5. рука снимает «!!» с ферзя: «The double exclamation mark is a sticker. A review site adds it later, by its own
+     rules» — экран разбора, стопка из трёх книг правил (Chess.com, Lichess, Chessigma);
+  6. правило Chess.com его словами («a good piece sacrifice», «more generous … for newer players»), дождь стикеров
+     новичку;
+  7. одна и та же жертва слона (учебная 9.Bxh7+): тебе — стикер, Магнусу — пустое место, «JUST A MOVE»;
+  8. Lichess: такого стикера нет, штамп «DOESN'T EXIST»;
+  9. тест Chessigma: стена из ста «!!», «One free tool found only 23»;
+  10. реклама (48–58 с): диаграмма их бенчмарка с логотипом — 93; телефон с разбором — «No limit, no signup»; ход в
+      приложении получает флажок SIGMA — «There, they're called... Sigma»; их карточка, «Link in bio»;
+  11. вопрос «So, how many brilliant moves do you have?» и петля на первый кадр.
+- **Где знак спонсора до рекламы:** корешок книги правил Chessigma (28–29 с). В кадрах с Магнусом его нет (правило 78).
+  Реклама стоит в конце по правилу 61; Элиоту это объяснено в черновике ответа ниже.
+- **Что не проверено и чего в ролике поэтому нет:** какой значок Chessigma и Chess.com дают самому ходу 50.Qh6+. В
+  сцене «тот же ход» взята учебная жертва, а не ход Магнуса.
+- **Запись приложения — прежняя, без входа** (`photos/rec/review.mp4`): кадр начинается под карточкой тренера с кнопкой
+  «Sign in for free». Для чистовика нужна новая запись автора **со входом**; лучше всего — разбор именно партии
+  Карлсен — Карякин (PGN: `engine/data/carlsen_karjakin_2016_tb4.pgn`): если Chessigma ставит 50.Qh6+ Sigma, в
+  рекламный блок встаёт этот ход. Подставить: положить файл в `episodes/nobrilliant/photos/rec/review.mp4`,
+  `python3 tools/frames.py episodes/nobrilliant`, поправить в `scenes.js` моменты записи (`recS`, `recClean`) и кадр.
+- **Файлы** (в `episodes/nobrilliant/build/`, в git не попадают):
+  `The64Files_Brilliant_Moves_Dont_Exist_Chessigma_v1_DRAFT.mp4` — автору;
+  `…_v1_PREVIEW.mp4` — превью для Элиота (720×1280, с надписью PREVIEW, 9,1 МБ, sha256 `4604c268…65fb`). Оба файла
+  отправлены автору 25.11. Пересборка: `./build.sh nobrilliant` или шаги
+  из [CLAUDE.md](CLAUDE.md); голос в кэше (`episodes/nobrilliant/tts_cache`), кредиты не тратятся.
+- **Голос:** дубли bait 1, ny 2, ad1 3 (в дублях по умолчанию одна фраза была громче остальных на 2,7–3,5 дБ);
+  `voice_check.py` — «no phrase stands out». Вёрстка — «no issues», планов короче 0,6 с нет, −16,4 LUFS.
+- **Магнус нарисован с бородой** (Магнус канала), хотя в 2016-м он был без неё: хук должен читаться с первого кадра.
+- **Дальше:** автор смотрит черновик → правки → превью Элиоту (заливает автор: коннектор Drive из сессии берёт до
+  3 МБ) → его письменное «ок» → 4К (`--scale 2`), отпечаток (`tools/proof.py`), публикация с #ad и Branded content.
+  `fivepoints` v6 остался без спонсора: выпускать ли его как обычный ролик без рекламного блока — решает автор.
+- **Черновик ответа Элиоту** (не отправлен; отправлять только по слову автора, ответом в ту же ветку, копия Мехди):
+
+  > Hi Eliot,
+  >
+  > Understood, thanks for the clear brief: each video about the feature it promotes.
+  >
+  > Video 1 is now "Brilliant moves don't exist", built on the pitch you quoted. Preview: [link]
+  >
+  > What is in it (62 s):
+  > - The famous sacrifice is Carlsen's 50.Qh6+ against Karjakin (New York, 2016), "the most brilliant final move of any
+  >   world chess championship" (Kavalek). Stockfish calls it +M2: just a number.
+  > - The "!!" is a sticker a review site adds afterwards, by its own rules: Chess.com's own definition, and Lichess,
+  >   which has no such label.
+  > - Your benchmark: one free tool found 23 of 100, Chessigma's free review found 93. "No limit, no signup."
+  > - "There, they're called... Sigma": the Sigma flag in your app, then your end card, App Store and Google Play.
+  >
+  > Branding: we kept the integration at the end, because our numbers drop when a sponsor comes early. So we took your
+  > second option, Chessigma on screen in the assets: your rulebook next to Chess.com's and Lichess's (0:28), your
+  > benchmark chart with your logo (0:48), your app (0:51 and 0:58), your end card (0:55). If you would rather have the
+  > logo on the board in more shots, or one line at the start, tell us and we will change it.
+  >
+  > Two things:
+  > 1. The preview still uses the earlier recording, framed below the coach card. We are recording again signed in and
+  >    will swap it in before the final version.
+  > 2. Does Chessigma give Sigma to 50.Qh6+ itself? If it does, we would show your review of that exact move.
+  >
+  > After your OK we can post within a day. For the second video this week: Openings, Game Review or Principles — which
+  > one first?
+  >
+  > Best,
+  > The 64 Files
+
+### 24.11 — `fivepoints` версия 6 (Элиот 25.11 не принял как ролик 1; ролик без спонсора)
 
 - **Почему.** Автор вспомнил, что Элиот просил свои темы, первая — brilliant moves: «может как-то переделать под его
   идею, но с той же идеей». Мост через игрока с рейтингом 527 он отклонил (правило 78). После черновика версии 5:

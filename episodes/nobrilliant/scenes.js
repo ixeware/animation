@@ -3230,16 +3230,17 @@ function tileWall(g, t, litAt, sheenT = Infinity) {
 }
 // the five free review tools of the sponsor's benchmark as bars on the same wall: brilliant moves found out of 100.
 // One accent for the sponsor and a neutral grey for the other four, every bar with its number (the others unnamed)
+let CSG_W = null;  // the sponsor's wordmark (set where it is loaded, below)
 const BARS_T = makeCanvas(1200, 1200), BARS = [['CHESSIGMA', 93], [null, 90], [null, 45], [null, 41], [null, 23]];
-function barsTex(lt) {
+function barsTex(lt, gold = null) {
   const x = BARS_T.getContext('2d'), w = 1200, h = 1200; x.setTransform(1, 0, 0, 1, 0, 0);
   x.fillStyle = '#080A11'; x.fillRect(0, 0, w, h); x.textBaseline = 'middle';
   x.textAlign = 'left'; x.font = sans(74, 900); x.letterSpacing = '5px'; x.fillStyle = CREAM; x.fillText('BRILLIANT MOVES FOUND', 80, 112);
   x.font = sans(50, 800); x.letterSpacing = '5px'; x.fillStyle = '#9AA4B8'; x.fillText('OUT OF 100 FROM CHESS.COM', 80, 196);
   const X0 = 80, FULL = 850;
   BARS.forEach(([name, v], i) => {
-    const me = i === 0, y = me ? 426 : 700 + (i - 1) * 128, th = me ? 112 : 84, u = ease.out(clamp((lt - 0.08 - i * 0.07) / 0.5)), bw = Math.max(8, FULL * v / 100 * u);
-    if (me) { x.font = sans(68, 900); x.letterSpacing = '6px'; x.fillStyle = CREAM; x.fillText(name, X0, y - 104); }
+    const me = i === 0, y = me ? 426 : 700 + (i - 1) * 128, th = me ? 112 : 84, u = me && gold !== null ? clamp(gold) : ease.out(clamp((lt - 0.08 - i * 0.07) / 0.5)), bw = Math.max(8, FULL * v / 100 * u);
+    if (me) { const lh = 104, lw = lh * CSG_W.width / CSG_W.height; x.drawImage(CSG_W, X0 - 10, y - 112 - lh / 2, lw, lh); }  // their wordmark
     x.fillStyle = me ? GOLD : '#5F6A80'; x.beginPath(); x.roundRect(X0, y - th / 2, bw, th, [0, 8, 8, 0]); x.fill();
     if (me) { x.save(); x.shadowColor = GOLD; x.shadowBlur = 40; x.globalAlpha = 0.5 * u; x.fill(); x.restore(); }
     x.font = mono(me ? 116 : 86, 800); x.letterSpacing = '0px'; x.fillStyle = me ? '#FFFFFF' : '#C6CEDC'; x.fillText(String(Math.round(v * u)), X0 + bw + 26, y + 4);
@@ -3248,10 +3249,10 @@ function barsTex(lt) {
   ledGrid(x, w, h, 10);
   return BARS_T;
 }
-function barsWall(g, t, lt) {
+function barsWall(g, t, lt, gold = null) {
   claimStage(g, t, 0.6);
   const { x0, y1, z } = CWALL;
-  texQuad(g, barsTex(lt), [x0, y1, z - 0.02], [x0 + 10, y1, z - 0.02], [x0, y1 - 10, z - 0.02], { under: false });
+  texQuad(g, barsTex(lt, gold), [x0, y1, z - 0.02], [x0 + 10, y1, z - 0.02], [x0, y1 - 10, z - 0.02], { under: false });
   lowKey(g, { cy: H * 0.46, a: 0.1 });
 }
 
@@ -3319,6 +3320,7 @@ const CK = await fetch('../engine/data/carlsen_karjakin_2016_tb4.json').then(r =
 const GG = await fetch('../engine/data/greek_gift_french.json').then(r => r.json());            // a textbook bishop sacrifice: 9.Bxh7+ = ply 17
 const FISH = await loadImage('../episodes/hikaru213/photos/stockfish_fish.png');  // the fish of Stockfish's logo, as in `biggerfish`: 716 × 264, head to the left
 const CSG = await loadImage('../episodes/woodpecker/photos/chessigma_logo.png');  // the sponsor's wordmark, white on clear, 334 × 92
+CSG_W = CSG;
 // Magnus is the channel's Magnus (curls, the beard, a dark jacket): in November 2016 he was clean-shaven, but the hook has
 // to read as him in the first frame (rule 57), and one film keeps one face
 const MAG = 'magnusSuit';
@@ -3406,7 +3408,7 @@ function paperBack(g, r, cx = 0) {
 function sticker(g, x, y, r, { a = 1, rot = 0, peel = 0, text = '!!', shadow = 1, fold = 0.9, sx = 1, face = 'front' } = {}) {
   if (a <= 0 || r < 1.5 || Math.abs(sx) < 0.02) return;
   g.save(); g.globalAlpha *= a; g.translate(x, y); g.rotate(rot); g.scale(sx, 1);
-  if (shadow > 0) { g.fillStyle = `rgba(6,10,20,${(0.26 * shadow).toFixed(3)})`; g.beginPath(); g.arc(r * 0.07, r * 0.12, r * 1.03, 0, 7); g.fill(); }
+  if (shadow > 0 && peel < 1) { g.fillStyle = `rgba(6,10,20,${(0.26 * shadow * (1 - clamp(peel))).toFixed(3)})`; g.beginPath(); g.arc(r * 0.07, r * 0.12, r * 1.03, 0, 7); g.fill(); }  // the shadow leaves with the peeled part
   if (face === 'back') paperBack(g, r);
   else if (peel <= 0.001) stickerFace(g, r, text, STK[text] || STK['!!']);
   else {
@@ -3414,7 +3416,7 @@ function sticker(g, x, y, r, { a = 1, rot = 0, peel = 0, text = '!!', shadow = 1
     g.rotate(fold);  // the fold line runs across the direction `fold` (0.9 rad: toward the lower right), at d from the centre
     g.save(); g.beginPath(); g.rect(-BIG, -BIG, BIG + d, 2 * BIG); g.clip(); g.rotate(-fold); stickerFace(g, r, text, STK[text] || STK['!!']); g.restore();
     g.save(); g.beginPath(); g.rect(-BIG, -BIG, BIG + d, 2 * BIG); g.clip();
-    g.fillStyle = 'rgba(6,10,20,0.22)'; g.beginPath(); g.arc(2 * d - r * 0.08, r * 0.06, r, 0, 7); g.fill();  // the lifted part's shade on the sticker
+    if (peel < 0.8) { g.fillStyle = 'rgba(6,10,20,0.22)'; g.beginPath(); g.arc(2 * d - r * 0.08, r * 0.06, r, 0, 7); g.fill(); }  // the lifted part's shade on the sticker
     paperBack(g, r, 2 * d);
     g.restore();
   }
@@ -3616,6 +3618,16 @@ function rulebooks(g, t, drops) {
 // ---------- a page of the first rulebook, open on the desk: the site's own words (support.chess.com, "How are moves
 // classified?", updated 9 Feb 2026). u1: the highlighter over the quote ----------
 const PAGE = makeCanvas(900, 760);
+let PAGE_TIP = null;  // the highlighter's leading edge on the page (px of its picture) while it draws
+const pagePt = (px, py) => [PG.x0 + (PG.x1 - PG.x0) * px / 900, 0.37, PG.z1 - (PG.z1 - PG.z0) * py / 760];
+// the review site's hand with a highlighter, its tip at (x, y)
+function markerHand(g, x, y, k = 1) {
+  g.save(); g.lineCap = 'round';
+  g.strokeStyle = '#16161E'; g.lineWidth = 36 * k; g.beginPath(); g.moveTo(x + 30 * k, y + 40 * k); g.lineTo(x + 130 * k, y + 180 * k); g.stroke();
+  g.strokeStyle = '#FFD21F'; g.lineWidth = 26 * k; g.beginPath(); g.moveTo(x + 4 * k, y + 6 * k); g.lineTo(x + 32 * k, y + 44 * k); g.stroke();
+  g.restore();
+  sleeveHand(g, x + 104 * k, y + 142 * k, W + 420, y + 820, { k: 1.15 * k });
+}
 const PG = { x0: 1.4, x1: 6.6, z0: 1.0, z1: 5.39 };
 function rulePage(g, u1) {
   const x = PAGE.getContext('2d'), w = 900, h = 760; x.setTransform(1, 0, 0, 1, 0, 0);
@@ -3626,7 +3638,9 @@ function rulePage(g, u1) {
   x.fillStyle = '#16161E'; x.font = sans(104, 900); x.letterSpacing = '0px'; x.fillText('Brilliant', 214, 240);
   x.font = sans(100, 900);
   const l1 = '“a good piece', l2 = 'sacrifice”', hl = (y, wd, u) => { if (u > 0) { x.fillStyle = '#FFE66B'; x.fillRect(38, y - 52, (wd + 24) * clamp(u), 104); } };
-  hl(424, x.measureText(l1).width, u1 * 2); hl(540, x.measureText(l2).width, u1 * 2 - 1);
+  const w1 = x.measureText(l1).width, w2 = x.measureText(l2).width;
+  hl(424, w1, u1 * 2); hl(540, w2, u1 * 2 - 1);
+  PAGE_TIP = u1 <= 0 || u1 >= 1 ? null : u1 < 0.5 ? [38 + (w1 + 24) * u1 * 2, 424] : [38 + (w2 + 24) * (u1 * 2 - 1), 540];
   x.fillStyle = '#16161E'; x.fillText(l1, 50, 428); x.fillText(l2, 50, 544);
   x.fillStyle = '#8A8F9C'; x.font = sans(26, 800); x.letterSpacing = '3px'; x.fillText('SUPPORT.CHESS.COM · UPDATED FEB 2026', 50, 690);
   ab(g, [PG.x0 - 0.5, 0, PG.z0 - 0.2], [PG.x1 + 0.5, 0.3, PG.z1 + 0.2], '#5E8A44', { spec: 0.15 });  // the open book under the page
@@ -3786,18 +3800,18 @@ export async function build(T) {
   const S4 = anyT - 0.07;
   shot(S4, (g, lt, t, sh) => {
     cam(lt, t, sh, K(Math.PI - 0.16, 0.06, 8.0, [4, 3.4, -1.4]), K(Math.PI - 0.08, 0.05, 6.9, [4, 3.45, -1.4]));
-    const u = clamp((t - humanT + 0.05) / 0.22), bob = hp => hp.y + bobOf(hp, hs(hp), t, HK);
-    lab(g, t, { mag: true, tank: null, eM: t >= humanT - 0.05 ? EXPR.shock : EXPR.worried,
+    const tt = t - 1, u = clamp((t - humanT + 0.05) / 0.22), bob = hp => hp.y + bobOf(hp, hs(hp), tt, HK);  // a second back: his blink fell on the cut
+    lab(g, tt, { mag: true, tank: null, eM: t >= humanT - 0.05 ? EXPR.shock : EXPR.worried,
       behind: g2 => { const hp = HEADW(); armsUp(g2, hp.x, bob(hp), hs(hp), u, CAST[HK].suit); },
-      front: g2 => { const hp = HEADW(); handsOnHead(g2, hp.x, bob(hp), hs(hp), t, u, skinOf(HK).base); } });
+      front: g2 => { const hp = HEADW(); handsOnHead(g2, hp.x, bob(hp), hs(hp), tt, u, skinOf(HK).base); } });
   }, { kb: 0, zoom: kicks([[anyT, 0.05]]), hud: (g, lt, t) => plate(g, 'BEATS ANY HUMAN', W / 2, 262, { color: GOLD, size: 64, rot: -0.02, ...popW(t, anyT) }) });
   cue(anyT, 'hit_punch', 0.45); cue(humanT, 'gasp', 0.3);
   // "But it has never seen": the fish, close; the music stops; a zero
   const S5 = butT - 0.1;
   shot(S5, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.16, 0.05, 9.6, [4, 2.9, 10]), K(-0.08, 0.04, 8.4, [4, 2.9, 10]));
+    cam(lt, t, sh, K(-0.16, 0.05, 9.8, [4, 3.55, 10]), K(-0.08, 0.04, 8.8, [4, 3.6, 10]));
     lab(g, t, { tank: { led: '+0.3', dx: 0.25 } });
-  }, { kb: 0, zoom: kicks([[neverT, 0.07]]), hud: (g, lt, t) => { if (t >= neverT) counter(g, '0', 'BRILLIANT MOVES SEEN', { y: 330, size: 200, color: RED, at: [t, neverT] }); } });
+  }, { kb: 0, zoom: kicks([[neverT, 0.07]]), hud: (g, lt, t) => { if (t >= neverT) counter(g, '0', 'BRILLIANT MOVES SEEN', { y: 270, size: 190, color: RED, at: [t, neverT] }); } });
   cue(neverT, 'boom_move', 0.55); cue(neverT + 0.02, 'stamp', 0.4);
   // "a brilliant move": a hand slaps the «!!» on its glass; the fish comes up to it, has no idea, and turns away
   const S6 = bril2T - 0.12, slapT = bril2T + 0.02, askT = move2T + 0.22, awayT = askT + 0.62;
@@ -3852,7 +3866,7 @@ export async function build(T) {
   }, { kb: 0, grade: 'warm', zoom: kicks([[LAND, 0.07]]), hud: (g, lt, t) => { if (t >= LAND + 0.06) stamp(g, 'QUEEN SACRIFICE', W / 2, 1590, t, LAND + 0.06, { color: RED, size: 78, rot: -0.05 }); } });
   cue(S10, 'heartbeat', 0.35); cue(LAND, 'boom_big', 0.6); cue(LAND, 'move', 0.5); cue(LAND + 0.3, 'gasp', 0.4);
   // Karjakin: the shock, then he gives up (50.Qh6+ 1-0)
-  const S11 = queenT + 0.36;
+  const S11 = queenT + 0.62;
   shot(S11, (g, lt, t, sh) => {
     cam(lt, t, sh, K(0.24, 0.06, 7.4, [4.3, 3.0, 9.3]), K(0.15, 0.05, 6.3, [4.2, 3.1, 9.3]));
     hall(g, t, ny({ eb: t >= gmT ? EX.sad : EXPR.shock, wPlayer: false, wChair: false }), { extra: false });
@@ -3914,7 +3928,7 @@ export async function build(T) {
     if (pe > 0.02) slot(g, q.x, q.y, r, { a: 0.6 * pe, col: '#FFFFFF', lw: 0.06 });  // where it was
     if (v <= 0) sticker(g, q.x, q.y, r, { rot: -0.1 * (1 - pe), peel: pe * 0.999 });
     else sticker(g, off[0], off[1], r, v < 0.5 ? { face: 'back', sx: Math.cos(Math.PI * v) } : { sx: -Math.cos(Math.PI * v), rot: -0.15 });
-    const edge = v > 0 ? [off[0] + r * 0.62, off[1] + r * 0.62] : [q.x + (r - 4 * r * pe) * NV[0], q.y + (r - 4 * r * pe) * NV[1]];
+    const k = ease.inOut(clamp(v * 1.6)), edge = v > 0 ? [lerp(q.x - 3 * r * NV[0], off[0] + r * 0.62, k), lerp(q.y - 3 * r * NV[1], off[1] + r * 0.62, k)] : [q.x + (r - 4 * r * pe) * NV[0], q.y + (r - 4 * r * pe) * NV[1]];
     if (hin > 0) sleeveHand(g, lerp(W + 300, edge[0], hin), lerp(q.y + 420, edge[1], hin), W + 460, q.y + 760, { k: 1.2 });
   }, { kb: 0, grade: 'warm', qaAllow: ['face cut by frame'], zoom: kicks([[stickT, 0.05]]), hud: (g, lt, t) => { if (t >= stickT) plate(g, 'A STICKER', W / 2, 262, { color: LIME, size: 76, rot: -0.02, ...popW(t, stickT) }); } });
   cue(laA - 0.03, 'whoosh_soft', 0.3); cue(PEEL0, 'fabric', 0.5); cue(PEEL1, 'paper', 0.4); cue(stickT, 'sparkle_pop', 0.3);
@@ -3945,6 +3959,7 @@ export async function build(T) {
   shot(ruA, (g, lt, t, sh) => {
     cam(lt, t, sh, K(-0.12, 1.0, 7.9, [4, 0.3, 3.2], { cy: H * 0.5 - 130 }), K(-0.04, 1.06, 7.1, [4, 0.3, 3.25], { cy: H * 0.5 - 130 }));
     deskRoom(g, t, { you: false, items: g2 => rulePage(g2, hl1(t)) });
+    if (PAGE_TIP) { const q = B.project(...pagePt(...PAGE_TIP)); markerHand(g, q.x, q.y); }
   }, { kb: 0, zoom: kicks([[sacT, 0.05]]), hud: (g, lt, t) => youCard(g, t, t >= sacT ? EX.happy : EXPR.focus, { x: 810, y: 150, w: 220 }) });
   cue(ruA - 0.03, 'page_flip', 0.5); cue(goodT, 'pen', 0.4); cue(sacT, 'sparkle_pop', 0.3);
   // "more generous for new players": stickers rain on your desk
@@ -3952,7 +3967,7 @@ export async function build(T) {
   shot(S20, (g, lt, t, sh) => {
     cam(lt, t, sh, K(-0.16, 0.2, 13.2, [4, 2.3, 6.2]), K(-0.07, 0.17, 11.2, [4, 2.6, 6.5]));
     const up = clamp((t - genT) / 0.25);
-    deskRoom(g, t, { e: t >= genT ? EX.happy : EXPR.focus, arms: up, items: g2 => stickerRain(g2, t, RAIN0) });
+    deskRoom(g, t + 0.6, { e: t >= genT ? EX.happy : EXPR.focus, arms: up, items: g2 => stickerRain(g2, t, RAIN0) });
   }, { kb: 0, zoom: kicks([[genT, 0.05]]), hud: (g, lt, t) => {
     const n = rainLanded(t, RAIN0);
     if (n > 0) counter(g, `${n} × !!`, 'NEW PLAYER · RATED 400', { y: 330, size: 150, color: LIME, at: [t, RAIN0 + 0.42] });
@@ -4031,16 +4046,14 @@ export async function build(T) {
 
   // ======================= THE SPONSOR (rule 61: at the end; rule 78: its own claim on the thing in frame) =======================
   // "Chessigma's free review found 93.": the same wall, their name on its sign; the tiles come back, the count stops at 93
-  const RUN0 = found2T - 0.25, RUN1 = n93T + 0.18, NEW70 = LIT93.filter(k => !KEEP23.includes(k));
-  const onAt = k => KEEP23.includes(k) ? -9 : NEW70.includes(k) ? lerp(RUN0, RUN1, (NEW70.indexOf(k) + 1) / NEW70.length) : Infinity;
-  const lit93 = t => 23 + NEW70.filter(k => t >= onAt(k)).length;
+  const RUN0 = found2T - 0.3, RUN1 = n93T + 0.16, gold = t => ease.out(clamp((t - RUN0) / (RUN1 - RUN0)));
   shot(a1A, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.14, 0.03, 22.2, [4, 7.1, 13], { cy: 868 }), K(0.03, 0.02, 20.8, [4, 7.1, 13], { cy: 868 }));
-    testWall(g, t, onAt, { brand: true, sheenT: RUN1 + 0.1 });
+    cam(lt, t, sh, K(-0.18, 0.03, 17.6, [4, 7.1, 13], { cy: 850 }), K(-0.05, 0.02, 16.2, [4, 7.1, 13], { cy: 850 }));
+    barsWall(g, t, lt, gold(t));
   }, { kb: 0, noGuard: true, zoom: kicks([[RUN1, 0.07]]), hud: (g, lt, t) => {
     adTag(g);
-    const n = lit93(t);
-    counter(g, `${n}/100`, 'FOUND BY CHESSIGMA\'S FREE REVIEW', { y: 212, size: 132, color: n >= 93 ? GOLD : CREAM, at: [t, a1A + 0.05] });
+    const n = Math.round(93 * gold(t));
+    counter(g, String(n), 'OF 100 · CHESSIGMA\'S FREE REVIEW', { y: 200, size: 128, color: n >= 93 ? GOLD : CREAM, at: [t, a1A + 0.05] });
   } });
   cue(a1A - 0.03, 'swipe_card', 0.3); cue(RUN0, 'riser', 0.3); for (let k = 0; k < 8; k++) cue(lerp(RUN0, RUN1, k / 8), 'clock_tick', 0.2);
   cue(RUN1, 'reveal_bell', 0.5); cue(RUN1 + 0.03, 'shimmer', 0.35);
