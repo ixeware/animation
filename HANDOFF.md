@@ -45,7 +45,9 @@
   Какой значок ставит Chess.com, не проверяли: сцена «тот же ход» — на учебной жертве слона.
 - **Файлы** (в `episodes/nobrilliant/build/`, в git не попадают):
   `The64Files_Brilliant_Moves_Dont_Exist_Chessigma_v2_DRAFT.mp4` — автору (v1 — до новой записи приложения);
-  `…_v2_PREVIEW.mp4` — превью для Элиота (720×1280, с надписью PREVIEW). Пересборка: `./build.sh nobrilliant` или шаги
+  `…_v2_PREVIEW.mp4` — превью для Элиота (720×1280, с надписью PREVIEW);
+  `…_v2_4K.mp4` — мастер для публикации (2160×3840, 93 МБ, −16,4 LUFS; собран 26.11 заранее, отправлен автору;
+  отпечаток `tools/proof.py` — перед самой публикацией, после «ок» Элиота). Пересборка: `./build.sh nobrilliant` или шаги
   из [CLAUDE.md](CLAUDE.md); голос в кэше (`episodes/nobrilliant/tts_cache`), кредиты не тратятся.
 - **Голос:** дубли bait 1, ny 2, ad1 3 (в дублях по умолчанию одна фраза была громче остальных на 2,7–3,5 дБ);
   `voice_check.py` — «no phrase stands out». Вёрстка — «no issues», планов короче 0,6 с нет, −16,4 LUFS.
