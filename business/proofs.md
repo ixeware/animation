@@ -23,3 +23,4 @@
 | 2026-11-16 16:05:59 | `rivalry_youtube.mp4` | 34547042 | 79.51 s | 1080×1920 | `174002037deb0dcf2d9e4d1acf1171ef4dfd3ea7a2e5fe5e05897c96a392b231` | rivalry v3, YouTube: the handle only |
 | 2026-11-16 18:15:35 | `rivalry.mp4` | 34449849 | 79.51 s | 1080×1920 | `afd503b6963ba52c59517f461c41757a2b60bd7e48cdd0949a24a43dfa70d262` | rivalry v4, TikTok: the flat scenes rebuilt as 3D sets |
 | 2026-11-16 18:15:35 | `rivalry_youtube.mp4` | 34445351 | 79.51 s | 1080×1920 | `f30bd6ecbc62fa7cff216c90e2de7d0aaa3c55daad31077868d488dd2a7e93b4` | rivalry v4, YouTube: the handle only |
+| 2026-11-27 15:20:36 | `The64Files_Brilliant_Moves_Dont_Exist_Chessigma_v3_4K.mp4` | 101639408 | 67.87 s | 2160×3840 | `99f2b1ac6cd9dd2ecdb45e3f4e383ab82848f960ec4fd34849cee3bc489385ff` | nobrilliant v3, TikTok: Chessigma ad with their B-roll and voiceover, approved by Eliot 27.11 |

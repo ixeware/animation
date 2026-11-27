@@ -49,7 +49,10 @@
   фраз): после сброса контейнера `cp episodes/nobrilliant/tts_cache/* episodes/nobrilliant/build/tts_cache/`.
 - **27.11, 13:39 UTC — Элиот одобрил v3** (письмо `1a21d3b7c191cc04`): «It's great, let's post it!» Про 141 и 93: «for
   the video it's alright» — ничего не меняем. Проверка почты выключена. Публикация:
-  1. 4К v3 (`…_v3_4K.mp4`), `python3 tools/proof.py <файл>` — строка в `business/proofs.md`, коммит и пуш до публикации;
+  1. 4К v3 (`…_v3_4K.mp4`), `python3 tools/proof.py <файл>` — строка в `business/proofs.md`, коммит и пуш до публикации.
+     **Сделано 27.11:** 2160×3840, 67,9 с, 101,6 МБ, −16,3 LUFS, пик −1,6 dBFS, планов короче 0,6 с нет; звук бит в бит
+     как в одобренном черновике, картинка совпадает с ним (PSNR 36,6–61 дБ); отпечаток — строка 27.11 15:20 UTC в
+     `business/proofs.md`, файл отдан автору. Файл не удалять: без него отпечаток ничего не доказывает;
   2. выкладывает автор: Content disclosure → Branded content; подпись — `post` из `episodes/nobrilliant/script.json`
      (там уже #ad); ссылка в био — `https://www.chessigma.com/go/app/the64files?utm_content=nobrilliant`;
   3. после выхода, по слову автора, — Элиоту «it's live» со ссылкой и счёт на вторую половину INV-2026-003 ($62.50).
