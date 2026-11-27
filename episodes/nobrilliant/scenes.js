@@ -23,6 +23,7 @@ import { webcam, trophy, goat } from '../../engine/js/witty.js';
 import { shockwave, burst, dust, glint } from '../../engine/js/fx.js';
 import { confetti, rays, vignette } from '../../engine/js/draw.js';
 import { loadImage } from '../../engine/js/photo.js';
+import { GRADES } from '../../engine/js/post.js';
 
 useLookV2();
 const CHANNEL = 'THE 64 FILES';  // whose channel the video is made for: the follow line names it (THE 64 FILES / HAPPYCHESS)
@@ -2139,14 +2140,57 @@ Object.assign(CAST, {
 });
 const MC = await fetch('../engine/data/martirosyan_carlsen_2026-11-13.json').then(r => r.json());  // Magnus Black; 39...Qd5 = ply 78
 const CA = await fetch('../engine/data/carlsen_artemiev_2026-11-19.json').then(r => r.json());      // Magnus White; 29...Qc2 = ply 58
-// the sponsor's end card (photos/rec/closer.mp4) and the author's recording of the app's review (photos/rec/review.mp4,
-// from `woodpecker`): frames by tools/frames.py into build/rec
+// the recordings (photos/rec/*.mp4): frames by tools/frames.py into build/rec. v3 shows only the sponsor's B-roll
+// (broll.mp4, Eliot 26.11); v2's end card, review and SIGMA recordings stay in photos/rec for its history
 const RECI = await fetch('../episodes/nobrilliant/build/rec/index.json').then(r => r.ok ? r.json() : null).catch(() => null);
-if (!RECI) throw new Error('no frames of the recordings: run python3 tools/frames.py episodes/nobrilliant');
-const REC = Object.fromEntries(await Promise.all(Object.entries(RECI).map(async ([name, { n }]) =>
+if (!RECI?.broll) throw new Error('no frames of the B-roll: run python3 tools/frames.py episodes/nobrilliant');
+const REC_USED = ['broll'];
+const REC = Object.fromEntries(await Promise.all(Object.entries(RECI).filter(([name]) => REC_USED.includes(name)).map(async ([name, { n }]) =>
   [name, await Promise.all(Array.from({ length: n }, (_, k) => loadImage(`../episodes/nobrilliant/build/rec/${name}/${String(k + 1).padStart(3, '0')}.jpg`)))])));
 const recFrame = (name, sec) => REC[name][clamp(Math.floor(sec * RECI[name].fps), 0, RECI[name].n - 1)];
 function adTag(g, a = 1) { plate(g, 'AD', 96, 146, { color: '#16161E', size: 26, a: a * 0.92, rot: 0 }); }
+
+// ---------- v3 (27.11.2026): the sponsor's B-roll (photos/rec/broll.mp4, Eliot 26.11) on the whole frame, through a
+// view: z the zoom, (cx, cy) the point of the recording at the centre of the frame, kept so the picture always covers
+// it; bp(V, x, y): where a point of the recording is on the screen ----------
+const bview = (z = 1, cx = W / 2, cy = H / 2) => { const hw = W / 2 / z, hh = H / 2 / z; return { z, cx: clamp(cx, hw, W - hw), cy: clamp(cy, hh, H - hh) }; };
+const bmix = (A, Bv, u) => bview(lerp(A.z, Bv.z, u), lerp(A.cx, Bv.cx, u), lerp(A.cy, Bv.cy, u));
+const bp = (V, x, y) => [(x - V.cx) * V.z + W / 2, (y - V.cy) * V.z + H / 2];
+// keys [[t, view, ease of the way to it]]: the view at t
+function vtrack(t, keys) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) if (t < keys[i][0]) {
+    const [t0, A] = keys[i - 1], [t1, Bv, e = ease.inOut] = keys[i];
+    return bmix(A, Bv, e(clamp((t - t0) / (t1 - t0))));
+  }
+  return keys[keys.length - 1][1];
+}
+function brollDraw(g, img, V) { g.save(); g.translate(W / 2, H / 2); g.scale(V.z, V.z); g.translate(-V.cx, -V.cy); g.drawImage(img, 0, 0, W, H); g.restore(); }
+// a lime frame drawn on round a part of the recording (its pixels x, y, w, h), through the view; out: when it goes
+function callout(g, V, [x, y, w, h], t, t0, { out = Infinity, col = LIME, lw = 9, r = 24, pad = 10 } = {}) {
+  const u = clamp((t - t0) / 0.3), a = 1 - clamp((t - out) / 0.15);
+  if (u <= 0 || a <= 0) return;
+  const [X, Y] = bp(V, x - pad, y - pad), ww = (w + 2 * pad) * V.z, hh = (h + 2 * pad) * V.z, per = 2 * (ww + hh);
+  g.save(); g.globalAlpha *= a; g.strokeStyle = col; g.lineWidth = lw; g.lineCap = 'round'; g.shadowColor = rgba(col, 0.7); g.shadowBlur = 22;
+  g.setLineDash([per * ease.out(u), per + 10]); g.beginPath(); g.roundRect(X, Y, ww, hh, r * V.z); g.stroke();
+  g.restore();
+}
+// a lime line drawn under a row of the recording, left to right
+function underline(g, V, x0, x1, y, t, t0, { out = Infinity, lw = 10 } = {}) {
+  const u = ease.out(clamp((t - t0) / 0.35)), a = 1 - clamp((t - out) / 0.15);
+  if (u <= 0 || a <= 0) return;
+  const [X0, Y] = bp(V, x0, y), [X1] = bp(V, x1, y);
+  g.save(); g.globalAlpha *= a; g.strokeStyle = LIME; g.lineWidth = lw; g.lineCap = 'round'; g.shadowColor = rgba(LIME, 0.7); g.shadowBlur = 18;
+  g.beginPath(); g.moveTo(X0, Y); g.lineTo(lerp(X0, X1, u), Y); g.stroke(); g.restore();
+}
+// a soft dark band under the captions where they lie over a busy screen recording (gray text of the app beside a caption
+// read as one line in v3's first cut: "141 brilliants 41"); the captions themselves stay as they are (rule 33)
+function capScrim(g, y, a = 0.55) {
+  if (a <= 0) return;
+  const y0 = y - 175, y1 = y + 125, gr = g.createLinearGradient(0, y0, 0, y1);
+  gr.addColorStop(0, 'rgba(6,7,10,0)'); gr.addColorStop(0.32, `rgba(6,7,10,${a})`); gr.addColorStop(0.68, `rgba(6,7,10,${a})`); gr.addColorStop(1, 'rgba(6,7,10,0)');
+  g.fillStyle = gr; g.fillRect(0, y0, W, y1 - y0);
+}
 
 // ---------- a crown on a head: where a character's head is (actor's projection and scale k) ----------
 function crownOn(g, hp, k, { a = 1, dy = 0, rot = 0, dx = 0 } = {}) {
@@ -3548,7 +3592,7 @@ function quoteCard(g, lines, by, x, y, { a = 1, scale = 1, size = 52, w = 980 } 
 // ---------- the review desk: your desk by the window (a deep one: its top is y = 0, x -2.2..10.2, z -0.8..6.4), you
 // behind it; arms 0..1: both fists up; items(g): the things on the desk ----------
 const DESK_Z0 = -0.8;
-function deskRoom(g, t, { e = 'focus', you = true, arms = 0, items = null, before = null, at = YOU_AT } = {}) {
+function deskRoom(g, t, { e = 'focus', you = true, arms = 0, items = null, before = null, mid = null, low = 1, at = YOU_AT } = {}) {
   dayRoom(g, t, {});
   const hp = B.project(at.x, at.y, at.z), s = hp.s * at.k * 1.05 / 100, on = you && hp.z > 0.8;
   if (before) before(g);
@@ -3557,12 +3601,13 @@ function deskRoom(g, t, { e = 'focus', you = true, arms = 0, items = null, befor
     actor(g, B, 'you', { ...at, e, t, face: -1 });
     if (arms > 0) for (const sd of [-1, 1]) raiseHand(g, hp, s, t, 'you', sd, arms, 1);
   }
+  if (mid) mid(g);  // what is in your hands, between you and the desk (the phone in v3)
   ab(g, [-2.2, FLOOR_Y + 0.6, 6.0], [10.2, -0.45, 6.3], '#6E5034');
   ab(g, [-2.2, -0.45, DESK_Z0], [10.2, 0, 6.4], '#8A6440', { spec: 0.15 });
   for (const [x, z] of [[-1.8, DESK_Z0 + 0.4], [9.8, DESK_Z0 + 0.4]]) ab(g, [x - 0.18, FLOOR_Y, z - 0.18], [x + 0.18, -0.45, z + 0.18], '#5E4128');
   pool(g, B, 4, 0.02, 3.2, 7, '#FFE7B8', 0.25);
   if (items) items(g);
-  lowKey(g, { cy: H * 0.46, a: 0.04 });
+  if (low > 0) lowKey(g, { cy: H * 0.46, a: 0.04 * low, bottom: 0.35 * low });  // low < 1: the camera is going into a screen
   return on ? { hp, s } : null;
 }
 // a screen standing on the desk, turned to us; a point of its 800 × 700 picture in the world
@@ -3752,11 +3797,14 @@ export async function build(T) {
   const laA = s('label') - 0.06, markT = w('label', 3), isT = w('label', 4), stickT = w('label', 6), revT = w('label', 8), addsT = w('label', 10), laterT = w('label', 12), byT = w('label', 13), ownT = w('label', 15), rulesT = w('label', 16);
   const ruA = s('rule') - 0.06, goodT = w('rule', 3), sacT = w('rule', 5), and2T = w('rule', 6), genT = w('rule', 9), newT = w('rule', 11);
   const saA = s('same') - 0.06, bril4T = w('same', 6), youT = w('same', 8), and3T = w('same', 9), justMT = w('same', 10), moveMT = w('same', 12), magnT = w('same', 14);
-  const liA = s('lichess') - 0.06, thatT = w('lichess', 2), doesT = w('lichess', 4), exist2T = w('lichess', 5);
-  const teA = s('test') - 0.06, hundT = w('test', 4), oneT = w('test', 7), foundT = w('test', 10), onlyT = w('test', 11), n23T = w('test', 12);
-  const a1A = s('ad1') - 0.06, freeT = w('ad1', 1), found2T = w('ad1', 3), n93T = w('ad1', 4), noT = w('ad1', 5), limitT = w('ad1', 6), signT = w('ad1', 8), thereT = w('ad1', 9), sigmaT = w('ad1', 12);
-  const onStoreT = w('ad2', 0), linkT = w('ad2', 7), CLOSE = onStoreT - 0.08;
-  const ctA = Math.max(s('cta') - 0.1, CLOSE + 3.0), manyT = w('cta', 2), haveT = w('cta', 7);
+  // v3 (27.11.2026): the sponsor's integration as Eliot asked on 26.11: their voiceover word for word over their B-roll
+  const qA = s('q') - 0.06, howT = w('q', 1), playedT = w('q', 7);
+  const cgT = w('tell', 0), free1T = w('tell', 1);
+  const likeT = w('flags', 5), thisT = w('flags', 6);
+  const yoursT = s('yours'), userT = w('yours', 9);
+  const triedT = w('gotham', 1), gcT = w('gotham', 2), n141T = w('gotham', 3), threeT = w('gotham', 6);
+  const eloA = s('elo'), eloT = w('elo', 1), partT = w('elo', 4), and5T = w('elo', 8), bril5T = w('elo', 10), tacticT = w('elo', 12);
+  const findA = s('find'), free2T = w('find', 2), linkT2 = w('find', 5);
 
   // ======================= HOOK (rules 1, 28, 42, 57): Magnus holds up his «!!» like a medal, and it is gone =======================
   // the board in New York, his side of it; the sticker in his raised hand is the one thing over his head. On "don't" it
@@ -4011,111 +4059,134 @@ export async function build(T) {
   } });
   cue(S22, 'whoosh_deep', 0.35); cue(LANDM, 'move_capture', 0.5); cue(noT2, 'error', 0.35); cue(noT2 + 0.02, 'stamp', 0.4); cue(magnT, 'sting', 0.25);
 
-  // ======================= THE SECOND RULEBOOK: on Lichess there is no such sticker =======================
-  const S24 = exist2T + 0.2;
-  shot(liA, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.14, 0.98, 8.0, [4, 0.3, 3.2], { cy: H * 0.5 - 150 }), K(0.03, 1.05, 7.0, [4, 0.3, 3.25], { cy: H * 0.5 - 150 }), glide, { bump: t >= doesT ? Math.exp(-(t - doesT) * 7) * 0.6 : 0 });
-    deskRoom(g, t, { you: false, items: g2 => sheetOnDesk(g2, sheetTex(t >= thatT && t < doesT ? Math.abs(Math.sin((t - thatT) * 9)) : 0, clamp((t - doesT) / 0.25))) });
-  }, { trans: 'whip', kb: 0, zoom: kicks([[doesT, 0.06]]), hud: (g, lt, t) => { if (t >= doesT) stamp(g, 'DOESN\'T EXIST', W / 2, 300, t, doesT, { color: RED, size: 118, rot: -0.07 }); } });
-  cue(liA - 0.04, 'whoosh_fast', 0.3); cue(liA + 0.05, 'page_flip', 0.45); cue(thatT, 'pluck', 0.3); cue(doesT, 'stamp', 0.55); cue(doesT + 0.02, 'error', 0.35);
-  // "at all": you
-  shot(S24, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.2, 0.12, 9.0, [4, 3.2, 7.2]), K(-0.1, 0.1, 7.8, [4, 3.3, 7.3]));
-    deskRoom(g, t, { e: t >= S24 + 0.5 ? EX.sad : EXPR.shock, items: g2 => sheetOnDesk(g2, sheetTex(0, 1)) });
-  }, { kb: 0, hud: (g, lt, t) => stamp(g, 'DOESN\'T EXIST', W / 2, 300, t, doesT, { color: RED, size: 118, rot: -0.07 }) });
-  cue(S24, 'gasp', 0.3);
+  // ======================= v3: THE SPONSOR (Eliot, 26.11: «keep 0:00–0:39.5», then their B-roll and voiceover) =======================
+  // the question to you at your desk; your phone comes up and the camera goes into its screen; from there their
+  // B-roll as delivered (flat: no grade, vignette, grain or watermark), timed to their voiceover, our callouts on top.
+  // Their B-roll in its own time b (s), against the film's time t: [t, b] or [t, b before the cut, b from the cut on].
+  // The cuts are the recording's own (sign-in page frame 235, report 292, overview 363, end card 585)
+  const WAKE = cgT - 0.04, CUT_SIGN = yoursT - 0.01, TYPE0 = w('yours', 6) - 0.05, TYPE1 = userT + 0.35, PRESS = triedT - 0.05,
+    CUT_REP = gcT + 0.37, CUT_ELO = eloA - 0.01, SCR0 = eloT + 0.39, SCR1 = partT - 0.06, CUT_END = findA - 0.09;
+  const BMAP = [[WAKE, 0], [likeT, 5.95], [thisT + 0.27, 6.45], [CUT_SIGN, 6.80, 7.84], [TYPE0, 8.05, 8.08], [TYPE1, 8.95], [PRESS - 0.17, 9.20], [PRESS, 9.27],
+    [CUT_REP, 9.69, 9.74], [CUT_ELO, 11.95, 12.11], [SCR0, 13.10], [SCR1, 13.86], [and5T - 0.05, 14.38], [bril5T - 0.03, 15.85],
+    [tacticT - 0.08, 17.6], [tacticT + 0.02, 17.8], [CUT_END, 19.44, 19.51], [CUT_END + 3.84, 23.35]];
+  const bAt = t => {
+    let p = [BMAP[0][0], BMAP[0][1]];
+    if (t < p[0]) return p[1];
+    for (const k of BMAP) {
+      if (t < k[0]) return p[1] + (k[1] - p[1]) * (t - p[0]) / (k[0] - p[0]);
+      p = [k[0], k[2] ?? k[1]];
+    }
+    return p[1] + (t - p[0]);
+  };
+  const BR = t => recFrame('broll', bAt(t) + 0.002);  // + 0.002: 7.84 × 30 is 235.2, never 234.99
 
-  // ======================= THE TEST: a hundred brilliant moves; one free tool found 23 =======================
-  const wave = k => hundT - 0.3 + 0.75 * ((k % 10) + Math.floor(k / 10)) / 18;
-  const lit100 = t => Array.from({ length: 100 }, (_, k) => k).filter(k => t >= wave(k)).length;
-  shot(teA, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.2, 0.03, 22.6, [4, 7.1, 13], { cy: 868 }), K(0.07, 0.02, 21, [4, 7.1, 13], { cy: 868 }));
-    testWall(g, t, wave);
-  }, { trans: 'whip', kb: 0, zoom: kicks([[hundT + 0.45, 0.05]]), hud: (g, lt, t) => {
-    counter(g, String(lit100(t)), 'BRILLIANT MOVES · FROM CHESS.COM GAMES', { y: 212, size: 132, color: lit100(t) >= 100 ? LIME : CREAM, at: [t, teA + 0.05] });
+  // "So... how many brilliant moves have you played?": back at your desk under the site's stickers; a counter spins and
+  // stops on a question mark (never on 93 or 141: those numbers come later)
+  const SPIN = [3, 17, 8, 41, 26, 5, 63, 12, 34, 9, 77, 21, 48, 2];
+  shot(qA, (g, lt, t, sh) => {
+    cam(lt, t, sh, K(-0.18, 0.14, 11.0, [4, 2.9, 6.8]), K(-0.08, 0.11, 8.6, [4, 3.2, 7.1]));
+    deskRoom(g, t, { e: t >= playedT ? EX.happy : EX.smug, items: g2 => stickerRain(g2, t, -99) });
+  }, { trans: 'whip', kb: 0, zoom: kicks([[playedT, 0.05]]), hud: (g, lt, t) => {
+    if (t < howT - 0.05) return;
+    const q = t >= playedT, v = q ? '?' : String(SPIN[Math.floor((t - howT + 0.05) / 0.09) % SPIN.length]);
+    counter(g, v, 'YOUR BRILLIANT MOVES', { y: 330, size: 200, color: q ? LIME : CREAM, at: [t, howT - 0.05] });
   } });
-  cue(teA - 0.04, 'whoosh_fast', 0.3); cue(hundT - 0.3, 'riser', 0.3); for (let k = 0; k < 7; k++) cue(hundT - 0.3 + 0.75 * k / 7, 'clock_tick', 0.18); cue(hundT + 0.45, 'reveal_bell', 0.4);
-  // "One free tool found only 23.": the tiles it missed go dark, the count falls
-  const S26 = oneT - 0.1, OUT = Array.from({ length: 100 }, (_, k) => k).filter(k => !KEEP23.includes(k)).sort((a, b) => hash2(a, 23) - hash2(b, 23));
-  const offAt = k => { const i = OUT.indexOf(k); return i < 0 ? Infinity : lerp(foundT - 0.15, n23T - 0.02, i / (OUT.length - 1)); };
-  const lit23 = t => 100 - OUT.filter(k => t >= offAt(k)).length;
-  shot(S26, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.26, 0.04, 22, [4, 7.1, 13], { cy: 868 }), K(-0.12, 0.03, 20.8, [4, 7.1, 13], { cy: 868 }));
-    testWall(g, t, k => (t >= offAt(k) ? Infinity : -9));
-  }, { kb: 0, zoom: kicks([[n23T, 0.07]]), hud: (g, lt, t) => {
-    const n = lit23(t);
-    counter(g, `${n}/100`, 'FOUND BY ONE FREE TOOL', { y: 212, size: 132, color: n <= 23 ? RED : CREAM, at: [t, S26 + 0.05] });
-    badge(g, 'SOURCE: CHESSIGMA.COM/BENCHMARKS/BRILLIANT', W / 2, 1500, { color: CREAM, size: 28, a: seg(t, S26 + 0.3, S26 + 0.5) });
-  } });
-  cue(S26 - 0.03, 'whoosh_soft', 0.3); cue(foundT - 0.15, 'whirr', 0.3); for (let k = 0; k < 6; k++) cue(lerp(foundT - 0.15, n23T, k / 6), 'tick', 0.2); cue(n23T, 'error', 0.4); cue(n23T + 0.02, 'thud', 0.4);
+  cue(qA - 0.04, 'whoosh_fast', 0.3); cue(howT - 0.05, 'riser', 0.22);
+  for (let k = 0; k < 8; k++) cue(howT + k * 0.2, 'clock_tick', 0.12);
+  cue(playedT, 'reveal_bell', 0.45); cue(playedT + 0.02, 'sparkle_pop', 0.3);
 
-  // ======================= THE SPONSOR (rule 61: at the end; rule 78: its own claim on the thing in frame) =======================
-  // "Chessigma's free review found 93.": the same wall, their name on its sign; the tiles come back, the count stops at 93
-  const RUN0 = found2T - 0.3, RUN1 = n93T + 0.16, gold = t => ease.out(clamp((t - RUN0) / (RUN1 - RUN0)));
-  shot(a1A, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(-0.18, 0.03, 17.6, [4, 7.1, 13], { cy: 850 }), K(-0.05, 0.02, 16.2, [4, 7.1, 13], { cy: 850 }));
-    barsWall(g, t, lt, gold(t));
-  }, { kb: 0, noGuard: true, zoom: kicks([[RUN1, 0.07]]), hud: (g, lt, t) => {
-    adTag(g);
-    const n = Math.round(93 * gold(t));
-    counter(g, String(n), 'OF 100 · CHESSIGMA\'S FREE REVIEW', { y: 200, size: 128, color: n >= 93 ? GOLD : CREAM, at: [t, a1A + 0.05] });
+  // "Chessigma's free review can tell you.": the phone comes up in your hand beside your face, its screen wakes on their
+  // review and the camera goes into it until the screen is the frame (the grade, vignette and grain go on the way)
+  const N2 = T.e('q') + 0.03, FILL = w('tell', 3) - 0.1, PUSH0 = FILL - 0.8, CAP_B = 1490;
+  const PH = { hw: 0.54, hh: 0.96 }, PHD = 1500 * PH.hw / 540, KK = YOU_AT.k * 1.05 / 100;  // KK: world units per unit of the actor's drawing
+  const upU = t => clamp((t - N2 + 0.08) / 0.3), pushU = t => ease.inOut(clamp((t - PUSH0) / (FILL - PUSH0)));
+  const handW = (u, bob) => { const a = raiseArm(-1, u, 0); return [YOU_AT.x + a.h[0] * KK, YOU_AT.y - (a.h[1] + bob) * KK, YOU_AT.z]; };
+  const PH_OFF = [0.44, 0.3, -0.15], PH_END = handW(1, 0).map((v, i) => v + PH_OFF[i]), SCR_END = [PH_END[0], PH_END[1], PH_END[2] - 0.003];
+  const G0 = GRADES.neutral, gradeAt = u => ({ con: lerp(G0.con, 1, u), sat: lerp(G0.sat, 1, u), bri: lerp(G0.bri, 1, u),
+    tone: [G0.tone[0], G0.tone[1] * (1 - u)], lift: [G0.lift[0], G0.lift[1] * (1 - u)], bloom: G0.bloom * (1 - u) });
+  const freeFly = (g, t) => {
+    if (t < free1T - 0.05) return;
+    const k = clamp((t - FILL + 0.24) / 0.3);
+    plate(g, 'FREE', W / 2, 300 - 90 * k, { color: LIME, size: 92, rot: -0.03, a: 1 - k, scale: popW(t, free1T - 0.05).scale * (1 + 0.55 * k * k) });
+  };
+  shot(N2, (g, lt, t) => {
+    const u = pushU(t), uh = upU(t);
+    rig(B, lt, [[0, K(-0.12, 0.1, 6.4, [2.95, 3.9, 7.3])], [PUSH0 - N2, K(-0.09, 0.09, 6.0, [2.7, 3.92, 7.3])], [FILL - N2, K(0, 0, PHD, SCR_END), ease.inOut]],
+      { t, e: lin, shake: 1 - u });
+    const hp = B.project(YOU_AT.x, YOU_AT.y, YOU_AT.z), sc = hp.s * KK, bob = Math.sin(t * 1.7 + 5.1 + hp.x * 0.01) * 4;
+    const hw = handW(uh, bob * (1 - u)), C = hw.map((v, i) => v + PH_OFF[i]);
+    const R = { rx: -0.06 * (1 - u), ry: (0.12 + Math.sin(t * 0.9) * 0.03) * (1 - u), rz: (-0.05 - 0.45 * (1 - ease.out(uh))) * (1 - u) };
+    const F = (x, y, z) => { const p = rot3([x, y, z], R); return [C[0] + p[0], C[1] + p[1], C[2] + p[2]]; };
+    const img = t >= WAKE ? BR(t) : null;
+    deskRoom(g, t, { e: t >= cgT ? EX.happy : EX.smug, low: 1 - u,
+      before: g2 => raiseSleeve(g2, hp, sc, t, 'you', -1, uh, 0),
+      mid: g2 => {
+        raiseHand(g2, hp, sc, t, 'you', -1, uh, 0);
+        obox(g2, F(0, 0, 0.03), [PH.hw + 0.05, PH.hh + 0.07, 0.03], '#15171C', R, { spec: 0.5 });
+        quad(g2, [F(-PH.hw, PH.hh, -0.002), F(PH.hw, PH.hh, -0.002), F(PH.hw, -PH.hh, -0.002), F(-PH.hw, -PH.hh, -0.002)], '#06070A');
+        if (img) texQuad(g2, img, F(-PH.hw, PH.hh, -0.003), F(PH.hw, PH.hh, -0.003), F(-PH.hw, -PH.hh, -0.003), { under: false, a: clamp((t - WAKE) / 0.12) });
+      } });
+  }, { kb: 0, noGuard: true, capY: CAP_B, qaAllow: ['text over face'], hud: (g, lt, t, sh) => {
+    const u = pushU(t);
+    sh.grade = gradeAt(u); sh.vig = 0.55 * (1 - u); sh.grain = 0.06 * (1 - u);
+    capScrim(g, CAP_B, 0.55 * clamp((u - 0.6) / 0.4));  // the band of the B-roll shots comes in with the screen
+    if (t >= WAKE) adTag(g);
+    freeFly(g, t);
   } });
-  cue(a1A - 0.03, 'swipe_card', 0.3); cue(RUN0, 'riser', 0.3); for (let k = 0; k < 8; k++) cue(lerp(RUN0, RUN1, k / 8), 'clock_tick', 0.2);
-  cue(RUN1, 'reveal_bell', 0.5); cue(RUN1 + 0.03, 'shimmer', 0.35);
-  // "No limit, no signup.": the review on your phone, the whole screen: the coach's comment on a move of this game
-  const S28 = noT - 0.1;
-  shot(S28, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.09, 0.02, 4.5, [4, 1.6, 2.2]), K(0.03, 0.02, 4.1, [4, 1.62, 2.2]));
-    phoneHeld(g, t, sigFrame(0.25 + (t - S28)));
-  }, { trans: 'whip', kb: 0, noGuard: true, qaAllow: ['text over face'], hud: (g, lt, t) => {  // your face is behind the phone
-    adTag(g);
-    if (t >= limitT - 0.12) badge(g, 'NO LIMIT', 290, 505, { color: LIME, size: 56, ...popW(t, limitT - 0.12) });  // between the coach's card and the board
-    if (t >= signT - 0.12) badge(g, 'NO SIGNUP', 780, 505, { color: LIME, size: 56, ...popW(t, signT - 0.12) });
-  } });
-  cue(S28 - 0.04, 'whoosh_fast', 0.3); cue(limitT - 0.12, 'success', 0.4); cue(signT - 0.12, 'sparkle_pop', 0.35);
-  // "There, they're called... Sigma.": the same review two moves on. "Kh7 is miss", the arrow to h6; the queen goes
-  // there and the app's own burst and SIGMA flag come out on the word (the recording at its own speed)
-  const S29 = thereT - 0.1, recS = t => clamp(SIG_OUT - 0.03 + (t - sigmaT), 3.72, 8.5);
-  let flagQ = null;
-  shot(S29, (g, lt, t, sh) => {
-    // the camera goes in with the queen and stands still when the flag comes out; the board and the move strip fill the frame
-    rig(B, lt, [[0, K(0.06, 0.02, 4.3, [4.0, 1.62, 2.2])], [sigmaT - S29 - 0.8, K(0.03, 0.02, 4.0, [4.05, 1.66, 2.2])],
-      [sigmaT - S29 - 0.15, K(0.0, 0.02, 3.3, [4.3, 1.35, 2.2]), ease.inOut], [len(sh), K(-0.01, 0.02, 3.15, [4.32, 1.36, 2.2])]], { t, e: glide });
-    phoneHeld(g, t, sigFrame(recS(t)));
-    flagQ = B.project(...heldPt(t, ...SIG_FLAG));
-  }, { kb: 0, noGuard: true, qaAllow: ['text over face'], zoom: kicks([[sigmaT, 0.05]]), hud: (g, lt, t) => {
-    adTag(g);
-    const rt = sigmaT + 0.12;
-    if (flagQ && t >= rt) glint(g, flagQ.x, flagQ.y, t, rt, { r: 240, color: '#E8FFF9' });
-    if (t >= rt) plate(g, 'BRILLIANT = SIGMA', W / 2 + 30, 132, { color: LIME, size: 64, rot: -0.02, ...popW(t, rt) });  // over the app's end-of-game card
-  } });
-  cue(S29 - 0.03, 'whoosh_soft', 0.25); cue(sigmaT - 0.35, 'move', 0.4); cue(sigmaT - 0.2, 'riser', 0.25); cue(sigmaT + 0.02, 'success', 0.5); cue(sigmaT + 0.1, 'sparkle_pop', 0.4);
-  // their 3-second end card as it is (logo, 2M+ players, the store badges): flat, no captions over it
-  shot(CLOSE, (g, lt) => { g.drawImage(recFrame('closer', lt), 0, 0, W, H); },
-    { flat: true, noGuard: true, noCaptions: true, hud: (g, lt, t) => {
+  cue(N2 - 0.02, 'fabric', 0.35); cue(WAKE, 'notify', 0.4); cue(free1T - 0.05, 'sparkle_pop', 0.35); cue(PUSH0 + 0.1, 'whoosh_soft', 0.3);
+
+  // their B-roll from here: flat, no watermark; the captions under its board; the AD tag stays
+  const flatShot = (a, views, over, { scrim = 0.55, ...o } = {}) => shot(a, (g, lt, t) => brollDraw(g, BR(t), vtrack(t, views)),
+    { flat: true, noGuard: true, kb: 0, capY: CAP_B, ...o, hud: (g, lt, t, sh) => {
+      capScrim(g, o.capY ?? CAP_B, scrim);
+      if (over) over(g, t, vtrack(t, views), sh);
       adTag(g);
-      if (t >= linkT - 0.05) badge(g, 'LINK IN BIO', W / 2, 1462, { color: GOLD, size: 50, ...pop(t, linkT - 0.05) });
     } });
-  cue(CLOSE, 'whoosh_soft', 0.3); cue(CLOSE + 0.2, 'reveal_bell', 0.35); cue(linkT, 'sparkle_pop', 0.3);
+  const FLAG = [506, 1115, 168, 51];  // the SIGMA !! flag over the knight (the recording's pixels, from 6.4 s)
+  // "can tell you. It flags every brilliant move... like this one.": the coach's comments roll; on "like" the camera
+  // punches in on the knight, the SIGMA flag comes out, a glint on "this"
+  flatShot(FILL, [[FILL, bview(1)], [likeT - 0.35, bview(1.07, 540, 840), glide], [likeT - 0.05, bview(1.6, 596, 1170), ease.out], [CUT_SIGN, bview(1.68, 596, 1172), lin]],
+    (g, t, V) => {
+      freeFly(g, t);
+      callout(g, V, FLAG, t, thisT + 0.02);
+      const [fx, fy] = bp(V, 648, 1138); glint(g, fx, fy, t, thisT + 0.05, { r: 250, color: '#E8FFF9' });
+    });
+  cue(likeT - 0.35, 'whoosh_fast', 0.25); cue(thisT - 0.02, 'success', 0.45); cue(thisT, 'sparkle_pop', 0.35);
+  // "And it finds all of yours. Just type a username.": their sign-in page; the name typed in; the button
+  flatShot(CUT_SIGN, [[CUT_SIGN, bview(1)], [TYPE0, bview(1.12, 540, 820), glide], [PRESS, bview(1.24, 540, 840), glide], [CUT_REP, bview(1.27, 540, 846), lin]],
+    (g, t, V) => callout(g, V, [172, 884, 740, 142], t, PRESS - 0.04), { trans: 'whip' });
+  cue(CUT_SIGN - 0.03, 'whoosh_fast', 0.3); cue(TYPE0 + 0.02, 'typewriter', 0.3); cue(PRESS, 'clack', 0.5); cue(PRESS + 0.03, 'success', 0.3);
+  // "I tried GothamChess: 141 brilliants in three months.": his report; on 141 the camera punches in on the line
+  flatShot(CUT_REP, [[CUT_REP, bview(1)], [n141T - 0.3, bview(1.1, 560, 600), glide], [n141T + 0.05, bview(1.6, 545, 610), ease.out], [CUT_ELO, bview(1.66, 546, 610), lin]],
+    (g, t, V) => { callout(g, V, [444, 606, 222, 88], t, n141T + 0.02); callout(g, V, [634, 570, 182, 58], t, threeT - 0.03, { lw: 7 }); },
+    { scrim: 0.7 });  // his games list under the captions: names and scores
+  cue(CUT_REP - 0.02, 'whoosh_soft', 0.3); cue(n141T, 'reveal_bell', 0.5); cue(n141T + 0.02, 'hit', 0.3); cue(threeT, 'sparkle_pop', 0.3);
+  // "An Elo for every part of his game, and every brilliant and tactic he played.": the gauge, his Elos part by part,
+  // the brilliant moves (93 of them), the tactics
+  flatShot(CUT_ELO, [[CUT_ELO, bview(1)], [SCR0, bview(1.06, 420, 1000), glide], [SCR1 + 0.05, bview(1.36, 536, 590)], [and5T - 0.05, bview(1.4, 536, 590), lin],
+    [bril5T - 0.03, bview(1.15, 440, 650)], [tacticT - 0.08, bview(1.17, 440, 640), lin], [tacticT + 0.2, bview(1.15, 460, 610)], [CUT_END, bview(1.12, 470, 620), lin]],
+    (g, t, V) => {
+      callout(g, V, [252, 980, 166, 82], t, eloT - 0.02, { out: SCR0 - 0.12 });
+      underline(g, V, 170, 905, 412, t, partT - 0.02, { out: and5T - 0.1 });
+      callout(g, V, [170, 510, 172, 213], t, bril5T - 0.02, { out: tacticT - 0.1 });
+      callout(g, V, [357, 460, 176, 215], t, tacticT + 0.04);
+    }, { trans: 'whip' });
+  cue(CUT_ELO - 0.03, 'whoosh_fast', 0.3); cue(eloT, 'success', 0.3); cue(partT, 'sparkle_pop', 0.25); cue(and5T - 0.05, 'whoosh_soft', 0.2);
+  cue(bril5T - 0.02, 'reveal_bell', 0.35); cue(tacticT + 0.04, 'sparkle_pop', 0.3);
+  // "Find yours free on chessigma.com. Link in bio": their end card as delivered (logo, players, store badges)
+  flatShot(CUT_END, [[CUT_END, bview(1)]], (g, t) => {
+    if (t >= free2T - 0.05) plate(g, 'FREE', W / 2, 218, { color: LIME, size: 84, rot: -0.03, ...popW(t, free2T - 0.05) });
+    if (t >= linkT2 - 0.05) badge(g, 'LINK IN BIO', W / 2, 1585, { color: GOLD, size: 46, ...popW(t, linkT2 - 0.05) });
+  }, { capY: 1478, scrim: 0 });
+  cue(CUT_END, 'swipe_card', 0.3); cue(free2T - 0.05, 'success', 0.35); cue(linkT2 - 0.05, 'sparkle_pop', 0.3);
 
-  // ======================= CTA (rules 10, 26, 39): how many do you have? Back to the first frame =======================
-  // your phone on your desk: the app's own list "Your brilliant moves" (other people's names under it are blurred)
-  const PANEL = onDesk(390, 430);
-  shot(ctA, (g, lt, t, sh) => {
-    cam(lt, t, sh, K(0.1, 1.14, 3.5, [PANEL[0], 0.1, PANEL[2] - 0.25], { cy: H * 0.5 - 120 }), K(0.04, 1.18, 3.05, [PANEL[0], 0.1, PANEL[2] - 0.2], { cy: H * 0.5 - 120 }));
-    yourRoom(g, t, { e: EXPR.focus, glow: 1, img: recClean(0.3) });  // 0.3 s of the recording: the list has not scrolled up, its names are under the blur
-  }, { trans: 'whip', kb: 0, noGuard: true, zoom: kicks([[manyT, 0.05]]), hud: (g, lt, t) => {
-    adTag(g);
-    if (t >= manyT - 0.1) counter(g, '?', 'YOUR BRILLIANT MOVES', { y: 320, size: 200, color: LIME, at: [t, manyT - 0.1] });
-  } });
-  cue(ctA - 0.04, 'whoosh_fast', 0.3); cue(manyT - 0.1, 'notify', 0.4);
-  // the loop: his hand, the sticker in it, as in the first frame
-  const S32 = Math.max(haveT - 0.42, ctA + 1.3);
+  // ======================= THE LOOP (rules 10, 26, 39): "and comment your number": back to the first frame =======================
+  const S32 = w('find', 8) - 0.1;
   shot(S32, (g, lt, t, sh) => {
     cam(lt, t, sh, K(Math.PI - 0.26, 0.05, 9.8, [3.25, 3.5, -1.4]), HOOK0);
     const q = holdSet(g, t - T.duration + 1, { e: EX.smug });  // the last frame is the first one
     glint(g, q.x + q.r * 0.3, q.y - q.r * 0.35, t, S32 + 0.15, { r: 260 });
-  }, { kb: 0, grade: 'warm', hud: (g, lt, t) => {
+  }, { trans: 'whip', kb: 0, grade: 'warm', hud: (g, lt, t) => {
     plate(g, 'BRILLIANT MOVES', W / 2, 262, { color: LIME, size: 74, rot: 0 });
     badge(g, 'COMMENT YOUR NUMBER', W / 2, 1560, { color: GOLD, size: 52, ...popW(t, S32 + 0.25) });
     badge(g, 'FOLLOW ' + CHANNEL, W / 2, 1680, { color: CREAM, size: 38, a: seg(t, S32 + 0.9, S32 + 1.0) });
@@ -4127,15 +4198,17 @@ export async function build(T) {
   const music = [
     { t: 0, m: 'hook' }, { t: baA, m: 'intrigue' }, { t: nyA, m: 'build' }, { t: S10, m: 'tension' }, { t: LAND, m: 'drop' }, { t: S12, m: 'glory' },
     { t: fiA, m: 'void' }, { t: laA, m: 'clockwork' }, { t: ruA, m: 'intrigue' }, { t: S20, m: 'victory' }, { t: saA, m: 'clockwork' }, { t: S22, m: 'void' },
-    { t: liA, m: 'paranoia' }, { t: teA, m: 'build' }, { t: a1A, m: 'glory' }, { t: S28, m: 'digital' }, { t: ctA, m: 'hook' }, { t: T.duration, m: 'end' },
+    { t: qA, m: 'intrigue' }, { t: WAKE, m: 'digital' }, { t: S32, m: 'hook' }, { t: T.duration, m: 'end' },
   ];
   const musicFx = [
     { t0: butT - 0.2, t1: neverT - 0.02, kind: 'mute' }, { t0: neverT, t1: nyA, kind: 'boost', db: 3 },
     { t0: LAND - 0.3, t1: LAND - 0.01, kind: 'mute' }, { t0: LAND, t1: S11, kind: 'boost', db: 4 },
     { t0: fiA, t1: S15, kind: 'lp', f: 900 }, { t0: S15, t1: numT + 0.45, kind: 'mute' },
     { t0: noT2 - 0.2, t1: magnT + 0.3, kind: 'mute' },
-    { t0: S28, t1: ctA, kind: 'lp', f: 1400 },
+    { t0: n141T - 0.35, t1: n141T - 0.02, kind: 'mute' }, { t0: n141T, t1: n141T + 1.4, kind: 'boost', db: 3 },
   ];
   shots.sort((a, b) => a.a - b.a);
-  return { shots, cues, music, musicFx, tvOff, duration: T.duration, autoWhoosh: false, jumpCut: { every: 1.4, zooms: [1, 1.1, 1.04], shift: 30 } };
+  // caption breaks (after word k of a phrase): 141 is not read before it is said, the lines follow the B-roll's beats
+  const capBreaks = { q: [0, 4], tell: [2], flags: [2, 4], yours: [2], gotham: [2, 4], elo: [7, 10], find: [2, 7] };
+  return { shots, cues, music, musicFx, tvOff, duration: T.duration, autoWhoosh: false, jumpCut: { every: 1.4, zooms: [1, 1.1, 1.04], shift: 30 }, capBreaks };
 }

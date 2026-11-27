@@ -7,19 +7,22 @@ const SIZE = 66, Y = Math.round(H * 0.68), MAXW = 860;
 // the band the captions occupy (with room for the jump-cut zoom), for labels that must keep out of it
 export const CAP_BAND = [Y - SIZE * 0.82 - 40, Y + SIZE * 0.3 + 40];
 
-export function buildChunks(phrases, ctx) {
+// breaks = { phraseId: [k, ...] }: a chunk also ends after word k of that phrase (a film's capBreaks), so a number the
+// picture reveals on its word is not read in the caption before it is said
+export function buildChunks(phrases, ctx, breaks = {}) {
   ctx.font = FONT(SIZE);
   const chunks = [];
   for (const p of phrases) {
     let cur = [];
     const flush = () => { if (cur.length) chunks.push({ words: cur, pid: p.id }); cur = []; };
-    for (const w of p.words) {
+    const after = (breaks || {})[p.id] || [];
+    p.words.forEach((w, k) => {
       const trial = [...cur, w].map(x => x.w).join(' ');
       // break on sentence ends inside a phrase, on width, or after 4 words
       if (cur.length && (ctx.measureText(trial).width > MAXW || cur.length >= 4)) flush();
       cur.push(w);
-      if (/[.!?]$/.test(w.w) && !/\.\.\.$/.test(w.w)) flush();
-    }
+      if ((/[.!?]$/.test(w.w) && !/\.\.\.$/.test(w.w)) || after.includes(k)) flush();
+    });
     flush();
   }
   chunks.forEach((c, i) => {

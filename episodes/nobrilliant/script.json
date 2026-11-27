@@ -1,7 +1,7 @@
 {
   "title": "Brilliant moves don't exist",
   "channel": "THE 64 FILES",
-  "post": "Brilliant moves don't exist 🤯 Stockfish only gives a number. The !! is a sticker 👀 How many brilliants do you have? 👇\nChessigma's free game review found 93 of 100 Chess.com brilliant moves. No limit, no signup. Link in bio.\n#ad #chessigma #chess #brilliantmove #magnuscarlsen #stockfish #chesstok",
+  "post": "Brilliant moves don't exist 🤯 Stockfish only gives a number. The !! is a sticker 👀 How many brilliants have you played? Comment your number 👇\nFind yours free on chessigma.com (link in bio).\n#ad #chessigma #chess #brilliantmove #magnuscarlsen #stockfish #chesstok",
   "lead_in": 0.05,
   "tail": 1.6,
   "voice": {
@@ -134,7 +134,7 @@
       "id": "same",
       "text": "So the same move can be brilliant for you, and just a move for Magnus.",
       "say": "So the same move can be brilliant for you... and just a move for Magnus.",
-      "pause": 0.4,
+      "pause": 0.5,
       "colors": {
         "same": "gold",
         "brilliant": "lime",
@@ -143,70 +143,93 @@
       }
     },
     {
-      "id": "lichess",
-      "text": "On Lichess, that sticker doesn't exist at all.",
-      "say": "On Lee-chess, that sticker doesn't exist at all.",
-      "pause": 0.3,
+      "id": "q",
+      "text": "So... how many brilliant moves have you played?",
+      "say": "So... [pause] how many brilliant moves have you played?",
+      "pause": 0.35,
       "colors": {
-        "Lichess,": "gold",
-        "doesn't": "red",
-        "exist": "red"
-      }
-    },
-    {
-      "id": "test",
-      "text": "One test took a hundred Chess.com brilliants. One free tool found only 23.",
-      "say": "One test took a hundred Chess dot com brilliants. [pause] One free tool found only twenty-three.",
-      "pause": 0.3,
-      "colors": {
-        "hundred": "gold",
-        "brilliants.": "lime",
-        "only": "red",
-        "23.": "red"
-      }
-    },
-    {
-      "id": "ad1",
-      "text": "Chessigma's free review found 93. No limit, no signup. There, they're called... Sigma.",
-      "say": "[impressed] Chessigma's free review found ninety-three. [pause] No limit, no signup. There, they're called... [pause] Sigma.",
-      "pause": 0.25,
-      "hold": {
-        "after": "called...",
-        "sec": 0.35
+        "brilliant": "lime",
+        "moves": "lime",
+        "played?": "gold"
       },
+      "take": 4
+    },
+    {
+      "id": "tell",
+      "text": "Chessigma's free review can tell you.",
+      "say": "Chessigma's free review can tell you.",
+      "pause": 0.25,
       "colors": {
         "Chessigma's": "gold",
         "free": "lime",
-        "93.": "gold",
-        "limit,": "lime",
-        "signup.": "lime",
-        "Sigma.": "lime"
-      },
-      "take": 3
-    },
-    {
-      "id": "ad2",
-      "text": "On the App Store and Google Play. Link in bio.",
-      "say": "On the App Store and Google Play. Link in bio.",
-      "pause": 0.45,
-      "tempo": 1.36,
-      "colors": {
-        "Link": "gold",
-        "bio.": "gold"
+        "review": "lime"
       }
     },
     {
-      "id": "cta",
-      "text": "So, how many brilliant moves do you have?",
-      "say": "So, how many brilliant moves do you have?",
+      "id": "flags",
+      "text": "It flags every brilliant move... like this one.",
+      "say": "It flags every brilliant move... [pause] like this one.",
+      "pause": 0.3,
+      "colors": {
+        "every": "gold",
+        "brilliant": "lime",
+        "move...": "lime",
+        "this": "gold",
+        "one.": "gold"
+      },
+      "take": 1
+    },
+    {
+      "id": "yours",
+      "text": "And it finds all of yours. Just type a username.",
+      "say": "And it finds all of yours. [pause] Just type a username.",
+      "pause": 0.3,
+      "colors": {
+        "all": "gold",
+        "yours.": "lime",
+        "username.": "gold"
+      }
+    },
+    {
+      "id": "gotham",
+      "text": "I tried GothamChess: 141 brilliants in three months.",
+      "say": "I tried Gotham Chess: [pause] one hundred forty-one brilliants in three months.",
+      "pause": 0.3,
+      "colors": {
+        "GothamChess:": "gold",
+        "141": "lime",
+        "brilliants": "lime",
+        "three": "gold",
+        "months.": "gold"
+      },
+      "take": 2
+    },
+    {
+      "id": "elo",
+      "text": "An Elo for every part of his game, and every brilliant and tactic he played.",
+      "say": "An Elo for every part of his game... and every brilliant and tactic he played.",
+      "pause": 0.3,
+      "colors": {
+        "Elo": "gold",
+        "part": "gold",
+        "brilliant": "lime",
+        "tactic": "lime"
+      }
+    },
+    {
+      "id": "find",
+      "text": "Find yours free on chessigma.com. Link in bio, and comment your number.",
+      "say": "Find yours free on Chessigma dot com. [pause] Link in bio, and comment your number.",
       "pause": 0.0,
       "colors": {
-        "how": "gold",
-        "many": "gold",
-        "brilliant": "lime",
-        "moves": "lime"
+        "free": "lime",
+        "chessigma.com.": "gold",
+        "Link": "gold",
+        "bio,": "gold",
+        "comment": "lime",
+        "number.": "lime"
       }
     }
   ],
-  "_voice_notes": "v1 (25.11.2026): Chessigma video 1 as the sponsor asked on 25.11, the pitch of 9.11. Numbers and site names are spelled out in `say` (Chess.com = Chess dot com, Lichess = Lee-chess, 2016 = twenty sixteen). Takes (tools/voice_check.py --takes, 25.11): bait 1, ny 2, ad1 3 — in the default readings one sentence stood 2.7–3.5 dB over the others ('Sigma.' the quietest)."
+  "_voice_notes": "v1 (25.11.2026): Chessigma video 1 as the sponsor asked on 25.11, the pitch of 9.11. Numbers and site names are spelled out in `say` (Chess.com = Chess dot com, Lichess = Lee-chess, 2016 = twenty sixteen). Takes (tools/voice_check.py --takes, 25.11): bait 1, ny 2, ad1 3 — in the default readings one sentence stood 2.7–3.5 dB over the others ('Sigma.' the quietest). v3 (27.11.2026): Eliot's integration of 26.11 — the video to 'just a move for Magnus', then their voiceover word for word over their B-roll (GothamChess = Gotham Chess, 141 = one hundred forty-one, chessigma.com = Chessigma dot com in `say`)."
 }

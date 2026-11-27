@@ -119,6 +119,20 @@
   (условие сделки; `woodpecker` вышел до ответа — вторая половина оплаты была перенесена; после выхода ролик не
   поправить). В Gmail лежит черновик короткого напоминания Элиоту с просьбой к Мехди согласовать, если Элиота нет
   (`r-2339598148650527422`), **не отправлен** — по слову автора. 4К-мастер v2 рендерится заранее.
+- **26.11.2026, 19:10 UTC — Элиот ответил на v2** (письмо `1a219440698faac4`, та же ветка, копия Мехди): «The video
+  is great, thank you! Sorry for the last-minute change: we'd like a different integration». Просит:
+  - оставить 0:00–0:39,5 (до «…just a move for Magnus»);
+  - дальше их B-roll из папки Drive `1flVRpY5ABUfn4iYeEBcjoPkyWFL7UXgg`: «1 - Integration B-roll» — ставить его;
+    «2 - Example with transition and subtitles» — только пример, «Do the transition your way»;
+  - их текст **слово в слово** (8 строк, в `episodes/nobrilliant/SOURCES.md`, раздел «Версия 3»): вопрос «how many
+    brilliant moves have you played?», бесплатный разбор, флажок на бриллианте, поиск по нику, GothamChess — 141
+    бриллиант за три месяца, Elo по частям игры, «Find yours free on chessigma.com. Link in bio, and comment your number»;
+  - «Please send us the new version before posting.»
+
+  Автор: «он ответил» — делаем v3. Черновик напоминания Элиоту (`r-2339598148650527422`) удалён: он больше не нужен.
+- **27.11.2026 — `nobrilliant` v3 собран** (67,9 с): ролик до «Magnus» без изменений, дальше наш переход и их B-roll
+  под их текст нашим голосом (Callum), субтитры по словам, метка AD, плашки FREE и LINK IN BIO, петля на первый кадр.
+  Превью — автору; письмо Элиоту — черновиком, отправка только по слову автора. Выкладывать — только после «ок» Элиота.
 - **24.11.2026, около 23:00 UTC — превью `fivepoints` версии 6 отправлено Элиоту** (автор: «отправляй», потом прислал ссылку
   на Drive). Ответ на его письмо от 23.11, копия Мехди; наше письмо — `1a20fcad41f7622a`.
   - Превью: `The64Files_Magnus_Five_Points_Chessigma_v6_PREVIEW.mp4`, 9,5 МБ, Drive канала, id

@@ -50,7 +50,7 @@ const mod = await import(`../../episodes/${ep}/scenes.js`);
 const film = await mod.build(T);
 const shots = film.shots.map((s, i) => ({ ...s, i }));
 shots.forEach((s, i) => { s.b = s.b ?? (shots[i + 1] ? shots[i + 1].a : film.duration ?? T.duration); });
-const chunks = buildChunks(T.phrases, ctx);
+const chunks = buildChunks(T.phrases, ctx, film.capBreaks);  // film.capBreaks { phraseId: [word indices to break after] }
 const DURATION = film.duration ?? T.duration;
 // the channel's moving watermark (guard.js, STYLE_BIBLE rule 70): on for every film unless the film returns guard: false
 // or the order set its own mark; a film's guard: { ... } changes its options. The page's ?guard=off (render.mjs --guard off)
@@ -198,8 +198,8 @@ function compose(t, frame) {
   if (tr === 'flash') flash(ctx, 1 - lt / 0.3);
   if (!s.flat) vignette(ctx, s.vig ?? 0.55);
   if (guard && !s.noGuard) guard(ctx, t, s);  // a sponsor's own card is shown as delivered: its shot says noGuard
-  drawCaptions(ctx, chunks, t, { hide: s.noCaptions });
-  if (!s.flat) grain(ctx, frame, 0.06);
+  drawCaptions(ctx, chunks, t, { hide: s.noCaptions, y: s.capY });  // a shot may move the captions (s.capY) off what it shows
+  if (!s.flat) grain(ctx, frame, s.grain ?? 0.06);
 }
 
 function renderFrame(t, frame = Math.round(t * FPS)) {

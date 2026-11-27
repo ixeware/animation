@@ -87,3 +87,30 @@ Chessigma logo on the board». Письмо — в `memory/sponsors.md`.
 - Финал закольцован (правило 10): последний кадр — первый; вопрос числом (правила 26, 39): «how many brilliant moves
   do you have?».
 - Stockfish — рыба его логотипа, как в `biggerfish` (правило 53).
+
+## Версия 3: интеграция Chessigma по письму Элиота (26.11.2026)
+- **Письмо Элиота, 26.11.2026, 19:10 UTC** (ветка про INV-2026-001, копия Мехди): «The video is great… we'd like a
+  different integration». Взять ролик 0:00–0:39,5 (до «…just a move for Magnus»), дальше их B-roll
+  («1 - Integration B-roll»; «2 - Example with transition and subtitles» — только пример, «Do the transition your way») и
+  их текст слово в слово: «So... how many brilliant moves have you played? / Chessigma's free review can tell you. / It
+  flags every brilliant move... like this one. / And it finds all of yours. Just type a username. / I tried GothamChess:
+  141 brilliants in three months. / An Elo for every part of his game, / and every brilliant and tactic he played. / Find
+  yours free on chessigma.com. Link in bio, and comment your number.» «Please send us the new version before posting.»
+  Папка на Drive: `1flVRpY5ABUfn4iYeEBcjoPkyWFL7UXgg`; B-roll лежит в `photos/rec/broll.mp4` (24,5 с, 30 к/с).
+- Всё, что говорится и видно после 0:39,5, — **их текст и их запись**; мы их не перепроверяли. Что в записи:
+  - разбор партии «gothamche… vs chesssknock»: комментарии тренера, потом ход **Nxe4 с флажком SIGMA !!** (вспышка на
+    6,0–6,5 с записи) — на «like this one»;
+  - страница входа: поле «Chess.com username», набирается «gothamchess», кнопка «Get free report» (8,1–9,3 с);
+  - его отчёт: «Their report · Last 90 days · **141 brilliants** · 1501 ta…» (9,7–11,9 с) — на «141 brilliants in three
+    months» (последние 90 дней ≈ три месяца — их формулировка);
+  - обзор: «687 games · Chess.com blitz · 2800–3000», оценка Elo 2605, Elo по частям игры (Openings 2759, Blunders 2933,
+    Tactics 2784, Conversion 2759, Clock 2759); коллекция тактик: **Brilliant 93**, Tactics 1636, Hanging 950, Mates 72;
+  - их финальная карточка: CHESSIGMA, «2M+ players», «15M+ games analyzed», звёзды, App Store и Google Play.
+- В записи два числа бриллиантов: 141 в отчёте и 93 в коллекции на «every brilliant». Откуда разница, из записи не
+  видно (возможно, разные выборки партий). Ролик ничего к этому не добавляет; в письме Элиоту — вопрос, оставить ли
+  рамку на плитке с 93.
+- **GothamChess** (реальный человек) назван в их тексте, его аккаунт и фото — в их записи. Это решение спонсора; автору
+  сказано, что риск (связь реального человека с рекламой) остаётся на их тексте.
+- Наше в этой части: переход (вопрос за столом и счётчик со знаком «?», телефон в руке, камера уходит в экран), подсветки
+  поверх записи (рамки, подчёркивание, блик), плашки FREE и LINK IN BIO, субтитры по их тексту, метка AD, голос канала.
+  Петля в конце — прежняя: последний кадр — первый, «comment your number».

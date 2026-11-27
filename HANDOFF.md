@@ -1,17 +1,67 @@
-# Передача проекта (handoff), 8.11.2026, дополнено 9.11, 22.11, 24.11 и 25.11.2026
+# Передача проекта (handoff), 8.11.2026, дополнено 9.11, 22.11, 24.11, 25.11 и 27.11.2026
 
 Записка для модели или человека, который продолжит работу. Проект — шахматные шортсы для TikTok, сделанные кодом.
 Здесь: что прочитать, как поставить окружение, как собрать ролик, что уже сделано и на чём легко ошибиться.
 Правила работы живут в [CLAUDE.md](CLAUDE.md). Файл назван по Claude Code, но обязателен для любой модели.
 
-## 0. Состояние на 25.11.2026 — читать первым
+## 0. Состояние на 27.11.2026 — читать первым
 
 Здесь всё, что висит, и как продолжить в новом контейнере. Подробности:
 - [memory/sponsors.md](memory/sponsors.md) — Chessigma, Hungry Studio, PolyBuzz, Chessnut;
 - [business/youtube_copies.md](business/youtube_copies.md);
 - [memory/journal.md](memory/journal.md).
 
-### Сначала: 25.11 — Элиот не принял `fivepoints`; новый ролик 1 — `nobrilliant` («Brilliant moves don't exist»)
+### Сначала: 27.11 — `nobrilliant` версия 3 по письму Элиота от 26.11
+
+- **Письмо Элиота, 26.11, 19:10 UTC** (письмо `1a219440698faac4`, ветка `1a1cd1a82e2a9623`, копия Мехди): «The video
+  is great… we'd like a different integration». Ролик до 0:39,5 («…just a move for Magnus») оставить, дальше — их
+  B-roll («1 - Integration B-roll», папка Drive `1flVRpY5ABUfn4iYeEBcjoPkyWFL7UXgg`) и их текст слово в слово, переход —
+  наш («Do the transition your way»). «Please send us the new version before posting.» Текст — в
+  `episodes/nobrilliant/SOURCES.md`, раздел «Версия 3».
+- **Версия 3 собрана 27.11** (67,9 с). До 39,2 с — версия 2 без изменений. Дальше:
+  1. «So... how many brilliant moves have you played?» — снова твой стол со стикерами, счётчик крутится и встаёт на «?»;
+  2. «Chessigma's free review can tell you» — телефон поднимается в руке, экран просыпается их разбором, камера уходит
+     в экран, пока он не станет кадром (грейд, виньетка и зерно уходят по дороге), плашка FREE пролетает мимо;
+  3. их B-roll плоскими планами, наезды и подсветки в такт словам: флажок SIGMA на «like this one», ник и кнопка «Get
+     free report», «141 brilliants» и «Last 90 days», Elo по частям игры, плитки Brilliant и Tactics; их карточка, FREE
+     и LINK IN BIO;
+  4. «and comment your number» — петля на первый кадр (Магнус со стикером), как в v2.
+  Метка AD — вся интеграция. Субтитры по словам их текста, под ними на записи — мягкая полоса.
+- **Голос:** их строки нашим голосом (Callum), дубли q 4, flags 1, gotham 2 (`voice_check.py`); `say` с «Gotham
+  Chess», «one hundred forty-one», «Chessigma dot com».
+- **Файлы** (в `episodes/nobrilliant/build/`, в git не попадают): `The64Files_Brilliant_Moves_Dont_Exist_Chessigma_v3_DRAFT.mp4`
+  и `…_v3_PREVIEW.mp4` — автору. Файлы v2 (DRAFT, PREVIEW и **4К-мастер v2**) устарели — **v2 не выкладывать**.
+- **Риски, сказанные автору:** GothamChess (реальный человек) назван в их тексте, его аккаунт и фото — в их записи;
+  в записи два числа (141 в отчёте и 93 на плитке Brilliant) — в письме вопрос Элиоту.
+- **Дальше:** автор смотрит v3 → заливает его на Drive (коннектор из сессии берёт до 3 МБ) и даёт слово → ответ
+  Элиоту в той же ветке (текст ниже, в разделе «Текст ответа на письмо от 26.11») → его письменное «ок» → 4К
+  (`node render.mjs nobrilliant --workers 4 --scale 2`, сведение, два прохода x264 12000k) → `tools/proof.py`, коммит,
+  пуш → публикация с #ad и Branded content. Черновик напоминания Элиоту (`r-2339598148650527422`) удалён.
+- **Текст ответа на письмо от 26.11** (вместо `[link]` — ссылка автора на v3; отправлять только по его слову):
+
+  > Hi Eliot,
+  >
+  > No problem, here is the new version: [link]
+  >
+  > - 0:00 to 0:39 is unchanged, up to "...just a move for Magnus".
+  > - The transition is ours: "So... how many brilliant moves have you played?" over a spinning counter, then the
+  >   viewer raises a phone, your review wakes up on it and the camera goes into the screen until it fills the frame.
+  >   From there it's your B-roll as delivered.
+  > - Your voiceover word for word, in the channel's voice, with word-by-word subtitles. On each line we highlight the
+  >   matching part of the B-roll: the SIGMA flag on "like this one", the username and "Get free report", "141
+  >   brilliants" and "Last 90 days", the Elo for each part of his game, the Brilliant and Tactics tiles. Then your end
+  >   card with "FREE" and "LINK IN BIO".
+  > - The "AD" label stays on screen for the whole integration, and the post goes out with #ad and Branded content on.
+  >
+  > One detail to check: the report shows 141 brilliants, and on "every brilliant" the tactics collection shows
+  > "Brilliant 93". If you'd rather not have both numbers on screen, I can take the highlight off the 93 tile.
+  >
+  > Once you OK it, I'll post within a day.
+  >
+  > Best,
+  > The 64 Files
+
+### 25.11 — Элиот не принял `fivepoints`; новый ролик 1 — `nobrilliant` («Brilliant moves don't exist»)
 
 - **Письмо Элиота, 25.11, 07:31 UTC** (ветка `1a1cd1a82e2a9623`, письмо `1a2119e6078a2e8a`, копия Мехди): «The video is
   well made, but I think we had a misunderstanding about the topics». Каждый из четырёх роликов должен быть **о функции,
