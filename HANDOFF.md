@@ -56,6 +56,28 @@
   2. выкладывает автор: Content disclosure → Branded content; подпись — `post` из `episodes/nobrilliant/script.json`
      (там уже #ad); ссылка в био — `https://www.chessigma.com/go/app/the64files?utm_content=nobrilliant`;
   3. после выхода, по слову автора, — Элиоту «it's live» со ссылкой и счёт на вторую половину INV-2026-003 ($62.50).
+- **Вышел 27.11 в 16:08 UTC:** https://www.tiktok.com/@the64files/video/7712883798265875719 (метка рекламы включена,
+  #ad в подписи). Через 17 ч — 83,5 тыс. просмотров. 28.11 в био ещё стояла ссылка `utm_content=witty2` — автору сказано
+  поменять. После выкладки проверять ссылку в био: `python3 tools/tiktok.py` её не печатает, но она есть в данных
+  профиля (`webapp.user-detail` → `userInfo.user.bioLink`).
+- **Письмо Элиоту «it's live»** — ответом на его «ок» (`1a21d3b7c191cc04`), копия Мехди, приложить
+  `Invoice_INV-2026-003_ARCHE_LABS.pdf` (в рабочей папке сессии, `scratchpad/invoice/`). Отправлять по слову автора и
+  после смены ссылки в био:
+
+  > Hi Eliot,
+  >
+  > It's live: https://www.tiktok.com/@the64files/video/7712883798265875719
+  >
+  > Posted on Nov 27 at 16:08 UTC, with Branded content on, #ad in the caption and your link in bio. In the first 17
+  > hours: 83K views, 4.6K likes and 1,180 saves, and viewers are commenting their numbers.
+  >
+  > As agreed, the second half of INV-2026-003 (USD 62.50) is due on publication. I've attached the invoice again.
+  >
+  > For video 2, I'd like to do Principles, your new module, unless you'd rather start with Openings. I'll send you
+  > the idea before I build it.
+  >
+  > Best,
+  > The 64 Files
 - **Текст ответа на письмо от 26.11** (вместо `[link]` — ссылка автора на v3; отправлять только по его слову):
 
   > Hi Eliot,
