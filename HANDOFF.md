@@ -58,7 +58,8 @@
   3. после выхода, по слову автора, — Элиоту «it's live» со ссылкой и счёт на вторую половину INV-2026-003 ($62.50).
 - **Вышел 27.11 в 16:08 UTC:** https://www.tiktok.com/@the64files/video/7712883798265875719 (метка рекламы включена,
   #ad в подписи). Через 17 ч — 83,5 тыс. просмотров. 28.11 в био ещё стояла ссылка `utm_content=witty2` — автору сказано
-  поменять. После выкладки проверять ссылку в био: `python3 tools/tiktok.py` её не печатает, но она есть в данных
+  поменять; 28.11 в 10:46 UTC проверено — в био `…?utm_content=nobrilliant`. Счёт пока французский, как раньше (автор:
+  «пока что оставь французский счет»). После выкладки проверять ссылку в био: `python3 tools/tiktok.py` её не печатает, но она есть в данных
   профиля (`webapp.user-detail` → `userInfo.user.bioLink`).
 - **Письмо Элиоту «it's live»** — ответом на его «ок» (`1a21d3b7c191cc04`), копия Мехди, приложить
   `Invoice_INV-2026-003_ARCHE_LABS.pdf` (в рабочей папке сессии, `scratchpad/invoice/`). Отправлять по слову автора и
@@ -68,8 +69,8 @@
   >
   > It's live: https://www.tiktok.com/@the64files/video/7712883798265875719
   >
-  > Posted on Nov 27 at 16:08 UTC, with Branded content on, #ad in the caption and your link in bio. In the first 17
-  > hours: 83K views, 4.6K likes and 1,180 saves, and viewers are commenting their numbers.
+  > Posted on Nov 27 at 16:08 UTC, with Branded content on, #ad in the caption and your link in bio. In the first 19
+  > hours: 88K views, 4.8K likes and 1.2K saves, and viewers are commenting their numbers.
   >
   > As agreed, the second half of INV-2026-003 (USD 62.50) is due on publication. I've attached the invoice again.
   >
