@@ -1,15 +1,58 @@
-# Передача проекта (handoff), 8.11.2026, дополнено 9.11, 22.11, 24.11, 25.11 и 27.11.2026
+# Передача проекта (handoff), 8.11.2026, дополнено 9.11, 22.11, 24.11, 25.11, 27.11 и 28.11.2026
 
 Записка для модели или человека, который продолжит работу. Проект — шахматные шортсы для TikTok, сделанные кодом.
 Здесь: что прочитать, как поставить окружение, как собрать ролик, что уже сделано и на чём легко ошибиться.
 Правила работы живут в [CLAUDE.md](CLAUDE.md). Файл назван по Claude Code, но обязателен для любой модели.
 
-## 0. Состояние на 27.11.2026 — читать первым
+## 0. Состояние на 28.11.2026 — читать первым
 
 Здесь всё, что висит, и как продолжить в новом контейнере. Подробности:
 - [memory/sponsors.md](memory/sponsors.md) — Chessigma, Hungry Studio, PolyBuzz, Chessnut;
 - [business/youtube_copies.md](business/youtube_copies.md);
 - [memory/journal.md](memory/journal.md).
+
+### Сначала: 28.11 — идея ролика 2 для Chessigma (принципы), письмо Элиоту не отправлено
+
+- **Идея готова:** «Magnus can afford it» — [IDEAS.md](IDEAS.md), первый раздел: тренды на 28.11, сценарий около 64 с,
+  факты с источниками, цифры Stockfish, что снять, запасной вариант про дебюты. Автор: «готовь, посмотрев текущие тренды».
+  Видео автор собирает сам на Fable («делать видео не начинай»).
+- **Письмо Элиоту с идеей — только по слову автора «отправь».** Ответом в ветке `1a1cd1a82e2a9623` на наше «it's live»
+  (`1a2223d844d8fb70`) или на ответ Элиота, если он придёт раньше; Элиоту, копия Мехди. Текст:
+
+  > Hi Eliot,
+  >
+  > Here's the idea for video 2, Principles. Working title: "Magnus can afford it."
+  >
+  > - Hook: Magnus Carlsen opened a final with 1.f3, the first move of the fastest checkmate in chess, and then walked
+  >   his king out with 2.Kf2. His opponent was Wesley So, who had just beaten him for the Fischer Random world title
+  >   (chess24 Banter final, 2020).
+  > - One image for the whole video: every principle you break has a price, paid in winning chances. A receipt prints
+  >   as he plays: about 9% for f3, about 9% for the king walk, 52% down to 35% in two moves (our engine check). He still
+  >   crushed So, who called it "so humiliating".
+  > - Edit-bait: "Magnus can afford to break the rules. You can't."
+  > - This week's beat: in Game 1 of the World Championship, Sindarov set a trap with 27.Nxf5+, and Gukesh walked his
+  >   king toward the attack with 27...Kf6!, the best move on the board. Price: zero. "I thought I'm more than safe, even!"
+  > - Then the viewer tries it, breaks one rule too many and gets the fastest checkmate in chess. Card declined.
+  > - Integration, the last 20 seconds or so: the declined receipt becomes your Principles review on a phone, showing
+  >   which principles you broke and how much winning chance each one cost you. Your logo is on the viewer's receipt
+  >   and in the app, not in shots with Magnus or Gukesh.
+  > - Question: "How many rules did you break in your last game? Comment your number."
+  >
+  > It also fits your own line, "I know what's costing you rating."
+  >
+  > Three questions:
+  > 1. Do you have B-roll and an exact script for Principles, like the ones for video 1? If not, we'll record the
+  >    review ourselves, signed in.
+  > 2. Is the Principles review live on every account? We'd import both games and record the review on ours.
+  > 3. Can we use the review's own numbers for these two games on the receipts? Otherwise we'll use Stockfish, as above.
+  >
+  > If one of the next games in the match brings a decisive win with a broken principle, we'll swap it in for Game 1.
+  > And if you'd rather start with Openings, we have an idea built on Gukesh's London in Game 2.
+  >
+  > We'd like to post while the match is on, before Dec 12.
+  >
+  > Best,
+  > The 64 Files
 
 ### Сначала: 27.11 — `nobrilliant` версия 3 по письму Элиота от 26.11
 

@@ -4,6 +4,102 @@
 (драма — один поворот внутри интересной самой по себе истории). Факты ниже проверены по источникам в конце каждого
 пункта; перед сценарием всё равно собрать `SOURCES.md`.
 
+## Chessigma, ролик 2 (принципы): «Magnus can afford it» (28.11.2026)
+Запрос автора: «готовь, посмотрев текущие тренды». Тему дал Элиот (25.11): «a strong player who doesn't follow the usual
+chess principles and wins because of it»; весь ролик — про функцию (правило 78). Функция, словами Элиота (18.11): разбор
+партии показывает, какие принципы ты нарушил и сколько шансов на победу стоил каждый. Видео автор собирает сам на Fable
+(«делать видео не начинай»); здесь идея, факты и что снять. Факты при сборке перенести в `episodes/<ep>/SOURCES.md`.
+
+**Что залетает сейчас** (`python3 tools/tiktok.py trends`, 28.11):
+- Матч за корону Гукеш — Синдаров идёт (24.11–12.12, Фонд Мартина Бодмера, Колоньи; 1,5 : 1,5 после трёх ничьих,
+  4-я партия — сегодня). У @chess лучший ролик недели про Синдарова: «Sindarov LOVES Counter Strike» — 443,7 тыс.
+- Магнус — самое смотримое: «Daddy pig's prep is finally revealed» — 5,9 млн, «Time flies…» — 2,1 млн.
+- chessbrah: «Bro thinks he is Magnesium Calcification (Bro is 676 elo)» — 268,9 тыс., топ-комментарий там — «why he
+  move the king....-3000elo» (461); «Bro thought it's a checkmate» — 437,4 тыс. Мем «bro thinks he's Magnus» жив, а
+  над королём, который вышел вперёд, зрители смеются сами.
+- У самой Chessigma на главной: «I know what's costing you rating» — наша метафора совпадает с их словами.
+
+**Метафора (одна): у каждого правила есть цена.** Нарушил принцип — заплатил шансами на победу. Чек, ценник, терминал:
+APPROVED / DECLINED. Это ровно то, что показывает модуль, поэтому образ — сама история, а не совпадение рядом с ней
+(правило 76). Сквозной предмет — чек: у Магнуса чек без бренда, у тебя — DECLINED, а в конце чек становится разбором
+Chessigma в телефоне (у тебя в шапке чека — CHESSIGMA; в кадрах со звёздами знака нет, правило 78).
+
+**Сценарий, около 64 с** (текст черновой; цифры в чеках — наш Stockfish, при сборке сверить с записью модуля):
+1. **0,0 — хук.** «Magnus Carlsen opened a final with this.» Первый кадр: Магнус крупно, пешка на f3 горит красным, на
+   ней ценник «−9%». Дальше «The first move of the fastest checkmate in chess.» — вспышкой мат дурака (g4?? Qh4#).
+2. **~4,6 с.** «Then he walked his king out.» — 2.Kf2 одним планом (правило 54), чат взрывается.
+3. **~6,4 с.** «Every rule you break has a price. Two moves cost Magnus a third of his winning chances.» Принтер печатает
+   чек: «f3 −9%», «KING WALK −9%», внизу «52% → 35%».
+4. **~9,6 с — эдит-байт.** Пауза, удар, две плашки: «Magnus can afford to break the rules.» (его карта, терминал
+   APPROVED) — «You can't.» Запасной: «Magnus breaks the rules. The rules break you.»
+5. **~12 с.** «His opponent, Wesley So, had just beaten him for a world title.» — Со с кубком Fischer Random 2019.
+6. **~15,5 с.** «Magnus crushed him.» 1–0, его слова картинкой: «…someone plays f3 and Kf2 and just crushes you. That's
+   so humiliating.»
+7. **~18,5 с — новый открытый вопрос.** «This week, the world champion broke the same rule. In the World Championship.»
+8. **~21 с — партия 1.** Синдаров ставит ловушку 27.Nxf5+!: возьмёшь коня — двойной шах 28.Bg5+ (призрак взятия, чек
+   «−15%»). «Every rule says: hide your king. Gukesh walked it toward the attack.» — 27...Kf6! одним планом. «The best
+   move on the board. Price: zero.» — чек «0%». Его слова картинкой: «I thought I'm more than safe, even!» Ловушка не
+   сработала, ничья. Декорация — библиотека Бодмера, не тот же зал, что у Магнуса.
+9. **~34 с — ты (ложная победа, правило 66).** «So you try it.» Твоя комната ночью: f3, «Magnus did this» — потом ещё одно
+   «смелое» правило, g4… «And…» — Qh4#, самый быстрый мат из хука. Терминал: DECLINED, звук отказа карты. Подпись в духе
+   chessbrah: «Bro thinks he's Magnus. (Bro is 676 elo.)»
+10. **~39,5 с — мост.** «Magnus knows the price of every rule. Do you?» Чек DECLINED выползает из терминала и ложится
+    экраном телефона — разбор Chessigma, вкладка принципов (запись автора, вход выполнен).
+11. **~41,5–60 с — реклама.** Их B-roll и их текст слово в слово, если пришлют, как в `nobrilliant` v3; если нет — наша
+    сцена на записи автора: какие принципы ты нарушил и сколько шансов стоил каждый, бесплатно, chessigma.com, link in bio.
+12. **~60 с — вопрос числом и петля.** «How many rules did you break in your last game? Comment your number.» Последний
+    кадр — первый (Магнус, f3, ценник).
+
+**Пасхалки:** табличка «NEVER PLAY f3» на стене (так учит Бен Файнголд); фото смеющегося Хикару из нашего `bongcloud`
+на стене у Магнуса.
+
+**Чек-лист удержания** (`memory/retention.md`): первое слово «Magnus» на 0,0 с, звезда и конфликт («a final» и худший
+ход); первый кадр с лицом и одним числом («−9%»); эдит-байт на ~10 с; новый вопрос на ~19 с; событие каждые ~10 с (ход
+короля, байт, разгром, ловушка, Kf6!, мат дурака); один поворот у «тебя» с тишиной перед Qh4#; петля и вопрос числом;
+64 с, реклама только после всей истории. Декорации разные: домашняя студия Магнуса (финал 2020 был онлайн), голограмма
+мата, касса с терминалом, сцена с кубком, библиотека Бодмера, твоя комната, телефон.
+
+**Факты** (проверено 28.11.2026):
+- Карлсен — Со, финал chess24 Banter Series, 29.09.2020, партия 1 четвёртого сета: 1.f3 e5 2.Kf2, 1–0 на 80-м ходу;
+  рейтинги 2863 и 2770; финал Карлсен выиграл 5½–3½. Слова Со: «It's hard to forget the game when someone plays f3 and
+  Kf2 and just crushes you. That's so humiliating.» — `episodes/bongcloud/SOURCES.md`, партия в
+  `engine/data/carlsen_so_banter2020.pgn` ([TWIC](https://theweekinchess.com/chessnews/events/chess24-banter-series-2020),
+  Guardian 02.10.2020, [Wikipedia, Barnes Opening](https://en.wikipedia.org/wiki/Barnes_Opening)).
+- 1.f3 «не развивает фигуру, не открывает линий, отнимает у коня поле f3, ослабляет королевский фланг и открывает
+  диагональ e1–h4»; гроссмейстер Эдмар Меднис считал 1.f3 худшим из 20 первых ходов, Бен Файнголд учит «Never play f3»
+  ([Wikipedia, Barnes Opening](https://en.wikipedia.org/wiki/Barnes_Opening)). Наш Stockfish 16 (глубина 22) хуже ставит
+  только 1.g4, поэтому в голосе не «худший ход», а факт про мат дурака.
+- Мат дурака — самый быстрый мат в шахматах, 1.f3 e6 2.g4 Qh4# (и с 1...e5 тоже)
+  ([Wikipedia, Fool's mate](https://en.wikipedia.org/wiki/Fool%27s_mate)).
+- Со — первый чемпион мира по Fischer Random: 02.11.2019 обыграл Карлсена в финале 13,5 : 2,5 (это очки, не партии)
+  ([Wikipedia, Wesley So](https://en.wikipedia.org/wiki/Wesley_So)).
+- Партия 1 матча, 24.11.2026, Синдаров — Гукеш, ничья на 38-м ходу. После 27.Nxf5+! взятие коня проигрывает двойному шаху
+  Bg5+; «Gukesh calmly played 27...Kf6!, not fearing the exposed position of his king». Синдаров: «I saw all this but I
+  missed 27...Kf6 was super-strong — I didn't get a good evaluation for this move». Гукеш: «I thought I'm more than safe,
+  even!» Потом Синдаров ладьёй на h5 свёл к повторению
+  ([Chess.com, Colin McGourty](https://www.chess.com/news/view/2026-fide-world-chess-championship-game-1); позиция —
+  [Wikipedia](https://en.wikipedia.org/wiki/World_Chess_Championship_2026)). «9 минут на часах» у Гукеша — только в
+  Википедии, не берём.
+- **Цифры — наш расчёт** (Stockfish 16, глубина 28; шансы — формула Lichess `50 + 50·(2/(1+e^(−0,00368208·cp)) − 1)`):
+  начало +0,25 (52,3 %); после 1.f3 −0,72 (43,4 %); после 1...e5 −0,62 (44,3 %); после 2.Kf2 −1,64 (35,3 %). У Гукеша
+  после 27.Nxf5+: 27...Kf6 — 0,00 (у чёрных 50 %), 27...Ke8 — 48,5 %, 27...Bxf5 — 35,4 % (28.Bg5+ — двойной шах ладьёй e2 и
+  слоном), 27...Kf8 — 30,4 %. Ход королём вперёд — лучший на доске, цена ноль; взятие коня стоило бы около 15 %.
+  «Отход стоил бы 20 %» не говорим: отход 27...Ke8 почти так же хорош (−1,5 %), 20 % — только у 27...Kf8. Если модуль
+  Chessigma даёт для этих партий свои цифры и названия принципов, в чеки ставим их (запись автора), а наши — в
+  `SOURCES.md` для сверки.
+
+**Что нужно до сборки:**
+- Ответ Элиота: тема Principles или Openings; их B-roll и точный текст для принципов, как в ролике 1.
+- В коде сайта модуль пока под флагом (`principlesReviewCanary`, эксперимент `review_principles`): проверить, видно ли
+  его на аккаунте канала. Автор импортирует обе партии в Chessigma и записывает вкладку принципов со входом.
+- Если в 4–6-й партиях матча будет решающая победа с нарушенным принципом — поставить её вместо партии 1.
+
+**Запасной вариант — дебюты (Opening Trainer).** Гукеш во 2-й партии (25.11) сыграл Лондонскую систему — «unambitious
+opening», ничья за 20 ходов, вторая по быстроте партия в истории матчей; «I thought it would be a nice, cool way to start
+the match!» ([Chess.com](https://www.chess.com/news/view/2026-fide-world-chess-championship-game-2), Wikipedia). У
+Opening Trainer есть `/openings/london` и `/openings/anti-london`. Мем про Лондон перед идеей проверить на настоящих
+примерах.
+
 ## Chessigma: 4 ролика — версия на широких мемах (18.11.2026, вечер)
 Автор на первые версии: «да не нужно такие нишевые темы, нужно что то кто сразу узнает в чем прикол, типо блять подключи
 себе какой то скилл чтобы ты мог тт листать». Ленту TikTok скрипту не отдают (поиск, хэштеги и «For You» — только
