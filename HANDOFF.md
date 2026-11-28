@@ -11,43 +11,32 @@
 - [business/youtube_copies.md](business/youtube_copies.md);
 - [memory/journal.md](memory/journal.md).
 
-### Сначала: 28.11 — идея ролика 2 для Chessigma (принципы) ждёт конца матча, письмо Элиоту не отправлено
+### Сначала: 28.11 — идея ролика 2 для Chessigma (принципы) готова, письмо Элиоту ждёт слова «отправь»
 
-- **Доделать после конца матча** (автор 28.11: «давай докончишь идею когда матч закончится, он все еще идет»). Матч
-  закончится не раньше 9-й партии (4.12) и не позже тай-брейка 12.12. Проверка счёта — `send_later` на 4.12, 22:43 UTC
-  (`trig_01HEgfjYunvdufvf2vMKbrNV`, в эту сессию), дальше — по счёту. Что сделать после матча — в
-  [IDEAS.md](IDEAS.md), строка «Статус» первого раздела. **Письмо-питч ниже — версия 28.11, в этом виде не
-  отправлять:** после матча переписать (итог матча, без «before Dec 12»).
-- **Короткое письмо Элиоту сейчас — только по слову автора «отправь».** Элиот сегодня заплатил аванс за ролик 2 и ждёт
-  идею, а 23.11 уже спрашивал про сроки. Отправить ответом в ветке `1a1cd1a82e2a9623` на наше «it's live»
-  (`1a2223d844d8fb70`), Элиоту, копия Мехди. Если уйдёт, убрать из питча строку про оплату.
-
-  > Hi Eliot,
-  >
-  > Thank you, both payments arrived. INV-2026-004 was written for Openings; I'll count it as video 2 whichever topic
-  > it is.
-  >
-  > Video 2 will be built on the World Championship match, so I'm waiting for the result and will send you the idea
-  > right after the last game. The match ends by Dec 12, and I'll post within a few days of your OK.
-  >
-  > Best,
-  > The 64 Files
+- **Тема подтверждена.** Элиот, 28.11, 13:25 UTC (письмо `1a222550eb163f85`, ветка `1a1cd1a82e2a9623`, копия Мехди):
+  «Thanks for reporting, the invoice is paid as well as the next half. Principles work well with us, yes please send the
+  idea so we can confirm / prepare the integration!»
 - **Идея готова:** «Magnus can afford it» — [IDEAS.md](IDEAS.md), первый раздел: тренды на 28.11, сценарий около 64 с,
-  факты с источниками, цифры Stockfish, что снять, запасной вариант про дебюты. Автор: «готовь, посмотрев текущие тренды».
+  факты с источниками, цифры Stockfish, что снять, идея для ролика про дебюты. Автор: «готовь, посмотрев текущие тренды».
   Видео автор собирает сам на Fable («делать видео не начинай»).
+- **Доделана после 4-й партии.** Автор в 17:31 UTC: «давай докончишь идею когда матч закончится, он все еще идет», в
+  17:37 — «все закончился»: речь была о 4-й партии (ничья, 2 : 2), а не о всём матче. Партии 1–4 проверены: бит 8
+  остаётся за 1-й партией (27...Kf6!), в 3-й и 4-й момента лучше нет. Ферзей в той позиции нет, поэтому в тексте
+  «keep your king safe», а не «hide your king». Проверка счёта на 4.12 снята (`trig_01HEgfjYunvdufvf2vMKbrNV` удалён),
+  короткое письмо о сроках больше не нужно.
 - **Оплата на 28.11: к оплате ничего нет.** В 13:18 GMT пришла вторая половина 003, в 13:19 GMT — первая половина 004
   (аванс за ролик 2), обе по 57,08 €. По пакету получено $187.50 из $500. В счёте 004 ролик 2 — дебюты, а принципы —
-  005, поэтому в письме ниже есть строка, что 004 идёт за ролик 2 при любой теме.
-- **Письмо Элиоту с идеей — после матча, переписанное, и только по слову автора «отправь».** Ответом в ветке `1a1cd1a82e2a9623` на наше «it's live»
-  (`1a2223d844d8fb70`) или на ответ Элиота, если он придёт раньше; Элиоту, копия Мехди. Текст:
+  005, поэтому в письме ниже есть строка: 004 — за этот ролик, 005 — за дебюты.
+- **Письмо Элиоту с идеей — только по слову автора «отправь».** Ответом на его письмо `1a222550eb163f85` (ветка
+  `1a1cd1a82e2a9623`), Элиоту, копия Мехди. Текст:
 
   > Hi Eliot,
   >
-  > Here's the idea for video 2, Principles. Working title: "Magnus can afford it."
+  > Thank you, both payments arrived. Here's the idea for video 2, Principles. Working title: "Magnus can afford it."
   >
   > - Hook: Magnus Carlsen opened a final with 1.f3, the first move of the fastest checkmate in chess, and then walked
-  >   his king out with 2.Kf2. His opponent was Wesley So, who had just beaten him for the Fischer Random world title
-  >   (chess24 Banter final, 2020).
+  >   his king out with 2.Kf2. His opponent in that final (chess24 Banter Series, 2020) was Wesley So, who had beaten
+  >   him for the Fischer Random world title the year before.
   > - One image for the whole video: every principle you break has a price, paid in winning chances. A receipt prints
   >   as he plays: about 9% for f3, about 9% for the king walk, 52% down to 35% in two moves (our engine check). He still
   >   crushed So, who called it "so humiliating".
@@ -63,18 +52,17 @@
   > It also fits your own line, "I know what's costing you rating."
   >
   > Three questions:
-  > 1. Do you have B-roll and an exact script for Principles, like the ones for video 1? If not, we'll record the
-  >    review ourselves, signed in.
+  > 1. Once you confirm, could you send B-roll and an exact script for Principles, like for video 1? We'll use them
+  >    word for word. If you don't have them, we'll record the review ourselves, signed in.
   > 2. Is the Principles review live on every account? We'd import both games and record the review on ours.
   > 3. Can we use the review's own numbers for these two games on the receipts? Otherwise we'll use Stockfish, as above.
   >
   > If one of the next games in the match brings a decisive win with a broken principle, we'll swap it in for Game 1.
-  > And if you'd rather start with Openings, we have an idea built on Gukesh's London in Game 2.
   >
-  > We'd like to post while the match is on, before Dec 12.
+  > We'd like to post while the match is still on.
   >
-  > Thank you, both payments arrived. INV-2026-004 was written for Openings; we'll count it as video 2 whichever topic
-  > it is.
+  > One note on the invoices: INV-2026-004 says Openings and INV-2026-005 says Principles. We'll count 004 for this
+  > video and 005 for Openings, if that works for you.
   >
   > Best,
   > The 64 Files
@@ -136,7 +124,8 @@
   `send_message` с `draftId` (уйдёт как есть, с вложением). Старый черновик «Hello elliot» от 24.11 в той же ветке не трогать.
   **Отправлено 28.11 в 13:00 UTC** по слову автора («отправь»): письмо `1a2223d844d8fb70`, PDF во вложении. **Вторая
   половина 003 пришла 28.11 в 13:18 GMT** (57,08 €), в 13:19 — аванс по 004 (57,08 €), подробности — в
-  [memory/sponsors.md](memory/sponsors.md). Ждём ответ Элиота про тему ролика 2 (Principles или Openings).
+  [memory/sponsors.md](memory/sponsors.md). Элиот ответил 28.11 в 13:25 UTC: оплату подтвердил, тему Principles
+  принял и ждёт идею (первый подраздел раздела 0).
 
   > Hi Eliot,
   >

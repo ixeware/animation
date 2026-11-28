@@ -10,15 +10,15 @@ chess principles and wins because of it»; весь ролик — про фун
 партии показывает, какие принципы ты нарушил и сколько шансов на победу стоил каждый. Видео автор собирает сам на Fable
 («делать видео не начинай»); здесь идея, факты и что снять. Факты при сборке перенести в `episodes/<ep>/SOURCES.md`.
 
-**Статус: доделать после конца матча.** Автор (28.11): «давай докончишь идею когда матч закончится, он все еще идет».
-Раньше 9-й партии (4.12) матч закончиться не может: после трёх партий 1,5 : 1,5, а для победы нужно 7,5. Последний
-возможный день — тай-брейк 12.12. Проверка счёта стоит на 4.12, 22:43 UTC (`trig_01HEgfjYunvdufvf2vMKbrNV`), дальше —
-по счёту. После матча: итог и решающая партия; лучший за матч момент «нарушил принцип и оказался прав» (всех кандидатов —
-движком); решить про бит 8; свежие тренды; переписать письмо-питч.
+**Статус: готово 28.11, письмо Элиоту ждёт слова автора «отправь».** Автор в 17:31 UTC: «давай докончишь идею когда матч
+закончится, он все еще идет», в 17:37 — «все закончился»: речь была о 4-й партии, а не о всём матче. 4-я партия —
+ничья, счёт 2 : 2, матч идёт до 12.12. Идея доделана по партиям 1–4: бит 8 остаётся за 1-й партией, в 3-й и 4-й момента
+лучше нет (факты ниже). Тему Элиот подтвердил 28.11 в 13:25 UTC: «Principles work well with us, yes please send the idea
+so we can confirm / prepare the integration!» Письмо-питч — в [HANDOFF](HANDOFF.md), раздел 0.
 
 **Что залетает сейчас** (`python3 tools/tiktok.py trends`, 28.11):
-- Матч за корону Гукеш — Синдаров идёт (24.11–12.12, Фонд Мартина Бодмера, Колоньи; 1,5 : 1,5 после трёх ничьих,
-  4-я партия — сегодня). У @chess лучший ролик недели про Синдарова: «Sindarov LOVES Counter Strike» — 443,7 тыс.
+- Матч за корону Гукеш — Синдаров идёт (24.11–12.12, Фонд Мартина Бодмера, Колоньи; 2 : 2 после четырёх ничьих,
+  5-я партия — 29.11). У @chess лучший ролик недели про Синдарова: «Sindarov LOVES Counter Strike» — 443,7 тыс.
 - Магнус — самое смотримое: «Daddy pig's prep is finally revealed» — 5,9 млн, «Time flies…» — 2,1 млн.
 - chessbrah: «Bro thinks he is Magnesium Calcification (Bro is 676 elo)» — 268,9 тыс., топ-комментарий там — «why he
   move the king....-3000elo» (461); «Bro thought it's a checkmate» — 437,4 тыс. Мем «bro thinks he's Magnus» жив, а
@@ -38,14 +38,18 @@ Chessigma в телефоне (у тебя в шапке чека — CHESSIGMA;
    чек: «f3 −9%», «KING WALK −9%», внизу «52% → 35%».
 4. **~9,6 с — эдит-байт.** Пауза, удар, две плашки: «Magnus can afford to break the rules.» (его карта, терминал
    APPROVED) — «You can't.» Запасной: «Magnus breaks the rules. The rules break you.»
-5. **~12 с.** «His opponent, Wesley So, had just beaten him for a world title.» — Со с кубком Fischer Random 2019.
+5. **~12 с.** «His opponent, Wesley So, had already beaten him for a world title.» — Со с кубком Fischer Random 2019. Не
+   «had just»: финал Fischer Random — 02.11.2019, а партия с 1.f3 — 29.09.2020, почти через год.
 6. **~15,5 с.** «Magnus crushed him.» 1–0, его слова картинкой: «…someone plays f3 and Kf2 and just crushes you. That's
    so humiliating.»
 7. **~18,5 с — новый открытый вопрос.** «This week, the world champion broke the same rule. In the World Championship.»
 8. **~21 с — партия 1.** Синдаров ставит ловушку 27.Nxf5+!: возьмёшь коня — двойной шах 28.Bg5+ (призрак взятия, чек
-   «−15%»). «Every rule says: hide your king. Gukesh walked it toward the attack.» — 27...Kf6! одним планом. «The best
-   move on the board. Price: zero.» — чек «0%». Его слова картинкой: «I thought I'm more than safe, even!» Ловушка не
-   сработала, ничья. Декорация — библиотека Бодмера, не тот же зал, что у Магнуса.
+   «−15%»). «Every rule says: keep your king safe. Gukesh walked it toward the attack.» — 27...Kf6! одним планом. «The
+   best move on the board. Price: zero.» — чек «0%». Его слова картинкой: «I thought I'm more than safe, even!» Ловушка не
+   сработала, ничья. Декорация — библиотека Бодмера, не тот же зал, что у Магнуса. Доска — настоящая позиция (FEN в
+   фактах): **ферзей на ней нет**, их разменяли на 8-м ходу. Поэтому не «hide your king»: в эндшпиле активный король —
+   сам по себе принцип, и знатоки напишут это в комментариях. «Keep your king safe» верно: на доске ладьи и лёгкие
+   фигуры, а рядом ловушка с двойным шахом.
 9. **~34 с — ты (ложная победа, правило 66).** «So you try it.» Твоя комната ночью: f3, «Magnus did this» — потом ещё одно
    «смелое» правило, g4… «And…» — Qh4#, самый быстрый мат из хука. Терминал: DECLINED, звук отказа карты. Подпись в духе
    chessbrah: «Bro thinks he's Magnus. (Bro is 676 elo.)»
@@ -86,6 +90,18 @@ Chessigma в телефоне (у тебя в шапке чека — CHESSIGMA;
   ([Chess.com, Colin McGourty](https://www.chess.com/news/view/2026-fide-world-chess-championship-game-1); позиция —
   [Wikipedia](https://en.wikipedia.org/wiki/World_Chess_Championship_2026)). «9 минут на часах» у Гукеша — только в
   Википедии, не берём.
+- Позиция после 27.Nxf5+, ход чёрных: `r5r1/1pp1kp2/2n1b2p/2p2N2/1bP3P1/1P2B2P/4R3/3RN1K1 b - - 0 27`. Ферзи разменены на
+  8-м ходу (8.Qxd8+ Kxd8, берлинский эндшпиль). Партия целиком — `engine/data/sindarov_gukesh_wch2026_g1.pgn`
+  ([трансляция Lichess](https://lichess.org/broadcast/fide-world-chess-championship-2026/game-1/xLgOJ6cb)).
+- Партия 3, 26.11, Синдаров — Гукеш, снова берлинская защита, ничья на 60-м ходу. После размена ферзей Гукеш пошёл
+  пешками на королевском фланге и поставил короля на d7 — Полгар: «the coolest move of the world championship so far!»;
+  потом 31...Kf5 и 32...Ke6 — «a fantastic idea»
+  ([Chess.com](https://www.chess.com/news/view/2026-fide-world-chess-championship-game-3)). Наш Stockfish (глубина 22):
+  21...Kd7 — 0,00, один из двух лучших ходов; 31...Kf5 — −0,01; 32...Ke6 — лучший. В ролик не берём: ферзей нет, и
+  активный король в эндшпиле — сам принцип, а не нарушение; партия — ничья.
+- Партия 4, 28.11, Гукеш — Синдаров, русская партия (Petrov, Modern Attack), ничья повторением после 34.Qc8+
+  ([трансляция Lichess](https://lichess.org/broadcast/fide-world-chess-championship-2026/game-4/wIwJtPqz/IriXvwPw)).
+  Хода против принципа с ценой в ней нет. Отчёта Chess.com о 4-й партии в 17:39 UTC ещё не было.
 - **Цифры — наш расчёт** (Stockfish 16, глубина 28; шансы — формула Lichess `50 + 50·(2/(1+e^(−0,00368208·cp)) − 1)`):
   начало +0,25 (52,3 %); после 1.f3 −0,72 (43,4 %); после 1...e5 −0,62 (44,3 %); после 2.Kf2 −1,64 (35,3 %). У Гукеша
   после 27.Nxf5+: 27...Kf6 — 0,00 (у чёрных 50 %), 27...Ke8 — 48,5 %, 27...Bxf5 — 35,4 % (28.Bg5+ — двойной шах ладьёй e2 и
@@ -95,12 +111,14 @@ Chessigma в телефоне (у тебя в шапке чека — CHESSIGMA;
   `SOURCES.md` для сверки.
 
 **Что нужно до сборки:**
-- Ответ Элиота: тема Principles или Openings; их B-roll и точный текст для принципов, как в ролике 1.
+- Ответ Элиота на идею: его OK, B-roll и точный текст для принципов, как в ролике 1. Тема уже подтверждена (28.11,
+  13:25 UTC).
 - В коде сайта модуль пока под флагом (`principlesReviewCanary`, эксперимент `review_principles`): проверить, видно ли
   его на аккаунте канала. Автор импортирует обе партии в Chessigma и записывает вкладку принципов со входом.
-- Если в 4–6-й партиях матча будет решающая победа с нарушенным принципом — поставить её вместо партии 1.
+- 4-я партия — ничья. Если в следующих партиях (5-я — 29.11, 6-я — 30.11) будет решающая победа с нарушенным принципом,
+  до сборки поставить её вместо партии 1 (цену — движком, как здесь).
 
-**Запасной вариант — дебюты (Opening Trainer).** Гукеш во 2-й партии (25.11) сыграл Лондонскую систему — «unambitious
+**Дебюты (Opening Trainer) — для следующего ролика.** Гукеш во 2-й партии (25.11) сыграл Лондонскую систему — «unambitious
 opening», ничья за 20 ходов, вторая по быстроте партия в истории матчей; «I thought it would be a nice, cool way to start
 the match!» ([Chess.com](https://www.chess.com/news/view/2026-fide-world-chess-championship-game-2), Wikipedia). У
 Opening Trainer есть `/openings/london` и `/openings/anti-london`. Мем про Лондон перед идеей проверить на настоящих
