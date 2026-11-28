@@ -9,7 +9,7 @@ All files were generated with the ElevenLabs sound-effects model (text-to-SFX) f
 manifest, then trimmed and peak-normalized to −1 dBFS. Note: the ElevenLabs free tier does not grant commercial
 rights (attribution required); a paid plan covers commercial use.
 
-Ids: whoosh_fast, whoosh_soft, whoosh_deep, swipe_card, boom_cine, hit_punch, stamp, gavel, thud, door_slam,
+Ids: whoosh_fast, whoosh_soft, whoosh_deep, slash, swipe_card, boom_cine, hit_punch, stamp, gavel, thud, door_slam,
 shimmer, reveal_bell, success, sparkle_pop, riser, error, dun_dun, record_scratch, paper, pen, typewriter, page_flip,
 piece, piece_slide, clock_press, clock_tick, gasp, murmur, applause, laugh, cash, coins, fabric, footsteps, camera,
 confetti, notify, tvoff, glass, heartbeat.

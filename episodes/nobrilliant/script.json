@@ -1,0 +1,235 @@
+{
+  "title": "Brilliant moves don't exist",
+  "channel": "THE 64 FILES",
+  "post": "Brilliant moves don't exist 🤯 Stockfish only gives a number. The !! is a sticker 👀 How many brilliants have you played? Comment your number 👇\nFind yours free on chessigma.com (link in bio).\n#ad #chessigma #chess #brilliantmove #magnuscarlsen #stockfish #chesstok",
+  "lead_in": 0.05,
+  "tail": 1.6,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.84,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "engine": 2,
+    "tempo": 1.28,
+    "max_gap": 0.16
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5.0,
+    "reverb": 0.4,
+    "reverb_sec": 2.3,
+    "duck": 0.5
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "Brilliant moves don't exist.",
+      "say": "[serious] Brilliant moves don't exist.",
+      "pause": 0.25,
+      "colors": {
+        "Brilliant": "lime",
+        "moves": "lime",
+        "don't": "red",
+        "exist.": "red"
+      }
+    },
+    {
+      "id": "bait",
+      "text": "Stockfish can beat any human. But it has never seen a brilliant move.",
+      "say": "Stockfish can beat any human. [pause] But it has never seen a brilliant move.",
+      "pause": 0.3,
+      "colors": {
+        "Stockfish": "gold",
+        "any": "gold",
+        "human.": "gold",
+        "never": "red",
+        "brilliant": "lime",
+        "move.": "lime"
+      },
+      "take": 1
+    },
+    {
+      "id": "ny",
+      "text": "New York, 2016. On his birthday, Magnus Carlsen plays for the world title... and gives away his queen.",
+      "say": "New York, twenty sixteen. On his birthday, Magnus Carlsen plays for the world title... [pause] and gives away his queen.",
+      "pause": 0.45,
+      "colors": {
+        "New": "gold",
+        "York,": "gold",
+        "2016.": "gold",
+        "birthday,": "lime",
+        "Magnus": "gold",
+        "Carlsen": "gold",
+        "queen.": "red"
+      },
+      "take": 2
+    },
+    {
+      "id": "quote",
+      "text": "A grandmaster called it the most brilliant final move in championship history.",
+      "say": "[impressed] A grandmaster called it the most brilliant final move in championship history.",
+      "pause": 0.4,
+      "colors": {
+        "most": "lime",
+        "brilliant": "lime",
+        "history.": "gold"
+      }
+    },
+    {
+      "id": "fish",
+      "text": "Stockfish calls it: mate in two. Just a number.",
+      "say": "Stockfish calls it: [deadpan] mate in two. [pause] Just a number.",
+      "pause": 0.3,
+      "colors": {
+        "Stockfish": "gold",
+        "mate": "red",
+        "two.": "red",
+        "number.": "gold"
+      },
+      "hold": {
+        "after": "two.",
+        "sec": 0.45
+      }
+    },
+    {
+      "id": "label",
+      "text": "The double exclamation mark is a sticker. A review site adds it later, by its own rules.",
+      "say": "The double exclamation mark is a sticker. [pause] A review site adds it later, by its own rules.",
+      "pause": 0.3,
+      "colors": {
+        "sticker.": "lime",
+        "later,": "gold",
+        "own": "gold",
+        "rules.": "gold"
+      }
+    },
+    {
+      "id": "rule",
+      "text": "Chess.com's rule: a good piece sacrifice. And it's more generous for new players.",
+      "say": "Chess dot com's rule: a good piece sacrifice. [pause] And it's more generous for new players.",
+      "pause": 0.3,
+      "colors": {
+        "good": "lime",
+        "piece": "lime",
+        "sacrifice.": "lime",
+        "generous": "gold",
+        "new": "gold",
+        "players.": "gold"
+      }
+    },
+    {
+      "id": "same",
+      "text": "So the same move can be brilliant for you, and just a move for Magnus.",
+      "say": "So the same move can be brilliant for you... and just a move for Magnus.",
+      "pause": 0.5,
+      "colors": {
+        "same": "gold",
+        "brilliant": "lime",
+        "you,": "lime",
+        "Magnus.": "gold"
+      }
+    },
+    {
+      "id": "q",
+      "text": "So... how many brilliant moves have you played?",
+      "say": "So... [pause] how many brilliant moves have you played?",
+      "pause": 0.35,
+      "colors": {
+        "brilliant": "lime",
+        "moves": "lime",
+        "played?": "gold"
+      },
+      "take": 4
+    },
+    {
+      "id": "tell",
+      "text": "Chessigma's free review can tell you.",
+      "say": "Chessigma's free review can tell you.",
+      "pause": 0.25,
+      "colors": {
+        "Chessigma's": "gold",
+        "free": "lime",
+        "review": "lime"
+      }
+    },
+    {
+      "id": "flags",
+      "text": "It flags every brilliant move... like this one.",
+      "say": "It flags every brilliant move... [pause] like this one.",
+      "pause": 0.3,
+      "colors": {
+        "every": "gold",
+        "brilliant": "lime",
+        "move...": "lime",
+        "this": "gold",
+        "one.": "gold"
+      },
+      "take": 1
+    },
+    {
+      "id": "yours",
+      "text": "And it finds all of yours. Just type a username.",
+      "say": "And it finds all of yours. [pause] Just type a username.",
+      "pause": 0.3,
+      "colors": {
+        "all": "gold",
+        "yours.": "lime",
+        "username.": "gold"
+      }
+    },
+    {
+      "id": "gotham",
+      "text": "I tried GothamChess: 141 brilliants in three months.",
+      "say": "I tried Gotham Chess: [pause] one hundred forty-one brilliants in three months.",
+      "pause": 0.3,
+      "colors": {
+        "GothamChess:": "gold",
+        "141": "lime",
+        "brilliants": "lime",
+        "three": "gold",
+        "months.": "gold"
+      },
+      "take": 2
+    },
+    {
+      "id": "elo",
+      "text": "An Elo for every part of his game, and every brilliant and tactic he played.",
+      "say": "An Elo for every part of his game... and every brilliant and tactic he played.",
+      "pause": 0.3,
+      "colors": {
+        "Elo": "gold",
+        "part": "gold",
+        "brilliant": "lime",
+        "tactic": "lime"
+      }
+    },
+    {
+      "id": "find",
+      "text": "Find yours free on chessigma.com. Link in bio, and comment your number.",
+      "say": "Find yours free on Chessigma dot com. [pause] Link in bio, and comment your number.",
+      "pause": 0.0,
+      "colors": {
+        "free": "lime",
+        "chessigma.com.": "gold",
+        "Link": "gold",
+        "bio,": "gold",
+        "comment": "lime",
+        "number.": "lime"
+      }
+    }
+  ],
+  "_voice_notes": "v1 (25.11.2026): Chessigma video 1 as the sponsor asked on 25.11, the pitch of 9.11. Numbers and site names are spelled out in `say` (Chess.com = Chess dot com, Lichess = Lee-chess, 2016 = twenty sixteen). Takes (tools/voice_check.py --takes, 25.11): bait 1, ny 2, ad1 3 — in the default readings one sentence stood 2.7–3.5 dB over the others ('Sigma.' the quietest). v3 (27.11.2026): Eliot's integration of 26.11 — the video to 'just a move for Magnus', then their voiceover word for word over their B-roll (GothamChess = Gotham Chess, 141 = one hundred forty-one, chessigma.com = Chessigma dot com in `say`)."
+}

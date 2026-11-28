@@ -9,8 +9,11 @@
 //    in a dark outlined box; no mono panels
 // mark: the channel's handle engraved on the sides of the board (STYLE_BIBLE rule 46); an order for another channel
 // sets its own handle or null with useMark()
-export const LOOK = { v2: false, motion: 1, mark: '@THE64FILES' };
-export function useMark(mark) { LOOK.mark = mark; }
+// guard: the channel's moving watermark over the whole film (STYLE_BIBLE rule 70, guard.js; {} = its defaults). An order
+// for another channel goes out without it: useMark() switches it off, useGuard({ handle, line }) gives the order its own
+export const LOOK = { v2: false, motion: 1, mark: '@THE64FILES', guard: {} };
+export function useMark(mark) { LOOK.mark = mark; LOOK.guard = null; }
+export function useGuard(guard) { LOOK.guard = guard; }
 export function useLookV2(on = true) { LOOK.v2 = on; }
 // Motion 2 (STYLE_BIBLE rules 41-44, after Emil Kowalski): on-screen text enters on a strong ease-out from 94% scale,
 // a little below and out of a light blur, in about 0.25 s; groups come in one after another, 50-80 ms apart; a move

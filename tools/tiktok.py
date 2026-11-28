@@ -2,6 +2,11 @@
 
     python3 tools/tiktok.py stats the64files [out.json]     views, likes, comments, shares, saves of every video
     python3 tools/tiktok.py comments the64files out_dir/     out_dir/<video id>.json: every comment and reply
+    python3 tools/tiktok.py trends [account ...]             what the big chess accounts posted lately: views, caption,
+                                                             sound and top comments of each account's latest videos
+
+TikTok gives no search, hashtag or For You feed to scripts (they need a logged-in browser), so trends come from the
+latest videos of the big chess accounts (STYLE_BIBLE rule 75).
 
 Public pages and TikTok's web comment API, no login. Keeps no user names. Needs curl_cffi and yt-dlp (with
 curl-cffi, for --impersonate).
@@ -88,8 +93,43 @@ def comments(user, out_dir):
         time.sleep(1.5)
 
 
+TREND_ACCOUNTS = ["magnuscarlsen", "chess", "gmhikaru", "chessbrah", "annacramling"]
+
+
+def trends(accounts, per=12, top_comments=5):
+    """Latest videos of each account, most viewed first, with the top comments of the three biggest."""
+    for user in accounts:
+        out = subprocess.run(["yt-dlp", "--impersonate", "chrome", "--flat-playlist", "-J", "--playlist-end", str(per),
+                              f"https://www.tiktok.com/@{user}"], capture_output=True, text=True).stdout
+        ids = [e["id"] for e in json.loads(out).get("entries", []) if e] if out else []
+        rows = []
+        for vid in ids:
+            ref = f"https://www.tiktok.com/@{user}/video/{vid}"
+            it = rehydration(ref).get("webapp.video-detail", {}).get("itemInfo", {}).get("itemStruct", {})
+            st = it.get("stats", {}) or it.get("statsV2", {})
+            rows.append({"id": vid, "ref": ref, "views": int(st.get("playCount", 0) or 0), "desc": it.get("desc") or "",
+                         "music": (it.get("music") or {}).get("title") or "",
+                         "date": datetime.datetime.fromtimestamp(int(vid) >> 32, datetime.UTC).strftime("%Y-%m-%d")})
+            time.sleep(1.0)
+        rows.sort(key=lambda r: -r["views"])
+        print(f"== @{user} ({len(rows)} latest)")
+        for i, r in enumerate(rows):
+            print(f"  {r['date']} {r['views']:>10,} | {r['desc'][:90]} | ♪ {r['music'][:30]}")
+            if i < 3 and top_comments:
+                S.get(r["ref"])
+                cs = sorted(_page(f"https://www.tiktok.com/api/comment/list/?aid=1988&aweme_id={r['id']}&count=30&cursor=0",
+                                  r["ref"]).get("comments") or [], key=lambda c: -c.get("digg_count", 0))[:top_comments]
+                for c in cs:
+                    print(f"      {c.get('digg_count', 0):>8,} | {re.sub(r'\s+', ' ', c.get('text') or '')[:110]}")
+        time.sleep(1.5)
+
+
 if __name__ == "__main__":
-    cmd, user = sys.argv[1], sys.argv[2]
+    cmd = sys.argv[1]
+    if cmd == "trends":
+        trends(sys.argv[2:] or TREND_ACCOUNTS)
+        sys.exit()
+    user = sys.argv[2]
     if cmd == "stats":
         rows = stats(user)
         if len(sys.argv) > 3:

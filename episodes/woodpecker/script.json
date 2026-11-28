@@ -1,0 +1,233 @@
+{
+  "title": "He has seen your position before (Magnus Carlsen's memory, Hans Tikkanen and the Woodpecker Method) x Chessigma Supercoach",
+  "channel": "THE 64 FILES",
+  "post": "Magnus names a famous game from one position. Can you? ♟️\nFree, unlimited game reviews on Chessigma. Link in bio.\n#ad #chessigma #chess #magnuscarlsen #chesstok",
+  "lead_in": 0.05,
+  "tail": 1.8,
+  "voice": {
+    "provider": "elevenlabs",
+    "voice_id": "N2lVS1w4EtoT3dr4eOWO",
+    "model": "eleven_v3",
+    "stability": 0.5,
+    "similarity": 0.8,
+    "_name": "Callum (ElevenLabs premade), eleven_v3 with audio tags in \"say\"",
+    "fallback": {
+      "provider": "kokoro",
+      "name": "am_michael",
+      "speed": 0.95,
+      "pitch_semitones": -1.0
+    }
+  },
+  "voice_fx": {
+    "tempo": 1.36,
+    "max_gap": 0.12
+  },
+  "mix": {
+    "engine": "v2",
+    "music_gap": 11,
+    "music_air": -1,
+    "music_lp": 7500,
+    "sfx_gap": 5.0,
+    "reverb": 0.4,
+    "reverb_sec": 2.3,
+    "duck": 0.5
+  },
+  "phrases": [
+    {
+      "id": "hook",
+      "text": "Magnus Carlsen can name a famous chess game from a single position.",
+      "say": "[impressed] Magnus Carlsen can name a famous chess game... from a single position.",
+      "tail_db": -45,
+      "pause": 0.2,
+      "colors": {
+        "Magnus": "blue",
+        "Carlsen": "blue",
+        "single": "gold",
+        "position.": "gold"
+      }
+    },
+    {
+      "id": "potter",
+      "text": "In one test, only one position stumped him. It was from Harry Potter.",
+      "say": "In one test, only one position stumped him. [amused] It was from Harry Potter.",
+      "tail_db": -45,
+      "pause": 0.3,
+      "colors": {
+        "one": "gold",
+        "stumped": "red",
+        "Harry": "lime",
+        "Potter.": "lime"
+      }
+    },
+    {
+      "id": "seen",
+      "text": "You can surprise a human. But not a library. He has seen your position before.",
+      "say": "[dramatic] You can surprise a human. But not a library. He has seen your position... before.",
+      "tail_db": -45,
+      "pause": 0.35,
+      "colors": {
+        "human.": "red",
+        "library.": "gold",
+        "seen": "gold",
+        "before.": "gold"
+      }
+    },
+    {
+      "id": "bridge",
+      "text": "And one man built that kind of memory by copying a woodpecker.",
+      "say": "And one man built that kind of memory... [amused] by copying a woodpecker.",
+      "tail_db": -45,
+      "pause": 0.8,
+      "colors": {
+        "one": "gold",
+        "memory": "gold",
+        "woodpecker.": "lime"
+      }
+    },
+    {
+      "id": "early",
+      "text": "A grandmaster remembers whole positions. How many pawns can you? Test it on Chessigma, today's sponsor: pawns flash, then vanish, and you put them back. And its game reviews are free: more on that at the end.",
+      "say": "A grandmaster remembers whole positions. [curious] How many pawns can you? Test it on Chess-Sigma, today's sponsor: pawns flash... then vanish, and you put them back. And its game reviews are free. More on that at the end.",
+      "tail_db": -45,
+      "pause": 0.3,
+      "colors": {
+        "whole": "gold",
+        "pawns": "gold",
+        "Chessigma,": "gold",
+        "sponsor:": "gold",
+        "flash,": "lime",
+        "vanish,": "red",
+        "back.": "lime",
+        "free:": "lime",
+        "end.": "gold"
+      }
+    },
+    {
+      "id": "plan",
+      "text": "His plan sounds too simple. Over a thousand puzzles. Solve them all. Then solve the same ones again, in half the time.",
+      "say": "His plan sounds... too simple. Over a thousand puzzles. Solve them all. [dramatic] Then solve the same ones again... in half the time.",
+      "pause": 0.3,
+      "colors": {
+        "simple.": "lime",
+        "thousand": "gold",
+        "same": "lime",
+        "half": "gold"
+      }
+    },
+    {
+      "id": "cycles",
+      "text": "Four weeks. Then two. Then one. Then days, until the whole set takes one single day.",
+      "say": "Four weeks. Then two. Then one. Then days... until the whole set takes... one single day.",
+      "pause": 0.3,
+      "colors": {
+        "Four": "gold",
+        "two.": "gold",
+        "one.": "gold",
+        "single": "lime",
+        "day.": "lime"
+      }
+    },
+    {
+      "id": "why",
+      "text": "By then, he isn't calculating anymore. He just sees it.",
+      "say": "[impressed] By then, he isn't calculating anymore. He just... sees it.",
+      "pause": 0.35,
+      "colors": {
+        "calculating": "red",
+        "sees": "lime"
+      }
+    },
+    {
+      "id": "mid",
+      "text": "Chessigma's Supercoach runs this method for you. It times every cycle, and only lets you move on when you're faster and cleaner.",
+      "say": "Chess-Sigma's Supercoach runs this method for you. It times every cycle... and only lets you move on when you're faster... and cleaner.",
+      "tail_db": -45,
+      "pause": 0.3,
+      "colors": {
+        "Chessigma's": "gold",
+        "Supercoach": "gold",
+        "faster": "lime",
+        "cleaner.": "lime"
+      }
+    },
+    {
+      "id": "result",
+      "text": "As for the man in the red hat: three grandmaster norms in seven weeks. And his name? Hans Tikkanen. In Finnish, it means little woodpecker.",
+      "say": "As for the man in the red hat... three grandmaster norms, in seven weeks. [mischievously] And his name? Hans Tikkanen. In Finnish, it means... little woodpecker.",
+      "tail_db": -45,
+      "pause": 0.3,
+      "colors": {
+        "red": "red",
+        "hat:": "red",
+        "three": "gold",
+        "seven": "gold",
+        "name?": "lime",
+        "Hans": "blue",
+        "Tikkanen.": "blue",
+        "little": "gold",
+        "woodpecker.": "gold"
+      }
+    },
+    {
+      "id": "method",
+      "text": "That's why it's called the Woodpecker Method.",
+      "say": "That's why it's called... the Woodpecker Method.",
+      "pause": 0.45,
+      "colors": {
+        "Woodpecker": "lime",
+        "Method.": "lime"
+      }
+    },
+    {
+      "id": "ad1",
+      "text": "Today, you don't need a thousand printed puzzles. The sets are in Chessigma.",
+      "say": "Today, you don't need a thousand printed puzzles. The sets are in Chess-Sigma.",
+      "tail_db": -45,
+      "pause": 0.25,
+      "colors": {
+        "don't": "red",
+        "Chessigma.": "gold"
+      }
+    },
+    {
+      "id": "ad3",
+      "text": "Its coach reads your own games and builds your training plan every morning.",
+      "say": "Its coach reads your own games... and builds your training plan, every morning.",
+      "tail_db": -45,
+      "pause": 0.3,
+      "colors": {
+        "coach": "gold",
+        "plan": "lime"
+      }
+    },
+    {
+      "id": "free",
+      "text": "And the best part is free: unlimited game reviews. Every move graded, your accuracy, the best move. It's on the App Store and Google Play. Link in bio.",
+      "say": "[excited] And the best part is free: unlimited game reviews. Every move graded, your accuracy, the best move. It's on the App Store, and Google Play. Link in bio.",
+      "tail_db": -45,
+      "pause": 0.4,
+      "colors": {
+        "free:": "lime",
+        "unlimited": "gold",
+        "graded,": "lime",
+        "accuracy,": "lime",
+        "Store": "gold",
+        "Play.": "gold",
+        "bio.": "gold"
+      }
+    },
+    {
+      "id": "cta",
+      "text": "So, how many puzzles did you solve today?",
+      "say": "[curious] So... how many puzzles did you solve today?",
+      "pause": 0.0,
+      "colors": {
+        "many": "gold",
+        "today?": "lime"
+      }
+    }
+  ],
+  "bio_link": "https://www.chessigma.com/go/app/the64files",
+  "_sponsor_approval": "Script approved by Eliot Hennebo (Chessigma) on 11 Nov 2026 with edits: beat 5 is his line; all on-screen footage recorded in the Chessigma app on a phone.",
+  "post_v6": "You can surprise a human. But not a library. ♟️\nMagnus Carlsen names famous games from a single position. One man built that kind of memory by copying a woodpecker 🐦\nTest yours: Chessigma's game reviews are free and unlimited, on the App Store and Google Play. Link in bio.\nHow many puzzles did you solve today? 👇\n#ad #chessigma #chess #magnuscarlsen #woodpeckermethod #chesstok #chesspuzzles"
+}
